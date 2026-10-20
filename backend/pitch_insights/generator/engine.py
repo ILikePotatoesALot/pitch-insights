@@ -441,7 +441,8 @@ class MatchEngine:
         d.fouls += 1
         if card == "yellow":
             d.yellow = True
-        self.emit("foul", D, d, *flip(*dpos[d.id]), victim_id=c.id, card=card)
+        penalty = in_box(self.bx, self.by)
+        self.emit("foul", D, d, *flip(*dpos[d.id]), victim_id=c.id, card=card, penalty=penalty)
         if card != "none":
             self.period_counts["cards"] += 1
             d.perf -= 0.4
@@ -450,7 +451,7 @@ class MatchEngine:
             d.on = False
         self.t += self.rng.uniform(15, 35)
         att_idx = self.att
-        if in_box(self.bx, self.by):
+        if penalty:
             self.restart = ("penalty", att_idx, 94.0, 34.0)
         elif distance_to_goal(self.bx, self.by) < 28 and self.bx > 77 and self.rng.random() < 0.4:
             self.restart = ("free_kick_shot", att_idx, self.bx, self.by)

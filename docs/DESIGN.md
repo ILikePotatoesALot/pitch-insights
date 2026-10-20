@@ -36,7 +36,7 @@ Hidden generator values (match form, the script) go in a separate `match_debug` 
 | `shot` | `xg`, `outcome` (goal, saved, off_target, blocked, woodwork), `body_part`, `kind` (open_play, penalty, free_kick, header, corner), `keeper_id` |
 | `pressure` | `target_player_id` |
 | `tackle`, `interception`, `recovery`, `clearance` | `outcome` |
-| `foul` | `victim_id`, `card` (none, yellow, red) |
+| `foul` | `victim_id`, `card` (none, yellow, red), `penalty` (true if the foul was in the fouling team's own box) |
 | `substitution` | `player_off_id`, `player_on_id` |
 
 - A goal is a `shot` with outcome `goal`. A save is a `shot` with outcome `saved` and a `keeper_id`.
@@ -146,7 +146,7 @@ Code in `backend/pitch_insights/interpret/`. The `Interpreter` reads events one 
 
 | Pattern | Meaning |
 |---|---|
-| Momentum | −1 (away on top) to +1 (home on top), from threat created (xT added + xG); smoothed minute by minute, plus a per-minute series for the chart |
+| Momentum | −1 (away on top) to +1 (home on top), from threat created (xT added + xG); smoothed minute by minute, plus a per-minute series for the chart, labelled with period, broadcast minute and clock |
 | Pressure | High pressures per minute for each team |
 | Chaos | 0 (calm) to 1 (frantic), from possession changes per minute |
 | Tempo | Passes per minute, both teams |
@@ -163,8 +163,9 @@ Each team's goal rate for the rest of the match blends a prior (league average, 
 - Errors: a giveaway in a player's own third that leads to an opponent shot within 20 seconds costs points (more if it leads to a goal); so does giving away a penalty.
 - Position weighting brings every position to a similar average while rewarding what that position is for. Goals and assists count fully for everyone.
 - Playing-time damping: shown rating = 6.0 + points × minutes / (minutes + 15). Above 7.8, extra points count half (diminishing returns).
-- Every contribution is logged, so each rating comes with totals per category and its biggest moments (for the "Why?" button).
-- Calibrated with `scripts/calibrate_ratings.py` against public rating systems: average 6.75, spread 0.76, best in match about 8.4, 9.5+ in under 10% of matches (see `docs/ratings-calibration.txt`).
+- Every contribution is logged, so each rating comes with totals per category and its biggest moments (for the "Why?" button). These are scaled exactly like the rating (damping, diminishing returns, limits), so they add up to the rating minus 6.0.
+- Clean sheets: goalkeepers and defenders who played 60+ minutes earn a bonus, including those substituted late (not those sent off).
+- Calibrated with `scripts/calibrate_ratings.py` against public rating systems: average 6.8, spread 0.76, best in match about 8.5, 9.5+ in about 10% of matches, and every position averaging 6.8–6.9 (see `docs/ratings-calibration.txt`).
 
 ### Signals
 
@@ -172,7 +173,6 @@ About 20 a match, each with the numbers behind it, for the Moment Scorer to rank
 
 ### Known limits
 
-- Defenders average about 0.3 lower than other positions, because synthetic defenders make fewer defensive actions.
 - The generator's high press creates many pressures but not many extra high turnovers, so the high-press club's PPDA is not as low as a real pressing side's. The pressure index shows the pressing correctly.
 
 ## Later (not v1)

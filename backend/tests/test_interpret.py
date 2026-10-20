@@ -155,3 +155,67 @@ def test_win_probability_basics():
     assert late_lead["home"] > 0.85
     down_to_ten = win_probability(0, 0, 30, 0.5, 0.5, ph, pa, men_home=10)
     assert down_to_ten["home"] < win_probability(0, 0, 30, 0.5, 0.5, ph, pa)["home"]
+
+
+def test_breakdown_adds_up_to_the_rating(played):
+    it, _ = played
+    for p in it.snapshot()["players"].values():
+        assert abs(p["rating"] - 6.0 - sum(p["by_category"].values())) <= 0.1, p["name"]
+
+
+def test_failed_tackles_do_not_change_possession(match):
+    meta, events, _ = match
+    it = Interpreter(meta)
+    for e in events:
+        before = sum(1 for _, k, _, _ in it.patterns.items if k == "possession_change")
+        it.update(e)
+        after = sum(1 for _, k, _, _ in it.patterns.items if k == "possession_change")
+        if e["type"] == "tackle" and e["outcome"] == "lost":
+            assert after <= before
+
+
+def test_rating_changes_are_tracked_for_everyone_affected():
+    from pitch_insights.interpret.ratings import Ratings
+
+    r = Ratings({"A-01": "CM", "A-02": "ST", "B-01": "GK"})
+    r.add("A-01", 1, "1'", "goals", "assist", 0.6)
+    r.add("B-01", 1, "1'", "conceding", "goal conceded", -0.2)
+    assert r.pop_changed() == {"A-01", "B-01"}
+    assert r.pop_changed() == set()
+
+
+def test_penalties_are_flagged_on_the_foul():
+    import itertools
+
+    from pitch_insights.generator.players import load_clubs
+
+    pairs = list(itertools.permutations(sorted(load_clubs()), 2))
+    shots = signals = 0
+    for i in range(30):
+        meta, events, _ = simulate(700 + i, *pairs[i % len(pairs)])
+        _, sig = run(meta, events)
+        shots += sum(e["type"] == "shot" and e["kind"] == "penalty" for e in events)
+        signals += sum(s["type"] == "penalty_awarded" for s in sig)
+        for prev, e in zip(events, events[1:]):
+            if e["type"] == "shot" and e["kind"] == "penalty":
+                fouls = [f for f in events[:e["seq"] - 1] if f["type"] == "foul"]
+                assert fouls[-1]["penalty"] is True
+    assert shots > 0 and signals == shots
+
+
+def test_momentum_series_follows_the_match_clock(played):
+    it, _ = played
+    series = it.snapshot()["momentum_series"]
+    second = [s for s in series if s["period"] == 2]
+    assert second[0]["minute"] == 45 and second[-1]["minute"] >= 90
+    assert all(s["clock"].endswith("'") for s in series)
+
+
+def test_report_stops_at_the_requested_minute(match):
+    from pitch_insights.interpret.__main__ import stop_index
+
+    _, events, _ = match
+    i = stop_index(events, 70)
+    assert events[i - 1]["period"] == 2 and events[i - 1]["minute"] <= 70
+    assert events[i]["minute"] >= 70
+    assert stop_index(events, None) == len(events)

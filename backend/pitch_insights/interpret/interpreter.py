@@ -20,7 +20,7 @@ from collections import deque
 from pitch_insights.interpret.patterns import Patterns
 from pitch_insights.interpret.ratings import Ratings
 from pitch_insights.interpret.stats import (
-    FINAL_THIRD_X, HALFWAY_X, PlayerStats, TeamStats, in_box, is_progressive, threat_added,
+    FINAL_THIRD_X, HALFWAY_X, PlayerStats, TeamStats, is_progressive, threat_added,
 )
 from pitch_insights.interpret.winprob import prior_rate, win_probability
 
@@ -30,10 +30,6 @@ ERROR_WINDOW_S = 20.0      # a giveaway is an error if the opponent shoots withi
 SEASON_GOAL_MILESTONES = {1, 5, 10, 15, 20, 25, 30}
 CAREER_GOAL_MILESTONES = {25, 50, 75, 100, 150, 200}
 SEASON_ASSIST_MILESTONES = {5, 10, 15}
-
-
-def _own_box(x: float, y: float) -> bool:
-    return x < 16.5 and 13.85 < y < 54.15
 
 
 class Interpreter:
@@ -69,6 +65,7 @@ class Interpreter:
         self.last_pass: dict | None = None
         self.pending_errors: list[dict] = []
         self.wp = self._win_prob()
+        self._wp_minute = 0
         self.signals: list[dict] = []
         self._rating_hist: dict[str, deque] = {pid: deque() for pid in self.players}
         self._rating_marks: dict[str, set] = {pid: set() for pid in self.players}
@@ -82,6 +79,12 @@ class Interpreter:
         if ev["period"] == 2:
             return (self.first_half_end or 2700.0) + ev["t"]
         return ev["t"]
+
+    def _clock_label(self, match_seconds: float) -> tuple[int, int]:
+        """(period, broadcast minute) for a match time, e.g. 2900 s -> (2, 48) if the first half ended at 2760 s."""
+        if self.first_half_end is None or match_seconds < self.first_half_end:
+            return 1, int(match_seconds // 60)
+        return 2, 45 + int((match_seconds - self.first_half_end) // 60)
 
     def _win_prob(self) -> dict:
         return win_probability(
@@ -129,11 +132,13 @@ class Interpreter:
             self.first_half_end = ev["t"]
         self.now = self._abs_time(ev)
         self.match_minute = ev["t"] / 60 + (45 if ev["period"] == 2 else 0)
-        self.patterns.advance(self.now)
+        self.patterns.advance(self.now, self._clock_label)
         out: list[dict] = []
 
         team = ev.get("team_id")
-        if team and "possession_id" in ev and ev["type"] not in ("pressure", "foul", "substitution"):
+        # Pressures, fouls, subs and failed tackles are made by a team without the ball; they don't change possession.
+        keeps_ball = ev["type"] in ("pressure", "foul", "substitution") or (ev["type"] == "tackle" and ev["outcome"] == "lost")
+        if team and "possession_id" in ev and not keeps_ball:
             if self.possession_team is not None and team != self.possession_team:
                 self.patterns.add(self.now, "possession_change", None)
                 self.last_pass = None
@@ -143,7 +148,10 @@ class Interpreter:
         if handler:
             handler(ev, out)
 
-        self.wp = self._win_prob()
+        # Inputs change only on shots (xG, score), red cards, the end of the match, or as time passes.
+        if ev["type"] in ("shot", "foul", "match_state") or int(self.match_minute) != self._wp_minute:
+            self.wp = self._win_prob()
+            self._wp_minute = int(self.match_minute)
         self._check_ratings(ev, out)
         self._check_patterns(ev, out)
         self.signals.extend(out)
@@ -354,7 +362,7 @@ class Interpreter:
         self.players[ev["victim_id"]].fouled += 1
         if ev["x"] > 42:
             ts.defensive_actions_high += 1
-        penalty = _own_box(ev["x"], ev["y"])
+        penalty = ev.get("penalty", False)
         self._rate(pid, ev, "discipline", "foul", -0.05)
         self._rate(ev["victim_id"], ev, "attacking", "won a penalty" if penalty else "won a foul", 0.25 if penalty else 0.03)
         if penalty:
@@ -390,7 +398,10 @@ class Interpreter:
             self.finished = True
             for team in (self.home, self.away):
                 if self.score[self.other[team]] == 0:
-                    for p in self._on_pitch(team):
+                    # Everyone who played 60+ minutes earns it, including players substituted late,
+                    # but not a player who was sent off.
+                    played = [p for p in self.players.values() if p.team_id == team and p.on_at is not None and not p.red]
+                    for p in played:
                         if p.minutes(self.now) >= 60 and p.position in ("GK", "CB", "FB"):
                             bonus = 0.35 if p.position == "GK" else 0.2
                             self._rate(p.player_id, ev, "goalkeeping" if p.position == "GK" else "defending",
@@ -460,9 +471,9 @@ class Interpreter:
     # ------------------------------------------------------------ rating and pattern signals
 
     def _check_ratings(self, ev, out):
-        involved = {ev.get("player_id"), ev.get("receiver_id"), ev.get("keeper_id"), ev.get("victim_id"),
-                    ev.get("opponent_id")} - {None}
-        for pid in involved:
+        # Every player whose points changed on this event: the scorer, but also the assister,
+        # conceding defenders, a player whose earlier giveaway led to this shot, and so on.
+        for pid in sorted(self.ratings.pop_changed()):
             p = self.players.get(pid)
             if not p or p.on_at is None:
                 continue

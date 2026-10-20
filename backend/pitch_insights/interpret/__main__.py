@@ -15,6 +15,7 @@ import json
 import sys
 
 from pitch_insights.generator.io import read_match
+from pitch_insights.generator.stream import match_seconds, start_seconds
 from pitch_insights.interpret.interpreter import Interpreter
 
 TEAM_ROWS = [
@@ -27,15 +28,11 @@ TEAM_ROWS = [
 
 
 def stop_index(events: list[dict], minute: float | None) -> int:
+    """Index of the first event at or after `minute` on the broadcast clock (all events if None)."""
     if minute is None:
         return len(events)
-    for i, e in enumerate(events):
-        if e["period"] == 2 and minute <= 45:
-            return i
-        m = e["minute"] if not (e["clock"].count("+")) else e["minute"] + int(e["clock"].split("+")[1].rstrip("'"))
-        if e["period"] == (1 if minute <= 45 else 2) and m > minute:
-            return i
-    return len(events)
+    cutoff = start_seconds(events, minute)
+    return next((i for i, t in enumerate(match_seconds(events)) if t >= cutoff), len(events))
 
 
 def main(argv: list[str] | None = None):

@@ -21,6 +21,16 @@ def match_seconds(events: list[dict]) -> list[float]:
     return [e["t"] + (first_half_end if e["period"] == 2 else 0.0) for e in events]
 
 
+def start_seconds(events: list[dict], minute: float) -> float:
+    """Match time in seconds for a minute on the broadcast clock (e.g. 80 means 80:00).
+
+    Minutes up to 45 are first-half time; later minutes are measured from the start of
+    the second half, so first-half stoppage time doesn't shift them.
+    """
+    first_half_end = max((e["t"] for e in events if e["period"] == 1), default=0.0)
+    return minute * 60 if minute <= 45 else first_half_end + (minute - 45) * 60
+
+
 class Replay:
     def __init__(self, events: list[dict], speed: float = 1.0, start_at: float = 0.0, poll: float = 0.1):
         self.events = events

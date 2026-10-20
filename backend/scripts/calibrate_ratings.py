@@ -18,7 +18,7 @@ from collections import defaultdict
 from pitch_insights.generator.engine import simulate
 from pitch_insights.generator.players import load_clubs
 from pitch_insights.interpret.interpreter import Interpreter
-from pitch_insights.interpret.ratings import GROUP
+from pitch_insights.interpret.ratings import CATEGORY_LABEL, GROUP
 
 TARGETS = [
     ("Average rating (60+ min)", "mean", 6.6, 7.0),
@@ -44,8 +44,8 @@ def run(n: int, start: int) -> int:
             if p["minutes"] >= 60:
                 ratings.append(p["rating"])
                 by_group[GROUP[p["position"]]].append(p["rating"])
-                for cat, v in p["by_category"].items():
-                    by_cat[(GROUP[p["position"]], cat)].append(v)
+                for cat in CATEGORY_LABEL.values():  # a missing category counts as 0
+                    by_cat[(GROUP[p["position"]], cat)].append(p["by_category"].get(cat, 0.0))
                 match_r.append(p["rating"])
         best.append(max(match_r))
         has95 += max(match_r) >= 9.5
@@ -63,7 +63,7 @@ def run(n: int, start: int) -> int:
     print("\nAverage by position group:")
     for g, rs in sorted(by_group.items()):
         print(f"  {g:<4}{statistics.fmean(rs):.2f}  (n={len(rs)})")
-    print("\nAverage points per category (after damping):")
+    print("\nAverage points per category, per player (after damping):")
     for (g, cat), vs in sorted(by_cat.items()):
         print(f"  {g:<4}{cat:<16}{statistics.fmean(vs):+.2f}")
     print(f"\n{'All checks passed' if not failed else f'{failed} check(s) failed'}")

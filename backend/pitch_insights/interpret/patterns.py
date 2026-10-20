@@ -13,6 +13,7 @@ so they describe what is happening now rather than the whole match.
 from __future__ import annotations
 
 from collections import deque
+from typing import Callable
 
 WINDOW_S = 300.0
 
@@ -30,15 +31,24 @@ class Patterns:
     def add(self, now: float, kind: str, team: str | None, value: float = 1.0):
         self.items.append((now, kind, team or "", value))
 
-    def advance(self, now: float):
+    def advance(self, now: float, label: Callable[[float], tuple[int, int]] | None = None):
+        """Move the window to match time `now` (seconds since kick-off, without the half-time break).
+
+        `label` turns a match time into (period, broadcast minute) for the momentum series,
+        so second-half points line up with the match clock whatever the first-half stoppage time.
+        """
         self.now = now
         while self.items and self.items[0][0] < now - self.window:
             self.items.popleft()
-        minute = int(now // 60)
-        while self._last_minute < minute:
+        tick = int(now // 60)
+        while self._last_minute < tick:
             self._last_minute += 1
             self._ema = 0.6 * self._ema + 0.4 * self.momentum_raw()
-            self.momentum_series.append({"minute": self._last_minute, "value": round(self._ema * 100)})
+            period, minute = label(self._last_minute * 60) if label else (1, self._last_minute)
+            cap = 45 if period == 1 else 90
+            clock = f"{cap}+{minute - cap}'" if minute > cap else f"{minute}'"
+            self.momentum_series.append({"period": period, "minute": minute, "clock": clock,
+                                         "value": round(self._ema * 100)})
 
     def _sum(self, kind: str, team: str | None = None) -> float:
         return sum(v for _, k, t, v in self.items if k == kind and (team is None or t == team))

@@ -15,7 +15,7 @@ import asyncio
 import sys
 
 from pitch_insights.generator.io import read_match
-from pitch_insights.generator.stream import Replay, match_seconds
+from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
 
 KEY_TYPES = {"shot", "foul", "substitution", "match_state"}
 
@@ -58,7 +58,8 @@ class Commentary:
             return f"Shot: {who} ({team}){kind}, {result} (xG {ev['xg']:.2f})"
         if t == "foul":
             card = {"yellow": "  [YELLOW CARD]", "red": "  [RED CARD]"}.get(ev["card"], "")
-            return f"Foul by {who} ({team}) on {self.name(ev['victim_id'])}{card}"
+            pen = "  -> PENALTY" if ev.get("penalty") else ""
+            return f"Foul by {who} ({team}) on {self.name(ev['victim_id'])}{card}{pen}"
         if t == "substitution":
             return f"Sub ({team}): {self.name(ev['player_on_id'])} on, {self.name(ev['player_off_id'])} off"
         if t == "pass":
@@ -77,12 +78,6 @@ class Commentary:
         if t in ("interception", "recovery", "clearance"):
             return f"{who} {t.replace('interception', 'intercepts').replace('recovery', 'picks up the loose ball').replace('clearance', 'clears')} ({team})"
         return None
-
-
-def start_seconds(events: list[dict], minute: float) -> float:
-    """Match time in seconds for a minute on the broadcast clock (e.g. 80 means 80:00)."""
-    first_half_end = max(e["t"] for e in events if e["period"] == 1)
-    return minute * 60 if minute <= 45 else first_half_end + (minute - 45) * 60
 
 
 async def watch(path: str, speed: float, from_minute: float, show_all: bool, out=sys.stdout):

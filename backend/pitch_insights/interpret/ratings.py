@@ -52,6 +52,7 @@ class Ratings:
         self.group = {pid: GROUP[pos] for pid, pos in positions.items()}
         self.raw: dict[str, float] = defaultdict(float)
         self.log: dict[str, list[Contribution]] = defaultdict(list)
+        self.changed: set[str] = set()  # players whose points changed since the last pop_changed()
 
     def add(self, pid: str, seq: int, clock: str, category: str, label: str, points: float):
         if not pid or pid not in self.group:
@@ -61,26 +62,42 @@ class Ratings:
             return
         self.raw[pid] += delta
         self.log[pid].append(Contribution(seq, clock, category, label, round(delta, 4)))
+        self.changed.add(pid)
 
-    def rating(self, pid: str, minutes: float) -> float:
+    def pop_changed(self) -> set[str]:
+        changed, self.changed = self.changed, set()
+        return changed
+
+    def _shown_points(self, pid: str, minutes: float) -> tuple[float, float]:
+        """(points before damping and the knee, points actually shown above 6.0)."""
+        raw = self.raw[pid]
         damp = minutes / (minutes + DAMPING_MIN) if minutes > 0 else 0.0
-        x = self.raw[pid] * damp
+        x = raw * damp
         if x > KNEE:
             x = KNEE + (x - KNEE) * KNEE_SLOPE
-        return round(max(3.0, min(10.0, BASE + x)), 1)
+        return raw, max(3.0 - BASE, min(10.0 - BASE, x))
+
+    def rating(self, pid: str, minutes: float) -> float:
+        return round(BASE + self._shown_points(pid, minutes)[1], 1)
 
     def breakdown(self, pid: str, minutes: float, top: int = 5) -> dict:
-        """Rating, the total per category, and the biggest single contributions."""
-        damp = minutes / (minutes + DAMPING_MIN) if minutes > 0 else 0.0
+        """Rating, the points per category and the biggest single contributions.
+
+        Category totals and moments are scaled by the same factor as the rating
+        (playing-time damping, diminishing returns and the 3-10 limits), so they
+        add up to the rating minus 6.0.
+        """
+        raw, shown = self._shown_points(pid, minutes)
+        scale = shown / raw if raw else 0.0
         totals: dict[str, float] = defaultdict(float)
         for c in self.log[pid]:
             totals[c.category] += c.delta
         biggest = sorted(self.log[pid], key=lambda c: -abs(c.delta))[:top]
         return {
             "rating": self.rating(pid, minutes),
-            "by_category": {CATEGORY_LABEL[k]: round(v * damp, 2) for k, v in
-                            sorted(totals.items(), key=lambda kv: -abs(kv[1])) if abs(v * damp) >= 0.01},
-            "key_moments": [{"clock": c.clock, "label": c.label, "delta": round(c.delta * damp, 2), "seq": c.seq}
+            "by_category": {CATEGORY_LABEL[k]: round(v * scale, 2) for k, v in
+                            sorted(totals.items(), key=lambda kv: -abs(kv[1])) if abs(v * scale) >= 0.01},
+            "key_moments": [{"clock": c.clock, "label": c.label, "delta": round(c.delta * scale, 2), "seq": c.seq}
                             for c in biggest],
-            "damping": round(damp, 2),
+            "scale": round(scale, 3),
         }

@@ -69,7 +69,7 @@ Each club's style shows in its numbers: the high-press side makes the most press
 
 ## Live player ratings
 
-Every player starts at 6.0 and moves with each action, weighted by position and damped by playing time, and every change is logged so the app can show why a rating is what it is. Over 120 generated matches (`scripts/calibrate_ratings.py`): average 6.75, spread 0.76, best player in a match about 8.4, and 9.5+ in under 10% of matches, in line with public rating systems. Details in [docs/DESIGN.md](docs/DESIGN.md#interpret-stage-v1).
+Every player starts at 6.0 and moves with each action, weighted by position and damped by playing time, and every change is logged so the app can show why a rating is what it is. Over 120 generated matches (`scripts/calibrate_ratings.py`): average 6.8, spread 0.76, best player in a match about 8.5, and 9.5+ in about 10% of matches, in line with public rating systems. Every position averages 6.8–6.9. Details in [docs/DESIGN.md](docs/DESIGN.md#interpret-stage-v1).
 
 ## Credits
 
