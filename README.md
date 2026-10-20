@@ -24,7 +24,46 @@ Built for the Microsoft Premier League Hackathon (October 2026).
 
 ## Setup
 
-Copy `.env.example` to `.env` and fill in your Azure details. Setup steps for the backend and frontend will be added as they are built.
+Copy `.env.example` to `.env` and fill in your Azure details.
+
+### Backend (Python 3.12)
+
+```
+cd backend
+py -3.12 -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+### Generate a match
+
+```
+python -m pitch_insights.generate --seed 42 --home NBR --away KSW --out ../data
+python scripts/seed_search.py --story comeback --home NBR --away KSW
+python scripts/validate_realism.py      # 300 matches against real-football ranges
+pytest
+```
+
+Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
+
+## Synthetic data realism
+
+Averages over 300 generated matches (`scripts/validate_realism.py`; full output in [docs/realism-check.txt](docs/realism-check.txt)):
+
+| Stat | Generated | Real-football target |
+|---|---|---|
+| Passes per team | 556 | 400–600 |
+| Pass accuracy | 83.8% | 75–88% |
+| Shots per team | 13.5 | 8–18 |
+| xG per match | 2.9 | 2.5–3.5 |
+| Goals per match | 2.7 | 2.5–3.0 |
+| Yellow cards per match | 3.2 | 3–4 |
+| Fouls per team | 9.6 | 9–13 |
+| Corners per team | 5.0 | 4–7 |
+| Penalties per match | 0.3 | 0.2–0.4 |
+| Home win / draw / away win | 47 / 25 / 29% | about 45 / 25 / 30% |
+
+Each club's style shows in its numbers: the high-press side makes the most pressures, the possession side has the best pass accuracy, and the direct side plays the longest passes.
 
 ## Credits
 

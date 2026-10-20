@@ -1,0 +1,395 @@
+{
+  "$defs": {
+    "Attributes": {
+      "additionalProperties": false,
+      "properties": {
+        "passing": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Passing",
+          "type": "integer"
+        },
+        "vision": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Vision",
+          "type": "integer"
+        },
+        "dribbling": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Dribbling",
+          "type": "integer"
+        },
+        "shooting": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Shooting",
+          "type": "integer"
+        },
+        "pace": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Pace",
+          "type": "integer"
+        },
+        "defending": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Defending",
+          "type": "integer"
+        },
+        "pressing": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Pressing",
+          "type": "integer"
+        },
+        "stamina": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Stamina",
+          "type": "integer"
+        },
+        "aerial": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Aerial",
+          "type": "integer"
+        },
+        "goalkeeping": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Goalkeeping",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "passing",
+        "vision",
+        "dribbling",
+        "shooting",
+        "pace",
+        "defending",
+        "pressing",
+        "stamina",
+        "aerial",
+        "goalkeeping"
+      ],
+      "title": "Attributes",
+      "type": "object"
+    },
+    "MatchInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        },
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "competition": {
+          "title": "Competition",
+          "type": "string"
+        },
+        "matchday": {
+          "title": "Matchday",
+          "type": "integer"
+        },
+        "venue": {
+          "title": "Venue",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "seed",
+        "date",
+        "competition",
+        "matchday",
+        "venue"
+      ],
+      "title": "MatchInfo",
+      "type": "object"
+    },
+    "Player": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "number": {
+          "title": "Number",
+          "type": "integer"
+        },
+        "position": {
+          "enum": [
+            "GK",
+            "CB",
+            "FB",
+            "DM",
+            "CM",
+            "AM",
+            "W",
+            "ST"
+          ],
+          "title": "Position",
+          "type": "string"
+        },
+        "foot": {
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Foot",
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/$defs/Attributes"
+        },
+        "history": {
+          "$ref": "#/$defs/PlayerHistory"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "number",
+        "position",
+        "foot",
+        "attributes",
+        "history"
+      ],
+      "title": "Player",
+      "type": "object"
+    },
+    "PlayerHistory": {
+      "additionalProperties": false,
+      "properties": {
+        "season_apps": {
+          "title": "Season Apps",
+          "type": "integer"
+        },
+        "season_goals": {
+          "title": "Season Goals",
+          "type": "integer"
+        },
+        "season_assists": {
+          "title": "Season Assists",
+          "type": "integer"
+        },
+        "season_clean_sheets": {
+          "title": "Season Clean Sheets",
+          "type": "integer"
+        },
+        "club_career_goals": {
+          "title": "Club Career Goals",
+          "type": "integer"
+        },
+        "last5_ratings": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Last5 Ratings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "season_apps",
+        "season_goals",
+        "season_assists",
+        "season_clean_sheets",
+        "club_career_goals",
+        "last5_ratings"
+      ],
+      "title": "PlayerHistory",
+      "type": "object"
+    },
+    "Team": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "short_name": {
+          "title": "Short Name",
+          "type": "string"
+        },
+        "colours": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Keys: primary, secondary (hex)",
+          "title": "Colours",
+          "type": "object"
+        },
+        "formation": {
+          "title": "Formation",
+          "type": "string"
+        },
+        "style": {
+          "enum": [
+            "possession",
+            "high_press",
+            "direct",
+            "counter"
+          ],
+          "title": "Style",
+          "type": "string"
+        },
+        "starting": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 11,
+          "minItems": 11,
+          "title": "Starting",
+          "type": "array"
+        },
+        "bench": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 9,
+          "title": "Bench",
+          "type": "array"
+        },
+        "players": {
+          "items": {
+            "$ref": "#/$defs/Player"
+          },
+          "title": "Players",
+          "type": "array"
+        },
+        "history": {
+          "$ref": "#/$defs/TeamHistory"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "short_name",
+        "colours",
+        "formation",
+        "style",
+        "starting",
+        "bench",
+        "players",
+        "history"
+      ],
+      "title": "Team",
+      "type": "object"
+    },
+    "TeamHistory": {
+      "additionalProperties": false,
+      "properties": {
+        "league_position": {
+          "title": "League Position",
+          "type": "integer"
+        },
+        "last5": {
+          "items": {
+            "enum": [
+              "W",
+              "D",
+              "L"
+            ],
+            "type": "string"
+          },
+          "title": "Last5",
+          "type": "array"
+        },
+        "current_run": {
+          "title": "Current Run",
+          "type": "string"
+        },
+        "head_to_head": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "Keys: wins, draws, losses vs this opponent",
+          "title": "Head To Head",
+          "type": "object"
+        }
+      },
+      "required": [
+        "league_position",
+        "last5",
+        "current_run",
+        "head_to_head"
+      ],
+      "title": "TeamHistory",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "const": "match_meta",
+      "default": "match_meta",
+      "title": "Type",
+      "type": "string"
+    },
+    "schema": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema",
+      "type": "string"
+    },
+    "match": {
+      "$ref": "#/$defs/MatchInfo"
+    },
+    "home": {
+      "$ref": "#/$defs/Team"
+    },
+    "away": {
+      "$ref": "#/$defs/Team"
+    },
+    "pitch": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Pitch",
+      "type": "object"
+    },
+    "attacking_direction": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "enum": [
+            "left_to_right",
+            "right_to_left"
+          ],
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "description": "Per period ('1', '2'), per team id",
+      "title": "Attacking Direction",
+      "type": "object"
+    }
+  },
+  "required": [
+    "match",
+    "home",
+    "away",
+    "attacking_direction"
+  ],
+  "title": "MatchMeta",
+  "type": "object"
+}

@@ -1,0 +1,2049 @@
+{
+  "$defs": {
+    "Carry": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "carry",
+          "default": "carry",
+          "title": "Type",
+          "type": "string"
+        },
+        "end_x": {
+          "maximum": 105.0,
+          "minimum": 0,
+          "title": "End X",
+          "type": "number"
+        },
+        "end_y": {
+          "maximum": 68.0,
+          "minimum": 0,
+          "title": "End Y",
+          "type": "number"
+        },
+        "duration": {
+          "minimum": 0,
+          "title": "Duration",
+          "type": "number"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "end_x",
+        "end_y",
+        "duration"
+      ],
+      "title": "Carry",
+      "type": "object"
+    },
+    "Clearance": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "clearance",
+          "default": "clearance",
+          "title": "Type",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "won",
+            "lost"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "outcome"
+      ],
+      "title": "Clearance",
+      "type": "object"
+    },
+    "Dribble": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "dribble",
+          "default": "dribble",
+          "title": "Type",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "won",
+            "lost"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "opponent_id": {
+          "title": "Opponent Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "outcome",
+        "opponent_id"
+      ],
+      "title": "Dribble",
+      "type": "object"
+    },
+    "Foul": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "foul",
+          "default": "foul",
+          "title": "Type",
+          "type": "string"
+        },
+        "victim_id": {
+          "title": "Victim Id",
+          "type": "string"
+        },
+        "card": {
+          "default": "none",
+          "enum": [
+            "none",
+            "yellow",
+            "red"
+          ],
+          "title": "Card",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "victim_id"
+      ],
+      "title": "Foul",
+      "type": "object"
+    },
+    "Interception": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "interception",
+          "default": "interception",
+          "title": "Type",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "won",
+            "lost"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "outcome"
+      ],
+      "title": "Interception",
+      "type": "object"
+    },
+    "MatchState": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "match_state",
+          "default": "match_state",
+          "title": "Type",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "kickoff",
+            "half_time",
+            "full_time"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "state"
+      ],
+      "title": "MatchState",
+      "type": "object"
+    },
+    "Pass": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "pass",
+          "default": "pass",
+          "title": "Type",
+          "type": "string"
+        },
+        "end_x": {
+          "maximum": 105.0,
+          "minimum": 0,
+          "title": "End X",
+          "type": "number"
+        },
+        "end_y": {
+          "maximum": 68.0,
+          "minimum": 0,
+          "title": "End Y",
+          "type": "number"
+        },
+        "receiver_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receiver Id"
+        },
+        "outcome": {
+          "enum": [
+            "complete",
+            "incomplete",
+            "out"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "length": {
+          "minimum": 0,
+          "title": "Length",
+          "type": "number"
+        },
+        "height": {
+          "enum": [
+            "ground",
+            "low",
+            "high"
+          ],
+          "title": "Height",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "open_play",
+            "cross",
+            "through_ball",
+            "long_ball",
+            "corner",
+            "free_kick",
+            "throw_in",
+            "goal_kick",
+            "kickoff"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "difficulty": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Difficulty",
+          "type": "number"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "end_x",
+        "end_y",
+        "outcome",
+        "length",
+        "height",
+        "kind",
+        "difficulty"
+      ],
+      "title": "Pass",
+      "type": "object"
+    },
+    "Pressure": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "pressure",
+          "default": "pressure",
+          "title": "Type",
+          "type": "string"
+        },
+        "target_player_id": {
+          "title": "Target Player Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "target_player_id"
+      ],
+      "title": "Pressure",
+      "type": "object"
+    },
+    "Recovery": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "recovery",
+          "default": "recovery",
+          "title": "Type",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "won",
+            "lost"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "outcome"
+      ],
+      "title": "Recovery",
+      "type": "object"
+    },
+    "Shot": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "shot",
+          "default": "shot",
+          "title": "Type",
+          "type": "string"
+        },
+        "xg": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Xg",
+          "type": "number"
+        },
+        "outcome": {
+          "enum": [
+            "goal",
+            "saved",
+            "off_target",
+            "blocked",
+            "woodwork"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "body_part": {
+          "enum": [
+            "left_foot",
+            "right_foot",
+            "head"
+          ],
+          "title": "Body Part",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "open_play",
+            "penalty",
+            "free_kick",
+            "header",
+            "corner"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "keeper_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Keeper Id"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "xg",
+        "outcome",
+        "body_part",
+        "kind"
+      ],
+      "title": "Shot",
+      "type": "object"
+    },
+    "Substitution": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "substitution",
+          "default": "substitution",
+          "title": "Type",
+          "type": "string"
+        },
+        "player_off_id": {
+          "title": "Player Off Id",
+          "type": "string"
+        },
+        "player_on_id": {
+          "title": "Player On Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "player_off_id",
+        "player_on_id"
+      ],
+      "title": "Substitution",
+      "type": "object"
+    },
+    "Tackle": {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema",
+          "type": "string"
+        },
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "source": {
+          "default": "synthetic",
+          "enum": [
+            "synthetic",
+            "video"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "t": {
+          "description": "Seconds since the current period started",
+          "minimum": 0,
+          "title": "T",
+          "type": "number"
+        },
+        "period": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Period",
+          "type": "integer"
+        },
+        "clock": {
+          "description": "Display clock, e.g. \"45+2'\"",
+          "title": "Clock",
+          "type": "string"
+        },
+        "minute": {
+          "maximum": 130,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "integer"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team Id"
+        },
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "possession_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Possession Id"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "maximum": 105.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "maximum": 68.0,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        },
+        "under_pressure": {
+          "default": false,
+          "title": "Under Pressure",
+          "type": "boolean"
+        },
+        "confidence": {
+          "default": 1.0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "type": {
+          "const": "tackle",
+          "default": "tackle",
+          "title": "Type",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "won",
+            "lost"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "match_id",
+        "seq",
+        "t",
+        "period",
+        "clock",
+        "minute",
+        "outcome"
+      ],
+      "title": "Tackle",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "carry": "#/$defs/Carry",
+      "clearance": "#/$defs/Clearance",
+      "dribble": "#/$defs/Dribble",
+      "foul": "#/$defs/Foul",
+      "interception": "#/$defs/Interception",
+      "match_state": "#/$defs/MatchState",
+      "pass": "#/$defs/Pass",
+      "pressure": "#/$defs/Pressure",
+      "recovery": "#/$defs/Recovery",
+      "shot": "#/$defs/Shot",
+      "substitution": "#/$defs/Substitution",
+      "tackle": "#/$defs/Tackle"
+    },
+    "propertyName": "type"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/MatchState"
+    },
+    {
+      "$ref": "#/$defs/Pass"
+    },
+    {
+      "$ref": "#/$defs/Carry"
+    },
+    {
+      "$ref": "#/$defs/Dribble"
+    },
+    {
+      "$ref": "#/$defs/Shot"
+    },
+    {
+      "$ref": "#/$defs/Pressure"
+    },
+    {
+      "$ref": "#/$defs/Tackle"
+    },
+    {
+      "$ref": "#/$defs/Interception"
+    },
+    {
+      "$ref": "#/$defs/Recovery"
+    },
+    {
+      "$ref": "#/$defs/Clearance"
+    },
+    {
+      "$ref": "#/$defs/Foul"
+    },
+    {
+      "$ref": "#/$defs/Substitution"
+    }
+  ]
+}

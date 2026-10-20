@@ -1,0 +1,131 @@
+# Fictional clubs and players for the synthetic generator.
+#
+# Every club, place and person here is invented. Player surnames are blends that
+# nod to real players without using any real full name or whole real surname.
+#
+# Player line format: "number | name | position | foot | quality | traits"
+#   position: GK CB FB DM CM AM W ST
+#   quality:  overall ability, 50-90 (attributes are derived from it, see players.py)
+#   traits:   comma-separated, optional: playmaker, speedster, finisher, target_man,
+#             presser, ball_winner, dribbler, sweeper_keeper, crosser
+# Optional per-player overrides: add an entry under `overrides` with exact attributes.
+
+league: Fictional Premier Division
+season_matchday: 14
+
+clubs:
+  - id: NBR
+    name: Northbridge FC
+    short_name: Northbridge
+    venue: Harbour Lane
+    colours: {primary: "#1B2A4A", secondary: "#7FB3E6"}
+    formation: "4-3-3"
+    style: possession
+    players:
+      - "1  | Dario Raymsdale    | GK | right | 80 | sweeper_keeper"
+      - "13 | Felix Pickaro      | GK | right | 70 |"
+      - "4  | Oskar Sabeliba     | CB | right | 82 | ball_winner"
+      - "5  | Tomas Vandikoné    | CB | right | 84 |"
+      - "15 | Lior Stonsberg     | CB | right | 74 | playmaker"
+      - "22 | Jonah Guehilo      | CB | left  | 71 |"
+      - "2  | Enzo Trentowski    | FB | right | 81 | playmaker, crosser"
+      - "3  | Maro Robbelli      | FB | left  | 78 | crosser"
+      - "12 | Caio Wolkeroy      | FB | right | 72 | speedster"
+      - "26 | Nils Chilvaro      | FB | left  | 68 |"
+      - "6  | Ruben Raisman      | DM | right | 83 | ball_winner"
+      - "18 | Pau Casemirez      | DM | right | 73 |"
+      - "8  | Kaito Odebelling   | CM | left  | 86 | playmaker"
+      - "16 | Iker Macallio      | CM | right | 79 | presser"
+      - "23 | Sven Gündonaldo    | CM | right | 72 | playmaker"
+      - "10 | Leandro Fodelli    | AM | left  | 84 | dribbler, playmaker"
+      - "7  | Yuri Sakinelli     | W  | left  | 85 | dribbler, crosser"
+      - "11 | Tiago Madekuta     | W  | left  | 76 | speedster"
+      - "9  | Teo Haalmer        | ST | left  | 87 | finisher"
+      - "19 | Bastian Watkinez   | ST | right | 74 | finisher"
+
+  - id: KSW
+    name: Kingswell Athletic
+    short_name: Kingswell
+    venue: The Kilnworks
+    colours: {primary: "#C8102E", secondary: "#FFFFFF"}
+    formation: "4-2-3-1"
+    style: high_press
+    players:
+      - "1  | Emil Alissandro    | GK | right | 82 | sweeper_keeper"
+      - "31 | Bram Kellevoort    | GK | right | 68 |"
+      - "4  | Rasmus Konavadi    | CB | right | 80 | ball_winner"
+      - "5  | Aurelio Gvardosz   | CB | left  | 79 |"
+      - "14 | Wes Mavrapanti     | CB | right | 72 |"
+      - "24 | Ilan Toswani       | CB | right | 69 |"
+      - "2  | Joaquín Frimpander | FB | right | 79 | speedster, presser"
+      - "3  | Milo Grimaldes     | FB | left  | 77 | presser"
+      - "17 | Arlo Hakimović     | FB | right | 71 | speedster"
+      - "29 | Teddy Davineau     | FB | left  | 66 |"
+      - "6  | Moritz Kimmedor    | DM | right | 81 | ball_winner, presser"
+      - "20 | Ezra Caicombe      | DM | right | 75 | presser"
+      - "8  | Florin Virtzano    | CM | right | 83 | playmaker, presser"
+      - "16 | Dani Szobalenko    | CM | right | 78 | presser"
+      - "25 | Ollie Gravenbach   | CM | left  | 70 |"
+      - "10 | Jonas Musialetti   | AM | right | 85 | dribbler"
+      - "7  | Brice Mbeulier     | W  | right | 80 | speedster, presser"
+      - "11 | Kofi Doküssler     | W  | left  | 78 | dribbler"
+      - "9  | Anders Gyokerland    | ST | right | 83 | finisher, presser"
+      - "19 | Hugo Isarkowski     | ST | right | 75 | finisher"
+
+  - id: IRM
+    name: Ironmoor United
+    short_name: Ironmoor
+    venue: Foundry Road
+    colours: {primary: "#E8A317", secondary: "#111111"}
+    formation: "4-4-2"
+    style: direct
+    players:
+      - "1  | Gareth Pickvardt   | GK | right | 76 |"
+      - "12 | Callum Flekmore    | GK | right | 66 |"
+      - "5  | Hal Maguvolt       | CB | right | 78 | target_man"
+      - "6  | Rhys Donkerton     | CB | right | 77 | target_man"
+      - "15 | Kieran Bernholt    | CB | left  | 70 |"
+      - "23 | Sam Coaderford      | CB | right | 66 |"
+      - "2  | Reece Lampwick     | FB | right | 72 | crosser"
+      - "3  | Ashley Shacroft    | FB | left  | 74 | crosser"
+      - "21 | Dion Aarnley       | FB | right | 66 |"
+      - "26 | Jack Udogbe        | FB | left  | 64 |"
+      - "4  | Declan Phillwood   | DM | right | 75 | ball_winner"
+      - "18 | Ross Wardleigh     | DM | right | 68 |"
+      - "8  | Owen Gallasher     | CM | right | 76 | presser"
+      - "14 | Kit Willonby       | CM | left  | 72 |"
+      - "16 | Rory Gilmerton     | CM | right | 69 | playmaker"
+      - "10 | Ezio Zahara        | AM | right | 74 | dribbler"
+      - "7  | Jordy Bowerman     | W  | left  | 79 | crosser"
+      - "11 | Aiden Gordale      | W  | right | 76 | speedster, crosser"
+      - "9  | Nathan Calvertson  | ST | right | 80 | target_man, finisher"
+      - "19 | Remy Wattsbury     | ST | right | 73 | target_man"
+
+  - id: RVH
+    name: Ravensholt City
+    short_name: Ravensholt
+    venue: Corvid Park
+    colours: {primary: "#2E7D4F", secondary: "#F2E8CF"}
+    formation: "4-1-4-1"
+    style: counter
+    players:
+      - "1  | Bernd Flekhagen    | GK | right | 77 |"
+      - "13 | Mads Vicarion      | GK | right | 67 |"
+      - "4  | Ezri Konsatou      | CB | right | 78 | ball_winner"
+      - "5  | Joel Andervik      | CB | left  | 76 |"
+      - "6  | Max Kilmarov       | CB | right | 71 |"
+      - "28 | Theo Colinsworth   | CB | right | 66 |"
+      - "2  | Pedro Porrance     | FB | right | 74 | speedster"
+      - "3  | Destin Udoroma     | FB | left  | 73 | speedster"
+      - "22 | Femi Aïnsley        | FB | right | 67 |"
+      - "27 | Rico Tsimikal      | FB | left  | 64 |"
+      - "8  | Moussa Bissolatte    | DM | right | 76 | ball_winner"
+      - "18 | Ibou Onanor        | DM | right | 69 |"
+      - "14 | Elias Rogerfield    | CM | right | 77 | dribbler"
+      - "20 | Davi Paquerro      | CM | left  | 75 | playmaker"
+      - "16 | Rowan Andersford   | CM | right | 70 |"
+      - "10 | Nico Mbeumonte     | AM | right | 76 | dribbler, speedster"
+      - "7  | Kwesi Kudalah         | W  | left  | 81 | speedster, dribbler"
+      - "11 | Kwame Semenello    | W  | right | 77 | speedster"
+      - "9  | Liam Woodelson     | ST | right | 78 | finisher"
+      - "19 | Tayo Awoniyama     | ST | right | 71 | speedster"

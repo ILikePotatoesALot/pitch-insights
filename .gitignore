@@ -6,6 +6,7 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+.pytest_tmp/
 
 # Node
 node_modules/
@@ -22,3 +23,6 @@ output/
 Thumbs.db
 .vscode/
 .idea/
+
+# Build output
+*.egg-info/
