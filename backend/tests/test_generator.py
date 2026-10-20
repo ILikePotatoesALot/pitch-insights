@@ -161,3 +161,28 @@ def test_replay_never_runs_ahead(match):
 
     got = asyncio.run(asyncio.wait_for(first_two(), timeout=5))
     assert all(match_seconds(events)[e["seq"] - 1] <= replay.now + 1e-6 for e in got)
+
+
+def test_watch_prints_every_goal_and_final_score(match, tmp_path):
+    import io
+
+    from pitch_insights.watch import watch
+
+    meta, events, debug = match
+    path = write_match(tmp_path, meta, events, debug)
+    out = io.StringIO()
+    asyncio.run(watch(str(path), speed=1e6, from_minute=0, show_all=False, out=out))
+    text = out.getvalue()
+    goals = sum(e["type"] == "shot" and e["outcome"] == "goal" for e in events)
+    assert text.count("GOAL!") == goals
+    assert "Full-time" in text.splitlines()[-1]
+
+
+def test_watch_all_events_has_a_line_for_each(match, tmp_path):
+    import io
+
+    from pitch_insights.watch import Commentary
+
+    meta, events, _ = match
+    c = Commentary(meta)
+    assert all(c.describe(e) for e in events)

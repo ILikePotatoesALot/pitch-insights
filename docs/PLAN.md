@@ -21,6 +21,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - **Synthetic generator** (main feed): possession chains, player profiles, pass difficulty, xG for shots, scripted storylines, a fake season history for milestones, and seeds so matches replay exactly. A check script compares output with real match averages.
 - **Video path** (core; keep-or-cut decision on day 4): Roboflow pre-trained football model, ByteTrack, team colours, homography, then a Video Ingest agent writing the same event format. Clips are processed ahead of time and replayed at match speed. Supplies real speed and distance.
 - Stream over WebSocket or Server-Sent Events; Azure Event Hubs optional.
+- Two ways to run a match: **replay** (default: generated up front, released on the match clock, with seek) and **live simulation** (generated step by step, with mid-match interventions from a Scenario Director agent; interventions are logged so the match can be replayed exactly).
 
 ## 2. Interpret (code first)
 
@@ -63,12 +64,12 @@ A live "match brain": specialist agents turn football events into scored, eviden
 | 1 | 20 Oct | Register, Azure account, Foundry model | Repo skeleton, event format, generator v1 |
 | 2 | 21 Oct | Pick footage clips | Stats, patterns, ratings; run detector on clips |
 | 3 | 22 Oct | Check generated matches feel real | Tracking, homography, video-to-events |
-| 4 | 23 Oct | Decide on the video path | Agents: scorer, explainer, narrator |
-| 5 | 24 Oct | Personas, test explanations | Vite app and Three.js pitch |
+| 4 | 23 Oct | Decide on the video path | Agents: scorer, explainer, narrator; live simulation mode |
+| 5 | 24 Oct | Personas, test explanations | Vite app and Three.js pitch; Scenario Director agent steering live matches |
 | 6 | 25 Oct | Test the UI | Overlays, personalizer, multi-language |
 | 7 | 26 Oct | Demo script | Deploy to Azure, README |
 | 8 | 27 Oct | Record video, submit | Final fixes, check repo is public |
 
 ## Cut first if behind
 
-Speech audio, then Event Hubs, then 3D polish. Never cut the five stages or the demo video.
+Speech audio, then Event Hubs, then live simulation mode (replay still covers the demo), then 3D polish. Never cut the five stages or the demo video.

@@ -39,6 +39,7 @@ pip install -e ".[dev]"
 
 ```
 python -m pitch_insights.generate --seed 42 --home POT --away CAR --out ../data
+python -m pitch_insights.watch ../samples/comeback-POT-CAR.jsonl --speed 60 --from 80   # watch it play out
 python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
 pytest
