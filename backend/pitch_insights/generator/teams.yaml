@@ -14,9 +14,9 @@ league: Fictional Premier Division
 season_matchday: 14
 
 clubs:
-  - id: NBR
-    name: Northbridge FC
-    short_name: Northbridge
+  - id: POT
+    name: Potato FC
+    short_name: Potato
     venue: Harbour Lane
     colours: {primary: "#1B2A4A", secondary: "#7FB3E6"}
     formation: "4-3-3"
@@ -43,9 +43,9 @@ clubs:
       - "9  | Teo Haalmer        | ST | left  | 87 | finisher"
       - "19 | Bastian Watkinez   | ST | right | 74 | finisher"
 
-  - id: KSW
-    name: Kingswell Athletic
-    short_name: Kingswell
+  - id: CAR
+    name: Carrot FC
+    short_name: Carrot
     venue: The Kilnworks
     colours: {primary: "#C8102E", secondary: "#FFFFFF"}
     formation: "4-2-3-1"
@@ -72,9 +72,9 @@ clubs:
       - "9  | Anders Gyokerland    | ST | right | 83 | finisher, presser"
       - "19 | Hugo Isarkowski     | ST | right | 75 | finisher"
 
-  - id: IRM
-    name: Ironmoor United
-    short_name: Ironmoor
+  - id: BRO
+    name: Broccoli FC
+    short_name: Broccoli
     venue: Foundry Road
     colours: {primary: "#E8A317", secondary: "#111111"}
     formation: "4-4-2"
@@ -101,9 +101,9 @@ clubs:
       - "9  | Nathan Calvertson  | ST | right | 80 | target_man, finisher"
       - "19 | Remy Wattsbury     | ST | right | 73 | target_man"
 
-  - id: RVH
-    name: Ravensholt City
-    short_name: Ravensholt
+  - id: CAU
+    name: Cauliflower FC
+    short_name: Cauliflower
     venue: Corvid Park
     colours: {primary: "#2E7D4F", secondary: "#F2E8CF"}
     formation: "4-1-4-1"

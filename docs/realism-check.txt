@@ -1,27 +1,27 @@
 
 Check                        Average   Target
-Passes per team                556.1   400-600  ok
-Pass accuracy %                 83.8   75-88  ok
+Passes per team                554.4   400-600  ok
+Pass accuracy %                 83.9   75-88  ok
 Shots per team                  13.5   8-18  ok
-xG per match                     2.9   2.5-3.5  ok
-Goals per match                  2.7   2.5-3.0  ok
+xG per match                     2.8   2.5-3.5  ok
+Goals per match                  2.9   2.5-3.0  ok
 Yellow cards per match           3.2   3-4  ok
-Fouls per team                   9.6   9-13  ok
+Fouls per team                   9.4   9-13  ok
 Corners per team                 5.0   4-7  ok
-Tackles per team                13.6   12-22  ok
-Pressures per team             119.8   100-180  ok
-Subs per team                    4.4   3-5  ok
+Tackles per team                13.8   12-22  ok
+Pressures per team             123.0   100-180  ok
+Subs per team                    4.2   3-5  ok
 Penalties per match              0.3   0.2-0.4  ok
-Red cards per match              0.2   0.05-0.2  ok
-Events per match              1905.3   1600-2000  ok
+Red cards per match              0.1   0.05-0.2  ok
+Events per match              1914.0   1600-2000  ok
 
-Home W/D/L: 140/74/86 (real football: about 45/25/30 %)
+Home W/D/L: 129/73/98 (real football: about 45/25/30 %)
 
 Club  style        pass acc pass len pressures  shots  goals
-IRM   direct           74.1     26.8     134.3    8.8   0.76
-KSW   high_press       87.4     19.9     189.7   17.5   2.19
-NBR   possession       90.8     18.0      94.2   17.1   1.80
-RVH   counter          82.7     22.7      60.8   10.6   0.67
+BRO   direct           75.0     26.7     126.5    9.6   0.85
+CAR   high_press       86.6     19.9     196.4   16.9   2.08
+CAU   counter          84.1     22.6      61.1   11.8   0.89
+POT   possession       89.8     18.1     108.1   15.8   1.90
 
 High-press club has the most pressures        ok
 Possession club has the best pass accuracy    ok

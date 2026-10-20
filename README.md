@@ -38,8 +38,8 @@ pip install -e ".[dev]"
 ### Generate a match
 
 ```
-python -m pitch_insights.generate --seed 42 --home NBR --away KSW --out ../data
-python scripts/seed_search.py --story comeback --home NBR --away KSW
+python -m pitch_insights.generate --seed 42 --home POT --away CAR --out ../data
+python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
 pytest
 ```
@@ -52,16 +52,16 @@ Averages over 300 generated matches (`scripts/validate_realism.py`; full output 
 
 | Stat | Generated | Real-football target |
 |---|---|---|
-| Passes per team | 556 | 400–600 |
-| Pass accuracy | 83.8% | 75–88% |
+| Passes per team | 554 | 400–600 |
+| Pass accuracy | 83.9% | 75–88% |
 | Shots per team | 13.5 | 8–18 |
-| xG per match | 2.9 | 2.5–3.5 |
-| Goals per match | 2.7 | 2.5–3.0 |
+| xG per match | 2.8 | 2.5–3.5 |
+| Goals per match | 2.9 | 2.5–3.0 |
 | Yellow cards per match | 3.2 | 3–4 |
-| Fouls per team | 9.6 | 9–13 |
+| Fouls per team | 9.4 | 9–13 |
 | Corners per team | 5.0 | 4–7 |
 | Penalties per match | 0.3 | 0.2–0.4 |
-| Home win / draw / away win | 47 / 25 / 29% | about 45 / 25 / 30% |
+| Home win / draw / away win | 43 / 24 / 33% | about 45 / 25 / 30% |
 
 Each club's style shows in its numbers: the high-press side makes the most pressures, the possession side has the best pass accuracy, and the direct side plays the longest passes.
 

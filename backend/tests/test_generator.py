@@ -13,16 +13,16 @@ from pitch_insights.generator.stream import Replay, match_seconds
 
 @pytest.fixture(scope="module")
 def match():
-    return simulate(7, "NBR", "KSW")
+    return simulate(7, "POT", "CAR")
 
 
 def test_same_seed_same_match(match):
-    again = simulate(7, "NBR", "KSW")
+    again = simulate(7, "POT", "CAR")
     assert json.dumps(match, sort_keys=True) == json.dumps(again, sort_keys=True)
 
 
 def test_different_seed_different_match(match):
-    other = simulate(8, "NBR", "KSW")
+    other = simulate(8, "POT", "CAR")
     assert other[1] != match[1]
 
 
@@ -92,20 +92,20 @@ def test_debug_values_stay_out_of_meta(match):
         for p in meta[side]["players"]:
             assert "form" not in p
     assert "script" not in meta
-    assert set(debug["form"]) == {"NBR", "KSW"}
+    assert set(debug["form"]) == {"POT", "CAR"}
 
 
 def test_forced_red_card():
-    script = script_from_dict({"forced": [{"minute": 30, "type": "red_card", "team": "KSW"}]})
-    _, events, _ = simulate(11, "NBR", "KSW", script)
-    reds = [e for e in events if e["type"] == "foul" and e["card"] == "red" and e["team_id"] == "KSW"]
+    script = script_from_dict({"forced": [{"minute": 30, "type": "red_card", "team": "CAR"}]})
+    _, events, _ = simulate(11, "POT", "CAR", script)
+    reds = [e for e in events if e["type"] == "foul" and e["card"] == "red" and e["team_id"] == "CAR"]
     assert reds and reds[0]["minute"] >= 30
 
 
 def test_forced_substitution():
-    script = script_from_dict({"forced": [{"minute": 20, "type": "substitution", "team": "NBR"}]})
-    _, events, _ = simulate(12, "NBR", "KSW", script)
-    first = next(e for e in events if e["type"] == "substitution" and e["team_id"] == "NBR")
+    script = script_from_dict({"forced": [{"minute": 20, "type": "substitution", "team": "POT"}]})
+    _, events, _ = simulate(12, "POT", "CAR", script)
+    first = next(e for e in events if e["type"] == "substitution" and e["team_id"] == "POT")
     assert first["period"] == 1 and first["minute"] >= 20
 
 

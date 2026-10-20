@@ -3,13 +3,13 @@
 Example (YAML):
 
     seed: 42
-    home: NBR
-    away: KSW
+    home: POT
+    away: CAR
     phases:
-      - {from: 60, to: 72, team: NBR, press: 0.4, directness: 0.2, attack: 0.3}
+      - {from: 60, to: 72, team: POT, press: 0.4, directness: 0.2, attack: 0.3}
     forced:
-      - {minute: 58, type: red_card, team: KSW}
-      - {minute: 65, type: substitution, team: NBR}
+      - {minute: 58, type: red_card, team: CAR}
+      - {minute: 65, type: substitution, team: POT}
 
 Phases only change probabilities, so the score is never forced. Red cards and
 substitutions can be forced because they are decisions, not luck.

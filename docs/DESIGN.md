@@ -45,8 +45,8 @@ Hidden generator values (match form, the script) go in a separate `match_debug` 
 
 ### IDs
 
-- Clubs: 3-letter codes, e.g. `NBR`.
-- Players: club plus squad number, e.g. `NBR-07`.
+- Clubs: 3-letter codes, e.g. `POT`.
+- Players: club plus squad number, e.g. `POT-07`.
 - Matches: `SYN-<seed>`. Demo matches keep their seed and get a friendly file name in `samples/`.
 
 ### Enforcement
@@ -79,7 +79,7 @@ position = formation anchor
 
 ### Clubs and players
 
-- 4 fictional clubs in a fictional league, one per style: possession, high press, direct, counter-attack. Invented town names.
+- 4 fictional clubs in a fictional league, one per style: possession, high press, direct, counter-attack. Named after vegetables: Potato FC (possession), Carrot FC (high press), Broccoli FC (direct), Cauliflower FC (counter).
 - 20 players per club. Names use blended surnames and invented first names; no real full name or whole real surname.
 - Attributes 0–100 (hidden ability): passing, vision, dribbling, shooting, pace, defending, pressing, stamina, aerial, plus goalkeeping. Also position, preferred foot, and a hidden match form value (−5 to +5) set by the seed.
 - Match ratings (3.0–10.0, start at 6.0) are a separate, visible scale worked out from events in the Interpret stage.

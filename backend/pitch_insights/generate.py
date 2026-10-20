@@ -1,7 +1,7 @@
 """Generate synthetic matches.
 
     python -m pitch_insights.generate --seed 42
-    python -m pitch_insights.generate --seed 42 --home NBR --away KSW --out data
+    python -m pitch_insights.generate --seed 42 --home POT --away CAR --out data
     python -m pitch_insights.generate --script scripts/derby.yaml
 """
 

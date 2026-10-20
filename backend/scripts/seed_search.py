@@ -1,7 +1,7 @@
 """Find seeds whose match tells a chosen story, for demo matches.
 
-    python scripts/seed_search.py --story comeback --home NBR --away KSW
-    python scripts/seed_search.py --story late_winner --count 3 --save ../samples --name late-winner-NBR-KSW
+    python scripts/seed_search.py --story comeback --home POT --away CAR
+    python scripts/seed_search.py --story late_winner --count 3 --save ../samples --name late-winner-POT-CAR
 
 Stories: comeback, late_winner, red_card_swing, high_scoring, goalless, thriller
 """
