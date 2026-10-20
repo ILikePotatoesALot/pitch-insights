@@ -36,7 +36,7 @@ Hidden generator values (match form, the script) go in a separate `match_debug` 
 | `shot` | `xg`, `outcome` (goal, saved, off_target, blocked, woodwork), `body_part`, `kind` (open_play, penalty, free_kick, header, corner), `keeper_id` |
 | `pressure` | `target_player_id` |
 | `tackle`, `interception`, `recovery`, `clearance` | `outcome` |
-| `foul` | `victim_id`, `card` (none, yellow, red) |
+| `foul` | `victim_id`, `card` (none, yellow, red), `penalty` (true if the foul was in the fouling team's own box) |
 | `substitution` | `player_off_id`, `player_on_id` |
 
 - A goal is a `shot` with outcome `goal`. A save is a `shot` with outcome `saved` and a `keeper_id`.
@@ -131,6 +131,49 @@ Same seed gives the same output; every event passes the schema; clock and `seq` 
 ### Environment
 
 Python 3.12 `.venv` with pip. 2–3 demo matches committed in `samples/`; other output goes in the ignored `data/`.
+
+## Interpret stage v1
+
+Code in `backend/pitch_insights/interpret/`. The `Interpreter` reads events one at a time and never looks ahead, so it behaves the same on a live feed as on a replay. `snapshot()` returns the full state; `update()` returns any signals raised by that event.
+
+### Stats
+
+- **Team:** possession (share of passes), shots and shots on target, xG, big chances (xG 0.30+), passes and accuracy, progressive passes, final-third entries, crosses, corners, threat added (xT), pressures (and high pressures in the opponent's half), tackles, interceptions, recoveries, clearances, PPDA, fouls, cards, subs, men on the pitch.
+- **Player:** minutes, touches, passes and accuracy, average pass difficulty and length, progressive passes and carries, key passes, assists, crosses, threat added, shots, xG, goals, dribbles, pressures, tackles, interceptions, recoveries, clearances, fouls committed and won, cards, saves, goals conceded.
+- **Expected threat (xT):** a 12 x 8 grid learned from 400 generated matches with the standard Markov method (`scripts/build_xt.py`), stored in `interpret/xt_grid.json`. It can be relearned from real data without code changes.
+
+### Patterns (rolling 5-minute window)
+
+| Pattern | Meaning |
+|---|---|
+| Momentum | −1 (away on top) to +1 (home on top), from threat created (xT added + xG); smoothed minute by minute, plus a per-minute series for the chart, labelled with period, broadcast minute and clock |
+| Pressure | High pressures per minute for each team |
+| Chaos | 0 (calm) to 1 (frantic), from possession changes per minute |
+| Tempo | Passes per minute, both teams |
+| Field tilt | Each team's share of final-third passes |
+
+### Win probability
+
+Each team's goal rate for the rest of the match blends a prior (league average, adjusted for league position and home advantage, worth 45 minutes of evidence) with its xG rate so far. Each extra player is worth about 30% more goals. Remaining goals are Poisson, giving home/draw/away chances. At full time it is the result.
+
+### Live player ratings
+
+- Start at 6.0, range 3.0–10.0. Every event adds or subtracts points for the players involved, in categories: attacking, goals and assists, passing, defending, goalkeeping, discipline, errors, goals conceded.
+- Goals and assists earn more when they swing the win probability (a 96th-minute winner is worth more than a fourth goal in a 4–0).
+- Errors: a giveaway in a player's own third that leads to an opponent shot within 20 seconds costs points (more if it leads to a goal); so does giving away a penalty.
+- Position weighting brings every position to a similar average while rewarding what that position is for. Goals and assists count fully for everyone.
+- Playing-time damping: shown rating = 6.0 + points × minutes / (minutes + 15). Above 7.8, extra points count half (diminishing returns).
+- Every contribution is logged, so each rating comes with totals per category and its biggest moments (for the "Why?" button). These are scaled exactly like the rating (damping, diminishing returns, limits), so they add up to the rating minus 6.0.
+- Clean sheets: goalkeepers and defenders who played 60+ minutes earn a bonus, including those substituted late (not those sent off).
+- Calibrated with `scripts/calibrate_ratings.py` against public rating systems: average 6.8, spread 0.76, best in match about 8.5, 9.5+ in about 10% of matches, and every position averaging 6.8–6.9 (see `docs/ratings-calibration.txt`).
+
+### Signals
+
+About 20 a match, each with the numbers behind it, for the Moment Scorer to rank: `goal` (with win-probability swing and assist), `red_card`, `penalty_awarded`, `big_chance_missed`, `momentum_swing`, `dominance`, `pressing_spell`, `chaos_spike`, `rating_jump`, `rating_drop`, `rating_milestone` (8.0, 9.0), `milestone` (brace, hat-trick, season goals and assists, club career goals, clean sheets, winning/unbeaten/losing runs extended or ended), `half_time`, `full_time` (with player of the match). Repeated signals have cooldowns.
+
+### Known limits
+
+- The generator's high press creates many pressures but not many extra high turnovers, so the high-press club's PPDA is not as low as a real pressing side's. The pressure index shows the pressing correctly.
 
 ## Later (not v1)
 

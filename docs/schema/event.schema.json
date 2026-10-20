@@ -628,6 +628,11 @@
           ],
           "title": "Card",
           "type": "string"
+        },
+        "penalty": {
+          "default": false,
+          "title": "Penalty",
+          "type": "boolean"
         }
       },
       "required": [

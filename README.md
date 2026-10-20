@@ -40,6 +40,7 @@ pip install -e ".[dev]"
 ```
 python -m pitch_insights.generate --seed 42 --home POT --away CAR --out ../data
 python -m pitch_insights.watch ../samples/comeback-POT-CAR.jsonl --speed 60 --from 80   # watch it play out
+python -m pitch_insights.interpret ../samples/comeback-POT-CAR.jsonl --at 70 --player Madekuta   # stats, ratings, signals
 python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
 pytest
@@ -65,6 +66,10 @@ Averages over 300 generated matches (`scripts/validate_realism.py`; full output 
 | Home win / draw / away win | 43 / 24 / 33% | about 45 / 25 / 30% |
 
 Each club's style shows in its numbers: the high-press side makes the most pressures, the possession side has the best pass accuracy, and the direct side plays the longest passes.
+
+## Live player ratings
+
+Every player starts at 6.0 and moves with each action, weighted by position and damped by playing time, and every change is logged so the app can show why a rating is what it is. Over 120 generated matches (`scripts/calibrate_ratings.py`): average 6.8, spread 0.76, best player in a match about 8.5, and 9.5+ in about 10% of matches, in line with public rating systems. Every position averages 6.8–6.9. Details in [docs/DESIGN.md](docs/DESIGN.md#interpret-stage-v1).
 
 ## Credits
 

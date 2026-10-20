@@ -117,6 +117,7 @@ class Foul(EventBase):
     type: Literal["foul"] = "foul"
     victim_id: str
     card: Literal["none", "yellow", "red"] = "none"
+    penalty: bool = False  # the foul was in the fouling team's own box
 
 
 class Substitution(EventBase):

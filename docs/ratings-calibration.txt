@@ -1,0 +1,50 @@
+120 matches, 2576 player ratings (60+ minutes)
+
+Average rating (60+ min)            6.82   6.6-7.0  ok
+Spread (std dev)                    0.76   0.5-0.85  ok
+Share below 6.0                     0.08   0.05-0.2  ok
+Share 8.0 or above                  0.08   0.03-0.12  ok
+Best in match (average)             8.47   7.9-8.8  ok
+Share of matches with a 9.5+        0.10   0.0-0.15  ok
+
+Average by position group:
+  ATT 6.87  (n=728)
+  DEF 6.77  (n=905)
+  GK  6.82  (n=240)
+  MID 6.85  (n=703)
+
+Average points per category, per player (after damping):
+  ATT Attacking       +0.33
+  ATT Defending       +0.08
+  ATT Discipline      -0.06
+  ATT Errors          +0.00
+  ATT Goalkeeping     +0.00
+  ATT Goals and assists+0.38
+  ATT Goals conceded  +0.00
+  ATT Passing         +0.13
+  DEF Attacking       +0.04
+  DEF Defending       +0.67
+  DEF Discipline      -0.01
+  DEF Errors          -0.03
+  DEF Goalkeeping     +0.00
+  DEF Goals and assists+0.01
+  DEF Goals conceded  -0.13
+  DEF Passing         +0.21
+  GK  Attacking       +0.00
+  GK  Defending       +0.17
+  GK  Discipline      -0.01
+  GK  Errors          -0.06
+  GK  Goalkeeping     +1.10
+  GK  Goals and assists+0.00
+  GK  Goals conceded  -0.41
+  GK  Passing         +0.01
+  MID Attacking       +0.17
+  MID Defending       +0.21
+  MID Discipline      -0.09
+  MID Errors          -0.02
+  MID Goalkeeping     +0.00
+  MID Goals and assists+0.20
+  MID Goals conceded  -0.04
+  MID Passing         +0.41
+
+All checks passed
