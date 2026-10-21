@@ -16,7 +16,7 @@ from pitch_insights.events.schema import (
 )
 from pitch_insights.generator.players import (
     FORMATIONS, ClubDef, PlayerDef, club_strength, league_info, load_clubs,
-    pick_lineup, player_history, team_history,
+    head_to_head, pick_lineup, player_history, team_history,
 )
 from pitch_insights.generator.script import Script
 from pitch_insights.generator.xg import distance_to_goal, expected_goals
@@ -129,7 +129,10 @@ class MatchEngine:
     # ------------------------------------------------------------ clock
 
     def minute_float(self) -> float:
-        return self.t / 60 + (45 if self.period == 2 else 0)
+        """Match minute on the broadcast clock; first-half stoppage time stays at 45, like 45+2'."""
+        if self.period == 1:
+            return min(45.0, self.t / 60)
+        return 45 + self.t / 60
 
     def clock(self) -> tuple[str, int]:
         m = int(self.t // 60) + 1
@@ -269,6 +272,8 @@ class MatchEngine:
         self.period, self.t = period, 0.0
         self.period_counts = {"goals": 0, "cards": 0, "windows": 0}
         if period == 2:
+            self.att = 1  # the away side kicks off the second half, in a possession of its own
+            self.possession_id += 1
             for team in self.teams:
                 if self.rng.random() < 0.15:
                     self.make_subs(team, 1, half_time=True)
@@ -278,8 +283,8 @@ class MatchEngine:
         while True:
             if period_end is None and self.t >= 2700:
                 period_end = 2700 + self.stoppage_seconds()
-            if period_end is not None and self.t >= period_end:
-                break
+            if period_end is not None and self.t >= period_end and not (self.restart and self.restart[0] == "penalty"):
+                break  # the half is extended for a penalty, as in real football
             self.check_forced()
             if self.restart:
                 self.do_restart()
@@ -803,7 +808,7 @@ class MatchEngine:
         mrng = random.Random(self.seed * 7919 + 1)
         matchday = matchday + mrng.randint(-4, 10)
 
-        def team_block(ts: TeamState, opp: TeamState, starters: list[PState], bench: list[PlayerDef]):
+        def team_block(ts: TeamState, h2h: dict, starters: list[PState], bench: list[PlayerDef]):
             ranked = sorted(ts.club.players, key=lambda p: -p.quality)
             players = [dict(id=p.id, name=p.name, number=p.number, position=p.position, foot=p.foot,
                             attributes=p.attributes, history=player_history(p, matchday, ranked.index(p), mrng))
@@ -811,15 +816,16 @@ class MatchEngine:
             return dict(id=ts.id, name=ts.club.name, short_name=ts.club.short_name, colours=ts.club.colours,
                         formation=ts.club.formation, style=ts.club.style,
                         starting=[p.id for p in starters], bench=[p.id for p in bench],
-                        players=players, history=team_history(ts.club, opp.club, mrng))
+                        players=players, history=team_history(ts.club, h2h, mrng))
 
         home, away = self.teams
+        h2h_home, h2h_away = head_to_head(home.club, away.club, mrng)
         meta = dict(
             type="match_meta", schema=SCHEMA_VERSION,
             match=dict(id=self.match_id, seed=self.seed, date="2026-10-24", competition=league,
                        matchday=matchday, venue=home.club.venue),
-            home=team_block(home, away, home.players[:11], self.initial_bench[0]),
-            away=team_block(away, home, away.players[:11], self.initial_bench[1]),
+            home=team_block(home, h2h_home, home.players[:11], self.initial_bench[0]),
+            away=team_block(away, h2h_away, away.players[:11], self.initial_bench[1]),
             attacking_direction={
                 "1": {home.id: "left_to_right", away.id: "right_to_left"},
                 "2": {home.id: "right_to_left", away.id: "left_to_right"},
@@ -845,8 +851,16 @@ def simulate(seed: int, home_id: str | None = None, away_id: str | None = None,
     away_id = away_id or script.away
     if not home_id or not away_id:
         pick = random.Random(seed ^ 0x5EED).sample(sorted(clubs), 2)
-        home_id, away_id = home_id or pick[0], away_id or (pick[1] if pick[1] != home_id else pick[0])
+        if not home_id and not away_id:
+            home_id, away_id = pick
+        elif not away_id:
+            away_id = pick[1] if pick[1] != home_id else pick[0]
+        else:
+            home_id = pick[0] if pick[0] != away_id else pick[1]
     if home_id == away_id:
         raise ValueError("home and away must be different clubs")
+    for item in (*script.phases, *script.forced):
+        if item.team not in (home_id, away_id):
+            raise ValueError(f"script refers to {item.team!r}, which isn't playing ({home_id} v {away_id})")
     engine = MatchEngine(seed, clubs[home_id], clubs[away_id], script)
     return engine.run()

@@ -13,14 +13,14 @@ Pressures per team             123.0   100-180  ok
 Subs per team                    4.2   3-5  ok
 Penalties per match              0.3   0.2-0.4  ok
 Red cards per match              0.1   0.05-0.2  ok
-Events per match              1914.0   1600-2000  ok
+Events per match              1914.1   1600-2000  ok
 
-Home W/D/L: 129/73/98 (real football: about 45/25/30 %)
+Home W/D/L: 128/73/99 (real football: about 45/25/30 %)
 
 Club  style        pass acc pass len pressures  shots  goals
 BRO   direct           75.0     26.7     126.5    9.6   0.85
-CAR   high_press       86.6     19.9     196.4   16.9   2.08
-CAU   counter          84.1     22.6      61.1   11.8   0.89
+CAR   high_press       86.6     19.9     196.5   16.9   2.10
+CAU   counter          84.0     22.6      61.0   11.7   0.89
 POT   possession       89.8     18.1     108.1   15.8   1.90
 
 High-press club has the most pressures        ok

@@ -219,3 +219,35 @@ def test_report_stops_at_the_requested_minute(match):
     assert events[i - 1]["period"] == 2 and events[i - 1]["minute"] <= 70
     assert events[i]["minute"] >= 70
     assert stop_index(events, None) == len(events)
+
+
+def test_set_pieces_have_no_assist():
+    meta, events, _ = simulate(5, "POT", "CAR")  # a penalty here used to credit the pass before the foul
+    _, signals = run(meta, events)
+    goals = [s for s in signals if s["type"] == "goal"]
+    assert any(s["data"]["kind"] == "penalty" for s in goals)
+    for s in goals:
+        if s["data"]["kind"] in ("penalty", "free_kick"):
+            assert s["data"]["assist_player_id"] is None
+
+
+def test_clearances_dont_count_as_possession_changes():
+    from pathlib import Path
+
+    from pitch_insights.generator.io import read_match
+
+    meta, events = read_match(Path(__file__).resolve().parents[2] / "samples" / "comeback-POT-CAR.jsonl")
+    it = Interpreter(meta)
+    changes = []
+    add = it.patterns.add
+
+    def counting_add(t, kind, *rest):
+        if kind == "possession_change":
+            changes.append(t)
+        add(t, kind, *rest)
+
+    it.patterns.add = counting_add
+    for e in events:
+        it.update(e)
+    ids = [e["possession_id"] for e in events if "possession_id" in e]
+    assert len(changes) <= sum(a != b for a, b in zip(ids, ids[1:]))

@@ -168,6 +168,7 @@ def load_clubs(path: Path = TEAMS_FILE) -> dict[str, ClubDef]:
     return clubs
 
 
+@lru_cache(maxsize=1)
 def league_info(path: Path = TEAMS_FILE) -> tuple[str, int]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     return data["league"], int(data["season_matchday"])
@@ -230,15 +231,20 @@ def player_history(p: PlayerDef, matchday: int, squad_rank: int, rng: random.Ran
                 season_clean_sheets=clean, club_career_goals=career, last5_ratings=ratings)
 
 
-def team_history(club: ClubDef, opponent: ClubDef, rng: random.Random) -> dict:
-    s, o = club_strength(club), club_strength(opponent)
+def head_to_head(home: ClubDef, away: ClubDef, rng: random.Random) -> tuple[dict, dict]:
+    """One shared record of past meetings, as (home's view, away's view)."""
+    total = rng.randint(6, 14)
+    edge = max(0.15, min(0.65, 0.38 + (club_strength(home) - club_strength(away)) * 0.04))
+    wins = sum(rng.random() < edge for _ in range(total))
+    draws = sum(rng.random() < 0.27 for _ in range(total - wins))
+    losses = total - wins - draws
+    return {"wins": wins, "draws": draws, "losses": losses}, {"wins": losses, "draws": draws, "losses": wins}
+
+
+def team_history(club: ClubDef, h2h: dict, rng: random.Random) -> dict:
+    s = club_strength(club)
     position = int(max(1, min(20, round(10 - (s - 76) * 1.6 + rng.gauss(0, 2)))))
     p_win = max(0.15, min(0.7, 0.4 + (s - 76) * 0.05))
     p_draw = 0.26
     last5 = [("W" if (r := rng.random()) < p_win else "D" if r < p_win + p_draw else "L") for _ in range(5)]
-    total = rng.randint(6, 14)
-    edge = max(0.15, min(0.65, 0.38 + (s - o) * 0.04))
-    wins = sum(rng.random() < edge for _ in range(total))
-    draws = sum(rng.random() < 0.27 for _ in range(total - wins))
-    return dict(league_position=position, last5=last5, current_run=_run_text(last5),
-                head_to_head={"wins": wins, "draws": draws, "losses": total - wins - draws})
+    return dict(league_position=position, last5=last5, current_run=_run_text(last5), head_to_head=h2h)

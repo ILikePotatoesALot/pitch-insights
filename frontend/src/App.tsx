@@ -117,14 +117,14 @@ export default function App() {
 function useLowerThird(live: Moment | null) {
   const [banner, setBanner] = useState<Moment | null>(null);
   useEffect(() => {
-    if (!live) {
-      setBanner(null);
-      return;
-    }
-    if (live.tier !== "headline") return;
-    setBanner(live);
+    if (!live) setBanner(null);
+    else if (live.tier === "headline") setBanner(live);
+  }, [live]);
+  // The timer belongs to the banner, so a smaller moment arriving meanwhile can't cancel it.
+  useEffect(() => {
+    if (!banner) return;
     const t = setTimeout(() => setBanner(null), 6000);
     return () => clearTimeout(t);
-  }, [live]);
+  }, [banner]);
   return banner;
 }

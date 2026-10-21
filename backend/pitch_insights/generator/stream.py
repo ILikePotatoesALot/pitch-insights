@@ -68,6 +68,8 @@ class Replay:
         self.paused = True
 
     def resume(self):
+        if not self.paused:  # resetting the wall clock while running would rewind the match
+            return
         self._wall = time.monotonic()
         self.paused = False
 

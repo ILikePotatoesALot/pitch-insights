@@ -103,10 +103,17 @@ async def watch(path: str, speed: float, from_minute: float, show_all: bool, out
             print(f"{ev['clock']:>7}  {line}", file=out, flush=True)
 
 
+def positive(value: str) -> float:
+    f = float(value)
+    if f <= 0:
+        raise argparse.ArgumentTypeError("must be more than 0")
+    return f
+
+
 def main(argv: list[str] | None = None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("match", help="path to a match .jsonl file")
-    ap.add_argument("--speed", type=float, default=20.0)
+    ap.add_argument("--speed", type=positive, default=20.0)
     ap.add_argument("--from", dest="from_minute", type=float, default=0.0, help="start at this minute")
     ap.add_argument("--all", action="store_true", help="show every event, not just key moments")
     args = ap.parse_args(argv)

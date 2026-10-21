@@ -27,3 +27,4 @@ Thumbs.db
 # Build output
 *.egg-info/
 *.tsbuildinfo
+.vite/
