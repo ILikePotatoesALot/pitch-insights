@@ -309,3 +309,15 @@ def test_records_say_which_provider_and_model_wrote_them(match):
     good = Lines(casual="Szobalenko wins it.", analyst="Carrot win it late.")
     rec = run(CommentaryDesk(FakeWriter(good), meta).comment(winner(moments)))
     assert (rec["provider"], rec["model"]) == ("fake", "fake-model")
+
+
+def test_compound_number_words_are_read_whole(match):
+    meta, moments = match
+    m = winner(moments)
+    assert grounding.check("Szobalenko has ninety-three goals.", m, meta).unsupported == ["ninety three"]
+    assert grounding.check("Szobalenko has ninety three goals.", m, meta).unsupported == ["ninety three"]
+    assert grounding.check("A winner in the ninety-sixth minute.", m, meta).passed  # 90+6' is the 96th
+    assert grounding.check("A winner in the ninety-third minute.", m, meta).unsupported == ["ninety third"]
+    assert grounding.check("Into the second half, the first goal.", m, meta).passed  # lone ordinals aren't counts
+    assert grounding.number_phrases("a hundred and five, twenty-one") == [("hundred five", 105), ("twenty one", 21)]
+    assert grounding.check("Their win chance rose to ninety-seven percent.", m, meta).passed  # 97% is in the facts

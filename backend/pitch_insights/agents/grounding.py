@@ -25,11 +25,49 @@ CLOCK = re.compile(r"(\d+)\+(\d+)")
 NUMBER_WORDS = {w: i for i, w in enumerate(
     "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen "
     "sixteen seventeen eighteen nineteen twenty".split())}
-NUMBER_WORDS |= {w: 10 * i for i, w in enumerate("thirty forty fifty sixty seventy eighty ninety".split(), 3)}
-NUMBER_WORDS["hundred"] = 100
-# Number words checked in commentary. "zero" and "one" are left out: "one of", "no one" and
-# "one-sided" are rarely counts, and the prompt asks for digits anyway.
-CLAIM_WORDS = {w: n for w, n in NUMBER_WORDS.items() if n >= 2}
+TENS = {w: 10 * i for i, w in enumerate("twenty thirty forty fifty sixty seventy eighty ninety".split(), 2)}
+# Ordinals count only at the end of a compound ("ninety-third" is 93); on their own ("second half",
+# "first goal") they're rarely numbers.
+ORDINALS = {w: i for i, w in enumerate("first second third fourth fifth sixth seventh eighth ninth".split(), 1)}
+
+
+def number_phrases(text: str) -> list[tuple[str, int]]:
+    """Numbers written as words, read whole: "ninety-three" is 93 (not 90 and 3), "a hundred
+    and five" is 105. Returns (the words, their value) for each run of number words."""
+    words = re.findall(r"[a-z]+", text.lower())  # hyphens split, so "ninety-three" is two words
+    out, i = [], 0
+    while i < len(words):
+        value, used = None, []
+        while i < len(words):
+            w, after_hundred = words[i], value is not None and value >= 100 and value % 100 == 0
+            if w in TENS and (value is None or after_hundred):
+                value = (value or 0) + TENS[w]
+            elif w in NUMBER_WORDS and (value is None or after_hundred
+                                        or (value % 100 >= 20 and value % 10 == 0 and NUMBER_WORDS[w] < 10)):
+                value = (value or 0) + NUMBER_WORDS[w]
+            elif w in ORDINALS and value is not None and value % 100 >= 20 and value % 10 == 0:
+                value += ORDINALS[w]
+                used.append(w)
+                i += 1
+                break  # an ordinal ends the number
+            elif w == "hundred" and (value is None or 1 <= value <= 9):
+                value = (value or 1) * 100  # "hundred", "a hundred", "three hundred"
+            elif not (w == "and" and used and used[-1] == "hundred" and i + 1 < len(words)
+                      and (words[i + 1] in NUMBER_WORDS or words[i + 1] in TENS)):
+                break
+            used.append(w)
+            i += 1
+        if used:
+            out.append((" ".join(u for u in used if u != "and"), value))
+        else:
+            i += 1
+    return out
+
+
+def word_claims(text: str) -> list[tuple[str, int]]:
+    """Number phrases in commentary that count as claims. A lone "one" or "zero" is left out:
+    "one of", "no one" and "one-sided" are rarely counts, and the prompt asks for digits anyway."""
+    return [(phrase, n) for phrase, n in number_phrases(text) if n >= 2 or " " in phrase]
 
 
 @dataclass
@@ -69,9 +107,8 @@ def _values(obj) -> list[int | float]:
 def supported_numbers(moment: dict) -> set[float]:
     text = moment_text(moment)
     nums = {float(n) for n in NUMBER.findall(text)}
-    for word in re.findall(r"[a-z]+", text.lower()):
-        if word in NUMBER_WORDS:
-            nums.add(float(NUMBER_WORDS[word]))  # "the last five minutes" backs "5 minutes"
+    for _, n in number_phrases(text):
+        nums.add(float(n))  # "the last five minutes" backs "5 minutes"
     for base, extra in CLOCK.findall(text):
         nums.add(float(int(base) + int(extra)))  # 90+6' is the 96th minute
     if moment.get("minute") is not None:
@@ -119,11 +156,10 @@ def check(text: str, moment: dict, meta: dict) -> Grounding:
         claims += 1
         if not _number_ok(float(raw), supported):
             unsupported.append(raw)
-    for word in re.findall(r"[a-z]+", text.lower()):  # "twenty goals" is checked like "20 goals"
-        if word in CLAIM_WORDS:
-            claims += 1
-            if not _number_ok(float(CLAIM_WORDS[word]), supported):
-                unsupported.append(word)
+    for phrase, n in word_claims(text):  # "ninety-three goals" is checked like "93 goals"
+        claims += 1
+        if not _number_ok(float(n), supported):
+            unsupported.append(phrase)
 
     source = moment_text(moment).lower()
     playing = {meta[s][k].lower() for s in ("home", "away") for k in ("name", "short_name")}
