@@ -14,7 +14,7 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 | Branch | State | Contents |
 |---|---|---|
 | `main` | On GitHub, at `4326538` | Event format, generator, terminal viewer, Interpret stage (merged via ILikePotatoesALot/pitch-insights#1), plan and video-path design |
-| `pitch-frontend` | **Local only, 3 commits ahead of `main`, not pushed** (`29cf3bb`, `9285862`, `7fab052`) | Moment Scorer, replay server, the app, and the fixes from its code review |
+| `pitch-frontend` | **Local only, ahead of `main`, not pushed** | Moment Scorer, replay server, the app, the fixes from its code review, and this handoff |
 | `interpret-stage` | On GitHub, merged | Can be deleted |
 | `moment-scorer` | Local only, at `29cf3bb` | Already inside `pitch-frontend`; can be deleted |
 
