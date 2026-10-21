@@ -27,3 +27,23 @@ def test_replay_streams_events_moments_and_state():
             if msg["type"] == "event":
                 assert msg["event"]["period"] == 2 and msg["event"]["minute"] >= 88
     assert seen["meta"] == 1 and seen["catchup"] == 1 and seen["event"] > 50 and seen["moment"] >= 2 and seen["state"] >= 1
+
+
+def test_bad_speed_and_from_values_are_handled():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0&from=abc") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        msg = ws.receive_json()
+        assert msg["type"] == "event" and msg["event"]["seq"] == 1  # "from=abc" starts at kick-off
+        ws.send_json({"cmd": "speed", "value": "fast"})  # ignored, not fatal
+        ws.send_text("not json")
+        ws.send_json({"cmd": "speed", "value": 600})
+        assert ws.receive_json()["type"] in ("event", "moment", "state")
+
+
+def test_disconnect_while_paused_ends_the_replay():
+    import time
+
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=1") as ws:
+        ws.receive_json()
+        ws.send_json({"cmd": "pause"})
+    time.sleep(0.3)  # the server side must have finished; TestClient would hang on exit otherwise

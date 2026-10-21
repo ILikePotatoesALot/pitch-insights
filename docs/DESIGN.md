@@ -181,18 +181,19 @@ Code in `backend/pitch_insights/explain/moments.py`. `MatchBrain` wraps the Inte
 
 - **Grouping:** one moment per anchor signal (goal, red card, penalty awarded, big chance missed, half-time, full-time), with that event's milestones and rating signals attached. Without an anchor, a team's pattern signals merge into one moment, and a player's rating signals into another.
 - **Importance (0–1):** goals from 0.6 plus up to 0.4 for the win-probability swing (more if late); red cards from 0.55 plus the swing; big chances from their xG, the score and the time; patterns, rating changes and milestones lower. Closer games and the last 15 minutes count a little more. Attached milestones add to the moment.
-- **Tiers:** headline (0.6+), notable (0.35+), minor. Calibrated over 120 matches (`scripts/calibrate_moments.py`): about 4 headlines and 10 headline-or-notable moments a match.
+- **Tiers:** headline (0.6+), notable (0.35+), minor. Importance is capped at 1.0, but each moment also keeps its uncapped `rank`, so the biggest moments can still be ordered (the full-time summary lists the top three by rank). Calibrated over 120 matches (`scripts/calibrate_moments.py`): about 4 headlines and 10 headline-or-notable moments a match.
 - **Evidence pack:** a list of facts, each with a `kind`, a plain-English `text` and the `value` behind it: score, win probability before and after, chance quality, assist, technique, goals this match and season, run of play, the last five minutes (momentum, field tilt, shots and corners), live rating, match totals. The Explainer agent may use only these facts.
 - **Fallback headline:** plain-English text such as "Szobalenko puts Carrot ahead late", so the app works without a language model.
 
 ## Replay server and app v1
 
-- **Server** (`backend/pitch_insights/server.py`, FastAPI): `GET /api/matches`, `GET /api/matches/{name}`, and `WS /ws/replay/{name}?speed=20&from=0`. It streams `meta`, then `catchup` (when starting after kick-off: moments so far, state, and the last three minutes of events so the pitch redraws), then `event`, `moment` and `state` (about once a second, plus after shots and moments), then `end`. The browser can send speed, pause and resume; seeking reconnects with a new `from`.
+- **Server** (`backend/pitch_insights/server.py`, FastAPI): `GET /api/matches`, `GET /api/matches/{name}`, and `WS /ws/replay/{name}?speed=20&from=0`. It streams `meta`, then `catchup` (when starting after kick-off: moments so far, state, and the last three minutes of events so the pitch redraws), then `event`, `moment` and `state` (about once a second, plus after shots and moments), then `end`. The browser can send speed, pause and resume; seeking reconnects with a new `from`. Speed is held between 0.1× and 600×. The replay and the command listener run together, so a disconnect (even while paused) ends both.
 - **App** (`frontend/`, Vite + React + TypeScript + Three.js):
   - **3D pitch:** a 1 m grid whose height and colour come from each team's recent activity (fading over about two match minutes), so the seam between colours shows who controls which space. Shots rise as spikes sized by xG; goals glow. Pitch lines are a texture on the same surface, so they bend with it.
   - **Panels:** scoreboard with live win probability, a momentum chart, the key-moments feed with a "Why?" button that shows the evidence, live ratings with a player card (rating breakdown and biggest moments), and match stats.
   - **Viewer modes (first step of Personalise):** casual fans see headline moments only, without the stats panel; analysts see notable moments too (and minor ones if they ask), the stats panel, and an extra fact on the banner.
-  - **Banner:** each new headline moment shows over the pitch for a few seconds.
+  - **Banner:** each headline moment that arrives live shows over the pitch for a few seconds (not ones restored by a catch-up).
+  - **Connection:** a dropped connection shows a message; jumping to a minute reconnects. A jump belongs to its match, so picking another match starts it from kick-off.
 
 ## Video path (planned)
 

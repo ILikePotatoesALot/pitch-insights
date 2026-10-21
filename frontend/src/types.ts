@@ -58,6 +58,7 @@ export interface Moment {
   player_id?: string;
   player_name?: string;
   importance: number;
+  rank: number; // unclamped importance, for ordering the biggest moments
   tier: "headline" | "notable" | "minor";
   headline: string;
   facts: Fact[];

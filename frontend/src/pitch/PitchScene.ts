@@ -39,6 +39,9 @@ export function teamColours(meta: MatchMeta): [THREE.Color, THREE.Color] {
 
 interface Spike { x: number; y: number; amp: number; born: number; goal: boolean }
 
+const BASE_COLOUR = new THREE.Color("#10202c");
+const GLOW_COLOUR = new THREE.Color("#fff6c2");
+
 export class PitchScene {
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
@@ -56,6 +59,7 @@ export class PitchScene {
   private frame = 0;
   private observer: ResizeObserver;
   private dirty = true;
+  private tmpColour = new THREE.Color();
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -98,10 +102,11 @@ export class PitchScene {
     this.loop();
   }
 
+  /** Use this match's team colours. Doesn't clear the surface: reset() does that, once per connection. */
   setMatch(meta: MatchMeta) {
     this.colours = teamColours(meta);
     this.homeId = meta.home.id;
-    this.reset();
+    this.dirty = true;
   }
 
   reset() {
@@ -115,6 +120,8 @@ export class PitchScene {
 
   /** Feed one event from the stream. */
   addEvent(ev: MatchEvent, meta: MatchMeta, matchTime: number) {
+    // Events can arrive before React has passed the new match in, so take the teams from the event's meta.
+    if (meta.home.id !== this.homeId) this.setMatch(meta);
     this.matchTime = matchTime;
     this.decay();
     const pos = toAbsolute(ev, meta);
@@ -140,6 +147,14 @@ export class PitchScene {
     cancelAnimationFrame(this.frame);
     this.observer.disconnect();
     this.controls.dispose();
+    this.scene.traverse((obj) => {
+      if (!(obj instanceof THREE.Mesh)) return;
+      obj.geometry.dispose();
+      for (const m of Array.isArray(obj.material) ? obj.material : [obj.material]) {
+        (m as THREE.MeshBasicMaterial).map?.dispose();
+        m.dispose();
+      }
+    });
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }
@@ -251,9 +266,9 @@ export class PitchScene {
     const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
     const col = this.geometry.getAttribute("color") as THREE.BufferAttribute;
     const [ch, ca] = this.colours;
-    const base = new THREE.Color("#10202c");
-    const tmp = new THREE.Color();
-    const spikes = this.spikes.map((s) => ({ ...s, a: s.amp * Math.exp(-(this.matchTime - s.born) / SPIKE_TAU) }));
+    const tmp = this.tmpColour;
+    const spikes = this.spikes;
+    const amps = spikes.map((s) => s.amp * Math.exp(-(this.matchTime - s.born) / SPIKE_TAU));
     for (let j = 0; j <= NZ; j++) {
       for (let i = 0; i <= NX; i++) {
         const k = this.idx(i, j);
@@ -262,9 +277,10 @@ export class PitchScene {
         let height = 9 * Math.tanh(total / 3);
         const x = (i / NX) * L, y = (j / NZ) * W;
         let glow = 0;
-        for (const s of spikes) {
+        for (let n = 0; n < spikes.length; n++) {
+          const s = spikes[n];
           const d2 = (x - s.x) ** 2 + (y - s.y) ** 2;
-          const v = s.a * Math.exp(-d2 / (2 * 2.2 * 2.2));
+          const v = amps[n] * Math.exp(-d2 / (2 * 2.2 * 2.2));
           height += v;
           if (s.goal) glow = Math.max(glow, Math.min(1, v / 8));
         }
@@ -273,8 +289,8 @@ export class PitchScene {
         const share = 0.5 + 0.5 * Math.tanh((raw - 0.5) * 3); // sharpen smoothly, so ownership reads clearly without hard edges
         tmp.copy(ca).lerp(ch, share);
         const strength = Math.min(1, total / 1.5);
-        tmp.lerp(base, 1 - (0.25 + 0.75 * strength));
-        if (glow > 0) tmp.lerp(new THREE.Color("#fff6c2"), glow * 0.8);
+        tmp.lerp(BASE_COLOUR, 1 - (0.25 + 0.75 * strength));
+        if (glow > 0) tmp.lerp(GLOW_COLOUR, glow * 0.8);
         col.setXYZ(k, tmp.r, tmp.g, tmp.b);
       }
     }

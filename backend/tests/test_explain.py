@@ -85,3 +85,12 @@ def test_goal_moment_absorbs_its_milestones(match, brain):
     goal_seqs = {m["seq"] for m in brain.moments if m["type"] == "goal"}
     separate = [m for m in brain.moments if m["type"] == "milestone" and m["seq"] in goal_seqs]
     assert not separate
+
+
+def test_full_time_key_moments_are_the_biggest(match, brain):
+    """The summary's key moments are the highest-ranked headlines, not just the first ones to hit 1.0."""
+    ft = brain.moments[-1]
+    listed = [f["value"] for f in ft["facts"] if f["kind"] == "key_moment"]
+    headlines = sorted((m for m in brain.moments[:-1] if m["tier"] == "headline"), key=lambda m: -m["rank"])
+    assert listed == [m["id"] for m in headlines[:3]]
+    assert all(m["rank"] >= m["importance"] for m in brain.moments)

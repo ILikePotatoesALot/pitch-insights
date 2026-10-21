@@ -36,6 +36,11 @@ from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
 
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
+MIN_SPEED, MAX_SPEED = 0.1, 600.0
+
+
+def clamp_speed(speed: float) -> float:
+    return max(MIN_SPEED, min(MAX_SPEED, speed))
 
 app = FastAPI(title="Pitch Insights replay server")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"], allow_headers=["*"])
@@ -88,7 +93,10 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         await ws.send_json({"type": "error", "message": e.detail})
         await ws.close()
         return
-    from_minute = float(ws.query_params.get("from", 0))  # "from" is a Python keyword, so read it directly
+    try:  # "from" is a Python keyword, so read it directly
+        from_minute = max(0.0, float(ws.query_params.get("from", 0)))
+    except ValueError:
+        from_minute = 0.0
     brain = MatchBrain(meta)
     await ws.send_json({"type": "meta", "meta": meta})
 
@@ -103,23 +111,31 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         await ws.send_json({"type": "catchup", "moments": brain.moments, "state": state_message(brain),
                             "recent_events": recent})
 
-    rep = Replay(events, speed=speed, start_at=times[first] if first < len(events) else start, poll=0.05)
+    rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
 
     async def listen():
+        """Apply the browser's commands. Ends (with WebSocketDisconnect) when the browser goes away."""
         while True:
-            msg = await ws.receive_json()
+            try:
+                msg = await ws.receive_json()
+            except ValueError:
+                continue  # not JSON: ignore it rather than stop listening
+            if not isinstance(msg, dict):
+                continue
             cmd = msg.get("cmd")
             if cmd == "speed":
-                rep.set_speed(max(0.1, min(600.0, float(msg["value"]))))
+                try:
+                    rep.set_speed(clamp_speed(float(msg["value"])))
+                except (KeyError, TypeError, ValueError):
+                    continue
             elif cmd == "pause":
                 rep.pause()
             elif cmd == "resume":
                 rep.resume()
 
-    listener = asyncio.create_task(listen())
-    loop = asyncio.get_running_loop()
-    last_state = 0.0
-    try:
+    async def play():
+        loop = asyncio.get_running_loop()
+        last_state = 0.0
         async for ev in rep:
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})
@@ -130,7 +146,15 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 last_state = loop.time()
         await ws.send_json({"type": "state", "state": state_message(brain)})
         await ws.send_json({"type": "end"})
-    except WebSocketDisconnect:
-        pass
-    finally:
-        listener.cancel()
+
+    # Run both together: whichever finishes first (the match ends, or the browser disconnects,
+    # even while paused) stops the other, so nothing is left running for a closed tab.
+    tasks = {asyncio.create_task(play()), asyncio.create_task(listen())}
+    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+    for task in pending:
+        task.cancel()
+    await asyncio.gather(*pending, return_exceptions=True)
+    for task in done:
+        exc = task.exception()
+        if exc and not isinstance(exc, (WebSocketDisconnect, RuntimeError)):
+            raise exc

@@ -308,7 +308,7 @@ class MomentScorer:
             facts.append({"kind": "player_of_the_match", "value": s["player_id"],
                           "text": f"Player of the match: {self.i.players[s['player_id']].name} "
                                   f"({d['player_of_the_match_rating']})."})
-        top = sorted((m for m in self.moments if m["tier"] == "headline"), key=lambda m: -m["importance"])[:3]
+        top = sorted((m for m in self.moments if m["tier"] == "headline"), key=lambda m: -m["rank"])[:3]
         for m in top:
             facts.append({"kind": "key_moment", "value": m["id"], "text": f"{m['clock']} {m['headline']}."})
         return (0.9 if full else 0.5), facts[0]["text"].rstrip("."), facts
@@ -341,12 +341,13 @@ class MomentScorer:
                     imp *= 1.08
                 if primary["minute"] >= 75:
                     imp *= 1.05
+            rank = round(imp, 3)  # unclamped, so the biggest moments can still be told apart
             imp = round(min(1.0, imp), 3)
             m = {
                 "id": f"M-{len(self.moments) + 1}", "seq": primary["seq"], "clock": primary["clock"],
                 "minute": primary["minute"], "period": primary["period"], "match_time": primary["match_time"],
                 "type": primary["type"], "team_id": primary.get("team_id"), "player_id": primary.get("player_id"),
-                "player_name": primary.get("player_name"), "importance": imp, "tier": tier(imp),
+                "player_name": primary.get("player_name"), "importance": imp, "rank": rank, "tier": tier(imp),
                 "headline": headline, "facts": facts,
                 "signals": [primary["type"]] + [x["type"] for x in attached],
                 "score": dict(self.i.score), "win_probability": dict(self.i.wp),

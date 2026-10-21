@@ -40,7 +40,7 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
-  const { meta, state, moments, status, speed, setSpeed, pause, resume, seek } = useReplay(name, onEvent, onReset);
+  const { meta, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } = useReplay(name, onEvent, onReset);
 
   useEffect(() => {
     if (meta) sceneRef.current?.setMatch(meta);
@@ -53,7 +53,7 @@ export default function App() {
     return [`#${h.getHexString()}`, `#${a.getHexString()}`];
   }, [meta]);
 
-  const banner = useLowerThird(moments);
+  const banner = useLowerThird(liveMoment);
 
   return (
     <div className="app">
@@ -82,6 +82,7 @@ export default function App() {
             )}
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
             {status === "error" && <div className="overlay-msg">Can't reach the replay server. Is it running on port 8000?</div>}
+            {status === "disconnected" && <div className="overlay-msg">Lost the connection to the replay server. Pick a minute and press Go to reconnect.</div>}
           </div>
           <div className="controls">
             {status === "paused" ? <button onClick={resume}>Play</button> : <button onClick={pause} disabled={status !== "live"}>Pause</button>}
@@ -112,15 +113,18 @@ export default function App() {
   );
 }
 
-/** The latest headline moment, shown over the pitch for a few seconds. */
-function useLowerThird(moments: Moment[]) {
+/** The latest headline moment that arrived live, shown over the pitch for a few seconds. */
+function useLowerThird(live: Moment | null) {
   const [banner, setBanner] = useState<Moment | null>(null);
-  const last = moments[moments.length - 1];
   useEffect(() => {
-    if (!last || last.tier !== "headline") return;
-    setBanner(last);
+    if (!live) {
+      setBanner(null);
+      return;
+    }
+    if (live.tier !== "headline") return;
+    setBanner(live);
     const t = setTimeout(() => setBanner(null), 6000);
     return () => clearTimeout(t);
-  }, [last?.id]);
+  }, [live]);
   return banner;
 }
