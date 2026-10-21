@@ -8,9 +8,9 @@ For a full pick-up guide (branches, how to run, rules, what's waiting, ordered n
 
 - **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
 - **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna requested. Details: [DESIGN.md, Agents](DESIGN.md#agents).
-- **Agents core built** on branch `agents` (not reviewed or pushed yet): Explainer and Narrator on GPT-4o through Agent Framework, code groundedness check with one retry and a fallback, stored commentary for the three samples (52 moments, all grounded), commentary shown in the app with an AI-generated note.
-- **Next, not blocked:** code review of `agents`; Memory agent, Content Safety, Translator and tracing; Overlay Director; live simulation mode.
-- **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights; whether to keep the video path (GPU quota in Azure ML or the GPU machine, and OK to download SoccerTrack match 117093's first half, 3.35 GB).
+- **Agents core merged** (ILikePotatoesALot/pitch-insights#4): Explainer and Narrator on GPT-4o through Agent Framework, code groundedness check with one retry and a fallback, stored commentary for the three samples (52 moments, all grounded), commentary shown in the app with an AI-generated note. Reviewed by `/code-review` and a second reviewer; all findings fixed.
+- **Next, not blocked:** Memory agent (embeddings are deployed); SoccerTrack loader (data downloaded); Overlay Director; live simulation mode.
+- **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights; which version of the video path (pre-trained detection on a short clip, recommended, or fine-tuning, which needs T4 GPU quota in Azure ML).
 - **Team:** Austin and Claude. Friends are listed only if they contribute (prize verification, rule 8.2).
 
 ## Concept
@@ -32,10 +32,10 @@ A live "match brain": specialist agents turn football events into scored, eviden
 
 - **Synthetic generator** (main feed): possession chains, player profiles, pass difficulty, xG for shots, scripted storylines, a fake season history for milestones, and seeds so matches replay exactly. A check script compares output with real match averages.
 - **Video path** (core; keep-or-cut decision on day 4), built on SoccerTrack v2:
-  - **Footage:** 4K panoramic video from a fixed camera covering the whole pitch. Start with one half of match 117093 (3.35 GB).
+  - **Footage:** 4K panoramic video from a fixed camera covering the whole pitch. Match 117093's first half is downloaded (video 3.35 GB, tracking ground truth 2.71 GB, events).
   - **Ground truth:** per-frame player positions in metres, track IDs, teams, roles and shirt numbers (GSR), plus timestamped events in 12 classes (BAS). Used to train the detector, and to measure our accuracy against.
   - **Detector:** **RF-DETR (small)** fine-tuned on SoccerTrack's boxes, with **YOLO** as the fallback. If time allows, fine-tune both and compare them against the ground truth. Check current versions, licenses and GPU memory needs before training.
-  - **Training:** on Austin's GPU machine (no Azure ML GPU quota). The run is tracked and the model registered in **Azure ML** through MLflow, which needs no compute quota.
+  - **Training (optional):** start with the released RF-DETR on a short clip, no training. Fine-tune only if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`), or on Austin's GPU machine. The run is tracked and the model registered in **Azure ML** through MLflow, which needs no compute quota.
   - **Panoramic view:** players and the ball are small, so train and detect at high resolution (1280–1920 px) or on tiles. The fixed camera and SoccerTrack's calibration maps make pitch coordinates, speed and distance reliable. The ball is not in SoccerTrack's tracking ground truth, so ball detection is a bonus, not a dependency.
   - **Then:** ByteTrack for IDs, team from shirt colour (SoccerTrack's team labels only for scoring), and a Video Ingest agent writing `frame` messages and, when the ball is tracked well enough, events. Clips are processed ahead of time and replayed at match speed. Supplies measured speed and distance.
   - **Design details** (format traps in SoccerTrack's files, coordinate conversion, frame message, event mapping): [DESIGN.md, Video path](DESIGN.md#video-path-planned).
@@ -90,9 +90,9 @@ Rearranged again 21 Oct: the app was built a day early, the student subscription
 | Day | Date | Austin | Claude |
 |---|---|---|---|
 | 1 | 20 Oct | Register, Azure account | Repo, event format, generator v1 (done) |
-| 2 | 21 Oct | Azure setup: personal Pay-As-You-Go subscription, Foundry with GPT-4o and embeddings (done) | Interpret stage, Moment Scorer, replay server and app, two code reviews (done); agents design |
-| 3 | 22 Oct | Free-tier Content Safety, Translator, Speech; Application Insights; video path inputs (GPU quota or details, download OK) | Agents: provider switch, Explainer, groundedness check, fallbacks, Narrator, stored commentary for the samples, commentary in the app |
-| 4 | 23 Oct | Test the commentary; **keep or cut the video path** | Memory agent (embeddings), Content Safety, Translator, tracing; Overlay Director |
+| 2 | 21 Oct | Azure setup: personal Pay-As-You-Go subscription, Foundry with GPT-4o and embeddings, Azure ML workspace; SoccerTrack download (done) | Interpret stage, Moment Scorer, replay server and app, two code reviews; agents core, reviewed and merged (done) |
+| 3 | 22 Oct | Free-tier Content Safety, Translator, Speech; Application Insights; T4 GPU quota request (only for fine-tuning) | Memory agent; SoccerTrack loader and conversion |
+| 4 | 23 Oct | Test the commentary; **choose the video path version** | Content Safety, Translator, tracing; detection on a short clip, pitch positions, benchmark; Overlay Director |
 | 5 | 24 Oct | Personas, test explanations | Personalizer (favourite club and player, language, focus metric); live simulation mode and Scenario Director; video path work only if kept |
 | 6 | 25 Oct | Test the UI | Deploy to Azure (Container Apps, Static Web Apps, Key Vault, Cosmos DB); switch to GPT-6 Luna if approved |
 | 7 | 26 Oct | Demo script | Polish, README (architecture, Microsoft technologies, groundedness scores) |

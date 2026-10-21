@@ -197,7 +197,7 @@ Code in `backend/pitch_insights/explain/moments.py`. `MatchBrain` wraps the Inte
 
 ## Agents
 
-Designed 21 Oct 2026; the core (steps 3, 4 and 7 below, plus stored commentary) built the same day on branch `agents`. The agents turn the Moment Scorer's evidence packs into commentary, check it, and fit it to each viewer. They are built with **Microsoft Agent Framework** and share one state: the `MatchBrain` (Interpreter plus Moment Scorer), which the agents read but never change.
+Designed 21 Oct 2026; the core (steps 3, 4 and 7 below, plus stored commentary) built the same day and merged in ILikePotatoesALot/pitch-insights#4. The agents turn the Moment Scorer's evidence packs into commentary, check it, and fit it to each viewer. They are built with **Microsoft Agent Framework** and share one state: the `MatchBrain` (Interpreter plus Moment Scorer), which the agents read but never change.
 
 ### Model access
 
@@ -320,7 +320,8 @@ Designed 21 Oct 2026. Turns real match video into the same messages as the synth
 
 - [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)): 10 full amateur university matches, 4K panoramic video from a fixed camera covering the whole pitch, 25 fps.
 - License: CC BY 4.0 for video and annotations (MIT for their code). Players gave informed consent, collection had ethics approval, and there are no names, only shirt numbers. Credit in the README and the demo video.
-- Start with one half: match `117093`, first half (3.35 GB), plus its GSR and BAS annotations. Files live in the git-ignored `data/` folder.
+- Hosted on Hugging Face (`atomscott/soccertrack-v2`), gated: downloads need a Hugging Face read token (`HF_TOKEN` in `.env`) from an account that has accepted the terms.
+- Downloaded (21 Oct): match `117093`, first half, into the git-ignored `data/soccertrack/117093/`: video (3.35 GB), GSR tracking (2.71 GB; much larger than the video's annotations suggest, because it holds every frame) and BAS events (0.5 MB).
 - In the demo, label these players by team side and shirt number ("Left #7"), never with our fictional names.
 
 ### Their annotations, and what to watch for
@@ -355,7 +356,8 @@ Designed 21 Oct 2026. Turns real match video into the same messages as the synth
 
 ### Detector
 
-- **Main:** RF-DETR (small), Apache-2.0, fine-tuned on SoccerTrack's player boxes. **Fallback:** YOLO (Ultralytics, AGPL-3.0). If time allows, fine-tune both on the same frames and compare.
+- **First step (recommended, needs no GPU quota):** RF-DETR (small) as released, already trained to find people and footballs, run on a short clip (one to two minutes, a few frames a second, each 4K frame cut into overlapping tiles). Scored against the GSR ground truth.
+- **Main, if T4 GPU quota arrives in Azure ML:** RF-DETR (small), Apache-2.0, fine-tuned on SoccerTrack's player boxes. **Fallback:** YOLO (Ultralytics, AGPL-3.0). If time allows, fine-tune both on the same frames and compare.
 - Classes: player, goalkeeper, referee, ball. The ball has no GSR ground truth, so its detection is a bonus, not a dependency.
 - Panoramic view: players are small, so train and detect at 1280–1920 px, or on overlapping tiles.
 - Before training, check current versions, licenses and GPU memory against the actual GPU.
@@ -363,7 +365,7 @@ Designed 21 Oct 2026. Turns real match video into the same messages as the synth
 ### Training
 
 - **Data:** a script turns SoccerTrack's image boxes into the detector's training format. Sample frames spaced out in time (not every frame), and split by time so test frames never sit next to training frames.
-- **Where:** Austin's GPU machine. There is no Azure ML GPU quota.
+- **Where:** an Azure ML compute cluster in workspace `ML-pitch-insights` (East US 2) once T4 quota (family NCASv3_T4, low priority if offered) is granted on the Pay-As-You-Go subscription, or Austin's GPU machine.
 - **Azure:** the run logs metrics and the final model to an Azure ML workspace through MLflow, which needs no compute quota. The model is registered in Azure ML.
 - **Serving:** CPU detection in a container on Azure Container Apps. Clips are processed ahead of time, so speed is not critical.
 

@@ -15,11 +15,10 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 |---|---|---|
 | `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3) |
 
-| `agents` | **Local only, not pushed** | Agents core: provider switch, Explainer, Narrator, groundedness check, stored commentary for the samples, commentary in the app; best-practice notes in DESIGN.md |
 
 The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
-**Next git step:** `/code-review` the `agents` branch, fix, then push and open its pull request (Austin's OK needed).
+**Next git step:** start the next piece of work (Memory agent, or the SoccerTrack loader) on a new branch from `main`.
 
 ## What's built
 
@@ -32,13 +31,13 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Moment Scorer (moments, tiers, evidence packs, fallback headlines) | Built, reviewed, fixed | `backend/pitch_insights/explain/moments.py` |
 | Replay server (FastAPI WebSocket) | Built, reviewed, fixed | `backend/pitch_insights/server.py` |
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
-| Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built on `agents`, checked in the browser, not reviewed yet | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
+| Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built, reviewed twice, fixed, merged (ILikePotatoesALot/pitch-insights#4) | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
 | Other agents (Memory, Content Safety, Translator, Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 80 passing on `agents` (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 94 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -102,7 +101,7 @@ cd backend
 
 **Technical**
 - Python 3.12 (3.14 is the machine default, but CV packages lag). Node 24.
-- Detector plan: **RF-DETR (small)** first, **YOLO** as fallback. Training on Austin's GPU machine (no Azure ML GPU quota); runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
+- Detector plan: **RF-DETR (small)** first, **YOLO** as fallback. First run the released model on a short clip (no GPU needed); fine-tune only if T4 quota arrives in Azure ML (workspace `ML-pitch-insights`) or on Austin's GPU machine; runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
 - License: AGPL-3.0 for now (because of Ultralytics). If we use RF-DETR and drop Ultralytics, relicense as MIT or Apache-2.0, which suits the Enterprise category better.
 - Everything downstream reads events one at a time and never looks ahead, so a live feed and a replay behave the same. Keep it that way; there are tests for it.
 - **Azure:** Austin's **personal Pay-As-You-Go subscription** (upgraded free trial; free credit spent first; US$20 monthly budget alert). Resource group `rg-pitch-insights`, everything in **East US 2**. The school's Azure for Students subscription is no longer used (five Asian regions only, no chat-model quota, quota requests refused automatically).
@@ -123,11 +122,16 @@ cd backend
 - Synthetic speed and distance don't exist yet; they come with the v2 tracking frames (estimates) and the video path (measured).
 - The app's JavaScript bundle is large (Three.js); fine for now.
 
+## Data on this machine
+
+- **SoccerTrack v2, match 117093, first half**, downloaded 21 Oct from Hugging Face (`atomscott/soccertrack-v2`, CC BY 4.0) into `data/soccertrack/117093/` (git-ignored): the video `117093_panorama_1st_half.mp4` (3.35 GB), tracking ground truth `117093_1st.json` (2.71 GB) and events `117093_12_class_events.json` (0.5 MB). Sizes checked against the dataset's file list.
+- The dataset is gated: downloads need Austin's Hugging Face read token as `HF_TOKEN` in `.env` (the terms are accepted on his account).
+
 ## Waiting on Austin
 
 1. **Free-tier resources** in `rg-pitch-insights`, East US 2: Content Safety (F0), Translator (F0, region Global), Speech (F0, optional), and Application Insights connected from the Foundry project's Tracing page. Endpoints and keys in `.env`. Needed for next step 2.
 2. **The GPT-6 Luna quota decision** from Microsoft (requested 21 Oct). Nothing to do unless it's approved.
-3. **Video path inputs**, by 23 Oct, or it's cut: either a small T4 GPU quota in Azure ML or the GPU machine's details (model, VRAM, OS), plus the **OK to download** SoccerTrack match 117093's first half (3.35 GB) and its annotations into `data/`.
+3. **Video path: which version, by 23 Oct.** The data is downloaded (see below). Recommended: the pre-trained detector on a short clip, no training, so no GPU needed. Fine-tuning needs a small T4 GPU quota in Azure ML (workspace `ML-pitch-insights`): request it from Compute > Compute clusters > New (the greyed-out GPU size has a "Request quota" link) or Azure portal > Quotas > Machine Learning, family **NCASv3_T4**, East US 2, 4 cores.
 4. **Confirm hackathon registration** went through (it closed 20 Oct).
 5. **Clarification question to the organisers** (rule 11.6, in writing, before the deadline): is licensed real footage (SoccerTrack v2) fine for the video path when the core uses synthetic data? Only needed if the video path stays.
 6. Whether to add teammates as GitHub collaborators.
@@ -136,13 +140,13 @@ cd backend
 
 | # | Step | Needs | Size |
 |---|---|---|---|
-| 1 | **Agents core**: built on `agents` (21 Oct). Left: `/code-review`, fixes, pull request | Austin's OK to push | ~1 h |
+| 1 | Done: **agents core**, merged in ILikePotatoesALot/pitch-insights#4 (21 Oct) | | |
 | 2 | **Foundry and AI services:** Memory agent (embeddings), Foundry groundedness evaluation, Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
-| 5 | **Video path keep-or-cut, 23 Oct.** Keep only if a GPU (Azure ML quota or the GPU machine) and the download OK are in by then; otherwise cut it and say so in the README | GPU, download OK | Decision |
+| 5 | **Video path: which version, 23 Oct.** Recommended: pre-trained detection on a short clip (no GPU quota needed), fine-tuning only if T4 quota arrives. Cut it if it isn't working by 24 Oct | Austin's call | Decision |
 | 6 | **Live simulation mode** and the **Scenario Director** agent that steers a live match (logged so it replays exactly) | Step 1 | ~half a day |
-| 7 | If kept: **SoccerTrack preparation and detector training** (loader, conversion, RF-DETR with YOLO fallback, accuracy benchmark) | GPU machine | 1–2 days |
+| 7 | **SoccerTrack loader** (mind the format traps), then detection on a short clip, pitch positions, `frame` messages, accuracy benchmark against the tracking ground truth; fine-tuning if a GPU arrives | Data downloaded | ~1–1.5 days |
 | 8 | **Deploy to Azure**: backend on Container Apps, app on Static Web Apps, keys in Key Vault through a managed identity, Cosmos DB free tier for profiles and stored commentary | Steps 1–4 | ~half a day |
 | 9 | **Demo video** (under 2 minutes; hero shot: same match, different viewers side by side), README polish, make the repo public, submit | Everything above | 27 Oct at the latest |
 
