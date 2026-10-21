@@ -6,6 +6,8 @@ Pitch Insights is an AI system that turns live football match events into explai
 
 Built for the Microsoft Premier League Hackathon (October 2026).
 
+Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
+
 ## Pipeline
 
 1. **Ingest**: synthetic match events, plus events derived from match video (YOLO detection, ByteTrack, pitch homography), in one shared event format.

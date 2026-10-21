@@ -4,6 +4,8 @@ Agreed 20 Oct 2026; video path updated 21 Oct. Submission deadline: 27 Oct 2026,
 
 ## Status (21 Oct)
 
+For a full pick-up guide (branches, how to run, rules, what's waiting, ordered next steps) see [HANDOFF.md](HANDOFF.md).
+
 - **Done:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (stats, patterns, win probability, live ratings, signals) merged into `main` via ILikePotatoesALot/pitch-insights#1. Moment Scorer, replay server and the first version of the app (3D pitch, moments feed, ratings, casual and analyst modes) on branch `pitch-frontend`.
 - **Next, not blocked:** live simulation mode; Overlay Director (timed overlay cues); more Personalise options (favourite club and player, language).
 - **Waiting on Austin:** GPU model, VRAM and OS (for detector training); a deployed Foundry GPT model with its endpoint and key in `.env` (for the agents); OK to download SoccerTrack match 117093's first half (3.35 GB).
