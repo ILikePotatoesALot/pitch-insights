@@ -1,6 +1,6 @@
 # Design: event format and synthetic generator v1
 
-Agreed 20 Oct 2026. See [PLAN.md](PLAN.md) for the overall plan.
+Agreed 20 Oct 2026; Interpret stage added 20 Oct; video path designed 21 Oct. See [PLAN.md](PLAN.md) for the overall plan.
 
 ## Event format v1
 
@@ -12,7 +12,7 @@ All messages are JSON Lines (one JSON object per line).
 |---|---|---|
 | `match_meta` | Once, at the start | Match info, teams, lineups, players, history, pitch directions |
 | `event` | Every on-ball action | See event types below |
-| `frame` | v2 only | Positions of all players and the ball, 10 times a second |
+| `frame` | v2 only | Positions of all players and the ball, 10 times a second (see [Frame message](#frame-message-v2-planned)) |
 
 Hidden generator values (match form, the script) go in a separate `match_debug` file, never in `match_meta`, so agents can't read them.
 
@@ -175,8 +175,103 @@ About 20 a match, each with the numbers behind it, for the Moment Scorer to rank
 
 - The generator's high press creates many pressures but not many extra high turnovers, so the high-press club's PPDA is not as low as a real pressing side's. The pressure index shows the pressing correctly.
 
+## Video path (planned)
+
+Designed 21 Oct 2026. Turns real match video into the same messages as the synthetic generator: `frame` messages with player positions, and `event` messages with `source: "video"` and a `confidence` below 1.
+
+### Source: SoccerTrack v2
+
+- [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)): 10 full amateur university matches, 4K panoramic video from a fixed camera covering the whole pitch, 25 fps.
+- License: CC BY 4.0 for video and annotations (MIT for their code). Players gave informed consent, collection had ethics approval, and there are no names, only shirt numbers. Credit in the README and the demo video.
+- Start with one half: match `117093`, first half (3.35 GB), plus its GSR and BAS annotations. Files live in the git-ignored `data/` folder.
+- In the demo, label these players by team side and shirt number ("Left #7"), never with our fictional names.
+
+### Their annotations, and what to watch for
+
+- **GSR (tracking ground truth):** per frame, each player's, goalkeeper's and referee's pitch position in metres, track ID, role, team side and shirt number. **The ball is not included.**
+- **BAS (event ground truth):** 12 timestamped classes. A shot that scores is two annotations (`Shot` and `Goal`) at the same time. There is no penalty class.
+- **Format traps (from their own docs):**
+  - The shipped GSR files don't match the written spec. They are COCO-style objects (`images`, `annotations`, ...). Fields sit under `attributes`, shirt numbers are strings, and the position is `bbox_pitch.x_bottom_middle` / `y_bottom_middle`.
+  - The declared image size (3840 × 1504) is wrong for nine of the ten matches. Use real pixel sizes from the video.
+  - BAS `position` for second-half events counts from the start of the match, not the half. Subtract the first half's length (or use their loader's `t_ms_in_half`).
+  - Team `left`/`right` is fixed per half and can swap between halves for the same team.
+- Their loader (`src.data_utils.soccertrack_v2`) already handles some of this. Use it where possible, and check the result against a few frames by eye.
+
+### Coordinates
+
+- SoccerTrack: metres, origin at the centre spot, x from −52.5 to +52.5 (towards the right goal), y from −34 to +34.
+- Ours: 0–105 × 0–68 from the acting team's attacking direction.
+- The team on the left side at kickoff attacks towards +x in that half: `x = x_st + 52.5`, `y = y_st + 34`. The other team: `x = 52.5 − x_st`, `y = 34 − y_st`. This is the same 180° flip the generator uses, so both sources line up.
+
+### Frame message (v2, planned)
+
+```json
+{"type": "frame", "schema": "1.1", "match_id": "ST-117093", "source": "video",
+ "period": 1, "t": 12.48, "clock": "1'",
+ "players": [{"id": "L-07", "team_id": "L", "x": 61.2, "y": 30.4, "speed": 5.8, "confidence": 0.91}],
+ "ball": {"x": 63.0, "y": 31.1, "confidence": 0.42}}
+```
+
+- Positions in our attacking-team frame for each player's own team. `ball` is null when not detected.
+- 10 frames a second for the stream (sampled from 25 fps). Speed is smoothed over about 0.5 s.
+- The synthetic generator will produce the same message in v2, by interpolating its event positions and calibrating movement against SoccerTrack's real tracking.
+
+### Detector
+
+- **Main:** RF-DETR (small), Apache-2.0, fine-tuned on SoccerTrack's player boxes. **Fallback:** YOLO (Ultralytics, AGPL-3.0). If time allows, fine-tune both on the same frames and compare.
+- Classes: player, goalkeeper, referee, ball. The ball has no GSR ground truth, so its detection is a bonus, not a dependency.
+- Panoramic view: players are small, so train and detect at 1280–1920 px, or on overlapping tiles.
+- Before training, check current versions, licenses and GPU memory against the actual GPU.
+
+### Training
+
+- **Data:** a script turns SoccerTrack's image boxes into the detector's training format. Sample frames spaced out in time (not every frame), and split by time so test frames never sit next to training frames.
+- **Where:** Austin's GPU machine. There is no Azure ML GPU quota.
+- **Azure:** the run logs metrics and the final model to an Azure ML workspace through MLflow, which needs no compute quota. The model is registered in Azure ML.
+- **Serving:** CPU detection in a container on Azure Container Apps. Clips are processed ahead of time, so speed is not critical.
+
+### From detections to messages
+
+1. **Detect** players (and, when possible, the ball) in each frame.
+2. **Track** with ByteTrack for stable IDs.
+3. **Team:** shirt-colour clustering. SoccerTrack's team labels are used only to score this, not as input.
+4. **Pitch position:** from SoccerTrack's calibration maps (fixed camera), so speed and distance are measured, not estimated.
+5. **Frames:** write `frame` messages.
+6. **Events** (when the ball is tracked well enough): the nearest player within about 1.5 m has possession. A change of possession between teammates is a `pass`, a run with the ball is a `carry`, a change to an opponent is a turnover (`interception` or `tackle`), and fast ball movement towards goal is a `shot`. Each gets a `confidence`.
+
+### Mapping SoccerTrack events to ours (for scoring)
+
+| BAS class | Our event |
+|---|---|
+| Pass | `pass`, height ground |
+| High Pass | `pass`, height high |
+| Cross | `pass`, kind cross |
+| Throw In | `pass`, kind throw_in (pairs with the preceding Out) |
+| Free Kick | `pass` or `shot`, kind free_kick |
+| Out | previous pass's outcome becomes `out` |
+| Drive | `carry` |
+| Shot | `shot` |
+| Goal | the matching `shot` gets outcome `goal` |
+| Header | `shot` with body part head if it goes towards goal, otherwise a headed `pass` |
+| Ball Player Block | `interception` (or a blocked `shot`) |
+| Player Successful Tackle | `tackle`, outcome won |
+
+This conversion also lets the Interpreter run directly on SoccerTrack's ground-truth events, as a check that it works on real data.
+
+### Benchmark
+
+- **Tracking:** average position error in metres against GSR, and the share of players found. Use their `gs_hota` evaluation script for the standard score.
+- **Events:** the share of BAS events we detect within ±1 s and ±5 s, by class (their `bas_map` script).
+- Results go in the README and the demo video, for example "positions within X m; Y% of passes detected".
+
+### Rules
+
+The core pipeline stays on synthetic data (rule 4.7); SoccerTrack is licensed footage for the video path only. Mention it in the clarification question to the organisers.
+
 ## Later (not v1)
 
-- v2 tracking frames by interpolating positions. Synthetic speed and distance labelled as estimates; the video path gives measured ones.
+- v2 tracking frames by interpolating positions, with movement calibrated against SoccerTrack's real tracking. Synthetic speed and distance labelled as estimates; the video path gives measured ones.
 - Offside.
 - A Scenario Director agent that writes scripts from a prompt.
+- Live simulation mode: the engine plays step by step and accepts changes mid-match (planned for day 4–5).
+- Generator: make the high press create more high turnovers, so the pressing club's PPDA looks like a real pressing side's.
