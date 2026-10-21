@@ -74,6 +74,7 @@ Every player starts at 6.0 and moves with each action, weighted by position and 
 ## Credits
 
 - Player detection: [Roboflow football-players-detection](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc) (CC BY 4.0)
+- Video and ground truth for the video path: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) by Scott et al. (CC BY 4.0), [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)
 - All clubs, players and matches in the synthetic data are fictional.
 
 ## License
