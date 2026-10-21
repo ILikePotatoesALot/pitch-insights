@@ -8,7 +8,7 @@ Best in match (average)             8.47   7.9-8.8  ok
 Share of matches with a 9.5+        0.10   0.0-0.15  ok
 
 Average by position group:
-  ATT 6.87  (n=728)
+  ATT 6.86  (n=728)
   DEF 6.77  (n=905)
   GK  6.82  (n=240)
   MID 6.85  (n=703)
@@ -38,7 +38,7 @@ Average points per category, per player (after damping):
   GK  Goals and assists+0.00
   GK  Goals conceded  -0.41
   GK  Passing         +0.01
-  MID Attacking       +0.17
+  MID Attacking       +0.16
   MID Defending       +0.21
   MID Discipline      -0.09
   MID Errors          -0.02

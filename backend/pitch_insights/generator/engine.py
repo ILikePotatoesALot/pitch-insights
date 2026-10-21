@@ -16,7 +16,7 @@ from pitch_insights.events.schema import (
 )
 from pitch_insights.generator.players import (
     FORMATIONS, ClubDef, PlayerDef, club_strength, league_info, load_clubs,
-    pick_lineup, player_history, team_history,
+    head_to_head, pick_lineup, player_history, team_history,
 )
 from pitch_insights.generator.script import Script
 from pitch_insights.generator.xg import distance_to_goal, expected_goals
@@ -808,7 +808,7 @@ class MatchEngine:
         mrng = random.Random(self.seed * 7919 + 1)
         matchday = matchday + mrng.randint(-4, 10)
 
-        def team_block(ts: TeamState, opp: TeamState, starters: list[PState], bench: list[PlayerDef]):
+        def team_block(ts: TeamState, h2h: dict, starters: list[PState], bench: list[PlayerDef]):
             ranked = sorted(ts.club.players, key=lambda p: -p.quality)
             players = [dict(id=p.id, name=p.name, number=p.number, position=p.position, foot=p.foot,
                             attributes=p.attributes, history=player_history(p, matchday, ranked.index(p), mrng))
@@ -816,15 +816,16 @@ class MatchEngine:
             return dict(id=ts.id, name=ts.club.name, short_name=ts.club.short_name, colours=ts.club.colours,
                         formation=ts.club.formation, style=ts.club.style,
                         starting=[p.id for p in starters], bench=[p.id for p in bench],
-                        players=players, history=team_history(ts.club, opp.club, mrng))
+                        players=players, history=team_history(ts.club, h2h, mrng))
 
         home, away = self.teams
+        h2h_home, h2h_away = head_to_head(home.club, away.club, mrng)
         meta = dict(
             type="match_meta", schema=SCHEMA_VERSION,
             match=dict(id=self.match_id, seed=self.seed, date="2026-10-24", competition=league,
                        matchday=matchday, venue=home.club.venue),
-            home=team_block(home, away, home.players[:11], self.initial_bench[0]),
-            away=team_block(away, home, away.players[:11], self.initial_bench[1]),
+            home=team_block(home, h2h_home, home.players[:11], self.initial_bench[0]),
+            away=team_block(away, h2h_away, away.players[:11], self.initial_bench[1]),
             attacking_direction={
                 "1": {home.id: "left_to_right", away.id: "right_to_left"},
                 "2": {home.id: "right_to_left", away.id: "left_to_right"},

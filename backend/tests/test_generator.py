@@ -240,3 +240,9 @@ def test_watch_rejects_a_speed_of_zero():
 
     with pytest.raises(SystemExit):
         main(["match.jsonl", "--speed", "0"])
+
+
+def test_head_to_head_records_agree(match):
+    meta, _, _ = match
+    home, away = meta["home"]["history"]["head_to_head"], meta["away"]["history"]["head_to_head"]
+    assert home == {"wins": away["losses"], "draws": away["draws"], "losses": away["wins"]}

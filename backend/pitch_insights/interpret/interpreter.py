@@ -136,8 +136,10 @@ class Interpreter:
         out: list[dict] = []
 
         team = ev.get("team_id")
-        # Pressures, fouls, subs and failed tackles are made by a team without the ball; they don't change possession.
-        keeps_ball = ev["type"] in ("pressure", "foul", "substitution") or (ev["type"] == "tackle" and ev["outcome"] == "lost")
+        # Pressures, fouls, subs, failed tackles and clearances can be made by a team without the ball; they don't
+        # change possession on their own (after a clearance, whoever recovers the ball decides it).
+        keeps_ball = (ev["type"] in ("pressure", "foul", "substitution", "clearance")
+                      or (ev["type"] == "tackle" and ev["outcome"] == "lost"))
         if team and "possession_id" in ev and not keeps_ball:
             if self.possession_team is not None and team != self.possession_team:
                 self.patterns.add(self.now, "possession_change", None)
@@ -360,6 +362,7 @@ class Interpreter:
         ts.fouls += 1
         ps.fouls += 1
         self.players[ev["victim_id"]].fouled += 1
+        self.last_pass = None  # play restarts with a set piece, so an earlier pass can't assist what follows
         if ev["x"] > 42:
             ts.defensive_actions_high += 1
         penalty = ev.get("penalty", False)
