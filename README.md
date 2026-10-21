@@ -6,6 +6,8 @@ Pitch Insights is an AI system that turns live football match events into explai
 
 Built for the Microsoft Premier League Hackathon (October 2026).
 
+Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
+
 ## Pipeline
 
 1. **Ingest**: synthetic match events, plus events derived from match video (YOLO detection, ByteTrack, pitch homography), in one shared event format.
@@ -45,6 +47,23 @@ python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
 pytest
 ```
+
+### Run the app
+
+Two terminals:
+
+```
+cd backend
+.venv\Scripts\python -m uvicorn pitch_insights.server:app --port 8000
+```
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute.
 
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 

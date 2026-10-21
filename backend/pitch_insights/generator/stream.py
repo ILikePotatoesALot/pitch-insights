@@ -33,6 +33,8 @@ def start_seconds(events: list[dict], minute: float) -> float:
 
 class Replay:
     def __init__(self, events: list[dict], speed: float = 1.0, start_at: float = 0.0, poll: float = 0.1):
+        if speed <= 0:
+            raise ValueError("speed must be positive")
         self.events = events
         self.times = match_seconds(events)
         self.speed = speed
@@ -56,6 +58,8 @@ class Replay:
         self._match_t, self._wall = self.now, time.monotonic()
 
     def set_speed(self, speed: float):
+        if speed <= 0:
+            raise ValueError("speed must be positive")
         self._rebase()
         self.speed = speed
 

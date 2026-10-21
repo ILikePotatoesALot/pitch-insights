@@ -1,0 +1,26 @@
+Headlines per match                4.0   3-8  ok
+Headline + notable per match       9.6   8-15  ok
+All moments per match             14.4
+
+Moments per match by type and tier:
+  big_chance_missed headline  0.12
+  big_chance_missed notable   0.28
+  chaos_spike       minor     0.42
+  dominance         minor     0.49
+  dominance         notable   1.45
+  full_time         headline  1.00
+  goal              headline  2.84
+  half_time         notable   1.00
+  momentum_swing    minor     0.01
+  momentum_swing    notable   1.52
+  penalty_awarded   notable   0.30
+  pressing_spell    minor     0.45
+  pressing_spell    notable   0.20
+  rating_drop       minor     0.16
+  rating_jump       minor     2.77
+  rating_milestone  minor     0.49
+  rating_milestone  notable   0.83
+  red_card          headline  0.06
+  red_card          notable   0.02
+
+All checks passed
