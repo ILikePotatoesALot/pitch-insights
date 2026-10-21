@@ -4,7 +4,7 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 ## The project in one paragraph
 
-**Pitch Insights** is our entry to the Microsoft Premier League Hackathon. **Submission deadline: 27 Oct 2026, 11:59 pm Pacific Time** (about 2:59 pm, 28 Oct, Singapore time). It turns football match events into explainable, personalised insight: a synthetic match generator (plus, later, real video) feeds an Interpreter (stats, patterns, win probability, live player ratings), a Moment Scorer picks the moments that matter with the evidence behind them, and a web app shows it all on a live 3D pitch, differently for casual fans and analysts. Agents on Microsoft Foundry will turn the evidence into commentary.
+**Pitch Insights** is our entry to the Microsoft Premier League Hackathon. **Submission deadline: 27 Oct 2026, 11:59 pm Pacific Time** (about 2:59 pm, 28 Oct, Singapore time). It turns football match events into explainable, personalised insight: a synthetic match generator (plus, later, real video) feeds an Interpreter (stats, patterns, win probability, live player ratings), a Moment Scorer picks the moments that matter with the evidence behind them, and a web app shows it all on a live 3D pitch, differently for casual fans and analysts. Agents built with Microsoft Agent Framework will turn the evidence into checked commentary, using Foundry for embeddings and tracing.
 
 - **Team:** Austin and Claude. Claude writes most of the code; Austin decides, sets up Azure, tests and records the demo. Friends are only listed if they contribute (prize verification, rule 8.2).
 - **Repo:** [github.com/ILikePotatoesALot/pitch-insights](https://github.com/ILikePotatoesALot/pitch-insights), **private** until submission (it must be public before 27 Oct, rule 4.4). Local copy: `C:\Users\austin\pitch-insights`.
@@ -13,12 +13,11 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 | Branch | State | Contents |
 |---|---|---|
-| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2) |
-| `generator-review` | On GitHub, pull request open into `main` | Fixes from the code review of the original code (generator, replay, tools) and from a second review (banner timer, set-piece assists, clearances, head-to-head) |
+| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3) |
 
-The merged branches (`interpret-stage`, `moment-scorer`, `pitch-frontend`) are deleted. Every branch so far has had a `/code-review`; the original code was reviewed by path on `generator-review`.
+`main` is the only branch; the merged ones are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
-**Next git step:** merge the `generator-review` pull request (Austin's OK needed), then delete the branch.
+**Next git step:** the agents go on a new branch (for example `agents`), with a `/code-review` before the pull request.
 
 ## What's built
 
@@ -31,7 +30,7 @@ The merged branches (`interpret-stage`, `moment-scorer`, `pitch-frontend`) are d
 | Moment Scorer (moments, tiers, evidence packs, fallback headlines) | Built, reviewed, fixed | `backend/pitch_insights/explain/moments.py` |
 | Replay server (FastAPI WebSocket) | Built, reviewed, fixed | `backend/pitch_insights/server.py` |
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
-| Agents on Foundry (Explainer, Narrator, Personalizer, Overlay Director, Scenario Director) | Not started | |
+| Agents (Memory, Explainer, Narrator, Personalizer, Overlay Director, Scenario Director; groundedness and safety checks; stored commentary) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents-planned) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
@@ -96,6 +95,8 @@ Then open http://localhost:5173. In Claude Code, both servers are also set up in
 - Detector plan: **RF-DETR (small)** first, **YOLO** as fallback. Training on Austin's GPU machine (no Azure ML GPU quota); runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
 - License: AGPL-3.0 for now (because of Ultralytics). If we use RF-DETR and drop Ultralytics, relicense as MIT or Apache-2.0, which suits the Enterprise category better.
 - Everything downstream reads events one at a time and never looks ahead, so a live feed and a replay behave the same. Keep it that way; there are tests for it.
+- **Azure (student subscription):** Austin is Owner of one Azure for Students subscription. It may only deploy to Japan West, Southeast Asia, East Asia, Malaysia West and Indonesia Central (a Microsoft policy, not changeable by us). Resource group `rg-pitch-insights` (East US is fine; its resources go in Southeast Asia). No chat-model quota anywhere it can deploy, and quota requests are refused automatically; only Pay-As-You-Go lifts that. It does have 350K TPM for `text-embedding-3-large` in Southeast Asia.
+- **Chat model:** one `.env` setting (`LLM_PROVIDER`: `github`, `foundry`, `foundry_local`). GitHub Models for now; GPT-6 Luna (`gpt-6-luna`) on Foundry if Austin goes Pay-As-You-Go. See [DESIGN.md, Agents](DESIGN.md#agents-planned).
 
 **Ways of working**
 - Commit locally as often as needed; **push only when Austin says so.**
@@ -112,30 +113,30 @@ Then open http://localhost:5173. In Claude Code, both servers are also set up in
 
 ## Waiting on Austin
 
-1. **Merge the `generator-review` pull request** (just say so).
-2. **GPU details** for the training machine: model, VRAM, OS.
-3. **A Foundry GPT model**, with its endpoint and key in `.env` (copy `.env.example`; never paste keys in chat). Needed for the agents.
-4. **OK to download** SoccerTrack match 117093's first half (3.35 GB) and its annotations into `data/`.
-5. **Confirm hackathon registration** went through (it closed 20 Oct).
-6. **Clarification question to the organisers** (rule 11.6, in writing, before the deadline): is licensed real footage (SoccerTrack v2) fine for the video path when the core uses synthetic data?
-7. Whether to add teammates as GitHub collaborators.
+1. **A GitHub token** with the Models permission, in `.env` as `GITHUB_TOKEN` (never paste it in chat). Needed for the agents.
+2. **Free-tier resources** in Southeast Asia, in `rg-pitch-insights`: Content Safety, Translator and Speech (F0 tier), with keys in `.env`. Say which ones the subscription allows.
+3. **Pay-As-You-Go decision:** the only way to get Foundry chat quota (GPT-6 Luna would cost well under a dollar; needs a card, a low rate limit and a budget alert). Optional.
+4. **GPU details** for the training machine: model, VRAM, OS.
+5. **OK to download** SoccerTrack match 117093's first half (3.35 GB) and its annotations into `data/`.
+6. **Confirm hackathon registration** went through (it closed 20 Oct).
+7. **Clarification question to the organisers** (rule 11.6, in writing, before the deadline): is licensed real footage (SoccerTrack v2) fine for the video path when the core uses synthetic data? Optionally also ask about Azure credits.
+8. Whether to add teammates as GitHub collaborators.
 
 ## Next steps, in order
 
 | # | Step | Needs | Size |
 |---|---|---|---|
-| 1 | Merge the `generator-review` pull request (the original code's review fixes; already reviewed twice) | Austin's OK | Minutes |
-| 2 | Done: code review of the original code, fixed on `generator-review` | | |
-| 3 | **Explainer and Narrator agents** on Foundry with Microsoft Agent Framework: turn each moment's evidence pack into commentary (casual and analyst voices, several languages); only facts from the pack | Foundry model in `.env` | ~half a day |
-| 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Step 3 for languages | ~half a day |
-| 5 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
-| 6 | **Live simulation mode** and the **Scenario Director** agent that steers a live match (logged so it replays exactly) | Step 3 | ~half a day |
-| 7 | **SoccerTrack preparation**: loader (mind the format traps), conversion to our events and frames, training kit for the GPU machine | Download OK | ~half a day |
-| 8 | **Train the detector** (RF-DETR, YOLO fallback), video-to-frames and events, accuracy benchmark against SoccerTrack. Keep-or-cut decision on 23 Oct | GPU machine | 1–2 days |
-| 9 | **Deploy to Azure**: backend and detection on Container Apps, app on Static Web Apps | Azure subscription | ~half a day |
-| 10 | **Demo video** (under 2 minutes; hero shot: same match, different viewers side by side), README polish, make the repo public, submit | Everything above | 27 Oct at the latest |
+| 1 | **Agents core** on a new branch: provider switch, Explainer (casual and analyst), groundedness check with retry and fallback, Narrator, stored commentary for the samples, commentary shown in the app | GitHub token | ~1 day |
+| 2 | **Foundry and AI services:** Memory agent (embeddings), Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
+| 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
+| 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
+| 5 | **Video path keep-or-cut, 23 Oct.** Keep only if the GPU details and download OK are in by then; otherwise cut it and say so in the README | GPU details, download OK | Decision |
+| 6 | **Live simulation mode** and the **Scenario Director** agent that steers a live match (logged so it replays exactly) | Step 1 | ~half a day |
+| 7 | If kept: **SoccerTrack preparation and detector training** (loader, conversion, RF-DETR with YOLO fallback, accuracy benchmark) | GPU machine | 1–2 days |
+| 8 | **Deploy to Azure**: backend on Container Apps, app on Static Web Apps, in allowed regions; Foundry chat if Pay-As-You-Go is set up | Steps 1–4 | ~half a day |
+| 9 | **Demo video** (under 2 minutes; hero shot: same match, different viewers side by side), README polish, make the repo public, submit | Everything above | 27 Oct at the latest |
 
-**If time runs short, cut in this order:** speech audio, Event Hubs, live simulation mode, then 3D polish. Never cut the five pipeline stages or the demo video.
+**If time runs short, cut in this order:** speech audio, Event Hubs, the video path, live simulation mode and the Scenario Director, then 3D polish. Never cut the five pipeline stages, the stored commentary or the demo video.
 
 ## Submission checklist (27 Oct)
 

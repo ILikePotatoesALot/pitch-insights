@@ -195,6 +195,75 @@ Code in `backend/pitch_insights/explain/moments.py`. `MatchBrain` wraps the Inte
   - **Banner:** each headline moment that arrives live shows over the pitch for a few seconds (not ones restored by a catch-up).
   - **Connection:** a dropped connection shows a message; jumping to a minute reconnects. A jump belongs to its match, so picking another match starts it from kick-off.
 
+## Agents (planned)
+
+Designed 21 Oct 2026. The agents turn the Moment Scorer's evidence packs into commentary, check it, and fit it to each viewer. They are built with **Microsoft Agent Framework** and share one state: the `MatchBrain` (Interpreter plus Moment Scorer), which the agents read but never change.
+
+### Model access (why the design looks like this)
+
+- Our Azure for Students subscription may only deploy to five regions (Japan West, Southeast Asia, East Asia, Malaysia West, Indonesia Central). In Southeast Asia and Japan West every base chat model has **0 TPM** of quota; only fine-tuned and batch deployments have quota. Quota increases are refused automatically for student and free-trial subscriptions; only Pay-As-You-Go lifts that.
+- What the subscription *does* have: a Foundry resource and project in Southeast Asia, **350K TPM for `text-embedding-3-large`**, and (to be confirmed) free tiers for Content Safety, Translator and Speech.
+- So the chat model sits behind one setting, and everything else uses Foundry and Azure AI services that need no chat quota.
+
+### Chat model provider
+
+One setting in `.env`, `LLM_PROVIDER`, picks where chat calls go. The agent code doesn't change:
+
+| Provider | Use | Notes |
+|---|---|---|
+| `github` (default for now) | Development, live mode | GitHub Models: free with a GitHub token (`GITHUB_TOKEN`, Models permission); daily rate limits |
+| `foundry` | If Austin moves the subscription to Pay-As-You-Go | `gpt-6-luna` (GPT-6's small, cheap tier: about US$0.10 / US$0.50 per million input / output tokens), Global Standard, low rate limit, budget alert |
+| `foundry_local` | Generating stored commentary offline | Foundry Local through Agent Framework's `FoundryLocalClient`; small models (Phi, Qwen) on the CPU, slow but free |
+
+Every stored or streamed commentary line records which provider and model wrote it.
+
+### The agents and how they hand off
+
+For each headline or notable moment, in order:
+
+1. **Moment Scorer** (code, built): the moment and its evidence pack.
+2. **Memory agent** (Foundry embeddings): embeds the moment's facts and finds similar earlier moments in this match ("Carrot's second big chance down the left"), and in our generated season of matches. Adds them to the pack as `memory` facts.
+3. **Explainer** (chat model): why the moment matters, from the pack only. Two voices: casual (one or two plain sentences) and analyst (adds the numbers: xG, win-probability swing, momentum).
+4. **Groundedness check** (code, no model needed): every player name, club, minute and number in the text must appear in the pack. The score is the share of these claims the pack supports. If anything is unsupported, the Explainer gets one retry with the unsupported claims listed; if it fails again, the moment falls back to the Moment Scorer's fallback headline. Scores are logged and summarised per match, for the README.
+5. **Safety check** (Azure AI Content Safety): screens the text before it can reach the screen. Anything flagged falls back to the fallback headline.
+6. **Translator** (Azure AI Translator): the viewer's language. Player and club names are protected from translation.
+7. **Narrator** (chat model): short live lines between big moments (pressing spells, momentum turning), from pattern signals, with the same groundedness and safety checks.
+8. **Personalizer**: picks what each viewer sees from their profile (casual or analyst, club, favourite player, language, focus metric).
+9. **Overlay Director**: turns what's left into timed overlay cues (time, duration, priority, template, data) so the screen never clutters.
+10. **Scenario Director** (live simulation only): steers a live match with interventions, logged so the match replays exactly.
+
+Failure handling is part of the design, because the Multi-Agent prize judges recovery: a timeout, a rate limit or a failed check never blocks the match. The moment shows its fallback headline at once and is upgraded if better text arrives in time.
+
+### Stored commentary for the demo
+
+- A script runs the agents over each sample match and stores the results in `samples/<name>.commentary.json`, keyed by moment, voice and language.
+- In replay, the server streams stored commentary, so judges never hit a rate limit or a missing key. Live simulation calls the model.
+- The stored file is regenerated whenever the generator, Interpreter or Moment Scorer changes the sample matches.
+
+### Tracing
+
+Agent Framework's OpenTelemetry traces go to Application Insights connected to the Foundry project, so each handoff, retry, fallback and check result can be shown in the demo and the README.
+
+### Azure resources
+
+All in the Owner subscription, resource group `rg-pitch-insights` (East US; a resource group's region only holds its records), resources in **Southeast Asia**:
+
+- Foundry resource and project, with the `text-embedding-3-large` deployment
+- Content Safety, Translator and Speech, each on the free F0 tier (Speech optional; first to cut)
+- Application Insights
+
+Keys and endpoints live in `.env` on the server only, never in the browser.
+
+### Not used, and why
+
+- **Foundry Agent Service and Foundry Evaluations:** both need a chat model deployed in Foundry. Our own groundedness check replaces the evaluation.
+- **Fine-tuning:** we have fine-tuning quota for 4.1-mini and 4.1-nano, but training costs money, Developer Tier deployments are deleted after about a day, and Global Standard fine-tuned deployments charge hourly hosting.
+
+### Rules this supports
+
+- Microsoft Foundry is the first "hero technology" under Technological Implementation (20% of every score). Agent Framework and "Azure Apps and AI Services" are on the same list.
+- The Multi-Agent prize accepts Agent Framework with any model provider; only the Foundry prize needs Foundry itself. A project can win one grand prize and up to one category prize (rule 8.2).
+
 ## Video path (planned)
 
 Designed 21 Oct 2026. Turns real match video into the same messages as the synthetic generator: `frame` messages with player positions, and `event` messages with `source: "video"` and a `confidence` below 1.

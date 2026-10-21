@@ -1,14 +1,15 @@
 # Plan
 
-Agreed 20 Oct 2026; video path updated 21 Oct. Submission deadline: 27 Oct 2026, 11:59 pm Pacific Time.
+Agreed 20 Oct 2026; video path updated 21 Oct; agents and model access updated 21 Oct. Submission deadline: 27 Oct 2026, 11:59 pm Pacific Time.
 
 ## Status (21 Oct)
 
 For a full pick-up guide (branches, how to run, rules, what's waiting, ordered next steps) see [HANDOFF.md](HANDOFF.md).
 
-- **Done:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (stats, patterns, win probability, live ratings, signals) merged into `main` via ILikePotatoesALot/pitch-insights#1. Moment Scorer, replay server and the first version of the app (3D pitch, moments feed, ratings, casual and analyst modes) on branch `pitch-frontend`.
-- **Next, not blocked:** live simulation mode; Overlay Director (timed overlay cues); more Personalise options (favourite club and player, language).
-- **Waiting on Austin:** GPU model, VRAM and OS (for detector training); a deployed Foundry GPT model with its endpoint and key in `.env` (for the agents); OK to download SoccerTrack match 117093's first half (3.35 GB).
+- **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
+- **Azure:** Foundry project in Southeast Asia, but the student subscription has no chat-model quota and can't get more without Pay-As-You-Go. The agents start on GitHub Models behind one `.env` setting; Foundry provides embeddings, tracing and AI services. Details: [DESIGN.md, Agents](DESIGN.md#agents-planned).
+- **Next, not blocked:** Explainer and Narrator agents with the groundedness check and stored commentary; Overlay Director; live simulation mode.
+- **Waiting on Austin:** a GitHub token for GitHub Models; free-tier Content Safety, Translator and Speech resources; the Pay-As-You-Go decision; GPU model, VRAM and OS; OK to download SoccerTrack match 117093's first half (3.35 GB).
 - **Team:** Austin and Claude. Friends are listed only if they contribute (prize verification, rule 8.2).
 
 ## Concept
@@ -57,6 +58,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - **Moment Scorer** (code, built): ranks the Interpreter's signals into moments (about 4 headlines and 10 shown a match), each with an evidence pack and a fallback headline. Details: [DESIGN.md, Moment Scorer](DESIGN.md#explain-stage-moment-scorer-v1).
 - Key moments get an evidence pack; the LLM explains only what is in it.
 - A "Why?" button shows the evidence behind any moment or rating.
+- **Agents** (Agent Framework, planned): Memory agent (similar earlier moments, Foundry embeddings), Explainer (casual and analyst voices), groundedness check in code (one retry, then the fallback headline), Content Safety, Translator, Narrator. Commentary for the sample matches is generated ahead and stored, so the judges' demo never depends on rate limits. Details: [DESIGN.md, Agents](DESIGN.md#agents-planned).
 
 ## 4. Render (Vite + React + Three.js)
 
@@ -73,27 +75,29 @@ A live "match brain": specialist agents turn football events into scored, eviden
 
 ## Microsoft stack
 
-- Foundry: GPT models and agents.
-- Agent Framework agents: Ingest, Video Ingest, Stats/Pattern, Moment Scorer, Explainer, Narrator, Personalizer, Overlay Director.
+- Microsoft Agent Framework: Memory, Explainer, Narrator, Personalizer, Overlay Director, Scenario Director (and Video Ingest if the video path stays).
+- Microsoft Foundry: project in Southeast Asia with `text-embedding-3-large` (Memory agent) and tracing through Application Insights; Foundry Local for generating stored commentary offline; GPT-6 Luna for chat only if the subscription moves to Pay-As-You-Go.
+- Chat model until then: GitHub Models, behind one `.env` setting.
+- Azure AI services (free tiers): Content Safety, Translator, Speech (optional).
 - Azure ML: experiment tracking and model registry for the detector (training runs on Austin's GPU; no GPU quota needed).
-- Azure Container Apps (backend, CPU detection service), Static Web Apps (frontend).
-- Optional: Event Hubs, AI Speech.
+- Azure Container Apps (backend, CPU detection service), Static Web Apps (frontend). Student subscription regions: Southeast Asia or East Asia.
+- Optional: Event Hubs.
 
 ## Timeline
 
-Rearranged 21 Oct: the Interpret stage finished early and training waits for Austin's GPU, so the frontend and agents move earlier.
+Rearranged again 21 Oct: the app was built a day early, the student subscription has no chat-model quota, and neither the GPU details nor the SoccerTrack download are in yet. The agents come first; the video path is decided on 23 Oct.
 
 | Day | Date | Austin | Claude |
 |---|---|---|---|
 | 1 | 20 Oct | Register, Azure account | Repo, event format, generator v1 (done) |
-| 2 | 21 Oct | Check GPU details; confirm a Foundry model is deployed | Interpret stage (done); SoccerTrack download and conversion to our event format and training data; training kit; Moment Scorer |
-| 3 | 22 Oct | Run detector training on the GPU machine | Vite + React + Three.js pitch; replay server streaming to the browser |
-| 4 | 23 Oct | Decide on the video path | Explainer and Narrator agents on Foundry; live simulation mode; video-to-events with the trained detector |
-| 5 | 24 Oct | Personas, test explanations | Overlays, Personalizer, multi-language; Scenario Director |
-| 6 | 25 Oct | Test the UI | Accuracy benchmark against SoccerTrack; deploy to Azure |
-| 7 | 26 Oct | Demo script | Polish, README |
+| 2 | 21 Oct | Azure setup: Foundry project, regions, quota (done; no chat quota) | Interpret stage, Moment Scorer, replay server and app, two code reviews (done); agents design |
+| 3 | 22 Oct | GitHub token; free-tier Content Safety, Translator, Speech; Pay-As-You-Go decision; GPU details | Agents: provider switch, Explainer, groundedness check, fallbacks, Narrator, stored commentary for the samples, commentary in the app |
+| 4 | 23 Oct | Test the commentary; **keep or cut the video path** | Memory agent (embeddings), Content Safety, Translator, tracing; Overlay Director |
+| 5 | 24 Oct | Personas, test explanations | Personalizer (favourite club and player, language, focus metric); live simulation mode and Scenario Director; video path work only if kept |
+| 6 | 25 Oct | Test the UI | Deploy to Azure (Container Apps, Static Web Apps); switch to Foundry chat if Pay-As-You-Go is set up |
+| 7 | 26 Oct | Demo script | Polish, README (architecture, Microsoft technologies, groundedness scores) |
 | 8 | 27 Oct | Record video, submit | Final fixes, make the repo public |
 
 ## Cut first if behind
 
-Speech audio, then Event Hubs, then live simulation mode (replay still covers the demo), then 3D polish. Never cut the five stages or the demo video.
+Speech audio, then Event Hubs, then the video path (if not already cut on 23 Oct), then live simulation mode and the Scenario Director (replay still covers the demo), then 3D polish. Never cut the five stages, the stored commentary or the demo video.
