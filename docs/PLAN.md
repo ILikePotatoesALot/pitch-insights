@@ -7,11 +7,12 @@ Agreed 20 Oct 2026; video path updated 21 Oct; agents and model access updated 2
 For a full pick-up guide (branches, how to run, rules, what's waiting, ordered next steps) see [HANDOFF.md](HANDOFF.md).
 
 - **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
-- **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna requested. Details: [DESIGN.md, Agents](DESIGN.md#agents).
+- **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna was refused, so the agents stay on GPT-4o. Details: [DESIGN.md, Agents](DESIGN.md#agents).
 - **Agents core merged** (ILikePotatoesALot/pitch-insights#4): Explainer and Narrator on GPT-4o through Agent Framework, code groundedness check with one retry and a fallback, stored commentary for the three samples (52 moments, all grounded), commentary shown in the app with an AI-generated note. Reviewed by `/code-review` and a second reviewer; all findings fixed.
 - **Next, not blocked:** Memory agent (embeddings are deployed); SoccerTrack loader (data downloaded); Overlay Director; live simulation mode.
-- **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights; which version of the video path (pre-trained detection on a short clip, recommended, or fine-tuning, which needs T4 GPU quota in Azure ML).
-- **Team:** Austin and Claude. Friends are listed only if they contribute (prize verification, rule 8.2).
+- **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights (placeholders are in `.env`).
+- **Decided 21 Oct:** the video path uses pre-trained detection on a short clip (fine-tuning maybe later); licensed footage is fine, so no clarification question; registration confirmed.
+- **Team:** Austin and Claude. Teammates are GitHub collaborators but not registered participants (prize verification, rule 8.2).
 
 ## Concept
 
@@ -25,7 +26,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - New project, started 20 Oct. The old CV project is reference only; no code copied.
 - Fictional clubs and players. No Premier League names, logos or other trademarks.
 - Only footage we have rights to. Main source: **SoccerTrack v2** (CC BY 4.0; amateur university players who gave informed consent, collected with ethics approval, no names). Credit it in the README and the demo video. In the demo, label its players as "Team Left #7" and so on, never with our fictional names.
-- The core pipeline still runs on synthetic data (rules 4.7); real footage is used only for the video path. Mention this in the clarification question to the organisers.
+- The core pipeline still runs on synthetic data (rules 4.7); real footage is used only for the video path. Austin confirmed on 21 Oct that licensed footage is fine.
 - License: AGPL-3.0 for now. If we use RF-DETR (Apache-2.0) and drop Ultralytics, relicense the repo as MIT or Apache-2.0, which suits the Enterprise category better.
 
 ## 1. Ingest (two sources, one event format)
@@ -77,7 +78,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 ## Microsoft stack
 
 - Microsoft Agent Framework: Memory, Explainer, Narrator, Personalizer, Overlay Director, Scenario Director (and Video Ingest if the video path stays).
-- Microsoft Foundry (East US 2): `gpt-4o` for the agents (GPT-6 Luna if the quota request is approved), `text-embedding-3-small` for the Memory agent, groundedness evaluations, and tracing through Application Insights. GitHub Models as a fallback behind one `.env` setting.
+- Microsoft Foundry (East US 2): `gpt-4o` for the agents (GPT-6 Luna quota was refused), `text-embedding-3-small` for the Memory agent, groundedness evaluations, and tracing through Application Insights. GitHub Models as a fallback behind one `.env` setting.
 - Azure AI services (free tiers): Content Safety, Translator, Speech (optional).
 - Azure ML: experiment tracking and model registry for the detector; training on a cloud GPU (needs GPU quota) or Austin's GPU machine.
 - Azure Container Apps (backend, detection run ahead of time), Static Web Apps (frontend), Key Vault with a managed identity, Cosmos DB free tier (viewer profiles, stored commentary).
@@ -92,9 +93,9 @@ Rearranged again 21 Oct: the app was built a day early, the student subscription
 | 1 | 20 Oct | Register, Azure account | Repo, event format, generator v1 (done) |
 | 2 | 21 Oct | Azure setup: personal Pay-As-You-Go subscription, Foundry with GPT-4o and embeddings, Azure ML workspace; SoccerTrack download (done) | Interpret stage, Moment Scorer, replay server and app, two code reviews; agents core, reviewed and merged (done) |
 | 3 | 22 Oct | Free-tier Content Safety, Translator, Speech; Application Insights; T4 GPU quota request (only for fine-tuning) | Memory agent; SoccerTrack loader and conversion |
-| 4 | 23 Oct | Test the commentary; **choose the video path version** | Content Safety, Translator, tracing; detection on a short clip, pitch positions, benchmark; Overlay Director |
+| 4 | 23 Oct | Test the commentary | Content Safety, Translator, tracing; detection on a short clip, pitch positions, benchmark; Overlay Director |
 | 5 | 24 Oct | Personas, test explanations | Personalizer (favourite club and player, language, focus metric); live simulation mode and Scenario Director; video path work only if kept |
-| 6 | 25 Oct | Test the UI | Deploy to Azure (Container Apps, Static Web Apps, Key Vault, Cosmos DB); switch to GPT-6 Luna if approved |
+| 6 | 25 Oct | Test the UI | Deploy to Azure (Container Apps, Static Web Apps, Key Vault, Cosmos DB) |
 | 7 | 26 Oct | Demo script | Polish, README (architecture, Microsoft technologies, groundedness scores) |
 | 8 | 27 Oct | Record video, submit | Final fixes, make the repo public |
 

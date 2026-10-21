@@ -6,7 +6,7 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 **Pitch Insights** is our entry to the Microsoft Premier League Hackathon. **Submission deadline: 27 Oct 2026, 11:59 pm Pacific Time** (about 2:59 pm, 28 Oct, Singapore time). It turns football match events into explainable, personalised insight: a synthetic match generator (plus, later, real video) feeds an Interpreter (stats, patterns, win probability, live player ratings), a Moment Scorer picks the moments that matter with the evidence behind them, and a web app shows it all on a live 3D pitch, differently for casual fans and analysts. Agents built with Microsoft Agent Framework will turn the evidence into checked commentary, using Foundry for embeddings and tracing.
 
-- **Team:** Austin and Claude. Claude writes most of the code; Austin decides, sets up Azure, tests and records the demo. Friends are only listed if they contribute (prize verification, rule 8.2).
+- **Team:** Austin and Claude. Claude writes most of the code; Austin decides, sets up Azure, tests and records the demo. Austin is registered (confirmed 21 Oct). Teammates have been added as GitHub collaborators but aren't registered participants, so they aren't listed as team members (prize verification, rule 8.2).
 - **Repo:** [github.com/ILikePotatoesALot/pitch-insights](https://github.com/ILikePotatoesALot/pitch-insights), **private** until submission (it must be public before 27 Oct, rule 4.4). Local copy: `C:\Users\austin\pitch-insights`.
 
 ## Where the code is
@@ -100,11 +100,11 @@ cd backend
 
 **Technical**
 - Python 3.12 (3.14 is the machine default, but CV packages lag). Node 24.
-- Detector plan: **RF-DETR (small)** first, **YOLO** as fallback. First run the released model on a short clip (no GPU needed); fine-tune only if T4 quota arrives in Azure ML (workspace `ML-pitch-insights`) or on Austin's GPU machine; runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
+- Detector plan (decided 21 Oct): the **pre-trained RF-DETR (small)** as released, on a short clip, no training and no GPU; **YOLO** as fallback. Austin may fine-tune later if T4 quota arrives in Azure ML (workspace `ML-pitch-insights`) or on Austin's GPU machine; runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
 - License: AGPL-3.0 for now (because of Ultralytics). If we use RF-DETR and drop Ultralytics, relicense as MIT or Apache-2.0, which suits the Enterprise category better.
 - Everything downstream reads events one at a time and never looks ahead, so a live feed and a replay behave the same. Keep it that way; there are tests for it.
 - **Azure:** Austin's **personal Pay-As-You-Go subscription** (upgraded free trial; free credit spent first; US$20 monthly budget alert). Resource group `rg-pitch-insights`, everything in **East US 2**. The school's Azure for Students subscription is no longer used (five Asian regions only, no chat-model quota, quota requests refused automatically).
-- **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` requested; much cheaper, switch to it by changing the deployment name in `.env` if approved. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents).
+- **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` was requested and refused (21 Oct), so the agents stay on `gpt-4o`; keep calls few (stored commentary, `max_tokens` 220) and watch the US$20 budget alert. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents).
 - **Keys:** in `.env` only (ignored by git). `.env.example` holds placeholders; never put real values in it, because it's committed.
 - **HTTPS on this machine:** the network inspects HTTPS, so Python's built-in certificate list fails with "self-signed certificate in certificate chain". Use the Windows certificate store (`ssl.create_default_context()`); never turn verification off. curl needs `--ssl-no-revoke` for a related reason.
 
@@ -128,12 +128,10 @@ cd backend
 
 ## Waiting on Austin
 
-1. **Free-tier resources** in `rg-pitch-insights`, East US 2: Content Safety (F0), Translator (F0, region Global), Speech (F0, optional), and Application Insights connected from the Foundry project's Tracing page. Endpoints and keys in `.env`. Needed for next step 2.
-2. **The GPT-6 Luna quota decision** from Microsoft (requested 21 Oct). Nothing to do unless it's approved.
-3. **Video path: which version, by 23 Oct.** The data is downloaded (see Data on this machine, above). Recommended: the pre-trained detector on a short clip, no training, so no GPU needed. Fine-tuning needs a small T4 GPU quota in Azure ML (workspace `ML-pitch-insights`): request it from Compute > Compute clusters > New (the greyed-out GPU size has a "Request quota" link) or Azure portal > Quotas > Machine Learning, family **NCASv3_T4**, East US 2, 4 cores.
-4. **Confirm hackathon registration** went through (it closed 20 Oct).
-5. **Clarification question to the organisers** (rule 11.6, in writing, before the deadline): is licensed real footage (SoccerTrack v2) fine for the video path when the core uses synthetic data? Only needed if the video path stays.
-6. Whether to add teammates as GitHub collaborators.
+1. **Free-tier resources** in `rg-pitch-insights`, East US 2: Content Safety (F0), Translator (F0, region Global), Speech (F0, optional), and Application Insights connected from the Foundry project's Tracing page. The names are already in `.env` (empty) and `.env.example`; fill in the endpoints and keys. Needed for next step 2.
+2. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
+
+Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is fine for the video path, so no clarification question is needed; teammates are GitHub collaborators only; GPT-6 Luna quota was refused; the video path uses the pre-trained detector.
 
 ## Next steps, in order
 
@@ -143,7 +141,7 @@ cd backend
 | 2 | **Foundry and AI services:** Memory agent (embeddings), Foundry groundedness evaluation, Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
-| 5 | **Video path: which version, 23 Oct.** Recommended: pre-trained detection on a short clip (no GPU quota needed), fine-tuning only if T4 quota arrives. Cut it if it isn't working by 24 Oct | Austin's call | Decision |
+| 5 | Decided 21 Oct: the video path uses **pre-trained detection on a short clip** (no GPU quota needed); fine-tuning maybe later. Cut it if it isn't working by 24 Oct | | |
 | 6 | **Live simulation mode** and the **Scenario Director** agent that steers a live match (logged so it replays exactly) | Step 1 | ~half a day |
 | 7 | **SoccerTrack loader** (mind the format traps), then detection on a short clip, pitch positions, `frame` messages, accuracy benchmark against the tracking ground truth; fine-tuning if a GPU arrives | Data downloaded | ~1–1.5 days |
 | 8 | **Deploy to Azure**: backend on Container Apps, app on Static Web Apps, keys in Key Vault through a managed identity, Cosmos DB free tier for profiles and stored commentary | Steps 1–4 | ~half a day |
@@ -159,4 +157,3 @@ cd backend
 - [ ] A link judges can use to try it (Azure deployment), free until 10 Nov
 - [ ] Credits: Roboflow (if used), SoccerTrack v2 (if used)
 - [ ] License file matches the final choice (AGPL-3.0, or MIT/Apache-2.0 if Ultralytics is dropped)
-- [ ] Clarification answer from the organisers on real footage, if received
