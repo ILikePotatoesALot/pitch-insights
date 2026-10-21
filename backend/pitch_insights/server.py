@@ -31,6 +31,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from pitch_insights.agents.prompts import input_hash
 from pitch_insights.agents.store import load_commentary
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
@@ -73,10 +74,13 @@ def get_match(name: str) -> dict:
     return meta
 
 
-def with_commentary(moment: dict, stored: dict) -> dict:
-    """The moment plus its stored commentary, if the agents wrote any for it."""
+def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
+    """The moment plus its stored commentary, if the agents wrote some from these same facts.
+    Commentary written for different facts (the file is older than the code) is left out."""
     rec = stored["moments"].get(moment["id"])
-    return moment | {"commentary": rec} if rec else moment
+    if not rec or rec.get("input_hash") != input_hash(moment, meta):
+        return moment
+    return moment | {"commentary": rec}
 
 
 def commentary_info(stored: dict) -> dict | None:
@@ -125,7 +129,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if first:
         recent = [ev for ev, t in zip(events[:first], times[:first])
                   if t >= times[first - 1] - 180 or (ev["type"] == "match_state" and ev["state"] == "half_time")]
-        await ws.send_json({"type": "catchup", "moments": [with_commentary(m, stored) for m in brain.moments],
+        await ws.send_json({"type": "catchup", "moments": [with_commentary(m, stored, meta) for m in brain.moments],
                             "state": state_message(brain), "recent_events": recent})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
@@ -157,7 +161,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})
             for m in out["moments"]:
-                await ws.send_json({"type": "moment", "moment": with_commentary(m, stored)})
+                await ws.send_json({"type": "moment", "moment": with_commentary(m, stored, meta)})
             if loop.time() - last_state >= STATE_EVERY_S or ev["type"] in ("shot", "match_state") or out["moments"]:
                 await ws.send_json({"type": "state", "state": state_message(brain)})
                 last_state = loop.time()

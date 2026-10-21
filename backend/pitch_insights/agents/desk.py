@@ -13,7 +13,6 @@ Timeouts, rate limits and service errors also fall back, so a moment always has 
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import json
 import logging
 import time
@@ -25,7 +24,7 @@ from pydantic import BaseModel
 from pitch_insights.agents import grounding
 from pitch_insights.agents.middleware import RunLogMiddleware, moment_id_var
 from pitch_insights.agents.prompts import (
-    EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, moment_input, retry_input,
+    EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, input_hash, moment_input, retry_input,
 )
 
 log = logging.getLogger("pitch_insights.agents")
@@ -54,9 +53,40 @@ def agent_for(moment: dict) -> str:
     return "explainer" if moment["type"] in EXPLAINER_TYPES else "narrator"
 
 
-def input_hash(moment: dict, meta: dict) -> str:
-    """Fingerprint of what the writer is shown, so stored commentary is redone when the facts change."""
-    return hashlib.sha256(moment_input(moment, meta).encode()).hexdigest()[:16]
+class ProviderConfigError(RuntimeError):
+    """The provider refused us outright (bad key, no access, wrong deployment): every moment would
+    fail the same way, so stop rather than write a file of fallbacks."""
+
+
+def _causes(exc: BaseException):
+    """The exception and everything it wraps. Agent Framework re-raises OpenAI errors as its own
+    ChatClientException, with the original as the cause."""
+    seen = set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        yield exc
+        exc = getattr(exc, "inner_exception", None) or exc.__cause__
+
+
+def failure_reason(exc: BaseException) -> str | None:
+    """Why a draft failed, for the record; None if it isn't a provider failure (a bug, so re-raise).
+    Raises ProviderConfigError for errors no retry or fallback can fix."""
+    from agent_framework.exceptions import ChatClientContentFilterException, ChatClientException
+
+    for e in _causes(exc):
+        if isinstance(e, (openai.AuthenticationError, openai.PermissionDeniedError, openai.NotFoundError)):
+            raise ProviderConfigError(f"the model provider refused the request ({e.status_code}); "
+                                      "check the endpoint, key and deployment name in .env") from exc
+        if isinstance(e, (openai.RateLimitError, openai.APITimeoutError, openai.APIConnectionError,
+                          openai.InternalServerError)):
+            return f"service unavailable ({type(e).__name__})"  # the SDK has already retried
+        if isinstance(e, ChatClientContentFilterException):
+            return "request refused (content filter)"
+        if isinstance(e, openai.APIStatusError):
+            return f"request refused ({e.status_code})"  # not worth retrying
+    if isinstance(exc, ChatClientException):
+        return f"service error ({type(exc).__name__})"
+    return None
 
 
 def fallback_lines(moment: dict) -> Lines:
@@ -89,12 +119,10 @@ class CommentaryDesk:
                 except TimeoutError:
                     reason = "timeout"
                     break
-                except (openai.RateLimitError, openai.APITimeoutError, openai.APIConnectionError,
-                        openai.InternalServerError) as e:
-                    reason = f"service unavailable ({type(e).__name__})"  # the SDK has already retried
-                    break
-                except openai.APIStatusError as e:
-                    reason = f"request refused ({e.status_code})"  # e.g. a content filter; not worth retrying
+                except Exception as e:
+                    reason = failure_reason(e)
+                    if reason is None:
+                        raise
                     break
                 if lines is None:
                     reason = "no structured output"
@@ -131,7 +159,7 @@ class AgentWriter:
     def __init__(self, client, provider: str, model: str, max_tokens: int = 220, temperature: float = 0.4):
         from agent_framework import Agent
 
-        self.provider, self.model = provider, model
+        self.provider, self.model, self.client = provider, model, client
         self.options = {"response_format": Lines, "max_tokens": max_tokens, "temperature": temperature}
         mw = [RunLogMiddleware()]
         self.agents = {
@@ -141,6 +169,12 @@ class AgentWriter:
             "narrator": Agent(client, NARRATOR_INSTRUCTIONS, name="narrator",
                               description="Describes the flow of play between key moments.", middleware=mw),
         }
+
+    async def aclose(self) -> None:
+        """Close the HTTP connection pool behind the chat client."""
+        oai = getattr(self.client, "client", None)
+        if oai is not None:
+            await oai.close()
 
     async def write(self, role: str, prompt: str) -> Lines | None:
         response = await self.agents[role].run(prompt, options=self.options)

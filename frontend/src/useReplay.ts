@@ -36,6 +36,7 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
     setMoments([]);
     setLiveMoment(null);
     setState(null);
+    setAiInfo(null);
     onResetRef.current();
     let ended = false;
     const proto = location.protocol === "https:" ? "wss" : "ws";

@@ -10,7 +10,7 @@ import pytest
 
 from pitch_insights.agents import grounding
 from pitch_insights.agents.clients import base_url
-from pitch_insights.agents.desk import CommentaryDesk, Lines, agent_for, fallback_lines
+from pitch_insights.agents.desk import CommentaryDesk, Lines, ProviderConfigError, agent_for, fallback_lines
 from pitch_insights.agents.prompts import moment_input
 from pitch_insights.agents.settings import AgentSettings, load_settings
 from pitch_insights.agents.store import commentary_path, load_commentary, write_commentary
@@ -130,13 +130,34 @@ def test_two_bad_drafts_fall_back_to_the_headline(match):
     assert rec["casual"] == m["headline"] + "." and rec["reason"].startswith("not grounded")
 
 
+def api_error(cls, status: int, code: str | None = None):
+    body = {"code": code} if code else None
+    return cls("err", response=httpx.Response(status, request=httpx.Request("POST", "http://x")), body=body)
+
+
+def wrapped(err: Exception, cls=None):
+    """Raise an OpenAI error the way Agent Framework's chat client does: wrapped, with the original as cause."""
+    from agent_framework.exceptions import ChatClientException
+
+    cls = cls or ChatClientException
+    try:
+        raise cls(f"service failed: {err}", inner_exception=err) from err
+    except cls as e:
+        return e
+
+
+def content_filter():
+    from agent_framework_openai import OpenAIContentFilterException
+
+    return wrapped(api_error(openai.BadRequestError, 400, "content_filter"), OpenAIContentFilterException)
+
+
 @pytest.mark.parametrize("failure, reason", [
-    (openai.RateLimitError("busy", response=httpx.Response(429, request=httpx.Request("POST", "http://x")), body=None),
-     "service unavailable"),
-    (openai.InternalServerError("down", response=httpx.Response(500, request=httpx.Request("POST", "http://x")),
-                                body=None), "service unavailable"),
-    (openai.BadRequestError("filtered", response=httpx.Response(400, request=httpx.Request("POST", "http://x")),
-                            body=None), "request refused (400)"),
+    (wrapped(api_error(openai.RateLimitError, 429)), "service unavailable (RateLimitError)"),
+    (wrapped(api_error(openai.InternalServerError, 500)), "service unavailable (InternalServerError)"),
+    (wrapped(api_error(openai.BadRequestError, 400)), "request refused (400)"),
+    (content_filter(), "request refused (content filter)"),
+    (api_error(openai.RateLimitError, 429), "service unavailable"),  # unwrapped, from another writer
     (None, "no structured output"),
     ("slow", "timeout"),
 ])
@@ -146,6 +167,21 @@ def test_failures_fall_back_without_raising(match, failure, reason):
     rec = run(desk.comment(winner(moments)))
     assert rec["status"] == "fallback" and rec["reason"].startswith(reason)
     assert rec["casual"] and rec["analyst"]
+
+
+@pytest.mark.parametrize("cls, status", [(openai.AuthenticationError, 401), (openai.PermissionDeniedError, 403),
+                                         (openai.NotFoundError, 404)])
+def test_configuration_errors_stop_instead_of_falling_back(match, cls, status):
+    meta, moments = match
+    desk = CommentaryDesk(FakeWriter(wrapped(api_error(cls, status))), meta)
+    with pytest.raises(ProviderConfigError, match=str(status)):
+        run(desk.comment(winner(moments)))
+
+
+def test_bugs_are_not_hidden_as_fallbacks(match):
+    meta, moments = match
+    with pytest.raises(KeyError):
+        run(CommentaryDesk(FakeWriter(KeyError("oops")), meta).comment(winner(moments)))
 
 
 def test_fallback_lines_use_the_headline_and_first_fact(match):
@@ -212,3 +248,25 @@ def test_input_hash_changes_when_the_facts_do(match):
     m = winner(moments)
     changed = m | {"facts": m["facts"][:-1]}
     assert input_hash(m, meta) == input_hash(dict(m), meta) != input_hash(changed, meta)
+
+
+def test_base_url_keeps_hosts_that_start_with_openai():
+    s = AgentSettings(provider="foundry", endpoint="https://openai-pitch.openai.azure.com/", api_key="k", model="m")
+    assert base_url(s) == "https://openai-pitch.openai.azure.com/openai/v1/"
+
+
+def test_out_of_range_numbers_keep_the_defaults(monkeypatch, tmp_path):
+    env = tmp_path / ".env"
+    env.write_text("AGENT_CONCURRENCY=0\nAGENT_MAX_RETRIES=-1\nAGENT_TIMEOUT_S=0\nAGENT_TEMPERATURE=0\n", encoding="utf-8")
+    for k in ("AGENT_CONCURRENCY", "AGENT_MAX_RETRIES", "AGENT_TIMEOUT_S", "AGENT_TEMPERATURE", "LLM_PROVIDER"):
+        monkeypatch.delenv(k, raising=False)
+    s = load_settings(env)
+    assert (s.concurrency, s.max_retries, s.timeout_s, s.temperature) == (3, 2, 20.0, 0.0)
+
+
+def test_whole_number_values_dont_back_percentages(match):
+    meta, moments = match
+    m = winner(moments) | {"facts": [{"kind": "score", "value": {"POT": 1, "CAR": 0}, "text": "It's 1-0."}],
+                           "headline": "A goal", "clock": "10'", "minute": 10, "player_name": None}
+    assert not grounding.check("100 passes", m, meta).passed
+    assert grounding.check("A 1-0 lead", m, meta).passed

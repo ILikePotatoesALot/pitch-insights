@@ -7,6 +7,7 @@ deployment time this can move to keyless auth (managed identity); see docs/DESIG
 from __future__ import annotations
 
 import ssl
+from urllib.parse import urlsplit
 
 import httpx
 import truststore
@@ -29,7 +30,8 @@ def base_url(settings: AgentSettings) -> str:
     """The v1 base URL. Accepts a resource URL or one copied with a path (e.g. /openai/v1/responses)."""
     if settings.provider != "foundry":
         return settings.endpoint.rstrip("/") + "/"
-    return settings.endpoint.split("/openai")[0].rstrip("/") + "/openai/v1/"
+    url = urlsplit(settings.endpoint)  # keep only scheme and host; a host may itself start with "openai"
+    return f"{url.scheme}://{url.netloc}/openai/v1/"
 
 
 def make_chat_client(settings: AgentSettings) -> OpenAIChatCompletionClient:

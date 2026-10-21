@@ -33,11 +33,13 @@ class AgentSettings:
         return bool(self.endpoint and self.api_key and self.model)
 
 
-def _num(env: dict, key: str, default, cast):
+def _num(env: dict, key: str, default, cast, lo, hi):
+    """A number from the environment, or the default if it's missing, malformed or outside lo..hi."""
     try:
-        return cast(env[key]) if env.get(key) else default
+        value = cast(env[key]) if env.get(key) else default
     except ValueError:
         return default
+    return value if lo <= value <= hi else default
 
 
 def load_settings(env_file: Path | None = ENV_FILE) -> AgentSettings:
@@ -59,9 +61,9 @@ def load_settings(env_file: Path | None = ENV_FILE) -> AgentSettings:
     return AgentSettings(
         provider=provider, endpoint=endpoint, api_key=key, model=model,
         embedding_model=env.get("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ""),
-        timeout_s=_num(env, "AGENT_TIMEOUT_S", 20.0, float),
-        max_retries=_num(env, "AGENT_MAX_RETRIES", 2, int),
-        max_tokens=_num(env, "AGENT_MAX_TOKENS", 220, int),
-        temperature=_num(env, "AGENT_TEMPERATURE", 0.4, float),
-        concurrency=_num(env, "AGENT_CONCURRENCY", 3, int),
+        timeout_s=_num(env, "AGENT_TIMEOUT_S", 20.0, float, 1, 300),
+        max_retries=_num(env, "AGENT_MAX_RETRIES", 2, int, 0, 10),
+        max_tokens=_num(env, "AGENT_MAX_TOKENS", 220, int, 16, 4096),
+        temperature=_num(env, "AGENT_TEMPERATURE", 0.4, float, 0, 2),
+        concurrency=_num(env, "AGENT_CONCURRENCY", 3, int, 1, 32),
     )

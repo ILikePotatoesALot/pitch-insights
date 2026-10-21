@@ -7,6 +7,8 @@ role and task, audience and tone, grounding rules, safety rules, output format.
 
 from __future__ import annotations
 
+import hashlib
+
 PROMPT_VERSION = "2026-10-21.2"
 
 _GROUNDING = """\
@@ -81,6 +83,12 @@ def moment_input(moment: dict, meta: dict) -> str:
     lines.append("Facts:")
     lines += [f"- {f['text']}" for f in moment["facts"] if f.get("text")]
     return "\n".join(lines)
+
+
+def input_hash(moment: dict, meta: dict) -> str:
+    """Fingerprint of what the writer is shown, so stored commentary is redone (and not shown)
+    when the facts behind a moment change."""
+    return hashlib.sha256(moment_input(moment, meta).encode()).hexdigest()[:16]
 
 
 def retry_input(moment: dict, meta: dict, unsupported: list[str]) -> str:

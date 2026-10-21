@@ -48,12 +48,12 @@ def moment_text(moment: dict) -> str:
     return " ".join(parts)
 
 
-def _values(obj) -> list[float]:
-    """Every number inside a fact value (dicts and lists included)."""
+def _values(obj) -> list[int | float]:
+    """Every number inside a fact value (dicts and lists included), keeping int or float."""
     if isinstance(obj, bool):
         return []
     if isinstance(obj, (int, float)):
-        return [float(obj)]
+        return [obj]
     if isinstance(obj, dict):
         return [v for x in obj.values() for v in _values(x)]
     if isinstance(obj, (list, tuple)):
@@ -74,9 +74,11 @@ def supported_numbers(moment: dict) -> set[float]:
     nums.update(_values(moment.get("score")))
     for f in moment.get("facts", []):
         for v in _values(f.get("value")):
-            nums.add(v)
-            if 0 <= v <= 1:
-                nums.add(round(v * 100))  # a probability or share written as a percentage
+            nums.add(float(v))
+            # A probability or share written as a percentage. Only fractions: whole-number counts and
+            # scores (a score of 1) mustn't back "100".
+            if isinstance(v, float) and 0 < v < 1:
+                nums.add(float(round(v * 100)))
     return nums
 
 
