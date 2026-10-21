@@ -4,8 +4,8 @@ Agreed 20 Oct 2026; video path updated 21 Oct. Submission deadline: 27 Oct 2026,
 
 ## Status (21 Oct)
 
-- **Done:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (stats, patterns, win probability, live ratings, signals) merged into `main` via ILikePotatoesALot/pitch-insights#1.
-- **Next, not blocked:** Moment Scorer; 3D pitch frontend with a replay server; live simulation mode.
+- **Done:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (stats, patterns, win probability, live ratings, signals) merged into `main` via ILikePotatoesALot/pitch-insights#1. Moment Scorer, replay server and the first version of the app (3D pitch, moments feed, ratings, casual and analyst modes) on branch `pitch-frontend`.
+- **Next, not blocked:** live simulation mode; Overlay Director (timed overlay cues); more Personalise options (favourite club and player, language).
 - **Waiting on Austin:** GPU model, VRAM and OS (for detector training); a deployed Foundry GPT model with its endpoint and key in `.env` (for the agents); OK to download SoccerTrack match 117093's first half (3.35 GB).
 - **Team:** Austin and Claude. Friends are listed only if they contribute (prize verification, rule 8.2).
 
@@ -52,7 +52,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 
 ## 3. Explain
 
-- **Moment Scorer** (code, next): ranks the Interpreter's signals into the 8–12 moments worth showing, by win-probability shift, deviation from normal and pattern breaks.
+- **Moment Scorer** (code, built): ranks the Interpreter's signals into moments (about 4 headlines and 10 shown a match), each with an evidence pack and a fallback headline. Details: [DESIGN.md, Moment Scorer](DESIGN.md#explain-stage-moment-scorer-v1).
 - Key moments get an evidence pack; the LLM explains only what is in it.
 - A "Why?" button shows the evidence behind any moment or rating.
 

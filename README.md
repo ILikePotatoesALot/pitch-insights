@@ -46,6 +46,23 @@ python scripts/validate_realism.py      # 300 matches against real-football rang
 pytest
 ```
 
+### Run the app
+
+Two terminals:
+
+```
+cd backend
+.venv\Scripts\python -m uvicorn pitch_insights.server:app --port 8000
+```
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute.
+
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 
 ## Synthetic data realism

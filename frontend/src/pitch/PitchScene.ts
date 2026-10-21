@@ -1,0 +1,306 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import type { MatchEvent, MatchMeta } from "../types";
+
+const L = 105;
+const W = 68;
+const NX = 105; // grid cells along the length (1 m each)
+const NZ = 68;
+const TERRITORY_TAU = 120; // seconds of match time for activity to fade to ~37%
+const SPIKE_TAU = 75;
+const SIGMA = 7; // metres: how far one action's influence spreads
+
+/** Event position in absolute pitch metres, with the home team attacking left to right in the first half. */
+export function toAbsolute(ev: MatchEvent, meta: MatchMeta, end = false): [number, number] | null {
+  const x = end ? ev.end_x : ev.x;
+  const y = end ? ev.end_y : ev.y;
+  if (x === undefined || y === undefined || !ev.team_id) return null;
+  const dir = meta.attacking_direction[String(ev.period)]?.[ev.team_id];
+  return dir === "right_to_left" ? [L - x, W - y] : [x, y];
+}
+
+function displayColour(hex: string): THREE.Color {
+  const c = new THREE.Color(hex);
+  const hsl = { h: 0, s: 0, l: 0 };
+  c.getHSL(hsl);
+  // Dark club colours vanish on a dark background, so lift them; keep very light ones off pure white.
+  c.setHSL(hsl.h, Math.max(hsl.s, 0.35), Math.min(0.72, Math.max(hsl.l, 0.5)));
+  return c;
+}
+
+/** Pick display colours for the two teams that are easy to tell apart. */
+export function teamColours(meta: MatchMeta): [THREE.Color, THREE.Color] {
+  const home = displayColour(meta.home.colours.primary);
+  let away = displayColour(meta.away.colours.primary);
+  const diff = Math.abs(home.r - away.r) + Math.abs(home.g - away.g) + Math.abs(home.b - away.b);
+  if (diff < 0.5) away = displayColour(meta.away.colours.secondary);
+  return [home, away];
+}
+
+interface Spike { x: number; y: number; amp: number; born: number; goal: boolean }
+
+export class PitchScene {
+  private renderer: THREE.WebGLRenderer;
+  private scene = new THREE.Scene();
+  private camera: THREE.PerspectiveCamera;
+  private controls: OrbitControls;
+  private geometry: THREE.BufferGeometry;
+  private heat: [Float32Array, Float32Array];
+  private spikes: Spike[] = [];
+  private ball: THREE.Mesh;
+  private ballTarget = new THREE.Vector3(0, 1, 0);
+  private matchTime = 0;
+  private lastDecayTime = 0;
+  private colours: [THREE.Color, THREE.Color] = [new THREE.Color("#4f7cff"), new THREE.Color("#ff5a5a")];
+  private homeId = "";
+  private frame = 0;
+  private observer: ResizeObserver;
+  private dirty = true;
+
+  constructor(private container: HTMLElement) {
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(this.renderer.domElement);
+
+    this.camera = new THREE.PerspectiveCamera(38, 1, 1, 1000);
+    this.camera.position.set(-18, 72, 92);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.target.set(0, 0, 0);
+    this.controls.enableDamping = true;
+    this.controls.maxPolarAngle = Math.PI * 0.45;
+    this.controls.minDistance = 40;
+    this.controls.maxDistance = 220;
+
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.1);
+    sun.position.set(-40, 90, 50);
+    this.scene.add(sun);
+
+    const count = (NX + 1) * (NZ + 1);
+    this.heat = [new Float32Array(count), new Float32Array(count)];
+    this.geometry = this.buildGeometry();
+    const surface = new THREE.Mesh(this.geometry, new THREE.MeshStandardMaterial({
+      vertexColors: true, roughness: 0.75, metalness: 0.05, side: THREE.DoubleSide,
+    }));
+    const lines = new THREE.Mesh(this.geometry, new THREE.MeshBasicMaterial({
+      map: this.lineTexture(), transparent: true, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+    }));
+    this.scene.add(surface, lines);
+
+    this.ball = new THREE.Mesh(new THREE.SphereGeometry(0.9, 20, 16),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.6 }));
+    this.scene.add(this.ball);
+
+    this.observer = new ResizeObserver(() => this.resize());
+    this.observer.observe(container);
+    this.resize();
+    this.loop();
+  }
+
+  setMatch(meta: MatchMeta) {
+    this.colours = teamColours(meta);
+    this.homeId = meta.home.id;
+    this.reset();
+  }
+
+  reset() {
+    this.heat[0].fill(0);
+    this.heat[1].fill(0);
+    this.spikes = [];
+    this.matchTime = 0;
+    this.lastDecayTime = 0;
+    this.dirty = true;
+  }
+
+  /** Feed one event from the stream. */
+  addEvent(ev: MatchEvent, meta: MatchMeta, matchTime: number) {
+    this.matchTime = matchTime;
+    this.decay();
+    const pos = toAbsolute(ev, meta);
+    if (!pos || !ev.team_id) return;
+    const side = ev.team_id === this.homeId ? 0 : 1;
+    const weight = ev.type === "shot" ? 0.9 : ev.type === "pressure" ? 0.12 : ev.type === "pass" ? 0.2 : 0.25;
+    this.splat(side, pos[0], pos[1], weight);
+    const end = toAbsolute(ev, meta, true);
+    if (end && (ev.type === "carry" || (ev.type === "pass" && ev.outcome === "complete"))) {
+      this.splat(side, end[0], end[1], 0.15);
+      this.moveBall(end[0], end[1]);
+    } else {
+      this.moveBall(pos[0], pos[1]);
+    }
+    if (ev.type === "shot") {
+      const goal = ev.outcome === "goal";
+      this.spikes.push({ x: pos[0], y: pos[1], amp: 6 + (ev.xg ?? 0.05) * 55 + (goal ? 10 : 0), born: matchTime, goal });
+    }
+    this.dirty = true;
+  }
+
+  dispose() {
+    cancelAnimationFrame(this.frame);
+    this.observer.disconnect();
+    this.controls.dispose();
+    this.renderer.dispose();
+    this.renderer.domElement.remove();
+  }
+
+  // ------------------------------------------------------------ internals
+
+  private idx(i: number, j: number) { return j * (NX + 1) + i; }
+
+  private buildGeometry() {
+    const g = new THREE.BufferGeometry();
+    const count = (NX + 1) * (NZ + 1);
+    const pos = new Float32Array(count * 3);
+    const uv = new Float32Array(count * 2);
+    const col = new Float32Array(count * 3);
+    for (let j = 0; j <= NZ; j++) {
+      for (let i = 0; i <= NX; i++) {
+        const k = this.idx(i, j);
+        pos[k * 3] = (i / NX) * L - L / 2;
+        pos[k * 3 + 2] = W / 2 - (j / NZ) * W;
+        uv[k * 2] = i / NX;
+        uv[k * 2 + 1] = j / NZ;
+      }
+    }
+    const index: number[] = [];
+    for (let j = 0; j < NZ; j++) {
+      for (let i = 0; i < NX; i++) {
+        const a = this.idx(i, j), b = this.idx(i + 1, j), c = this.idx(i, j + 1), d = this.idx(i + 1, j + 1);
+        index.push(a, b, c, b, d, c); // counter-clockwise seen from above, so faces (and normals) point up
+      }
+    }
+    g.setIndex(index);
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+    g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    return g;
+  }
+
+  private lineTexture() {
+    const s = 20; // pixels per metre
+    const canvas = document.createElement("canvas");
+    canvas.width = L * s;
+    canvas.height = W * s;
+    const c = canvas.getContext("2d")!;
+    c.strokeStyle = "rgba(255,255,255,0.95)";
+    c.lineWidth = 0.4 * s; // wider than real lines so they survive texture filtering at a low viewing angle
+    // Canvas y runs down while pitch y (uv v) runs up, so flip.
+    const P = (x: number, y: number): [number, number] => [x * s, (W - y) * s];
+    const rect = (x: number, y: number, w: number, h: number) => {
+      const [px, py] = P(x, y + h);
+      c.strokeRect(px, py, w * s, h * s);
+    };
+    rect(0.2, 0.2, L - 0.4, W - 0.4);
+    c.beginPath(); c.moveTo(...P(L / 2, 0)); c.lineTo(...P(L / 2, W)); c.stroke();
+    c.beginPath(); c.arc(...P(L / 2, W / 2), 9.15 * s, 0, Math.PI * 2); c.stroke();
+    for (const left of [true, false]) {
+      const x0 = left ? 0 : L;
+      const dir = left ? 1 : -1;
+      rect(left ? 0 : L - 16.5, W / 2 - 20.16, 16.5, 40.32);
+      rect(left ? 0 : L - 5.5, W / 2 - 9.16, 5.5, 18.32);
+      c.beginPath();
+      const [sx, sy] = P(x0 + dir * 11, W / 2);
+      c.arc(sx, sy, 0.45 * s, 0, Math.PI * 2);
+      c.fillStyle = "rgba(255,255,255,0.95)";
+      c.fill();
+      c.beginPath();
+      const a = Math.acos(5.5 / 9.15);
+      if (left) c.arc(sx, sy, 9.15 * s, -a, a);
+      else c.arc(sx, sy, 9.15 * s, Math.PI - a, Math.PI + a);
+      c.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  private splat(side: number, x: number, y: number, amount: number) {
+    const h = this.heat[side];
+    const r = Math.ceil(SIGMA * 2.5);
+    const ci = Math.round((x / L) * NX), cj = Math.round((y / W) * NZ);
+    for (let j = Math.max(0, cj - r); j <= Math.min(NZ, cj + r); j++) {
+      for (let i = Math.max(0, ci - r); i <= Math.min(NX, ci + r); i++) {
+        const dx = (i / NX) * L - x, dy = (j / NZ) * W - y;
+        h[this.idx(i, j)] += amount * Math.exp(-(dx * dx + dy * dy) / (2 * SIGMA * SIGMA));
+      }
+    }
+  }
+
+  private decay() {
+    const dt = this.matchTime - this.lastDecayTime;
+    if (dt <= 0) return;
+    const f = Math.exp(-dt / TERRITORY_TAU);
+    for (const h of this.heat) for (let k = 0; k < h.length; k++) h[k] *= f;
+    this.lastDecayTime = this.matchTime;
+    this.spikes = this.spikes.filter((s) => this.matchTime - s.born < SPIKE_TAU * 4);
+  }
+
+  private moveBall(x: number, y: number) {
+    this.ballTarget.set(x - L / 2, 0, W / 2 - y);
+  }
+
+  private heightAt(x: number, y: number) {
+    const i = Math.min(NX, Math.max(0, Math.round((x / L) * NX)));
+    const j = Math.min(NZ, Math.max(0, Math.round((y / W) * NZ)));
+    return (this.geometry.getAttribute("position") as THREE.BufferAttribute).getY(this.idx(i, j));
+  }
+
+  private updateSurface() {
+    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const col = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+    const [ch, ca] = this.colours;
+    const base = new THREE.Color("#10202c");
+    const tmp = new THREE.Color();
+    const spikes = this.spikes.map((s) => ({ ...s, a: s.amp * Math.exp(-(this.matchTime - s.born) / SPIKE_TAU) }));
+    for (let j = 0; j <= NZ; j++) {
+      for (let i = 0; i <= NX; i++) {
+        const k = this.idx(i, j);
+        const hh = this.heat[0][k], ha = this.heat[1][k];
+        const total = hh + ha;
+        let height = 9 * Math.tanh(total / 3);
+        const x = (i / NX) * L, y = (j / NZ) * W;
+        let glow = 0;
+        for (const s of spikes) {
+          const d2 = (x - s.x) ** 2 + (y - s.y) ** 2;
+          const v = s.a * Math.exp(-d2 / (2 * 2.2 * 2.2));
+          height += v;
+          if (s.goal) glow = Math.max(glow, Math.min(1, v / 8));
+        }
+        pos.setY(k, height);
+        const raw = total > 1e-4 ? hh / total : 0.5;
+        const share = 0.5 + 0.5 * Math.tanh((raw - 0.5) * 3); // sharpen smoothly, so ownership reads clearly without hard edges
+        tmp.copy(ca).lerp(ch, share);
+        const strength = Math.min(1, total / 1.5);
+        tmp.lerp(base, 1 - (0.25 + 0.75 * strength));
+        if (glow > 0) tmp.lerp(new THREE.Color("#fff6c2"), glow * 0.8);
+        col.setXYZ(k, tmp.r, tmp.g, tmp.b);
+      }
+    }
+    pos.needsUpdate = true;
+    col.needsUpdate = true;
+    this.geometry.computeVertexNormals();
+  }
+
+  private resize() {
+    const { clientWidth: w, clientHeight: h } = this.container;
+    if (!w || !h) return;
+    this.renderer.setSize(w, h, false);
+    this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix();
+  }
+
+  private loop = () => {
+    this.frame = requestAnimationFrame(this.loop);
+    if (this.dirty) {
+      this.updateSurface();
+      this.dirty = false;
+    }
+    const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
+    const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
+    this.ball.position.lerp(target, 0.18);
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+  };
+}

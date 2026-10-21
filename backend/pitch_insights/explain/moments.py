@@ -101,7 +101,8 @@ class MomentScorer:
         rc = self._recent_counts(team)
         if rc["shots"] >= 3:
             facts.append({"kind": "recent_shots", "value": rc,
-                          "text": f"{self._team_name(team)} had {rc['shots']} shots (xG {rc['xg']}) and {rc['corners']} corners in the last five minutes."})
+                          "text": f"{self._team_name(team)} had {rc['shots']} shots (xG {rc['xg']}) and {rc['corners']} "
+                                  f"corner{'' if rc['corners'] == 1 else 's'} in the last five minutes."})
         return facts
 
     def _rating_fact(self, pid: str) -> dict:
@@ -269,7 +270,8 @@ class MomentScorer:
                              "text": f"Down from {d['from_rating']} in the last ten minutes."})
             return 0.15 + 0.05 * abs(d["change"]), f"Tough spell for {who}", facts
         imp = 0.45 if d["threshold"] >= 9.0 else 0.33
-        return imp, f"{who} hits a {d['rating']} rating", facts
+        article = "an" if str(d["rating"]).startswith("8") else "a"
+        return imp, f"{who} hits {article} {d['rating']} rating", facts
 
     def _milestone(self, s):
         d, pid, team = s["data"], s.get("player_id"), s.get("team_id")
