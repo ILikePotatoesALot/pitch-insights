@@ -50,6 +50,9 @@ def main() -> int:
             if todo:
                 client = client or make_embeddings_client(settings)
                 model, vectors = embed_batch(client, settings.embedding_model, todo)
+                if stored.model and model != stored.model and len(todo) < len(texts):
+                    todo = texts  # vectors from different models can't be compared: redo the lot
+                    model, vectors = embed_batch(client, settings.embedding_model, todo)
                 stored.vectors.update(zip(todo, vectors))
             out = write_vectors(path, model, {t: stored.vectors[t] for t in texts})
             print(f"{path.stem}: {len(texts)} moments remembered, {len(todo)} embedded  ->  {out.name}")
