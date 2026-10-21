@@ -17,7 +17,7 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
-**Next git step:** start the next piece of work (Memory agent, or the SoccerTrack loader) on a new branch from `main`.
+**Next git step:** the Memory agent is on local branch `memory-agent` (cut from `tidy-ups`, ILikePotatoesALot/pitch-insights#5), committed, not pushed. Push it and open a pull request when Austin says.
 
 ## What's built
 
@@ -31,12 +31,13 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Replay server (FastAPI WebSocket) | Built, reviewed, fixed | `backend/pitch_insights/server.py` |
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
 | Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built, reviewed twice, fixed, merged (ILikePotatoesALot/pitch-insights#4) | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
-| Other agents (Memory, Content Safety, Translator, Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
+| Memory agent (similar earlier moments as `memory` facts; Foundry embeddings stored next to each sample, so replays need no network) | Built and reviewed on local branch `memory-agent` (21 Oct), not pushed | `backend/pitch_insights/agents/memory.py`, [DESIGN.md, Memory agent](DESIGN.md#memory-agent) |
+| Other agents (Content Safety, Translator, Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 94 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 113 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, and the memory tests use fake embedders. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -74,6 +75,13 @@ npm run dev
 ```
 
 Then open http://localhost:5173. In Claude Code, both servers are also set up in `C:\Users\austin\.claude\launch.json` as `pitch-replay-server` and `pitch-frontend`. If port 8000 is taken (for example by another session's server), the replay server moves to 8001; use `pitch-frontend-8001` (port 5174), which points the app at 8001 through `PITCH_API`. The replay server doesn't reload, so restart it after backend changes.
+
+**Memory embeddings** (needs the Foundry values in `.env`; embeds only descriptions not already stored, so re-running costs nothing when nothing changed). Run it before the stored commentary whenever the moments or their descriptions change:
+
+```
+cd backend
+.venv\Scripts\python scripts/embed_moments.py
+```
 
 **Stored commentary** (needs the Foundry values in `.env`; redoes only moments whose facts, model or prompt changed):
 
@@ -138,7 +146,7 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 | # | Step | Needs | Size |
 |---|---|---|---|
 | 1 | Done: **agents core**, merged in ILikePotatoesALot/pitch-insights#4 (21 Oct) | | |
-| 2 | **Foundry and AI services:** Memory agent (embeddings), Foundry groundedness evaluation, Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
+| 2 | **Foundry and AI services:** Memory agent (built, on `memory-agent`), Foundry groundedness evaluation, Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
 | 5 | Decided 21 Oct: the video path uses **pre-trained detection on a short clip** (no GPU quota needed); fine-tuning maybe later. Cut it if it isn't working by 24 Oct | | |
