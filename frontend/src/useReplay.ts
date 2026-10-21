@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { LiveState, MatchEvent, MatchMeta, Moment } from "./types";
+import type { CommentaryInfo, LiveState, MatchEvent, MatchMeta, Moment } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 
@@ -11,6 +11,7 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
 export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
                           onReset: () => void) {
   const [meta, setMeta] = useState<MatchMeta | null>(null);
+  const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
   const [state, setState] = useState<LiveState | null>(null);
   const [moments, setMoments] = useState<Moment[]>([]);
   // The latest moment that arrived live, not from a catch-up, for the banner over the pitch.
@@ -35,6 +36,7 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
     setMoments([]);
     setLiveMoment(null);
     setState(null);
+    setAiInfo(null);
     onResetRef.current();
     let ended = false;
     const proto = location.protocol === "https:" ? "wss" : "ws";
@@ -46,6 +48,7 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
         case "meta":
           metaRef.current = data.meta;
           setMeta(data.meta);
+          setAiInfo(data.commentary ?? null);
           setStatus("live");
           break;
         case "catchup":
@@ -91,5 +94,5 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
   const resume = useCallback(() => { send({ cmd: "resume" }); setStatus("live"); }, []);
   const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, n: j.n + 1 })), [name]);
 
-  return { meta, state, moments, liveMoment, status, speed, from, setSpeed, pause, resume, seek };
+  return { meta, aiInfo, state, moments, liveMoment, status, speed, from, setSpeed, pause, resume, seek };
 }

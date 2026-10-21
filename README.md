@@ -90,6 +90,17 @@ Each club's style shows in its numbers: the high-press side makes the most press
 
 Every player starts at 6.0 and moves with each action, weighted by position and damped by playing time, and every change is logged so the app can show why a rating is what it is. Over 120 generated matches (`scripts/calibrate_ratings.py`): average 6.8, spread 0.76, best player in a match about 8.5, and 9.5+ in about 10% of matches, in line with public rating systems. Every position averages 6.8–6.9. Details in [docs/DESIGN.md](docs/DESIGN.md#interpret-stage-v1).
 
+## Agents and grounded commentary
+
+The Explainer and Narrator agents, built with Microsoft Agent Framework on a Microsoft Foundry GPT-4o deployment, turn each key moment's evidence pack into commentary in two voices: casual and analyst. A code check confirms that every name and number they write is in the evidence. A draft that fails gets one retry with the problems named, and after that the moment keeps its plain headline. Commentary for the demo matches is generated ahead and stored, so the demo never waits on a model:
+
+```
+cd backend
+.venv\Scripts\python scripts/generate_commentary.py
+```
+
+First full run: 52 moments across the three demo matches, all grounded, none fell back. Commentary is labelled as AI-generated in the app, and "Why?" shows the facts it came from. Details and the engineering practices we follow: [docs/DESIGN.md](docs/DESIGN.md#agents).
+
 ## Credits
 
 - Player detection: [Roboflow football-players-detection](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc) (CC BY 4.0)

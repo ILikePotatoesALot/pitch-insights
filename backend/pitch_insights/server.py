@@ -7,13 +7,14 @@ GET  /api/matches/{name}         that match's match_meta
 WS   /ws/replay/{name}?speed=20&from=0
 
 The WebSocket sends, in order:
-  {"type": "meta", "meta": ...}
+  {"type": "meta", "meta": ..., "commentary": {...}}     commentary: who wrote the stored commentary
+                                                        (model, prompt version, groundedness summary)
   {"type": "catchup", "moments": [...], "state": ..., "recent_events": [...]}
                                                         only when starting after kick-off; recent_events
                                                         (the last 3 minutes) let the pitch redraw at once
   then, as the match clock reaches them:
   {"type": "event", "event": ...}
-  {"type": "moment", "moment": ...}
+  {"type": "moment", "moment": ...}                     with "commentary" when the agents wrote some
   {"type": "state", "state": ...}                       about once a second
   {"type": "end"}
 The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"} or {"cmd": "resume"}.
@@ -30,6 +31,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from pitch_insights.agents.prompts import input_hash
+from pitch_insights.agents.store import load_commentary
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
@@ -71,6 +74,22 @@ def get_match(name: str) -> dict:
     return meta
 
 
+def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
+    """The moment plus its stored commentary, if the agents wrote some from these same facts.
+    Commentary written for different facts (the file is older than the code) is left out."""
+    rec = stored["moments"].get(moment["id"])
+    if not rec or rec.get("input_hash") != input_hash(moment, meta):
+        return moment
+    return moment | {"commentary": rec}
+
+
+def commentary_info(stored: dict) -> dict | None:
+    """Who wrote the stored commentary, for the app's AI-generated label."""
+    if not stored["moments"]:
+        return None
+    return {k: stored.get(k) for k in ("ai_generated", "provider", "model", "prompt_version", "summary")}
+
+
 def state_message(brain: MatchBrain) -> dict:
     """The live state the app needs, kept small enough to send every second."""
     snap = brain.interp.snapshot(top_moments=3)
@@ -88,7 +107,8 @@ def state_message(brain: MatchBrain) -> dict:
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     await ws.accept()
     try:
-        meta, events = read_match(_match_path(name))
+        path = _match_path(name)
+        meta, events = read_match(path)
     except HTTPException as e:
         await ws.send_json({"type": "error", "message": e.detail})
         await ws.close()
@@ -98,7 +118,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     except ValueError:
         from_minute = 0.0
     brain = MatchBrain(meta)
-    await ws.send_json({"type": "meta", "meta": meta})
+    stored = load_commentary(path)
+    await ws.send_json({"type": "meta", "meta": meta, "commentary": commentary_info(stored)})
 
     start = start_seconds(events, from_minute) if from_minute > 0 else 0.0
     times = match_seconds(events)
@@ -108,8 +129,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if first:
         recent = [ev for ev, t in zip(events[:first], times[:first])
                   if t >= times[first - 1] - 180 or (ev["type"] == "match_state" and ev["state"] == "half_time")]
-        await ws.send_json({"type": "catchup", "moments": brain.moments, "state": state_message(brain),
-                            "recent_events": recent})
+        await ws.send_json({"type": "catchup", "moments": [with_commentary(m, stored, meta) for m in brain.moments],
+                            "state": state_message(brain), "recent_events": recent})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
 
@@ -140,7 +161,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})
             for m in out["moments"]:
-                await ws.send_json({"type": "moment", "moment": m})
+                await ws.send_json({"type": "moment", "moment": with_commentary(m, stored, meta)})
             if loop.time() - last_state >= STATE_EVERY_S or ev["type"] in ("shot", "match_state") or out["moments"]:
                 await ws.send_json({"type": "state", "state": state_message(brain)})
                 last_state = loop.time()
