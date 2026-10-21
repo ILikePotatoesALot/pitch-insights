@@ -270,3 +270,42 @@ def test_whole_number_values_dont_back_percentages(match):
                            "headline": "A goal", "clock": "10'", "minute": 10, "player_name": None}
     assert not grounding.check("100 passes", m, meta).passed
     assert grounding.check("A 1-0 lead", m, meta).passed
+
+
+def test_reply_that_doesnt_fit_the_schema_counts_as_no_output():
+    from pydantic import ValidationError
+
+    from pitch_insights.agents.desk import AgentWriter
+
+    class BadReply:
+        text = '{"casual": "only one voice"}'
+
+        @property
+        def value(self):
+            return Lines.model_validate_json(self.text)  # raises ValidationError, as AgentResponse.value does
+
+    class FakeAgent:
+        async def run(self, prompt, options=None):
+            return BadReply()
+
+    writer = AgentWriter.__new__(AgentWriter)
+    writer.agents, writer.options = {"explainer": FakeAgent()}, {}
+    with pytest.raises(ValidationError):
+        BadReply().value
+    assert run(writer.write("explainer", "x")) is None
+
+
+def test_number_words_are_checked_like_digits(match):
+    meta, moments = match
+    m = winner(moments)
+    assert grounding.check("Szobalenko has scored twenty goals.", m, meta).unsupported == ["twenty"]
+    assert grounding.check("Szobalenko strikes with eleven minutes left.", m, meta).unsupported == ["eleven"]
+    assert grounding.check("Potato had two goals, Carrot three.", m, meta).passed  # 2-3 backs both
+    assert grounding.check("One of the great finishes: Carrot win it.", m, meta).passed
+
+
+def test_records_say_which_provider_and_model_wrote_them(match):
+    meta, moments = match
+    good = Lines(casual="Szobalenko wins it.", analyst="Carrot win it late.")
+    rec = run(CommentaryDesk(FakeWriter(good), meta).comment(winner(moments)))
+    assert (rec["provider"], rec["model"]) == ("fake", "fake-model")

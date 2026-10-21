@@ -236,7 +236,7 @@ class MomentScorer:
         facts = self._context_facts(team) if team else []
         if kind == "momentum_swing":
             facts.insert(0, {"kind": "momentum_swing", "value": {"from": d["from_momentum"], "to": d["momentum"]},
-                             "text": f"Ten minutes ago {self._team_name(self._leader(d['from_momentum']))} were on top "
+                             "text": f"Within the last ten minutes {self._team_name(self._leader(d['from_momentum']))} were on top "
                                      f"(momentum {abs(d['from_momentum']):.2f} from their side); now "
                                      f"{self._team_name(team)} are ({abs(d['momentum']):.2f} from their side)."})
             imp = 0.34 + 0.15 * min(1.0, max(0.0, abs(d["momentum"] - d["from_momentum"]) - 0.8) / 0.8)

@@ -62,11 +62,11 @@
   },
   "M-4": {
    "moment_id": "M-4",
-   "input_hash": "50817cea74803824",
+   "input_hash": "f19322451179915d",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are piling on the pressure, keeping Potato pinned back.",
-   "analyst": "Carrot have dominated the last five minutes with 4 shots, 2 corners, and all final-third passes.",
+   "casual": "Carrot are piling on the pressure, keeping the ball upfield and creating chances.",
+   "analyst": "Carrot have turned the tide, dominating the last five minutes with 100% of final-third passes and 4 shots.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -74,7 +74,9 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-5": {
    "moment_id": "M-5",
@@ -126,35 +128,39 @@
   },
   "M-9": {
    "moment_id": "M-9",
-   "input_hash": "9afbe231f9c4ee8c",
+   "input_hash": "dcb27b4af8faf121",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC are dominating now, really controlling the game.",
-   "analyst": "Potato FC have swung the momentum heavily in their favour, with 95% of final-third passes in the last five minutes.",
+   "casual": "Potato FC are firmly on top now, dominating the play in Carrot FC's half.",
+   "analyst": "Potato FC have seized control, with 95% of final-third passes in the last 5 minutes and 0.75 momentum.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 2,
+    "claims": 5,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-12": {
    "moment_id": "M-12",
-   "input_hash": "c6e2960ee2c60809",
+   "input_hash": "e17bff83044ca8a8",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are pushing forward and have taken control of the game.",
-   "analyst": "Carrot have swung momentum their way, dominating the last 5 minutes with 33% of final-third passes.",
+   "casual": "Carrot are starting to take control after a strong five minutes.",
+   "analyst": "Carrot shift the momentum, taking control with 33% of final-third passes in the last five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 3,
+    "claims": 4,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-13": {
    "moment_id": "M-13",
@@ -254,11 +260,11 @@
   },
   "M-21": {
    "moment_id": "M-21",
-   "input_hash": "096c3f14fd8cf307",
+   "input_hash": "7931eb3c08948570",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are taking charge now, pushing forward and controlling the game.",
-   "analyst": "Carrot shift the momentum, playing 78% of final-third passes in the last 5 minutes to take control.",
+   "casual": "Carrot FC are starting to dominate, pushing forward and controlling the play.",
+   "analyst": "Carrot FC have taken control with 78% of final-third passes in the last five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -266,7 +272,9 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-22": {
    "moment_id": "M-22",
@@ -302,11 +310,11 @@
   },
   "M-24": {
    "moment_id": "M-24",
-   "input_hash": "0379f302f25f5903",
+   "input_hash": "6eb87d2606f41fcc",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC have turned the tide and are now in control of the match.",
-   "analyst": "Potato FC shift the momentum, leading 2–1 and dominating with 71% of final-third passes in the last 5 minutes.",
+   "casual": "Potato FC are on top now, turning the tide in their favour.",
+   "analyst": "Potato FC regain control with 71% of final-third passes in the last five minutes, leading 2–1.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -314,7 +322,9 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-26": {
    "moment_id": "M-26",
@@ -334,19 +344,21 @@
   },
   "M-29": {
    "moment_id": "M-29",
-   "input_hash": "4c0a8312e0a40e0b",
+   "input_hash": "e2f0582ea1a6d55a",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are turning the tide and pushing hard for an equaliser.",
-   "analyst": "Carrot have seized control, completing 84% of final-third passes in the last five minutes to dominate momentum.",
+   "casual": "Carrot are pushing hard and taking control as the game heads into the final stages.",
+   "analyst": "Carrot dominate the last five minutes, completing 84% of final-third passes and swinging momentum to 0.54 from their side.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 2,
+    "claims": 4,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-30": {
    "moment_id": "M-30",
@@ -382,19 +394,21 @@
   },
   "M-33": {
    "moment_id": "M-33",
-   "input_hash": "d63dd52b502eeac1",
+   "input_hash": "f12ee3ea2c12eb15",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC are dominating late on, pushing Carrot FC back and controlling the game.",
-   "analyst": "Potato FC turn the tide, taking control with 100% of final-third passes in the last 5 minutes.",
+   "casual": "Potato FC are finishing strongly, turning the game in their favour late on.",
+   "analyst": "Potato FC have seized control in the final stages, completing all final-third passes in the last five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 2,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-34": {
    "moment_id": "M-34",

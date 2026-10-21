@@ -78,19 +78,21 @@
   },
   "M-6": {
    "moment_id": "M-6",
-   "input_hash": "1129fb611474b647",
+   "input_hash": "329d9b61fa5e679c",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Cauliflower FC are firmly on top as they dominate the final-third play before the break.",
-   "analyst": "Cauliflower FC have turned the tide, now controlling 73% of final-third passes in the last 5 minutes.",
+   "casual": "Cauliflower are pushing hard and keeping Potato on the back foot.",
+   "analyst": "Cauliflower dominate the last five minutes with 73% of final-third passes, reversing Potato's earlier momentum advantage.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 3,
+    "claims": 4,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-7": {
    "moment_id": "M-7",
@@ -110,19 +112,21 @@
   },
   "M-8": {
    "moment_id": "M-8",
-   "input_hash": "b5a4c2dbdc77112a",
+   "input_hash": "089160f80213030c",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato are taking charge after a strong spell in the last five minutes.",
-   "analyst": "Potato dominate the final-third play with 85% of passes in the last five minutes, shifting momentum their way.",
+   "casual": "Potato FC are starting to dominate after a strong five minutes.",
+   "analyst": "Potato FC take control, completing 85% of final-third passes in the last five minutes despite trailing 1–0.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 2,
+    "claims": 6,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-9": {
    "moment_id": "M-9",

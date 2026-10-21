@@ -142,7 +142,7 @@ class CommentaryDesk:
                 "status": "ok" if ok else "fallback",
                 "casual": lines.casual, "analyst": lines.analyst, "attempts": attempts,
                 "grounding": check.to_dict() if check else None, "corrected": corrected,
-                "reason": reason or None,
+                "reason": reason or None, "provider": self.writer.provider, "model": self.writer.model,
             }
             log.info(json.dumps({"event": "commentary", "moment_id": moment["id"], "agent": role,
                                  "status": record["status"], "attempts": attempts, "reason": reason or None,
@@ -178,11 +178,11 @@ class AgentWriter:
 
     async def write(self, role: str, prompt: str) -> Lines | None:
         response = await self.agents[role].run(prompt, options=self.options)
-        value = response.value
-        if isinstance(value, Lines):
-            return value
-        try:  # some providers return the JSON as text instead of a parsed value
-            return Lines.model_validate_json(response.text)
+        try:
+            # .value parses the reply on first access and raises (ValidationError is a ValueError)
+            # when it isn't JSON in the Lines shape; the desk treats None as "no structured output".
+            value = response.value
+            return value if isinstance(value, Lines) else Lines.model_validate_json(response.text)
         except ValueError:
             return None
 

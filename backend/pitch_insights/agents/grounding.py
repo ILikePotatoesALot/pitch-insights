@@ -25,6 +25,11 @@ CLOCK = re.compile(r"(\d+)\+(\d+)")
 NUMBER_WORDS = {w: i for i, w in enumerate(
     "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen "
     "sixteen seventeen eighteen nineteen twenty".split())}
+NUMBER_WORDS |= {w: 10 * i for i, w in enumerate("thirty forty fifty sixty seventy eighty ninety".split(), 3)}
+NUMBER_WORDS["hundred"] = 100
+# Number words checked in commentary. "zero" and "one" are left out: "one of", "no one" and
+# "one-sided" are rarely counts, and the prompt asks for digits anyway.
+CLAIM_WORDS = {w: n for w, n in NUMBER_WORDS.items() if n >= 2}
 
 
 @dataclass
@@ -114,6 +119,11 @@ def check(text: str, moment: dict, meta: dict) -> Grounding:
         claims += 1
         if not _number_ok(float(raw), supported):
             unsupported.append(raw)
+    for word in re.findall(r"[a-z]+", text.lower()):  # "twenty goals" is checked like "20 goals"
+        if word in CLAIM_WORDS:
+            claims += 1
+            if not _number_ok(float(CLAIM_WORDS[word]), supported):
+                unsupported.append(word)
 
     source = moment_text(moment).lower()
     playing = {meta[s][k].lower() for s in ("home", "away") for k in ("name", "short_name")}

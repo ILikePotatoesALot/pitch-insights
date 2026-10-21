@@ -5,7 +5,7 @@
     python scripts/generate_commentary.py --force             # rewrite even if up to date
     python scripts/generate_commentary.py --limit 5           # first 5 moments only, printed, not saved
 
-Moments already written from the same facts, by the same model and prompt version, are
+Moments already written from the same facts, by the same provider, model and prompt version, are
 kept, so re-running is cheap. Uses the provider in .env (LLM_PROVIDER). Stops without
 saving if the provider refuses the key, access or deployment.
 """
@@ -37,12 +37,13 @@ async def run_match(path: Path, writer, header: dict, force: bool, limit: int | 
         brain.update(ev)
     moments = [m for m in brain.moments if desk.wants(m)][:limit]
     old = load_commentary(path)
-    reuse = not force and all(old.get(k) == header[k] for k in ("model", "prompt_version"))
+    reuse = not force and all(old.get(k) == header[k] for k in ("provider", "model", "prompt_version"))
     sem = asyncio.Semaphore(concurrency)
 
     async def one(m: dict) -> dict:
         kept = old["moments"].get(m["id"]) if reuse else None
-        if kept and kept["status"] == "ok" and kept.get("input_hash") == input_hash(m, meta):
+        if (kept and kept["status"] == "ok" and kept.get("input_hash") == input_hash(m, meta)
+                and kept.get("provider", header["provider"]) == header["provider"]):
             return kept
         async with sem:
             return await desk.comment(m)
