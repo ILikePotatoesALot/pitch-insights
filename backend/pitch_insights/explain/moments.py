@@ -411,15 +411,21 @@ class MomentScorer:
 
 
 class MatchBrain:
-    """Interpreter plus Moment Scorer: feed events, get signals and moments."""
+    """Interpreter plus Moment Scorer: feed events, get signals and moments.
 
-    def __init__(self, meta: dict):
+    `memory` is the Memory agent (agents/memory.py), if any: it adds facts about similar
+    earlier moments to each new moment's evidence pack."""
+
+    def __init__(self, meta: dict, memory=None):
         self.interp = Interpreter(meta)
         self.scorer = MomentScorer(self.interp)
+        self.memory = memory
 
     def update(self, ev: dict) -> dict:
         signals = self.interp.update(ev)
         moments = self.scorer.update(ev, signals)
+        if self.memory is not None:
+            self.memory.update(ev, moments)
         return {"event": ev, "signals": signals, "moments": moments}
 
     @property

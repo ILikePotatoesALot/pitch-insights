@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 from pitch_insights.agents.desk import CommentaryDesk, ProviderConfigError, file_header, writer_from_settings
+from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.prompts import input_hash
 from pitch_insights.agents.settings import load_settings
 from pitch_insights.agents.store import load_commentary, summarise, write_commentary
@@ -31,7 +32,7 @@ SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 async def run_match(path: Path, writer, header: dict, force: bool, limit: int | None,
                     concurrency: int) -> dict:
     meta, events = read_match(path)
-    brain = MatchBrain(meta)
+    brain = MatchBrain(meta, memory=memory_for(path, meta))
     desk = CommentaryDesk(writer, meta)
     for ev in events:
         brain.update(ev)

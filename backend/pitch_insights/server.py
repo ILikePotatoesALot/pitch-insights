@@ -31,6 +31,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.prompts import input_hash
 from pitch_insights.agents.store import load_commentary
 from pitch_insights.explain.moments import MatchBrain
@@ -117,7 +118,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         from_minute = max(0.0, float(ws.query_params.get("from", 0)))
     except ValueError:
         from_minute = 0.0
-    brain = MatchBrain(meta)
+    brain = MatchBrain(meta, memory=memory_for(path, meta))  # stored vectors: no network
     stored = load_commentary(path)
     await ws.send_json({"type": "meta", "meta": meta, "commentary": commentary_info(stored)})
 
