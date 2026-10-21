@@ -7,9 +7,9 @@ Agreed 20 Oct 2026; video path updated 21 Oct; agents and model access updated 2
 For a full pick-up guide (branches, how to run, rules, what's waiting, ordered next steps) see [HANDOFF.md](HANDOFF.md).
 
 - **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
-- **Azure:** Foundry project in Southeast Asia, but the student subscription has no chat-model quota and can't get more without Pay-As-You-Go. The agents start on GitHub Models behind one `.env` setting; Foundry provides embeddings, tracing and AI services. Details: [DESIGN.md, Agents](DESIGN.md#agents-planned).
+- **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna requested. Details: [DESIGN.md, Agents](DESIGN.md#agents-planned).
 - **Next, not blocked:** Explainer and Narrator agents with the groundedness check and stored commentary; Overlay Director; live simulation mode.
-- **Waiting on Austin:** a GitHub token for GitHub Models; free-tier Content Safety, Translator and Speech resources; the Pay-As-You-Go decision; GPU model, VRAM and OS; OK to download SoccerTrack match 117093's first half (3.35 GB).
+- **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights; whether to keep the video path (GPU quota in Azure ML or the GPU machine, and OK to download SoccerTrack match 117093's first half, 3.35 GB).
 - **Team:** Austin and Claude. Friends are listed only if they contribute (prize verification, rule 8.2).
 
 ## Concept
@@ -76,11 +76,10 @@ A live "match brain": specialist agents turn football events into scored, eviden
 ## Microsoft stack
 
 - Microsoft Agent Framework: Memory, Explainer, Narrator, Personalizer, Overlay Director, Scenario Director (and Video Ingest if the video path stays).
-- Microsoft Foundry: project in Southeast Asia with `text-embedding-3-large` (Memory agent) and tracing through Application Insights; Foundry Local for generating stored commentary offline; GPT-6 Luna for chat only if the subscription moves to Pay-As-You-Go.
-- Chat model until then: GitHub Models, behind one `.env` setting.
+- Microsoft Foundry (East US 2): `gpt-4o` for the agents (GPT-6 Luna if the quota request is approved), `text-embedding-3-small` for the Memory agent, groundedness evaluations, and tracing through Application Insights. GitHub Models as a fallback behind one `.env` setting.
 - Azure AI services (free tiers): Content Safety, Translator, Speech (optional).
-- Azure ML: experiment tracking and model registry for the detector (training runs on Austin's GPU; no GPU quota needed).
-- Azure Container Apps (backend, CPU detection service), Static Web Apps (frontend). Student subscription regions: Southeast Asia or East Asia.
+- Azure ML: experiment tracking and model registry for the detector; training on a cloud GPU (needs GPU quota) or Austin's GPU machine.
+- Azure Container Apps (backend, detection run ahead of time), Static Web Apps (frontend), Key Vault with a managed identity, Cosmos DB free tier (viewer profiles, stored commentary).
 - Optional: Event Hubs.
 
 ## Timeline
@@ -90,11 +89,11 @@ Rearranged again 21 Oct: the app was built a day early, the student subscription
 | Day | Date | Austin | Claude |
 |---|---|---|---|
 | 1 | 20 Oct | Register, Azure account | Repo, event format, generator v1 (done) |
-| 2 | 21 Oct | Azure setup: Foundry project, regions, quota (done; no chat quota) | Interpret stage, Moment Scorer, replay server and app, two code reviews (done); agents design |
-| 3 | 22 Oct | GitHub token; free-tier Content Safety, Translator, Speech; Pay-As-You-Go decision; GPU details | Agents: provider switch, Explainer, groundedness check, fallbacks, Narrator, stored commentary for the samples, commentary in the app |
+| 2 | 21 Oct | Azure setup: personal Pay-As-You-Go subscription, Foundry with GPT-4o and embeddings (done) | Interpret stage, Moment Scorer, replay server and app, two code reviews (done); agents design |
+| 3 | 22 Oct | Free-tier Content Safety, Translator, Speech; Application Insights; video path inputs (GPU quota or details, download OK) | Agents: provider switch, Explainer, groundedness check, fallbacks, Narrator, stored commentary for the samples, commentary in the app |
 | 4 | 23 Oct | Test the commentary; **keep or cut the video path** | Memory agent (embeddings), Content Safety, Translator, tracing; Overlay Director |
 | 5 | 24 Oct | Personas, test explanations | Personalizer (favourite club and player, language, focus metric); live simulation mode and Scenario Director; video path work only if kept |
-| 6 | 25 Oct | Test the UI | Deploy to Azure (Container Apps, Static Web Apps); switch to Foundry chat if Pay-As-You-Go is set up |
+| 6 | 25 Oct | Test the UI | Deploy to Azure (Container Apps, Static Web Apps, Key Vault, Cosmos DB); switch to GPT-6 Luna if approved |
 | 7 | 26 Oct | Demo script | Polish, README (architecture, Microsoft technologies, groundedness scores) |
 | 8 | 27 Oct | Record video, submit | Final fixes, make the repo public |
 

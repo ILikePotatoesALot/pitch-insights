@@ -199,11 +199,12 @@ Code in `backend/pitch_insights/explain/moments.py`. `MatchBrain` wraps the Inte
 
 Designed 21 Oct 2026. The agents turn the Moment Scorer's evidence packs into commentary, check it, and fit it to each viewer. They are built with **Microsoft Agent Framework** and share one state: the `MatchBrain` (Interpreter plus Moment Scorer), which the agents read but never change.
 
-### Model access (why the design looks like this)
+### Model access
 
-- Our Azure for Students subscription may only deploy to five regions (Japan West, Southeast Asia, East Asia, Malaysia West, Indonesia Central). In Southeast Asia and Japan West every base chat model has **0 TPM** of quota; only fine-tuned and batch deployments have quota. Quota increases are refused automatically for student and free-trial subscriptions; only Pay-As-You-Go lifts that.
-- What the subscription *does* have: a Foundry resource and project in Southeast Asia, **350K TPM for `text-embedding-3-large`**, and (to be confirmed) free tiers for Content Safety, Translator and Speech.
-- So the chat model sits behind one setting, and everything else uses Foundry and Azure AI services that need no chat quota.
+- **Subscription:** Austin's personal Pay-As-You-Go subscription (a free trial upgraded, so the free credit is spent first), with a US$20 monthly budget alert. Everything is in resource group `rg-pitch-insights`, region **East US 2**.
+- **Deployed and tested (21 Oct):** `gpt-4o` (model version 2024-11-20, retires April 2027, after judging ends on 10 Nov) and `text-embedding-3-small`, both on the Foundry resource's **v1 API** (no API version needed).
+- **Requested:** quota for `gpt-6-luna` (GPT-6's small, cheap tier: about US$0.10 / US$0.50 per million input / output tokens, far cheaper than GPT-4o). If it's approved, switch by changing the deployment name in `.env`.
+- **Why not the school subscription:** the Azure for Students subscription could only deploy to five Asian regions, had no chat-model quota in any of them, and quota requests were refused automatically. It's no longer used.
 
 ### Chat model provider
 
@@ -211,11 +212,13 @@ One setting in `.env`, `LLM_PROVIDER`, picks where chat calls go. The agent code
 
 | Provider | Use | Notes |
 |---|---|---|
-| `github` (default for now) | Development, live mode | GitHub Models: free with a GitHub token (`GITHUB_TOKEN`, Models permission); daily rate limits |
-| `foundry` | If Austin moves the subscription to Pay-As-You-Go | `gpt-6-luna` (GPT-6's small, cheap tier: about US$0.10 / US$0.50 per million input / output tokens), Global Standard, low rate limit, budget alert |
-| `foundry_local` | Generating stored commentary offline | Foundry Local through Agent Framework's `FoundryLocalClient`; small models (Phi, Qwen) on the CPU, slow but free |
+| `foundry` (default) | Development, stored commentary, live mode | Foundry deployment from `.env` (GPT-4o now, GPT-6 Luna if approved), low rate limit |
+| `github` | Fallback if Foundry has problems | GitHub Models: free with a GitHub token (`GITHUB_TOKEN`, Models permission); daily rate limits |
+| `foundry_local` | Offline experiments | Foundry Local through Agent Framework's `FoundryLocalClient`; small models (Phi, Qwen) on the CPU, slow but free |
 
 Every stored or streamed commentary line records which provider and model wrote it.
+
+**Network note:** the development machine's network inspects HTTPS, so Python's built-in certificate list rejects Azure's certificates. HTTP clients must use the Windows certificate store (`ssl.create_default_context()`), never turn verification off.
 
 ### The agents and how they hand off
 
@@ -224,7 +227,7 @@ For each headline or notable moment, in order:
 1. **Moment Scorer** (code, built): the moment and its evidence pack.
 2. **Memory agent** (Foundry embeddings): embeds the moment's facts and finds similar earlier moments in this match ("Carrot's second big chance down the left"), and in our generated season of matches. Adds them to the pack as `memory` facts.
 3. **Explainer** (chat model): why the moment matters, from the pack only. Two voices: casual (one or two plain sentences) and analyst (adds the numbers: xG, win-probability swing, momentum).
-4. **Groundedness check** (code, no model needed): every player name, club, minute and number in the text must appear in the pack. The score is the share of these claims the pack supports. If anything is unsupported, the Explainer gets one retry with the unsupported claims listed; if it fails again, the moment falls back to the Moment Scorer's fallback headline. Scores are logged and summarised per match, for the README.
+4. **Groundedness check** (code, no model needed): every player name, club, minute and number in the text must appear in the pack. The score is the share of these claims the pack supports. If anything is unsupported, the Explainer gets one retry with the unsupported claims listed; if it fails again, the moment falls back to the Moment Scorer's fallback headline. Scores are logged and summarised per match, for the README. Foundry's built-in groundedness evaluator also scores the stored commentary, as a second opinion.
 5. **Safety check** (Azure AI Content Safety): screens the text before it can reach the screen. Anything flagged falls back to the fallback headline.
 6. **Translator** (Azure AI Translator): the viewer's language. Player and club names are protected from translation.
 7. **Narrator** (chat model): short live lines between big moments (pressing spells, momentum turning), from pattern signals, with the same groundedness and safety checks.
@@ -246,18 +249,20 @@ Agent Framework's OpenTelemetry traces go to Application Insights connected to t
 
 ### Azure resources
 
-All in the Owner subscription, resource group `rg-pitch-insights` (East US; a resource group's region only holds its records), resources in **Southeast Asia**:
+All in `rg-pitch-insights`, East US 2:
 
-- Foundry resource and project, with the `text-embedding-3-large` deployment
+- Foundry resource and project, with the `gpt-4o` and `text-embedding-3-small` deployments (done)
 - Content Safety, Translator and Speech, each on the free F0 tier (Speech optional; first to cut)
-- Application Insights
+- Application Insights, connected to the Foundry project for tracing
+- At deployment: Container Apps (backend), Static Web Apps (app), Key Vault for the keys (read by the backend through a managed identity), and Cosmos DB on its free tier for viewer profiles and stored commentary
 
-Keys and endpoints live in `.env` on the server only, never in the browser.
+During development keys live in `.env` (ignored by git; `.env.example` holds placeholders only). They never reach the browser.
 
 ### Not used, and why
 
-- **Foundry Agent Service and Foundry Evaluations:** both need a chat model deployed in Foundry. Our own groundedness check replaces the evaluation.
-- **Fine-tuning:** we have fine-tuning quota for 4.1-mini and 4.1-nano, but training costs money, Developer Tier deployments are deleted after about a day, and Global Standard fine-tuned deployments charge hourly hosting.
+- **Foundry Agent Service:** possible now, but Agent Framework running in our own backend already gives us the handoffs, shared state and failure handling the Multi-Agent prize judges, with less to deploy.
+- **AI Gateway (API Management):** it caps token use per project but doesn't add quota, and it costs money; the budget alert and low rate limits do the same job here.
+- **Fine-tuning:** not needed for commentary from evidence packs.
 
 ### Rules this supports
 
