@@ -46,19 +46,21 @@
   },
   "M-3": {
    "moment_id": "M-3",
-   "input_hash": "97e0e943986fdfae",
+   "input_hash": "68fecf630e5d2007",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC are dominating, keeping the ball upfield and creating chances.",
-   "analyst": "Potato FC are asserting control with 95% of final-third passes and 3 shots in the last five minutes.",
+   "casual": "Potato FC are firmly in control, keeping Cauliflower FC pinned back.",
+   "analyst": "Potato FC dominate with 95% of final-third passes and 3 shots in the last five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 3,
+    "claims": 5,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-5": {
    "moment_id": "M-5",

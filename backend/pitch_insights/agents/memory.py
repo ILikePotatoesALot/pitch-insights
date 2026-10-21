@@ -263,14 +263,14 @@ class MemoryAgent:
                 delivery = "after a run with the ball" if run else ""
             route = "left" if y > 68 - WING else "right" if y < WING else "middle"
         in_box = shot["x"] >= 105 - 16.5 and 34 - 20.16 <= shot["y"] <= 34 + 20.16
-        technique = ("a header" if shot.get("body_part") == "head" else "a shot") + ("" if in_box else " from outside the box")
+        technique = ("a " if in_box else "a long-range ") + ("header" if shot.get("body_part") == "head" else "shot")
         how = " ".join(p for p in (delivery, "" if set_piece else ROUTES[route]) if p)
         _, poss_t, poss_x = self._possession
         if poss_x < 52.5 and shot["t"] - poss_t <= BREAK_S:
             how += ", on the break" + ("" if goal else ",")
         if goal:
             return f"{who} scored with {technique} {how}".rstrip(", "), route
-        noun = technique.replace("a ", "", 1)
+        noun = technique.removeprefix("a ")
         return f"{who}'s {noun} {how}{result}", route
 
     # ------------------------------------------------------------ records and facts
