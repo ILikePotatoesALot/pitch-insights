@@ -13,12 +13,12 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 | Branch | State | Contents |
 |---|---|---|
-| `main` | On GitHub, at `4326538` | Event format, generator, terminal viewer, Interpret stage (merged via ILikePotatoesALot/pitch-insights#1), plan and video-path design |
-| `pitch-frontend` | **Local only, ahead of `main`, not pushed** | Moment Scorer, replay server, the app, the fixes from its code review, and this handoff |
-| `interpret-stage` | On GitHub, merged | Can be deleted |
-| `moment-scorer` | Local only, at `29cf3bb` | Already inside `pitch-frontend`; can be deleted |
+| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2) |
+| `generator-review` | On GitHub, pull request open into `main` | Fixes from the code review of the original code (generator, replay, tools) and from a second review (banner timer, set-piece assists, clearances, head-to-head) |
 
-**Next git step:** push `pitch-frontend` and open a pull request into `main` (Austin's OK needed).
+The merged branches (`interpret-stage`, `moment-scorer`, `pitch-frontend`) are deleted. Every branch so far has had a `/code-review`; the original code was reviewed by path on `generator-review`.
+
+**Next git step:** merge the `generator-review` pull request (Austin's OK needed), then delete the branch.
 
 ## What's built
 
@@ -36,7 +36,7 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 49 passing (`cd backend && .venv\Scripts\python -m pytest`).
+**Tests:** 59 passing (`cd backend && .venv\Scripts\python -m pytest`).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -112,7 +112,7 @@ Then open http://localhost:5173. In Claude Code, both servers are also set up in
 
 ## Waiting on Austin
 
-1. **Push `pitch-frontend` and open the pull request** (just say so).
+1. **Merge the `generator-review` pull request** (just say so).
 2. **GPU details** for the training machine: model, VRAM, OS.
 3. **A Foundry GPT model**, with its endpoint and key in `.env` (copy `.env.example`; never paste keys in chat). Needed for the agents.
 4. **OK to download** SoccerTrack match 117093's first half (3.35 GB) and its annotations into `data/`.
@@ -124,8 +124,8 @@ Then open http://localhost:5173. In Claude Code, both servers are also set up in
 
 | # | Step | Needs | Size |
 |---|---|---|---|
-| 1 | Push `pitch-frontend`, open and merge the pull request | Austin's OK | Minutes |
-| 2 | **Code review of the original code** (event format, generator, stream, command-line tools, scripts) by file path; fixes on a new branch | Nothing | ~1–2 h |
+| 1 | Merge the `generator-review` pull request (the original code's review fixes; already reviewed twice) | Austin's OK | Minutes |
+| 2 | Done: code review of the original code, fixed on `generator-review` | | |
 | 3 | **Explainer and Narrator agents** on Foundry with Microsoft Agent Framework: turn each moment's evidence pack into commentary (casual and analyst voices, several languages); only facts from the pack | Foundry model in `.env` | ~half a day |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Step 3 for languages | ~half a day |
 | 5 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
