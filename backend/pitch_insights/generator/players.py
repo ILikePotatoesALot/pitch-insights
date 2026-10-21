@@ -168,6 +168,7 @@ def load_clubs(path: Path = TEAMS_FILE) -> dict[str, ClubDef]:
     return clubs
 
 
+@lru_cache(maxsize=1)
 def league_info(path: Path = TEAMS_FILE) -> tuple[str, int]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     return data["league"], int(data["season_matchday"])

@@ -186,3 +186,57 @@ def test_watch_all_events_has_a_line_for_each(match, tmp_path):
     meta, events, _ = match
     c = Commentary(meta)
     assert all(c.describe(e) for e in events)
+
+
+def test_resume_while_playing_keeps_the_clock():
+    replay = Replay([{"t": 0.0, "period": 1}], speed=100.0, start_at=10.0)
+    replay._wall -= 1.0  # pretend a second of wall time has passed: now is about 110
+    before = replay.now
+    replay.resume()  # not paused, so this must not rewind to 10
+    assert replay.now >= before
+    replay.pause()
+    paused_at = replay.now
+    replay.resume()
+    assert abs(replay.now - paused_at) < 1.0
+
+
+def test_away_only_picks_a_different_home_club():
+    for seed in range(1, 40):
+        meta, _, _ = simulate(seed, None, "POT")
+        assert meta["away"]["id"] == "POT" and meta["home"]["id"] != "POT"
+
+
+def test_script_rejects_typos():
+    with pytest.raises(ValueError, match="forced event type"):
+        script_from_dict({"forced": [{"minute": 30, "type": "red", "team": "CAR"}]})
+    with pytest.raises(ValueError, match="isn't playing"):
+        simulate(11, "POT", "CAR", script_from_dict({"forced": [{"minute": 30, "type": "red_card", "team": "CRA"}]}))
+
+
+def test_second_half_script_minutes_wait_for_the_second_half():
+    script = script_from_dict({"forced": [{"minute": 46, "type": "substitution", "team": "POT"}]})
+    _, events, _ = simulate(12, "POT", "CAR", script)
+    first = next(e for e in events if e["type"] == "substitution" and e["team_id"] == "POT")
+    assert first["period"] == 2
+
+
+def test_penalty_at_the_end_of_a_half_is_taken():
+    for seed, home, away in ((35, "CAU", "POT"), (185, "CAR", "BRO")):  # both award a penalty in stoppage time
+        _, events, _ = simulate(seed, home, away)
+        awarded = sum(e["type"] == "foul" and e["penalty"] for e in events)
+        taken = sum(e["type"] == "shot" and e["kind"] == "penalty" for e in events)
+        assert awarded == taken > 0
+
+
+def test_second_half_starts_a_new_possession(match):
+    _, events, _ = match
+    last_first = [e["possession_id"] for e in events if e["period"] == 1 and "possession_id" in e][-1]
+    first_second = next(e["possession_id"] for e in events if e["period"] == 2 and "possession_id" in e)
+    assert first_second > last_first
+
+
+def test_watch_rejects_a_speed_of_zero():
+    from pitch_insights.watch import main
+
+    with pytest.raises(SystemExit):
+        main(["match.jsonl", "--speed", "0"])

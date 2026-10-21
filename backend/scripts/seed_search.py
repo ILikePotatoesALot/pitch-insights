@@ -19,21 +19,18 @@ def goals(events):
     return [e for e in events if e["type"] == "shot" and e["outcome"] == "goal"]
 
 
-def score_at(events, home, away, minute):
-    g = [e for e in goals(events) if e["minute"] < minute or (e["minute"] == minute and e["period"] == 1)]
-    return sum(e["team_id"] == home for e in g), sum(e["team_id"] == away for e in g)
-
-
-def final(events, home, away):
-    g = goals(events)
+def score_before(events, home, away, seq=float("inf")):
+    """Score from the goals before event `seq` (the final score by default)."""
+    g = [e for e in goals(events) if e["seq"] < seq]
     return sum(e["team_id"] == home for e in g), sum(e["team_id"] == away for e in g)
 
 
 def story_matches(story: str, meta: dict, events: list[dict]) -> bool:
     home, away = meta["home"]["id"], meta["away"]["id"]
-    fh, fa = final(events, home, away)
+    fh, fa = score_before(events, home, away)
     if story == "comeback":
-        h70, a70 = score_at(events, home, away, 70)
+        at70 = next(e["seq"] for e in events if e["period"] == 2 and e["minute"] >= 70)
+        h70, a70 = score_before(events, home, away, at70)
         return (h70 < a70 and fh > fa) or (a70 < h70 and fa > fh)
     if story == "late_winner":
         if fh == fa:
@@ -47,7 +44,7 @@ def story_matches(story: str, meta: dict, events: list[dict]) -> bool:
             return False
         red_team = reds[0]["team_id"]
         other = away if red_team == home else home
-        before = score_at(events, home, away, reds[0]["minute"])
+        before = score_before(events, home, away, reds[0]["seq"])
         lead_before = (before[0] - before[1]) * (1 if other == home else -1)
         lead_after = (fh - fa) * (1 if other == home else -1)
         return lead_before <= 0 < lead_after

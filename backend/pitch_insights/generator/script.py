@@ -23,6 +23,8 @@ from typing import Literal
 
 import yaml
 
+FORCED_TYPES = ("red_card", "substitution")
+
 
 @dataclass(frozen=True)
 class Phase:
@@ -72,4 +74,7 @@ def script_from_dict(data: dict) -> Script:
         for p in data.get("phases", [])
     )
     forced = tuple(Forced(minute=f["minute"], type=f["type"], team=f["team"]) for f in data.get("forced", []))
+    for f in forced:
+        if f.type not in FORCED_TYPES:
+            raise ValueError(f"unknown forced event type {f.type!r}; use one of {', '.join(FORCED_TYPES)}")
     return Script(seed=data.get("seed"), home=data.get("home"), away=data.get("away"), phases=phases, forced=forced)

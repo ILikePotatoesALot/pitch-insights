@@ -129,7 +129,10 @@ class MatchEngine:
     # ------------------------------------------------------------ clock
 
     def minute_float(self) -> float:
-        return self.t / 60 + (45 if self.period == 2 else 0)
+        """Match minute on the broadcast clock; first-half stoppage time stays at 45, like 45+2'."""
+        if self.period == 1:
+            return min(45.0, self.t / 60)
+        return 45 + self.t / 60
 
     def clock(self) -> tuple[str, int]:
         m = int(self.t // 60) + 1
@@ -269,6 +272,8 @@ class MatchEngine:
         self.period, self.t = period, 0.0
         self.period_counts = {"goals": 0, "cards": 0, "windows": 0}
         if period == 2:
+            self.att = 1  # the away side kicks off the second half, in a possession of its own
+            self.possession_id += 1
             for team in self.teams:
                 if self.rng.random() < 0.15:
                     self.make_subs(team, 1, half_time=True)
@@ -278,8 +283,8 @@ class MatchEngine:
         while True:
             if period_end is None and self.t >= 2700:
                 period_end = 2700 + self.stoppage_seconds()
-            if period_end is not None and self.t >= period_end:
-                break
+            if period_end is not None and self.t >= period_end and not (self.restart and self.restart[0] == "penalty"):
+                break  # the half is extended for a penalty, as in real football
             self.check_forced()
             if self.restart:
                 self.do_restart()
@@ -845,8 +850,16 @@ def simulate(seed: int, home_id: str | None = None, away_id: str | None = None,
     away_id = away_id or script.away
     if not home_id or not away_id:
         pick = random.Random(seed ^ 0x5EED).sample(sorted(clubs), 2)
-        home_id, away_id = home_id or pick[0], away_id or (pick[1] if pick[1] != home_id else pick[0])
+        if not home_id and not away_id:
+            home_id, away_id = pick
+        elif not away_id:
+            away_id = pick[1] if pick[1] != home_id else pick[0]
+        else:
+            home_id = pick[0] if pick[0] != away_id else pick[1]
     if home_id == away_id:
         raise ValueError("home and away must be different clubs")
+    for item in (*script.phases, *script.forced):
+        if item.team not in (home_id, away_id):
+            raise ValueError(f"script refers to {item.team!r}, which isn't playing ({home_id} v {away_id})")
     engine = MatchEngine(seed, clubs[home_id], clubs[away_id], script)
     return engine.run()
