@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { MomentFeed, MomentumChart, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
+import { commentaryText, MomentFeed, MomentumChart, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { PitchScene, teamColours } from "./pitch/PitchScene";
 import type { MatchEvent, MatchMeta, MatchSummary, Moment, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
@@ -40,7 +40,7 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
-  const { meta, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } = useReplay(name, onEvent, onReset);
+  const { meta, aiInfo, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } = useReplay(name, onEvent, onReset);
 
   useEffect(() => {
     if (meta) sceneRef.current?.setMatch(meta);
@@ -77,7 +77,9 @@ export default function App() {
               <div className={`lowerthird ${banner.tier}`} key={banner.id}>
                 <span className="lt-clock">{banner.clock}</span>
                 <span className="lt-head">{banner.headline}</span>
-                {mode === "analyst" && banner.facts[1] && <span className="lt-fact">{banner.facts[1].text}</span>}
+                {commentaryText(banner, mode)
+                  ? <span className="lt-fact">{commentaryText(banner, mode)}</span>
+                  : mode === "analyst" && banner.facts[1] && <span className="lt-fact">{banner.facts[1].text}</span>}
               </div>
             )}
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
@@ -104,7 +106,7 @@ export default function App() {
         </section>
 
         <aside>
-          {meta && <MomentFeed moments={moments} meta={meta} mode={mode} colours={colours} />}
+          {meta && <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={mode} colours={colours} />}
           {meta && <Ratings state={state} meta={meta} colours={colours} favourite={favourite} setFavourite={setFavourite} />}
           {meta && mode === "analyst" && <StatsPanel state={state} meta={meta} />}
         </aside>

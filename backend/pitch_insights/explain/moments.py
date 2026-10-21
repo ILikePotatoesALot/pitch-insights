@@ -227,19 +227,24 @@ class MomentScorer:
         verb = "misses" if d["outcome"] != "saved" else "is denied"
         return imp, f"{self._surname(pid)} {verb} a big chance", facts
 
+    def _leader(self, momentum: float) -> str:
+        """Momentum is positive when the home side is on top."""
+        return self.i.home if momentum >= 0 else self.i.away
+
     def _pattern(self, s):
         d, team, kind = s["data"], s.get("team_id"), s["type"]
         facts = self._context_facts(team) if team else []
         if kind == "momentum_swing":
             facts.insert(0, {"kind": "momentum_swing", "value": {"from": d["from_momentum"], "to": d["momentum"]},
-                             "text": f"Momentum swung from {d['from_momentum']:+.2f} to {d['momentum']:+.2f} "
-                                     f"(positive means {self._team_name(self.i.home)} on top) within ten minutes."})
+                             "text": f"Ten minutes ago {self._team_name(self._leader(d['from_momentum']))} were on top "
+                                     f"(momentum {abs(d['from_momentum']):.2f} from their side); now "
+                                     f"{self._team_name(team)} are ({abs(d['momentum']):.2f} from their side)."})
             imp = 0.34 + 0.15 * min(1.0, max(0.0, abs(d["momentum"] - d["from_momentum"]) - 0.8) / 0.8)
             headline = f"{self._team_name(team)} take control"
         elif kind == "dominance":
             facts.insert(0, {"kind": "dominance", "value": d["momentum"],
-                             "text": f"Momentum is {d['momentum']:+.2f}, about as one-sided as it gets "
-                                     f"(positive means {self._team_name(self.i.home)} on top)."})
+                             "text": f"{self._team_name(team)} have momentum {abs(d['momentum']):.2f} from their side, "
+                                     f"about as one-sided as it gets."})
             imp, headline = 0.33, f"{self._team_name(team)} on top"
         elif kind == "pressing_spell":
             facts.insert(0, {"kind": "pressing", "value": d,

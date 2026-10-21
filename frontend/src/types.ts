@@ -64,6 +64,29 @@ export interface Moment {
   facts: Fact[];
   signals: string[];
   score: Record<string, number>;
+  commentary?: Commentary; // written by the agents, when there is some for this moment
+}
+
+/** One moment's commentary from the agents, checked against its evidence pack. */
+export interface Commentary {
+  moment_id: string;
+  agent: "explainer" | "narrator";
+  status: "ok" | "fallback";
+  casual: string;
+  analyst: string;
+  attempts: number;
+  grounding: { score: number; claims: number; unsupported: string[] } | null;
+  corrected: string[]; // what the groundedness check caught in an earlier draft
+  reason: string | null;
+}
+
+/** Who wrote a match's stored commentary, for the AI-generated label. */
+export interface CommentaryInfo {
+  ai_generated: boolean;
+  provider: string;
+  model: string;
+  prompt_version: string;
+  summary: { moments: number; ok: number; fallback: number; retried: number; grounding_mean: number | null };
 }
 
 export interface PlayerState {

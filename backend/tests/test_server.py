@@ -47,3 +47,19 @@ def test_disconnect_while_paused_ends_the_replay():
         ws.receive_json()
         ws.send_json({"cmd": "pause"})
     time.sleep(0.3)  # the server side must have finished; TestClient would hang on exit otherwise
+
+
+def test_moments_carry_stored_commentary():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=87") as ws:
+        meta = ws.receive_json()
+        assert meta["commentary"]["ai_generated"] is True and meta["commentary"]["model"]
+        live = []
+        while (msg := ws.receive_json())["type"] != "end":
+            if msg["type"] == "catchup":
+                shown = [m for m in msg["moments"] if m["tier"] != "minor"]
+                assert shown and all(m["commentary"]["casual"] for m in shown)
+            if msg["type"] == "moment":
+                live.append(msg["moment"])
+    goals = [m for m in live if m["type"] == "goal"]
+    assert goals and all(m["commentary"]["agent"] == "explainer" for m in goals)
+    assert all("commentary" not in m for m in live if m["tier"] == "minor")

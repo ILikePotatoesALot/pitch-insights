@@ -87,6 +87,9 @@ aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .moment .why { color: var(--accent); font-size: 12px; }
 .facts { margin: 0; padding: 0 12px 10px 66px; color: var(--muted); font-size: 13px; }
 .facts li { margin: 3px 0; }
+.moment .mtext { display: block; margin-top: 3px; color: var(--muted); font-weight: 400; font-size: 13px; line-height: 1.4; }
+.moment .check { margin: 0; padding: 0 12px 10px 66px; color: var(--accent); font-size: 12px; }
+.ai-note { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
 
 .ratings ol { list-style: none; margin: 0; padding: 0; }
 .ratings li { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid var(--line); cursor: pointer; }

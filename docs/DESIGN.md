@@ -195,9 +195,9 @@ Code in `backend/pitch_insights/explain/moments.py`. `MatchBrain` wraps the Inte
   - **Banner:** each headline moment that arrives live shows over the pitch for a few seconds (not ones restored by a catch-up).
   - **Connection:** a dropped connection shows a message; jumping to a minute reconnects. A jump belongs to its match, so picking another match starts it from kick-off.
 
-## Agents (planned)
+## Agents
 
-Designed 21 Oct 2026. The agents turn the Moment Scorer's evidence packs into commentary, check it, and fit it to each viewer. They are built with **Microsoft Agent Framework** and share one state: the `MatchBrain` (Interpreter plus Moment Scorer), which the agents read but never change.
+Designed 21 Oct 2026; the core (steps 3, 4 and 7 below, plus stored commentary) built the same day on branch `agents`. The agents turn the Moment Scorer's evidence packs into commentary, check it, and fit it to each viewer. They are built with **Microsoft Agent Framework** and share one state: the `MatchBrain` (Interpreter plus Moment Scorer), which the agents read but never change.
 
 ### Model access
 
@@ -218,7 +218,7 @@ One setting in `.env`, `LLM_PROVIDER`, picks where chat calls go. The agent code
 
 Every stored or streamed commentary line records which provider and model wrote it.
 
-**Network note:** the development machine's network inspects HTTPS, so Python's built-in certificate list rejects Azure's certificates. HTTP clients must use the Windows certificate store (`ssl.create_default_context()`), never turn verification off.
+**Network note:** the development machine's network inspects HTTPS, so Python's bundled certificate list rejects Azure's certificates. The chat client verifies against the operating system's store through `truststore`; verification is never turned off.
 
 ### The agents and how they hand off
 
@@ -226,11 +226,11 @@ For each headline or notable moment, in order:
 
 1. **Moment Scorer** (code, built): the moment and its evidence pack.
 2. **Memory agent** (Foundry embeddings): embeds the moment's facts and finds similar earlier moments in this match ("Carrot's second big chance down the left"), and in our generated season of matches. Adds them to the pack as `memory` facts.
-3. **Explainer** (chat model): why the moment matters, from the pack only. Two voices: casual (one or two plain sentences) and analyst (adds the numbers: xG, win-probability swing, momentum).
-4. **Groundedness check** (code, no model needed): every player name, club, minute and number in the text must appear in the pack. The score is the share of these claims the pack supports. If anything is unsupported, the Explainer gets one retry with the unsupported claims listed; if it fails again, the moment falls back to the Moment Scorer's fallback headline. Scores are logged and summarised per match, for the README. Foundry's built-in groundedness evaluator also scores the stored commentary, as a second opinion.
+3. **Explainer** (chat model; built): why the moment matters, from the pack only. Two voices: casual (one or two plain sentences) and analyst (adds the numbers: xG, win-probability swing, momentum).
+4. **Groundedness check** (code, no model needed; built): every number in the text, and every player or club the league knows, must be in the pack. Numbers may be rounded decimals (3.88 as 3.9), percentages of a probability (0.9669 as 97%), number words in the facts ("five minutes" backs "5 minutes") or stoppage time as a minute (90+6' as 96th); whole numbers must otherwise match exactly. The two clubs playing are always allowed. The score is the share of claims the pack supports. If anything is unsupported, the writer gets one retry with the unsupported claims named; if it fails again, the moment falls back to the Moment Scorer's headline. What the check caught is kept (`corrected`) and shown under "Why?". It can't catch claims without a name or number ("dominating" with only 33% of final-third passes); Foundry's groundedness evaluator is planned as a second opinion.
 5. **Safety check** (Azure AI Content Safety): screens the text before it can reach the screen. Anything flagged falls back to the fallback headline.
 6. **Translator** (Azure AI Translator): the viewer's language. Player and club names are protected from translation.
-7. **Narrator** (chat model): short live lines between big moments (pressing spells, momentum turning), from pattern signals, with the same groundedness and safety checks.
+7. **Narrator** (chat model; built): short lines between big moments (momentum turning, dominance, pressing spells, rating milestones), with the same checks. The order above is the data flow, not the build order.
 8. **Personalizer**: picks what each viewer sees from their profile (casual or analyst, club, favourite player, language, focus metric).
 9. **Overlay Director**: turns what's left into timed overlay cues (time, duration, priority, template, data) so the screen never clutters.
 10. **Scenario Director** (live simulation only): steers a live match with interventions, logged so the match replays exactly.
@@ -239,9 +239,52 @@ Failure handling is part of the design, because the Multi-Agent prize judges rec
 
 ### Stored commentary for the demo
 
-- A script runs the agents over each sample match and stores the results in `samples/<name>.commentary.json`, keyed by moment, voice and language.
-- In replay, the server streams stored commentary, so judges never hit a rate limit or a missing key. Live simulation calls the model.
-- The stored file is regenerated whenever the generator, Interpreter or Moment Scorer changes the sample matches.
+- `scripts/generate_commentary.py` runs the agents over each sample match (headline and notable moments only) and stores the results in `samples/<name>.commentary.json`. The file records `ai_generated`, provider, model, prompt version and a summary; each moment's record has the agent, status (`ok` or `fallback`), both voices, attempts, the groundedness result, what was `corrected`, and an `input_hash` of exactly what the writer was shown.
+- Re-running only redoes moments whose facts, model or prompt version changed, so it's cheap. `--force` redoes everything.
+- In replay, the server adds each moment's stored commentary to the `moment` and `catchup` messages and says who wrote it in the `meta` message, so judges never hit a rate limit or a missing key. Live simulation will call the model.
+- First full run (21 Oct, GPT-4o, prompt 2026-10-21.2): 52 moments across the three samples, all grounded, none fell back. Earlier runs caught and corrected made-up numbers in first drafts.
+- The app shows the casual or analyst line under each moment's headline and on the live banner, an "AI-generated" note under the feed, and under "Why?" which agent wrote it, how many names and numbers were checked, and anything corrected.
+
+### Code
+
+`backend/pitch_insights/agents/`:
+
+| Module | What it does |
+|---|---|
+| `settings.py` | Reads `.env` and the environment: provider, endpoint, key (never in `repr` or logs), model, timeout, retries, `max_tokens`, temperature, concurrency |
+| `clients.py` | Builds the Agent Framework chat client (`OpenAIChatCompletionClient`) on the provider's OpenAI-compatible endpoint, with the timeout, the SDK's retry layer and OS certificate verification |
+| `prompts.py` | Versioned system messages for the Explainer and Narrator, and the moment as the writer sees it |
+| `grounding.py` | The groundedness check |
+| `desk.py` | `CommentaryDesk`: routes each moment, runs the check, retries once, falls back. `AgentWriter`: the two Agent Framework agents, with structured output (`Lines`: casual, analyst) |
+| `middleware.py` | Agent Framework middleware: one structured log line per agent run (agent, moment, time, tokens, error), never the prompt or reply |
+| `store.py` | Reads and writes stored commentary |
+
+Tests (`tests/test_agents.py`) use a fake writer, so they need no key or network: grounded and made-up text, the retry naming the problems, fallbacks for 429, 500, 400, timeouts and missing structured output, settings, the cache key and the stored file.
+
+### Engineering practices (Microsoft guidance)
+
+The judging criteria ask for "quality software development practices", pointing to Microsoft Learn and the [Azure Architecture Center best practices](https://learn.microsoft.com/en-us/azure/architecture/best-practices/index-best-practices). What we follow, and where:
+
+| Area | Practice | Status |
+|---|---|---|
+| Reliability | A timeout on every model call (`AGENT_TIMEOUT_S`, 20 s) and on the whole draft (45 s) | Done |
+| Reliability | One retry layer only: the OpenAI SDK's (`AGENT_MAX_RETRIES`, 2), which backs off and honours `Retry-After`; it retries 429, 5xx and timeouts, never 400/401/403/404 | Done |
+| Reliability | A degraded result instead of an error: every failure falls back to the plain headline | Done |
+| Reliability | Limits in config, not code; failure paths tested with a fake client (429, 500, 400, timeout) | Done |
+| Security | Keys only in `.env` (ignored by git) or environment variables; never logged, never in `repr`, never sent to the browser | Done |
+| Security | Keyless auth with a managed identity and the "Cognitive Services OpenAI User" role; any remaining secrets in Key Vault | At deployment |
+| Observability | Structured log lines per agent run and per moment, tied together by the moment ID; prompts and replies not logged | Done |
+| Observability | OpenTelemetry traces from Agent Framework to Application Insights, sensitive data off | Next step |
+| Responsible AI | The evidence pack is the only source of facts; code groundedness check with retry and fallback; rates summarised per match | Done |
+| Responsible AI | Tell users the commentary is AI-generated (the note under the feed; `ai_generated` in every stored file) | Done |
+| Responsible AI | Content Safety on every line; Foundry's groundedness evaluator as a second opinion | Next step |
+| Prompt design | System messages structured as role and task, grounding rules, safety rules, style, output format; the moment marked as data, not instructions | Done |
+| Prompt design | Prompts versioned in code; the version stored with every line, so a change triggers regeneration | Done |
+| Cost | `max_tokens` near the real output size (220); at most 3 calls in flight; stored commentary reused unless its inputs change | Done |
+| Code quality | Structured output (a Pydantic model) instead of parsing free text; middleware for cross-cutting concerns; the model behind an interface (`Writer`) so providers and tests can swap in | Done |
+| Orchestration | Deterministic code for a predictable flow (route, check, retry, fall back), not an agent deciding the order | Done |
+
+Sources: [transient fault handling](https://learn.microsoft.com/en-us/azure/architecture/best-practices/transient-faults), [Azure OpenAI quotas and limits](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/quota), [keyless connections](https://learn.microsoft.com/en-us/azure/developer/ai/keyless-connections), [Agent Framework observability](https://learn.microsoft.com/en-us/agent-framework/agents/observability), [monitoring and diagnostics](https://learn.microsoft.com/en-us/azure/architecture/best-practices/monitoring), [system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/system-message), [safety system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates), [transparency note](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/transparency-note), [RAG evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/rag-evaluators), [structured outputs](https://learn.microsoft.com/en-us/agent-framework/agents/structured-outputs), [middleware](https://learn.microsoft.com/en-us/agent-framework/agents/middleware/), [Well-Architected AI application design](https://learn.microsoft.com/en-us/azure/well-architected/ai/application-design), [API design](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design).
 
 ### Tracing
 

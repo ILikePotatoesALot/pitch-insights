@@ -1,0 +1,240 @@
+{
+ "ai_generated": true,
+ "provider": "foundry",
+ "model": "gpt-4o",
+ "prompt_version": "2026-10-21.2",
+ "match": "thriller-CAR-BRO",
+ "summary": {
+  "moments": 14,
+  "ok": 14,
+  "fallback": 0,
+  "retried": 0,
+  "grounding_mean": 1.0
+ },
+ "moments": {
+  "M-1": {
+   "moment_id": "M-1",
+   "input_hash": "f0f1dc95143ec924",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Shacroft scores early for Broccoli, making it 1–0 after Bowerman's assist.",
+   "analyst": "Shacroft's goal, with a 0.31 xG chance, puts Broccoli ahead 1–0 and boosts their win probability from 26% to 61%. Broccoli's recent final-third control pays off with a decisive early strike.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 10,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-2": {
+   "moment_id": "M-2",
+   "input_hash": "d4f2b031e846b8e3",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Gyokerland levels it for Carrot with his 14th goal this season, assisted by Mbeulier. It's now 1–1.",
+   "analyst": "Gyokerland's equaliser, assisted by Mbeulier, lifts Carrot's win chance from 30% to 57%. It caps a dominant spell where Carrot controlled 72% of final-third passes and generated 4 shots (xG 0.51).",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-4": {
+   "moment_id": "M-4",
+   "input_hash": "0a5b3f8477939659",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Carrot FC are dominating the game right now, keeping Broccoli FC under constant pressure.",
+   "analyst": "Carrot FC are in control, with 89% of final-third passes in the last five minutes and strong momentum.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 3,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-5": {
+   "moment_id": "M-5",
+   "input_hash": "6d5dfeecd0eaf402",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Carrot FC are firmly in control as they push forward.",
+   "analyst": "Carrot FC dominate with 90% of final-third passes in the last five minutes, showcasing their control at 1–1.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 4,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-6": {
+   "moment_id": "M-6",
+   "input_hash": "68635166d56edaaa",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Phillwood scores his first goal of the season to give Broccoli a 2-1 lead, despite Carrot dominating the game.",
+   "analyst": "Declan Phillwood's first goal of the season, assisted by Gallasher, puts Broccoli ahead 2-1 against the run of play. Carrot had dominated with 13 shots and xG 1.59, but Broccoli's win chance jumps to 46%.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-7": {
+   "moment_id": "M-7",
+   "input_hash": "24aa9fd936221cbd",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Gyokerland scores his second to level it for Carrot at 2–2. Carrot are pushing hard and now look like favourites.",
+   "analyst": "Gyokerland's second goal, assisted by Szobalenko, levels the match at 2–2 with an xG of 0.18. Carrot's win chance jumps from 28% to 56%, reflecting their dominance in momentum and final-third activity.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 10,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-8": {
+   "moment_id": "M-8",
+   "input_hash": "c41b60b771bec437",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Gyokerland's shot could have put Carrot ahead, but Pickvardt made the save. It's still 2–2 at the break.",
+   "analyst": "Gyokerland's missed chance, with an xG of 0.34, could have shifted the balance before half-time. Carrot's momentum and 65% of final-third passes show they were pressing hard.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 7,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-9": {
+   "moment_id": "M-9",
+   "input_hash": "835d47692635e805",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "It's all square at half-time, 2–2. Carrot FC have had more of the ball and chances, but Broccoli FC are keeping up.",
+   "analyst": "Half-time sees Carrot FC and Broccoli FC level at 2–2. Carrot dominate with 68.8% possession and 15 shots (xG 2.11), but Broccoli's efficiency from 6 shots (xG 0.74) keeps them in it.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-10": {
+   "moment_id": "M-10",
+   "input_hash": "233026b15101caa6",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Bowerman scores a brilliant goal to make it 3–2 for Broccoli, turning the game around.",
+   "analyst": "Jordy Bowerman's low-probability strike (xG 0.03) gives Broccoli a 3–2 lead, doubling their win chance to 50%. His rating jumps to 7.9, reflecting his decisive impact in a tight match.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 9,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-12": {
+   "moment_id": "M-12",
+   "input_hash": "c802fc9986edced6",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Jordy Bowerman is shining for Broccoli FC, hitting an impressive 8.0 rating.",
+   "analyst": "Jordy Bowerman reaches an 8.0 rating for Broccoli FC, reflecting his strong influence in this match.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 4,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-14": {
+   "moment_id": "M-14",
+   "input_hash": "7da2fbf81fbc71ce",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Calvertson scores his 12th of the season, making it 4–2 to Broccoli. Zahara sets him up.",
+   "analyst": "Calvertson's 12th goal of the season boosts Broccoli's win probability from 62% to 90%. Assisted by Zahara, it caps a strong five-minute spell with 3 shots and 1 corner.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-16": {
+   "moment_id": "M-16",
+   "input_hash": "230d9d8e8232f3c1",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Zahara misses a great chance to extend Broccoli's lead late on.",
+   "analyst": "Ezio Zahara misses a high-quality chance with an xG of 0.37, which could have pushed Broccoli further ahead. Broccoli are dominating the final-third play, controlling 88% of passes in the last five minutes.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 4,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-18": {
+   "moment_id": "M-18",
+   "input_hash": "ca4223e043a3092f",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Gyokerland scores his third goal to make it 3–4. Carrot are still behind but this gives them hope.",
+   "analyst": "Gyokerland completes his hat-trick with a low xG chance (0.16), assisted by Szobalenko, to reduce the deficit to 3–4. Despite Broccoli's dominance, Carrot's top scorer keeps them in the match.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 9,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-20": {
+   "moment_id": "M-20",
+   "input_hash": "57fa28ba1fb78e45",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Broccoli edge out Carrot 4–3 in a thrilling match, ending Carrot's unbeaten run.",
+   "analyst": "Broccoli secure a 4–3 victory over Carrot, despite Carrot dominating possession with 65% and creating higher xG (3.14 to 1.96). Anders Gyokerland shines as Player of the Match with an 8.9 rating.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  }
+ }
+}

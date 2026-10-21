@@ -7,8 +7,9 @@ Agreed 20 Oct 2026; video path updated 21 Oct; agents and model access updated 2
 For a full pick-up guide (branches, how to run, rules, what's waiting, ordered next steps) see [HANDOFF.md](HANDOFF.md).
 
 - **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
-- **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna requested. Details: [DESIGN.md, Agents](DESIGN.md#agents-planned).
-- **Next, not blocked:** Explainer and Narrator agents with the groundedness check and stored commentary; Overlay Director; live simulation mode.
+- **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna requested. Details: [DESIGN.md, Agents](DESIGN.md#agents).
+- **Agents core built** on branch `agents` (not reviewed or pushed yet): Explainer and Narrator on GPT-4o through Agent Framework, code groundedness check with one retry and a fallback, stored commentary for the three samples (52 moments, all grounded), commentary shown in the app with an AI-generated note.
+- **Next, not blocked:** code review of `agents`; Memory agent, Content Safety, Translator and tracing; Overlay Director; live simulation mode.
 - **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights; whether to keep the video path (GPU quota in Azure ML or the GPU machine, and OK to download SoccerTrack match 117093's first half, 3.35 GB).
 - **Team:** Austin and Claude. Friends are listed only if they contribute (prize verification, rule 8.2).
 
@@ -58,7 +59,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - **Moment Scorer** (code, built): ranks the Interpreter's signals into moments (about 4 headlines and 10 shown a match), each with an evidence pack and a fallback headline. Details: [DESIGN.md, Moment Scorer](DESIGN.md#explain-stage-moment-scorer-v1).
 - Key moments get an evidence pack; the LLM explains only what is in it.
 - A "Why?" button shows the evidence behind any moment or rating.
-- **Agents** (Agent Framework, planned): Memory agent (similar earlier moments, Foundry embeddings), Explainer (casual and analyst voices), groundedness check in code (one retry, then the fallback headline), Content Safety, Translator, Narrator. Commentary for the sample matches is generated ahead and stored, so the judges' demo never depends on rate limits. Details: [DESIGN.md, Agents](DESIGN.md#agents-planned).
+- **Agents** (Agent Framework, planned): Memory agent (similar earlier moments, Foundry embeddings), Explainer (casual and analyst voices), groundedness check in code (one retry, then the fallback headline), Content Safety, Translator, Narrator. Commentary for the sample matches is generated ahead and stored, so the judges' demo never depends on rate limits. Details: [DESIGN.md, Agents](DESIGN.md#agents).
 
 ## 4. Render (Vite + React + Three.js)
 

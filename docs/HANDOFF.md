@@ -15,9 +15,11 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 |---|---|---|
 | `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3) |
 
-`main` is the only branch; the merged ones are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
+| `agents` | **Local only, not pushed** | Agents core: provider switch, Explainer, Narrator, groundedness check, stored commentary for the samples, commentary in the app; best-practice notes in DESIGN.md |
 
-**Next git step:** the agents go on a new branch (for example `agents`), with a `/code-review` before the pull request.
+The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
+
+**Next git step:** `/code-review` the `agents` branch, fix, then push and open its pull request (Austin's OK needed).
 
 ## What's built
 
@@ -30,12 +32,13 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 | Moment Scorer (moments, tiers, evidence packs, fallback headlines) | Built, reviewed, fixed | `backend/pitch_insights/explain/moments.py` |
 | Replay server (FastAPI WebSocket) | Built, reviewed, fixed | `backend/pitch_insights/server.py` |
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
-| Agents (Memory, Explainer, Narrator, Personalizer, Overlay Director, Scenario Director; groundedness and safety checks; stored commentary) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents-planned) |
+| Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built on `agents`, checked in the browser, not reviewed yet | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
+| Other agents (Memory, Content Safety, Translator, Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 59 passing (`cd backend && .venv\Scripts\python -m pytest`).
+**Tests:** 80 passing on `agents` (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -72,7 +75,14 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:5173. In Claude Code, both servers are also set up in `C:\Users\austin\.claude\launch.json` as `pitch-replay-server` and `pitch-frontend`.
+Then open http://localhost:5173. In Claude Code, both servers are also set up in `C:\Users\austin\.claude\launch.json` as `pitch-replay-server` and `pitch-frontend`. If port 8000 is taken (for example by another session's server), the replay server moves to 8001; use `pitch-frontend-8001` (port 5174), which points the app at 8001 through `PITCH_API`. The replay server doesn't reload, so restart it after backend changes.
+
+**Stored commentary** (needs the Foundry values in `.env`; redoes only moments whose facts, model or prompt changed):
+
+```
+cd backend
+.venv\Scripts\python scripts/generate_commentary.py
+```
 
 **Demo matches** (in `samples/`): `comeback-POT-CAR` (seed 52: Potato lead 2–1, Carrot win 3–2 with an 88' equaliser and a 96th-minute winner; the hero match), `thriller-CAR-BRO` (seed 4: Broccoli win 4–3 away), `red-card-CAU-POT` (seed 24: Potato down to ten at 20', Cauliflower win 2–0).
 
@@ -96,7 +106,7 @@ Then open http://localhost:5173. In Claude Code, both servers are also set up in
 - License: AGPL-3.0 for now (because of Ultralytics). If we use RF-DETR and drop Ultralytics, relicense as MIT or Apache-2.0, which suits the Enterprise category better.
 - Everything downstream reads events one at a time and never looks ahead, so a live feed and a replay behave the same. Keep it that way; there are tests for it.
 - **Azure:** Austin's **personal Pay-As-You-Go subscription** (upgraded free trial; free credit spent first; US$20 monthly budget alert). Resource group `rg-pitch-insights`, everything in **East US 2**. The school's Azure for Students subscription is no longer used (five Asian regions only, no chat-model quota, quota requests refused automatically).
-- **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` requested; much cheaper, switch to it by changing the deployment name in `.env` if approved. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents-planned).
+- **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` requested; much cheaper, switch to it by changing the deployment name in `.env` if approved. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents).
 - **Keys:** in `.env` only (ignored by git). `.env.example` holds placeholders; never put real values in it, because it's committed.
 - **HTTPS on this machine:** the network inspects HTTPS, so Python's built-in certificate list fails with "self-signed certificate in certificate chain". Use the Windows certificate store (`ssl.create_default_context()`); never turn verification off. curl needs `--ssl-no-revoke` for a related reason.
 
@@ -126,7 +136,7 @@ Then open http://localhost:5173. In Claude Code, both servers are also set up in
 
 | # | Step | Needs | Size |
 |---|---|---|---|
-| 1 | **Agents core** on a new branch: provider switch, Explainer (casual and analyst), groundedness check with retry and fallback, Narrator, stored commentary for the samples, commentary shown in the app | Nothing (Foundry is ready) | ~1 day |
+| 1 | **Agents core**: built on `agents` (21 Oct). Left: `/code-review`, fixes, pull request | Austin's OK to push | ~1 h |
 | 2 | **Foundry and AI services:** Memory agent (embeddings), Foundry groundedness evaluation, Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |

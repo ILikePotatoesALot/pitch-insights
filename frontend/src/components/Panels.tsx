@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LiveState, MatchMeta, Moment, PlayerState, ViewMode } from "../types";
+import type { CommentaryInfo, LiveState, MatchMeta, Moment, PlayerState, ViewMode } from "../types";
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
@@ -48,22 +48,48 @@ export function MomentumChart({ state, colours }: { state: LiveState | null; col
   );
 }
 
-function MomentCard({ m, meta, colours }: { m: Moment; meta: MatchMeta; colours: [string, string] }) {
+/** The agents' line for this viewer, if they wrote one (a fallback is just the headline again). */
+export function commentaryText(m: Moment, mode: ViewMode): string | null {
+  const c = m.commentary;
+  if (!c || c.status !== "ok") return null;
+  return mode === "casual" ? c.casual : c.analyst;
+}
+
+function CheckNote({ m }: { m: Moment }) {
+  const c = m.commentary;
+  if (!c) return null;
+  if (c.status !== "ok") return <p className="check">AI commentary unavailable ({c.reason}); showing the plain headline.</p>;
+  const g = c.grounding;
+  return (
+    <p className="check">
+      {c.agent === "explainer" ? "Explainer" : "Narrator"} agent · {g ? `${g.claims} names and numbers checked against these facts` : "checked"}
+      {c.corrected.length > 0 && `; first draft corrected (${c.corrected.join(", ")} weren't in the facts)`}
+    </p>
+  );
+}
+
+function MomentCard({ m, meta, mode, colours }: { m: Moment; meta: MatchMeta; mode: ViewMode; colours: [string, string] }) {
   const [open, setOpen] = useState(false);
   const colour = m.team_id === meta.home.id ? colours[0] : m.team_id === meta.away.id ? colours[1] : "var(--muted)";
+  const text = commentaryText(m, mode);
   return (
     <li className={`moment ${m.tier}`} style={{ borderLeftColor: colour }}>
       <button onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="mclock">{m.clock}</span>
-        <span className="mhead">{m.headline}</span>
+        <span className="mhead">{m.headline}{text && <span className="mtext">{text}</span>}</span>
         <span className="why">{open ? "Hide" : "Why?"}</span>
       </button>
-      {open && <ul className="facts">{m.facts.map((f, i) => <li key={i}>{f.text}</li>)}</ul>}
+      {open && <>
+        <ul className="facts">{m.facts.map((f, i) => <li key={i}>{f.text}</li>)}</ul>
+        <CheckNote m={m} />
+      </>}
     </li>
   );
 }
 
-export function MomentFeed({ moments, meta, mode, colours }: { moments: Moment[]; meta: MatchMeta; mode: ViewMode; colours: [string, string] }) {
+export function MomentFeed({ moments, meta, aiInfo, mode, colours }: {
+  moments: Moment[]; meta: MatchMeta; aiInfo: CommentaryInfo | null; mode: ViewMode; colours: [string, string];
+}) {
   const [showMinor, setShowMinor] = useState(false);
   const shown = moments.filter((m) =>
     mode === "casual" ? m.tier === "headline" : m.tier !== "minor" || showMinor);
@@ -74,7 +100,8 @@ export function MomentFeed({ moments, meta, mode, colours }: { moments: Moment[]
         {mode === "analyst" && <label className="toggle"><input type="checkbox" checked={showMinor} onChange={(e) => setShowMinor(e.target.checked)} /> minor</label>}
       </h3>
       {shown.length === 0 ? <p className="empty">Nothing yet. Moments appear here as the match unfolds.</p> :
-        <ul>{[...shown].reverse().map((m) => <MomentCard key={m.id} m={m} meta={meta} colours={colours} />)}</ul>}
+        <ul>{[...shown].reverse().map((m) => <MomentCard key={m.id} m={m} meta={meta} mode={mode} colours={colours} />)}</ul>}
+      {aiInfo && <p className="ai-note">Commentary is AI-generated ({aiInfo.model}) from the facts under "Why?", and every name and number in it is checked against them.</p>}
     </div>
   );
 }

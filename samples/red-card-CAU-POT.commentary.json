@@ -1,0 +1,160 @@
+{
+ "ai_generated": true,
+ "provider": "foundry",
+ "model": "gpt-4o",
+ "prompt_version": "2026-10-21.2",
+ "match": "red-card-CAU-POT",
+ "summary": {
+  "moments": 9,
+  "ok": 9,
+  "fallback": 0,
+  "retried": 0,
+  "grounding_mean": 1.0
+ },
+ "moments": {
+  "M-1": {
+   "moment_id": "M-1",
+   "input_hash": "d805d5657a9840c6",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Potato FC are in control, keeping Cauliflower FC pinned back.",
+   "analyst": "Potato FC dominate with 88% of final-third passes in the last five minutes, asserting clear control.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 3,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-2": {
+   "moment_id": "M-2",
+   "input_hash": "8a50fa006dc32b52",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Raisman is sent off for a second yellow, leaving Potato with 10 players. It's still 0–0.",
+   "analyst": "Raisman’s second yellow card reduces Potato to 10 players, significantly lowering their win probability from 43% to 28%. With the score still 0–0, this shift could be pivotal in the match.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 10,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-3": {
+   "moment_id": "M-3",
+   "input_hash": "97e0e943986fdfae",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Potato FC are dominating, keeping the ball upfield and creating chances.",
+   "analyst": "Potato FC are asserting control with 95% of final-third passes and 3 shots in the last five minutes.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 3,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-5": {
+   "moment_id": "M-5",
+   "input_hash": "25c8709322b1f40e",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Bissolatte heads in his first goal of the season to put Cauliflower ahead just before half-time.",
+   "analyst": "Bissolatte's header, from a low xG chance of 0.06, gives Cauliflower a 1–0 lead and boosts their win probability to 73%. Kudalah's assist caps a strong spell of final-third dominance for Cauliflower.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 7,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-6": {
+   "moment_id": "M-6",
+   "input_hash": "1129fb611474b647",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Cauliflower FC are firmly on top as they dominate the final-third play before the break.",
+   "analyst": "Cauliflower FC have turned the tide, now controlling 73% of final-third passes in the last 5 minutes.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 3,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-7": {
+   "moment_id": "M-7",
+   "input_hash": "a0ad8bbc9ff1ce4f",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "It's half-time, and Cauliflower lead 1–0 thanks to Bissolatte's goal. Potato are down to 10 men after Raisman's red card.",
+   "analyst": "At half-time, Cauliflower lead 1–0 despite having less possession and lower xG than Potato. Bissolatte's goal and Raisman's red card have shifted the balance in Cauliflower's favour.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 9,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-8": {
+   "moment_id": "M-8",
+   "input_hash": "b5a4c2dbdc77112a",
+   "agent": "narrator",
+   "status": "ok",
+   "casual": "Potato are taking charge after a strong spell in the last five minutes.",
+   "analyst": "Potato dominate the final-third play with 85% of passes in the last five minutes, shifting momentum their way.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 2,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-9": {
+   "moment_id": "M-9",
+   "input_hash": "86cc2268f89deec6",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Woodelson scores against the run of play to make it 2–0 for Cauliflower, easing the pressure.",
+   "analyst": "Woodelson's goal, assisted by Mbeumonte, doubles Cauliflower's lead to 2–0 despite Potato's dominance. With an xG of 0.20, it boosts their win chance from 77% to 96%, relieving recent pressure.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  },
+  "M-13": {
+   "moment_id": "M-13",
+   "input_hash": "604a423590a75db7",
+   "agent": "explainer",
+   "status": "ok",
+   "casual": "Cauliflower FC win 2–0 against Potato FC, ending their unbeaten streak. Konsatou shines as player of the match.",
+   "analyst": "Cauliflower FC secure a 2–0 victory over Potato FC, despite being outshot 23 to 11 and trailing in possession. Konsatou's standout performance (8.4 rating) and Raisman's early red card shape the result.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "reason": null
+  }
+ }
+}
