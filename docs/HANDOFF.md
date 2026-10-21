@@ -13,8 +13,7 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 | Branch | State | Contents |
 |---|---|---|
-| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3) |
-
+| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4) |
 
 The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
@@ -125,13 +124,13 @@ cd backend
 ## Data on this machine
 
 - **SoccerTrack v2, match 117093, first half**, downloaded 21 Oct from Hugging Face (`atomscott/soccertrack-v2`, CC BY 4.0) into `data/soccertrack/117093/` (git-ignored): the video `117093_panorama_1st_half.mp4` (3.35 GB), tracking ground truth `117093_1st.json` (2.71 GB) and events `117093_12_class_events.json` (0.5 MB). Sizes checked against the dataset's file list.
-- The dataset is gated: downloads need Austin's Hugging Face read token as `HF_TOKEN` in `.env` (the terms are accepted on his account).
+- The dataset is gated: downloads need Austin's Hugging Face read token as `HF_TOKEN` in `.env` (the terms are accepted on Austin's account).
 
 ## Waiting on Austin
 
 1. **Free-tier resources** in `rg-pitch-insights`, East US 2: Content Safety (F0), Translator (F0, region Global), Speech (F0, optional), and Application Insights connected from the Foundry project's Tracing page. Endpoints and keys in `.env`. Needed for next step 2.
 2. **The GPT-6 Luna quota decision** from Microsoft (requested 21 Oct). Nothing to do unless it's approved.
-3. **Video path: which version, by 23 Oct.** The data is downloaded (see below). Recommended: the pre-trained detector on a short clip, no training, so no GPU needed. Fine-tuning needs a small T4 GPU quota in Azure ML (workspace `ML-pitch-insights`): request it from Compute > Compute clusters > New (the greyed-out GPU size has a "Request quota" link) or Azure portal > Quotas > Machine Learning, family **NCASv3_T4**, East US 2, 4 cores.
+3. **Video path: which version, by 23 Oct.** The data is downloaded (see Data on this machine, above). Recommended: the pre-trained detector on a short clip, no training, so no GPU needed. Fine-tuning needs a small T4 GPU quota in Azure ML (workspace `ML-pitch-insights`): request it from Compute > Compute clusters > New (the greyed-out GPU size has a "Request quota" link) or Azure portal > Quotas > Machine Learning, family **NCASv3_T4**, East US 2, 4 cores.
 4. **Confirm hackathon registration** went through (it closed 20 Oct).
 5. **Clarification question to the organisers** (rule 11.6, in writing, before the deadline): is licensed real footage (SoccerTrack v2) fine for the video path when the core uses synthetic data? Only needed if the video path stays.
 6. Whether to add teammates as GitHub collaborators.
