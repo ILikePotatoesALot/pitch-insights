@@ -44,6 +44,8 @@ def summarise(records: list[dict]) -> dict:
         "moments": len(records), "ok": len(ok), "fallback": len(records) - len(ok),
         "retried": sum(r["attempts"] > 1 for r in records),
         "grounding_mean": round(sum(scores) / len(scores), 3) if scores else None,
+        "safety_checked": sum(bool(r.get("safety")) for r in records),
+        "safety_blocked": sum(bool(r.get("safety")) and not r["safety"]["passed"] for r in records),
     }
 
 

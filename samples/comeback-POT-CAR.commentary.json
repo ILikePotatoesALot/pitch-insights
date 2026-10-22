@@ -9,7 +9,9 @@
   "ok": 29,
   "fallback": 0,
   "retried": 0,
-  "grounding_mean": 1.0
+  "grounding_mean": 1.0,
+  "safety_checked": 29,
+  "safety_blocked": 0
  },
  "moments": {
   "M-1": {
@@ -26,7 +28,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-2": {
    "moment_id": "M-2",
@@ -44,7 +59,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-3": {
    "moment_id": "M-3",
@@ -60,7 +88,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-4": {
    "moment_id": "M-4",
@@ -78,7 +119,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-5": {
    "moment_id": "M-5",
@@ -94,7 +148,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-6": {
    "moment_id": "M-6",
@@ -110,7 +177,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-7": {
    "moment_id": "M-7",
@@ -126,7 +206,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-9": {
    "moment_id": "M-9",
@@ -144,7 +237,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-12": {
    "moment_id": "M-12",
@@ -162,7 +268,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-13": {
    "moment_id": "M-13",
@@ -178,7 +297,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-14": {
    "moment_id": "M-14",
@@ -194,7 +326,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-16": {
    "moment_id": "M-16",
@@ -212,7 +357,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-17": {
    "moment_id": "M-17",
@@ -228,7 +386,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-18": {
    "moment_id": "M-18",
@@ -246,7 +417,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-20": {
    "moment_id": "M-20",
@@ -262,7 +446,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-21": {
    "moment_id": "M-21",
@@ -280,7 +477,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-22": {
    "moment_id": "M-22",
@@ -298,7 +508,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-23": {
    "moment_id": "M-23",
@@ -316,7 +539,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-24": {
    "moment_id": "M-24",
@@ -334,7 +570,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-26": {
    "moment_id": "M-26",
@@ -350,7 +599,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-29": {
    "moment_id": "M-29",
@@ -368,7 +630,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-30": {
    "moment_id": "M-30",
@@ -384,7 +659,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-31": {
    "moment_id": "M-31",
@@ -400,7 +688,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-33": {
    "moment_id": "M-33",
@@ -418,7 +719,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-34": {
    "moment_id": "M-34",
@@ -436,7 +750,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-36": {
    "moment_id": "M-36",
@@ -452,7 +779,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-37": {
    "moment_id": "M-37",
@@ -470,7 +810,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-38": {
    "moment_id": "M-38",
@@ -488,7 +841,20 @@
    "corrected": [],
    "reason": null,
    "provider": "foundry",
-   "model": "gpt-4o"
+   "model": "gpt-4o",
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   },
   "M-39": {
    "moment_id": "M-39",
@@ -504,7 +870,20 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   }
   }
  }
 }

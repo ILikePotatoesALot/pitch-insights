@@ -19,6 +19,7 @@ import time
 from typing import Protocol
 
 import openai
+from opentelemetry import trace
 from pydantic import BaseModel
 
 from pitch_insights.agents import grounding
@@ -26,8 +27,10 @@ from pitch_insights.agents.middleware import RunLogMiddleware, moment_id_var
 from pitch_insights.agents.prompts import (
     EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, input_hash, moment_input, retry_input,
 )
+from pitch_insights.agents.safety import ContentSafety
 
 log = logging.getLogger("pitch_insights.agents")
+tracer = trace.get_tracer("pitch_insights.agents")  # a no-op until tracing is set up (agents/tracing.py)
 
 EXPLAINER_TYPES = {"goal", "red_card", "penalty_awarded", "big_chance_missed", "half_time", "full_time"}
 COMMENTED_TIERS = {"headline", "notable"}
@@ -95,21 +98,43 @@ def fallback_lines(moment: dict) -> Lines:
 
 
 class CommentaryDesk:
-    def __init__(self, writer: Writer, meta: dict, timeout_s: float = 45.0):
+    def __init__(self, writer: Writer, meta: dict, timeout_s: float = 45.0, safety: ContentSafety | None = None):
         self.writer = writer
         self.meta = meta
         self.timeout_s = timeout_s  # the whole draft, including the SDK's own retries
+        self.safety = safety        # Azure AI Content Safety; None skips the check (tests, no .env values)
 
     def wants(self, moment: dict) -> bool:
         return moment["tier"] in COMMENTED_TIERS
 
+    async def screen(self, record: dict, moment: dict) -> dict:
+        """Run the safety check on a stored record written before the check existed (no model call).
+        A blocked line becomes the plain headline, as it would have when it was written."""
+        if record["status"] != "ok" or record.get("safety") or self.safety is None:
+            return record
+        res = await self.safety.check(f"{record['casual']}\n{record['analyst']}")
+        record = record | {"safety": res.to_dict()}
+        if not res.passed:
+            lines = fallback_lines(moment)
+            record |= {"status": "fallback", "casual": lines.casual, "analyst": lines.analyst, "reason": res.reason}
+        return record
+
     async def comment(self, moment: dict) -> dict:
         """Commentary for one moment. Always returns a record; status says how it was made."""
+        with tracer.start_as_current_span("commentary", attributes={"pitch.moment_id": moment["id"]}) as span:
+            record = await self._comment(moment)
+            span.set_attributes({"pitch.agent": record["agent"], "pitch.status": record["status"],
+                                 "pitch.attempts": record["attempts"], "pitch.reason": record["reason"] or "",
+                                 "pitch.grounding_score": (record["grounding"] or {}).get("score", -1.0),
+                                 "pitch.safety_passed": bool((record["safety"] or {}).get("passed"))})
+            return record
+
+    async def _comment(self, moment: dict) -> dict:
         token = moment_id_var.set(moment["id"])
         role = agent_for(moment)
         started = time.perf_counter()
         prompt = moment_input(moment, self.meta)
-        attempts, lines, check, reason = 0, None, None, ""
+        attempts, lines, check, reason, safety = 0, None, None, "", None
         corrected: list[str] = []  # what the groundedness check caught in earlier drafts
         try:
             while attempts < MAX_ATTEMPTS:
@@ -135,6 +160,10 @@ class CommentaryDesk:
                 corrected += check.unsupported
                 prompt = retry_input(moment, self.meta, check.unsupported)
             ok = lines is not None and check is not None and check.passed
+            if ok and self.safety is not None:  # only grounded text is worth screening
+                safety = await self.safety.check(f"{lines.casual}\n{lines.analyst}")
+                if not safety.passed:
+                    ok, reason = False, safety.reason
             if not ok:
                 lines = fallback_lines(moment)
             record = {
@@ -142,11 +171,13 @@ class CommentaryDesk:
                 "status": "ok" if ok else "fallback",
                 "casual": lines.casual, "analyst": lines.analyst, "attempts": attempts,
                 "grounding": check.to_dict() if check else None, "corrected": corrected,
+                "safety": safety.to_dict() if safety else None,
                 "reason": reason or None, "provider": self.writer.provider, "model": self.writer.model,
             }
             log.info(json.dumps({"event": "commentary", "moment_id": moment["id"], "agent": role,
                                  "status": record["status"], "attempts": attempts, "reason": reason or None,
                                  "grounding": record["grounding"],
+                                 "safety_passed": safety.passed if safety else None,
                                  "ms": round((time.perf_counter() - started) * 1000)}))
             return record
         finally:
