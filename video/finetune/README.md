@@ -60,14 +60,8 @@ the three versions consistent.) ROCm builds of PyTorch answer through the same `
 **NVIDIA.** A current driver (`nvidia-smi` lists the card), then the command from https://pytorch.org/get-started/locally/
 (Stable, Windows, Pip, Python, and the newest CUDA your driver supports).
 
-Then, for either:
-
-**AMD Radeon instead (done 22 Oct on an RX 9070 XT):** use AMD's ROCm build for Windows from
-https://rocm.docs.amd.com/projects/radeon-ryzen/ (Install PyTorch, Windows). For ROCm 7.2.1 that was the SDK wheels
-`rocm_sdk_core`, `rocm_sdk_devel`, `rocm_sdk_libraries_custom` and `rocm-7.2.1.tar.gz`, then `torch-2.9.1+rocm7.2.1`,
-`torchvision-0.24.1+rocm7.2.1` and `torchaudio-2.9.1+rocm7.2.1`, all from `https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/`.
-It reports the card through `torch.cuda` like a CUDA build, so the check below and the scripts work unchanged. Installing the
-requirements afterwards keeps that torch (check with `pip install --dry-run -r video\requirements.txt` first).
+The AMD route above was run on 22 Oct on a Radeon RX 9070 XT (ROCm 7.2.1). Installing the requirements afterwards kept that torch
+(check with `pip install --dry-run -r video\requirements.txt` first). Then, for either route:
 
 ```powershell
 video\.venv\Scripts\pip install -r video\requirements.txt
