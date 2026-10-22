@@ -24,3 +24,5 @@ Output of the video path on real, licensed footage: [SoccerTrack v2](https://ato
 | `117093-38min.events.jsonl` | Events derived from the tracked ball and players (`source: "video"`) |
 | `117093-38min.benchmark.json` | Scores against SoccerTrack's ground truth |
 | `117093-38min.calibration.json` | The fitted image-to-pitch mapping |
+| `117093-38min_ft.*` | The same four files with the fine-tuned detector for people (recommended) |
+| `117093-boxes.eval.json` | Pre-trained against fine-tuned detector boxes on SoccerTrack's held-out test frames |

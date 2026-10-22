@@ -114,24 +114,26 @@ First full run: 52 moments across the three demo matches, all grounded, none fel
 
 The core pipeline runs on synthetic matches. As a second source, the video path turns real, licensed match video into the same `frame` and `event` messages: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), a fixed 4K panoramic camera over a whole pitch, amateur university players who consented, no names. Players are labelled by side and shirt number ("Left #7"), never with our fictional names.
 
-**RF-DETR** (small, pre-trained, no fine-tuning, on CPU) runs on 5 × 2 tiles of each frame. A 2-D polynomial, fitted on frames before the clip, maps feet in the image to pitch metres (one homography can't describe a stitched panorama). A ByteTrack-style tracker works in pitch metres, shirt colours give the teams, and possession of the tracked ball gives passes, carries and turnovers with a `confidence`.
+**RF-DETR** (small) runs on 5 × 2 tiles of each frame: for people, a model fine-tuned on SoccerTrack's own player boxes from the first four minutes of the half (never on the benchmark clip); for the ball, the COCO-pre-trained one. A 2-D polynomial, fitted on frames before the clip, maps feet in the image to pitch metres (one homography can't describe a stitched panorama). A ByteTrack-style tracker works in pitch metres, shirt colours give the teams, and possession of the tracked ball gives passes, carries and turnovers with a `confidence`.
 
 Benchmarked against SoccerTrack's ground truth on 100 s of match 117093 (38:00–39:40, the build-up to a goal, 500 frames at 5 fps):
 
-| | |
-|---|---|
-| Players found | 91% |
-| Position error | 0.78 m mean, 0.59 m median |
-| Precision | 85% (the rest are officials, who aren't in the ground truth, people behind the goals and spectators the filter missed) |
-| Team from shirt colour | 88% |
-| Events matching SoccerTrack's within ±5 s | 74% of ours; 38% of theirs found |
-| Detection time | 7.7 s a frame on CPU (64 min for the clip) |
+| | Fine-tuned | Pre-trained |
+|---|---|---|
+| Players found | 93% | 90% |
+| Position error | 0.76 m mean, 0.58 m median | 0.77 m mean, 0.59 m median |
+| Precision | 97% | 85% (the rest are officials, who aren't in the ground truth, people behind the goals and spectators the filter missed) |
+| Team from shirt colour | 95% | 93% |
+| Events matching SoccerTrack's within ±5 s | 79% of ours; 30% of theirs found | 73%; 30% |
+| Detection time | 0.47 s a frame on a GPU (AMD RX 9070 XT) | 0.26 s on the GPU, 7.7 s on a laptop CPU |
+
+On SoccerTrack's held-out test frames, fine-tuning lifts box precision from 45% to 98% at the same 98% recall: it learns to ignore spectators and staff.
 
 The team, ID and event settings were chosen on this clip, so those figures are optimistic until checked on another; details, limits and how to run it in [docs/DESIGN.md, Video path](docs/DESIGN.md#video-path). The output is in [`samples/video/`](samples/README.md#video-path-video).
 
 ## Credits
 
-- Player and ball detection: [RF-DETR](https://github.com/roboflow/rf-detr) by Roboflow (Apache-2.0), small model with its pre-trained COCO weights as released
+- Player and ball detection: [RF-DETR](https://github.com/roboflow/rf-detr) by Roboflow (Apache-2.0), small model with its pre-trained COCO weights, fine-tuned for people on SoccerTrack v2's boxes
 - Video and ground truth for the video path: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) by Scott et al. (CC BY 4.0), [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)
 - Tracking follows the idea of [ByteTrack](https://arxiv.org/abs/2110.06864) (Zhang et al.); the code is our own
 - All clubs, players and matches in the synthetic data are fictional.
