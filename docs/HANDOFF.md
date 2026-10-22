@@ -136,8 +136,9 @@ cd backend
 
 ## Waiting on Austin
 
-1. **Move Speech to East US 2** (22 Oct). The free-tier services are set up and all four connect: Content Safety, Translator and Application Insights in East US 2, but Speech was created in East US by mistake (`AZURE_SPEECH_REGION=eastus` in `.env`). Recreate it in East US 2, then set `AZURE_SPEECH_REGION` back to `eastus2`.
-2. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
+1. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
+
+Settled 22 Oct: all four free-tier services (Content Safety, Translator, Application Insights, Speech) are in East US 2 and connect with the values in `.env`.
 
 Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is fine for the video path, so no clarification question is needed; teammates are GitHub collaborators only; GPT-6 Luna quota was refused; the video path uses the pre-trained detector.
 
