@@ -136,8 +136,8 @@ The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples
 
 **Technical**
 - Python 3.12 (3.14 is the machine default, but CV packages lag). Node 24.
-- Detector plan (decided 21 Oct): the **pre-trained RF-DETR (small)** as released, on a short clip, no training and no GPU; **YOLO** as fallback. Austin may fine-tune later if T4 quota arrives in Azure ML (workspace `ML-pitch-insights`) or on Austin's GPU machine; runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
-- License: AGPL-3.0 for now (because of Ultralytics). The video path uses RF-DETR (Apache-2.0) and no Ultralytics, so the repo can be relicensed as MIT or Apache-2.0, which suits the Enterprise category better; Austin's call.
+- Detector plan: the **pre-trained RF-DETR (small)** as released, on a short clip, no training and no GPU (decided 21 Oct). **The video path stays** (decided 22 Oct); fine-tuning is planned later in Azure ML (workspace `ML-pitch-insights`) once the account has GPU quota (Austin puts the earlier refusals down to the account being new); runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
+- License: **Apache-2.0** since 22 Oct (Austin's call), with a `NOTICE` file for RF-DETR, SoccerTrack v2 and the ByteTrack idea. It was AGPL-3.0 only because YOLO (Ultralytics) was planned; nothing uses Ultralytics.
 - Everything downstream reads events one at a time and never looks ahead, so a live feed and a replay behave the same. Keep it that way; there are tests for it.
 - **Azure:** Austin's **personal Pay-As-You-Go subscription** (upgraded free trial; free credit spent first; US$20 monthly budget alert). Resource group `rg-pitch-insights`, everything in **East US 2**. The school's Azure for Students subscription is no longer used (five Asian regions only, no chat-model quota, quota requests refused automatically).
 - **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` was requested and refused (21 Oct), so the agents stay on `gpt-4o`; keep calls few (stored commentary, `max_tokens` 220) and watch the US$20 budget alert. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents).
@@ -169,10 +169,10 @@ The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples
 
 ## Waiting on Austin
 
-1. **Video path: keep or cut (by 24 Oct).** It works on a 100 s clip (numbers above and in [DESIGN.md, Benchmark](DESIGN.md#benchmark-22-oct)); watch `data\video\117093\preview.mp4` to judge it.
+1. Done 22 Oct: **the video path stays.** Fine-tuning comes later, in Azure ML.
 2. Done 22 Oct: **MLflow logging to Azure ML.** `mlflow-skinny` 3.15.0 and `azureml-mlflow` 1.62.0.post6 are in `video\.venv`, `MLFLOW_TRACKING_URI` is in `.env` (placeholder in `.env.example`), and the benchmark is run `117093-38min-rfdetr-small-pretrained` in experiment `video-path-benchmark`. Every run of `video\log_mlflow.py` opens a browser window for Austin to sign in (no Azure CLI or token cache on this machine), so run it only with Austin there.
-3. **License:** Ultralytics isn't used (the detector is RF-DETR, Apache-2.0), so the repo could move from AGPL-3.0 to Apache-2.0 or MIT.
-4. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
+3. Done 22 Oct: **relicensed as Apache-2.0.**
+4. **Later:** fine-tuning the detector in Azure ML, once GPU quota is granted (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
 
 Settled 22 Oct: all four free-tier services (Content Safety, Translator, Application Insights, Speech) are in East US 2 and connect with the values in `.env`.
 
@@ -200,5 +200,5 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 - [ ] Demo video under 2 minutes, public link, no copyrighted music or third-party logos
 - [ ] Project description: what it does, which Microsoft and Azure technologies, what problem it solves
 - [ ] A link judges can use to try it (Azure deployment), free until 10 Nov
-- [ ] Credits: Roboflow (if used), SoccerTrack v2 (if used)
-- [ ] License file matches the final choice (AGPL-3.0, or MIT/Apache-2.0 if Ultralytics is dropped)
+- [x] Credits: RF-DETR (Roboflow), SoccerTrack v2, the ByteTrack idea (README and NOTICE)
+- [x] License file matches the final choice (Apache-2.0, 22 Oct)
