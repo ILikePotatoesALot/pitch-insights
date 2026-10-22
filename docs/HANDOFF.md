@@ -1,6 +1,6 @@
 # Handoff
 
-Written 21 Oct 2026. The single place to pick this project up: where things stand, how to run it, the rules we agreed, what's waiting, and what to do next. For the full plan see [PLAN.md](PLAN.md); for how each part works see [DESIGN.md](DESIGN.md).
+Written 21 Oct 2026, updated 22 Oct (video path). The single place to pick this project up: where things stand, how to run it, the rules we agreed, what's waiting, and what to do next. For the full plan see [PLAN.md](PLAN.md); for how each part works see [DESIGN.md](DESIGN.md).
 
 ## The project in one paragraph
 
@@ -13,12 +13,12 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 | Branch | State | Contents |
 |---|---|---|
-| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4), Memory agent (ILikePotatoesALot/pitch-insights#6) |
-| `ai-services` | Local only, not pushed | Content Safety, Translator (five languages), tracing to Application Insights, Foundry groundedness evaluator |
+| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4), Memory agent (ILikePotatoesALot/pitch-insights#6), Content Safety, Translator, tracing and the groundedness evaluator (ILikePotatoesALot/pitch-insights#8, 22 Oct) |
+| `video-path` | Local only, not pushed; cut from `ai-services`, which is now merged into `main` | The video path on SoccerTrack v2: loader, tiled RF-DETR, pitch calibration, tracker, teams, events, benchmark (22 Oct) |
 
 The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
-**Next git step:** `ai-services` is committed locally and reviewed, not pushed. Push it and open a pull request when Austin says.
+**Next git step:** `video-path` is committed locally and reviewed, not pushed. It already contains everything in `ai-services` (merged as #8). When Austin says: merge `main` into it, push it and open its pull request into `main` (merged with a merge commit), so the PR shows only the video path and the Apache-2.0 relicense.
 
 ## What's built
 
@@ -33,15 +33,15 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
 | Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built, reviewed twice, fixed, merged (ILikePotatoesALot/pitch-insights#4) | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
 | Memory agent (similar earlier moments as `memory` facts; Foundry embeddings stored next to each sample, so replays need no network) | Built, reviewed, merged (ILikePotatoesALot/pitch-insights#6) | `backend/pitch_insights/agents/memory.py`, [DESIGN.md, Memory agent](DESIGN.md#memory-agent) |
-| Safety check (Azure AI Content Safety: every line screened, blocked at severity 2, fails closed) | Built on `ai-services` (22 Oct); 52 stored moments screened, none blocked | `backend/pitch_insights/agents/safety.py`, [DESIGN.md, Safety check](DESIGN.md#safety-check) |
-| Translations (Azure AI Translator: Spanish, French, German, Dutch, Simplified Chinese; names and clocks protected; checked; stored) | Built on `ai-services` (22 Oct); 9 of 3,180 kept English | `backend/pitch_insights/agents/translate.py`, [DESIGN.md, Translations](DESIGN.md#translations) |
-| Tracing (Agent Framework to Application Insights, no prompts or replies) and Foundry's groundedness evaluator (all 52 lines pass, lowest 4 of 5) | Built on `ai-services` (22 Oct) | `agents/tracing.py`, `scripts/evaluate_groundedness.py` |
+| Safety check (Azure AI Content Safety: every line screened, blocked at severity 2, fails closed) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8; 52 stored moments screened, none blocked | `backend/pitch_insights/agents/safety.py`, [DESIGN.md, Safety check](DESIGN.md#safety-check) |
+| Translations (Azure AI Translator: Spanish, French, German, Dutch, Simplified Chinese; names and clocks protected; checked; stored) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8; 9 of 3,180 kept English | `backend/pitch_insights/agents/translate.py`, [DESIGN.md, Translations](DESIGN.md#translations) |
+| Tracing (Agent Framework to Application Insights, no prompts or replies) and Foundry's groundedness evaluator (all 52 lines pass, lowest 4 of 5) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8 | `agents/tracing.py`, `scripts/evaluate_groundedness.py` |
 | Other agents (Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
-| Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
+| Video path (SoccerTrack v2 + RF-DETR) | Built on `video-path` (22 Oct) on a 100 s clip, reviewed; keep-or-cut decision 24 Oct. 91% of players found at 85% precision, 0.78 m mean position error, 88% teams, 19 events (74% match SoccerTrack's within 5 s) | `video/`, `backend/pitch_insights/video/`, [DESIGN.md, Video path](DESIGN.md#video-path) |
 | Azure deployment | Not started | |
 
-**Tests:** 154 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 205 passing (51 of them for the video path, on hand-made snippets: no video, model or network) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -104,6 +104,19 @@ cd backend
 
 Order after changing moments: `embed_moments.py`, then `generate_commentary.py`, then `translate_moments.py` and `evaluate_groundedness.py`.
 
+**Video path** (needs the SoccerTrack files under `data/soccertrack/117093/` and the separate environment `video\.venv`: Python 3.12, torch CPU, rfdetr 1.11.2, opencv, supervision, truststore; RF-DETR small's weights are in `C:\Users\austin\.roboflow\models\`). From the repo root:
+
+```
+backend\.venv\Scripts\python video\extract_gsr.py      # 25 s: the clip's ground truth and calibration pairs
+video\.venv\Scripts\python video\detect.py calib       # 11 min: 76 frames before the clip
+video\.venv\Scripts\python video\calibrate.py          # seconds: the image-to-pitch mapping
+video\.venv\Scripts\python video\detect.py clip        # about 65 min: 500 frames; resumable, run it in the background
+video\.venv\Scripts\python video\process.py            # 2 s: tracking, teams, ball, frames, events, benchmark
+video\.venv\Scripts\python video\preview.py            # 1 min: data\video\117093\preview.mp4 to check by eye
+```
+
+The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples/` itself: the server and the commentary scripts read every `samples/*.jsonl` as a match). `video/log_mlflow.py` logs the benchmark run to the Azure ML workspace through MLflow; each run needs Austin to sign in in a browser window.
+
 **Demo matches** (in `samples/`): `comeback-POT-CAR` (seed 52: Potato lead 2–1, Carrot win 3–2 with an 88' equaliser and a 96th-minute winner; the hero match), `thriller-CAR-BRO` (seed 4: Broccoli win 4–3 away), `red-card-CAU-POT` (seed 24: Potato down to ten at 20', Cauliflower win 2–0).
 
 ## Rules and decisions to keep
@@ -122,13 +135,14 @@ Order after changing moments: `embed_moments.py`, then `generate_commentary.py`,
 
 **Technical**
 - Python 3.12 (3.14 is the machine default, but CV packages lag). Node 24.
-- Detector plan (decided 21 Oct): the **pre-trained RF-DETR (small)** as released, on a short clip, no training and no GPU; **YOLO** as fallback. Austin may fine-tune later if T4 quota arrives in Azure ML (workspace `ML-pitch-insights`) or on Austin's GPU machine; runs tracked and the model registered in Azure ML through MLflow; detection served on CPU in Azure Container Apps.
-- License: AGPL-3.0 for now (because of Ultralytics). If we use RF-DETR and drop Ultralytics, relicense as MIT or Apache-2.0, which suits the Enterprise category better.
+- Detector plan: the **pre-trained RF-DETR (small)** as released, on a short clip, no training and no GPU (decided 21 Oct). **The video path stays** (decided 22 Oct); fine-tuning is built (`video/finetune/`) and runs on Austin's own GPU machine, because the Azure ML GPU quota request failed on a permissions error (22 Oct); runs are logged to Azure ML through MLflow afterwards; detection served on CPU in Azure Container Apps.
+- License: **Apache-2.0** since 22 Oct (Austin's call), with a `NOTICE` file for RF-DETR, SoccerTrack v2 and the ByteTrack idea. It was AGPL-3.0 only because YOLO (Ultralytics) was planned; nothing uses Ultralytics.
 - Everything downstream reads events one at a time and never looks ahead, so a live feed and a replay behave the same. Keep it that way; there are tests for it.
 - **Azure:** Austin's **personal Pay-As-You-Go subscription** (upgraded free trial; free credit spent first; US$20 monthly budget alert). Resource group `rg-pitch-insights`, everything in **East US 2**. The school's Azure for Students subscription is no longer used (five Asian regions only, no chat-model quota, quota requests refused automatically).
 - **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` was requested and refused (21 Oct), so the agents stay on `gpt-4o`; keep calls few (stored commentary, `max_tokens` 220) and watch the US$20 budget alert. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents).
 - **Keys:** in `.env` only (ignored by git). `.env.example` holds placeholders; never put real values in it, because it's committed.
 - **HTTPS on this machine:** the network inspects HTTPS, so Python's built-in certificate list fails with "self-signed certificate in certificate chain". Use the Windows certificate store (`ssl.create_default_context()`); never turn verification off. curl needs `--ssl-no-revoke` for a related reason.
+- **No admin rights on this machine** (an organisation laptop): machine-wide installers such as Azure CLI can't be installed (tried 22 Oct; skipped). So Azure sign-ins from Python use a browser window each time, and the deployment (step 8) needs another route: the Azure portal, Azure Cloud Shell, or another machine.
 
 **Ways of working**
 - Commit locally as often as needed; **push only when Austin says so.**
@@ -142,16 +156,25 @@ Order after changing moments: `embed_moments.py`, then `generate_commentary.py`,
 - The high press creates many pressures but not many extra high turnovers, so Carrot's PPDA isn't as low as a real pressing side's (the pressure index shows the pressing correctly).
 - Synthetic speed and distance don't exist yet; they come with the v2 tracking frames (estimates) and the video path (measured).
 - The app's JavaScript bundle is large (Three.js); fine for now.
+- Video path: the stored detections and benchmark predate the tile-merge fix of 22 Oct (about 4% of person boxes differ); re-run `detect.py calib`, `calibrate.py`, `detect.py clip` and `process.py` (about 80 min) to refresh them, then `log_mlflow.py` (browser sign-in). 5 frames a second (not 10); no shots (the ball is often missed in flight); the ball is found in under half the frames; team from shirt colour is about 88% right and track IDs switch (a player keeps one ID for 72% of frames); the spectator and spare-ball filters need the whole clip, so they're offline only; team, tracker and event settings were chosen on the benchmark clip itself.
 - Machine translation can get idioms wrong while keeping every name and number ("turn up the pressure" came out as "turn up the news" in Chinese), and the check can't catch that. The app labels translations as machine-made.
 
 ## Data on this machine
 
 - **SoccerTrack v2, match 117093, first half**, downloaded 21 Oct from Hugging Face (`atomscott/soccertrack-v2`, CC BY 4.0) into `data/soccertrack/117093/` (git-ignored): the video `117093_panorama_1st_half.mp4` (3.35 GB), tracking ground truth `117093_1st.json` (2.71 GB) and events `117093_12_class_events.json` (0.5 MB). Sizes checked against the dataset's file list.
 - The dataset is gated: downloads need Austin's Hugging Face read token as `HF_TOKEN` in `.env` (the terms are accepted on Austin's account).
+- **Video path working files** in `data/video/117093/` (git-ignored, about 135 MB): the clip's ground truth (`gsr_clip.jsonl`), calibration pairs, raw detections for the clip (4 MB) and the calibration frames, and `preview.mp4` (126 MB).
+- **CV environment** `video\.venv` (Python 3.12, separate from the backend's) and RF-DETR small's weights (368 MB) in `C:\Users\austin\.roboflow\models\rf-detr-small.pth`.
 
 ## Waiting on Austin
 
-1. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
+1. Done 22 Oct: **the video path stays.** Fine-tuning comes later, in Azure ML.
+2. Done 22 Oct: **MLflow logging to Azure ML.** `mlflow-skinny` 3.15.0 and `azureml-mlflow` 1.62.0.post6 are in `video\.venv`, `MLFLOW_TRACKING_URI` is in `.env` (placeholder in `.env.example`), and the benchmark is run `117093-38min-rfdetr-small-pretrained` in experiment `video-path-benchmark`. Every run of `video\log_mlflow.py` opens a browser window for Austin to sign in (no Azure CLI or token cache on this machine), so run it only with Austin there.
+3. Done 22 Oct: **relicensed as Apache-2.0.**
+4. **Fine-tuning on Austin's GPU machine** (Windows, 16 GB or more of video memory; decided 22 Oct). `video-path` is pushed to GitHub (22 Oct), so the machine can clone it. The procedure is [video/finetune/README.md](../video/finetune/README.md): install PyTorch with CUDA and `video/requirements.txt`, put the Hugging Face token in `.env`, fetch the data, run the one-epoch smoke test, then the real run, `eval_boxes.py` and the `VIDEO_TAG=_ft` pipeline run. Nothing has trained yet, and the training step is untested because the organisation laptop lacks the `rfdetr[train]` extras.
+   - **A coding assistant on that machine** (for example Claude Code) follows [video/finetune/LLM_BRIEF.md](../video/finetune/LLM_BRIEF.md): the rules (no secrets printed, work on a `video-finetune-results` branch, push only when Austin says, no weights or data in git, at most two training configurations, no tuning on the test frames), the stop conditions and the report to give. Start it in the cloned repo with: *"Read video/finetune/LLM_BRIEF.md and video/finetune/README.md, then do the task. Follow the brief's rules and stop conditions, and report in its format."*
+   - **When it comes back:** the small results arrive as the branch `video-finetune-results` (`samples/video/117093-boxes.eval.json`, `117093-38min_ft.*`, and a refreshed baseline `117093-38min.*`); the weights (about 370 MB, `checkpoint_best_total.pth`) come by USB or a share. Then here: read the report, compare `117093-38min_ft.benchmark.json` with the baseline, merge the results branch into `video-path` if the numbers hold, update DESIGN.md's benchmark table (the baseline there predates the tile-merge fix), and log the run to Azure ML with `video\log_mlflow.py` (`VIDEO_TAG=_ft`; browser sign-in).
+5. **Optional, Azure ML GPU quota:** the quota page (workspace `ML-pitch-insights`, East US 2, family NCASv3_T4, 0 cores) refuses the request with "Forbidden": Austin's account lacks Owner, Contributor or Support Request Contributor on the subscription (it is outside the account's home tenant). Check Subscriptions > Access control (IAM) > View my access, or ask the subscription's owner to grant the role or file the request.
 
 Settled 22 Oct: all four free-tier services (Content Safety, Translator, Application Insights, Speech) are in East US 2 and connect with the values in `.env`.
 
@@ -162,12 +185,12 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 | # | Step | Needs | Size |
 |---|---|---|---|
 | 1 | Done: **agents core**, merged in ILikePotatoesALot/pitch-insights#4 (21 Oct) | | |
-| 2 | Done 22 Oct: **Foundry and AI services** (Memory agent merged; Content Safety, Translator, tracing and the groundedness evaluator on `ai-services`) | | |
+| 2 | Done 22 Oct: **Foundry and AI services** (Memory agent and Content Safety, Translator, tracing and the groundedness evaluator, all merged; the latter in ILikePotatoesALot/pitch-insights#8) | | |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
-| 5 | Decided 21 Oct: the video path uses **pre-trained detection on a short clip** (no GPU quota needed); fine-tuning maybe later. Cut it if it isn't working by 24 Oct | | |
+| 5 | Decided 21 Oct: the video path uses **pre-trained detection on a short clip** (no GPU quota needed); fine-tuning on Austin's GPU machine. Kept (decided 22 Oct) | | |
 | 6 | **Live simulation mode** and the **Scenario Director** agent that steers a live match (logged so it replays exactly) | Step 1 | ~half a day |
-| 7 | **SoccerTrack loader** (mind the format traps), then detection on a short clip, pitch positions, `frame` messages, accuracy benchmark against the tracking ground truth; fine-tuning if a GPU arrives | Data downloaded | ~1–1.5 days |
+| 7 | Done 22 Oct on `video-path`: **SoccerTrack loader**, tiled detection on a 100 s clip, pitch positions, `frame` messages, events, benchmark. Next, if kept: a second clip to check the settings chosen on this one, better shirt colours for teams, a `match_meta` so the Interpreter can read video events, the clip in the app; run the fine-tuning (step 4 under Waiting on Austin); try SoccerTrack's own calibration (homography and intrinsics in `raw/`) against our polynomial; score the ball at event frames against SoccerTrack's reconstructed ball file | Austin's keep-or-cut call | ~half a day for the next steps |
 | 8 | **Deploy to Azure**: backend on Container Apps, app on Static Web Apps, keys in Key Vault through a managed identity, Cosmos DB free tier for profiles and stored commentary | Steps 1–4 | ~half a day |
 | 9 | **Demo video** (under 2 minutes; hero shot: same match, different viewers side by side), README polish, make the repo public, submit | Everything above | 27 Oct at the latest |
 
@@ -179,5 +202,5 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 - [ ] Demo video under 2 minutes, public link, no copyrighted music or third-party logos
 - [ ] Project description: what it does, which Microsoft and Azure technologies, what problem it solves
 - [ ] A link judges can use to try it (Azure deployment), free until 10 Nov
-- [ ] Credits: Roboflow (if used), SoccerTrack v2 (if used)
-- [ ] License file matches the final choice (AGPL-3.0, or MIT/Apache-2.0 if Ultralytics is dropped)
+- [x] Credits: RF-DETR (Roboflow), SoccerTrack v2, the ByteTrack idea (README and NOTICE)
+- [x] License file matches the final choice (Apache-2.0, 22 Oct)

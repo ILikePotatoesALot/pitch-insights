@@ -1,0 +1,144 @@
+{
+ "clip": {
+  "match": "117093",
+  "half": 1,
+  "from": "38:00.0",
+  "to": "39:40.0",
+  "frames": 500,
+  "fps_processed": 5.0
+ },
+ "detector": {
+  "model": "RF-DETR small (rfdetr 1.11.2), COCO weights as released, no fine-tuning",
+  "weights": null,
+  "fine_tuned": false,
+  "device": "CPU",
+  "tiles": "5 x 2 over rows 90-790, 96 px overlap",
+  "person_min_score": 0.3
+ },
+ "calibration": {
+  "3": {
+   "mean_m": 1.569,
+   "median_m": 1.326
+  },
+  "4": {
+   "mean_m": 0.966,
+   "median_m": 0.781
+  },
+  "5": {
+   "mean_m": 0.764,
+   "median_m": 0.572
+  }
+ },
+ "detections_on_pitch": {
+  "match_radius_m": 3.0,
+  "recall": 0.913,
+  "precision": 0.5139,
+  "position_error_mean_m": 0.7794,
+  "position_error_median_m": 0.5864,
+  "position_error_p90_m": 1.7074,
+  "detections": 19541,
+  "ground_truth": 11000,
+  "matched": 10043
+ },
+ "tracked_players": {
+  "match_radius_m": 3.0,
+  "recall": 0.9086,
+  "precision": 0.8498,
+  "position_error_mean_m": 0.7757,
+  "position_error_median_m": 0.5851,
+  "position_error_p90_m": 1.6922,
+  "detections": 11762,
+  "ground_truth": 11000,
+  "matched": 9995,
+  "team_accuracy": 0.8804,
+  "tracks": 60,
+  "static_spots": 48,
+  "static_detections_dropped": 7630,
+  "ground_truth_players": 22,
+  "tracks_per_ground_truth_player_mean": 6,
+  "id_consistency": 0.7177
+ },
+ "players_with_a_team": {
+  "recall": 0.8316,
+  "precision": 0.9564,
+  "detections": 9565,
+  "matched": 9148
+ },
+ "ball": {
+  "frames_with_ball": 227,
+  "frames": 500,
+  "spare_ball_spots": 8,
+  "note": "SoccerTrack has no ball ground truth; not scored"
+ },
+ "events": {
+  "predicted": {
+   "carry": 7,
+   "pass": 9,
+   "interception": 3
+  },
+  "bas_in_clip": {
+   "HIGH PASS": 5,
+   "DRIVE": 15,
+   "CROSS": 3,
+   "PASS": 10,
+   "FREE KICK": 1,
+   "SHOT": 1,
+   "THROW IN": 1,
+   "GOAL": 1
+  },
+  "within_1s": {
+   "carry": {
+    "truth": 15,
+    "found": 3,
+    "recall": 0.2
+   },
+   "pass": {
+    "truth": 20,
+    "found": 6,
+    "recall": 0.3
+   },
+   "shot": {
+    "truth": 2,
+    "found": 0,
+    "recall": 0.0
+   },
+   "all": {
+    "truth": 37,
+    "found": 9,
+    "recall": 0.2432,
+    "predicted": 19,
+    "precision": 0.4737
+   }
+  },
+  "within_5s": {
+   "carry": {
+    "truth": 15,
+    "found": 6,
+    "recall": 0.4
+   },
+   "pass": {
+    "truth": 20,
+    "found": 8,
+    "recall": 0.4
+   },
+   "shot": {
+    "truth": 2,
+    "found": 0,
+    "recall": 0.0
+   },
+   "all": {
+    "truth": 37,
+    "found": 14,
+    "recall": 0.3784,
+    "predicted": 19,
+    "precision": 0.7368
+   }
+  }
+ },
+ "timing": {
+  "detect_seconds_per_frame_mean": 7.7,
+  "detect_seconds_per_frame_median": 7.29,
+  "detect_minutes_total": 64.1,
+  "process_seconds": 1.5
+ }
+}

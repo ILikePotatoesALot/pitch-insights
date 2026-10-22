@@ -218,6 +218,55 @@ class MatchMeta(_Strict):
     model_config = ConfigDict(extra="forbid", frozen=True, populate_by_name=True)
 
 
+# ----------------------------------------------------------------- frame
+
+FRAME_SCHEMA_VERSION = "1.1"
+
+
+class FramePlayer(_Strict):
+    id: str = Field(description="Stable within the match, e.g. a tracker ID such as 'L-t12'")
+    team_id: str | None = Field(None, description="None when the team isn't known (referees, unclassified)")
+    x: X = Field(description="In the attacking frame of the player's own team (of `ref_team_id` when team_id is None)")
+    y: Y
+    speed: float | None = Field(None, ge=0, description="m/s, smoothed over about 0.5 s")
+    confidence: Prob
+
+
+class FrameBall(_Strict):
+    x: X = Field(description="In the attacking frame of `ref_team_id`")
+    y: Y
+    confidence: Prob
+
+
+class Frame(_Strict):
+    """Positions of everyone on the pitch at one moment (v2; see DESIGN.md, Frame message)."""
+
+    type: Literal["frame"] = "frame"
+    schema_: Literal["1.1"] = Field(FRAME_SCHEMA_VERSION, alias="schema")
+    match_id: str
+    source: Literal["synthetic", "video"]
+    period: Literal[1, 2]
+    t: float = Field(ge=0, description="Seconds since the current period started")
+    clock: str
+    ref_team_id: str = Field(description="The team whose attacking frame the ball and teamless players use")
+    players: list[FramePlayer]
+    ball: FrameBall | None = Field(None, description="None when the ball isn't detected")
+
+    model_config = ConfigDict(extra="forbid", frozen=True, populate_by_name=True)
+
+
+def display_clock(period: int, t: float) -> tuple[str, int]:
+    """Broadcast clock and stats minute for `t` seconds into a period, e.g. ("45+2'", 45)."""
+    m = int(t // 60) + 1
+    cap = 45
+    if period == 2:
+        m += 45
+        cap = 90
+    if m > cap:
+        return f"{cap}+{m - cap}'", cap
+    return f"{m}'", m
+
+
 def dump(model: BaseModel) -> dict:
     """Serialise a model the way it appears on the wire (uses the `schema` alias)."""
     return model.model_dump(mode="json", by_alias=True, exclude_none=True)

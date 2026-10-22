@@ -7,7 +7,7 @@ name = "pitch-insights"
 version = "0.1.0"
 description = "Live football intelligence, explained and personalised."
 requires-python = ">=3.12"
-license = { text = "AGPL-3.0-only" }
+license = { text = "Apache-2.0" }
 dependencies = [
     "pydantic>=2.7",
     "pyyaml>=6.0",

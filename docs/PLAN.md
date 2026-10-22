@@ -27,19 +27,19 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - Fictional clubs and players. No Premier League names, logos or other trademarks.
 - Only footage we have rights to. Main source: **SoccerTrack v2** (CC BY 4.0; amateur university players who gave informed consent, collected with ethics approval, no names). Credit it in the README and the demo video. In the demo, label its players as "Team Left #7" and so on, never with our fictional names.
 - The core pipeline still runs on synthetic data (rules 4.7); real footage is used only for the video path. Austin confirmed on 21 Oct that licensed footage is fine.
-- License: AGPL-3.0 for now. If we use RF-DETR (Apache-2.0) and drop Ultralytics, relicense the repo as MIT or Apache-2.0, which suits the Enterprise category better.
+- License: Apache-2.0 since 22 Oct (was AGPL-3.0 while YOLO was planned); `NOTICE` credits third-party work.
 
 ## 1. Ingest (two sources, one event format)
 
 - **Synthetic generator** (main feed): possession chains, player profiles, pass difficulty, xG for shots, scripted storylines, a fake season history for milestones, and seeds so matches replay exactly. A check script compares output with real match averages.
-- **Video path** (core; keep-or-cut decision on day 4), built on SoccerTrack v2:
+- **Video path** (core; built 22 Oct and kept, Austin's decision), built on SoccerTrack v2:
   - **Footage:** 4K panoramic video from a fixed camera covering the whole pitch. Match 117093's first half is downloaded (video 3.35 GB, tracking ground truth 2.71 GB, events).
   - **Ground truth:** per-frame player positions in metres, track IDs, teams, roles and shirt numbers (GSR), plus timestamped events in 12 classes (BAS). Used to train the detector, and to measure our accuracy against.
-  - **Detector:** **RF-DETR (small)** fine-tuned on SoccerTrack's boxes, with **YOLO** as the fallback. If time allows, fine-tune both and compare them against the ground truth. Check current versions, licenses and GPU memory needs before training.
+  - **Detector:** **RF-DETR (small)**, pre-trained as released for now; fine-tuned on SoccerTrack's boxes later in Azure ML once GPU quota is granted. YOLO is no longer planned (it would bring back AGPL). Check current versions, licenses and GPU memory needs before training.
   - **Training (optional):** start with the released RF-DETR on a short clip, no training. Fine-tune only if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`), or on Austin's GPU machine. The run is tracked and the model registered in **Azure ML** through MLflow, which needs no compute quota.
   - **Panoramic view:** players and the ball are small, so train and detect at high resolution (1280–1920 px) or on tiles. The fixed camera and SoccerTrack's calibration maps make pitch coordinates, speed and distance reliable. The ball is not in SoccerTrack's tracking ground truth, so ball detection is a bonus, not a dependency.
   - **Then:** ByteTrack for IDs, team from shirt colour (SoccerTrack's team labels only for scoring), and a Video Ingest agent writing `frame` messages and, when the ball is tracked well enough, events. Clips are processed ahead of time and replayed at match speed. Supplies measured speed and distance.
-  - **Design details** (format traps in SoccerTrack's files, coordinate conversion, frame message, event mapping): [DESIGN.md, Video path](DESIGN.md#video-path-planned).
+  - **Design details** (format traps in SoccerTrack's files, coordinate conversion, frame message, event mapping): [DESIGN.md, Video path](DESIGN.md#video-path).
   - **Benchmark:** position error and share of SoccerTrack's labelled events we detect, shown in the README and demo.
   - **Synthetic data:** use SoccerTrack's real tracking to calibrate movement (speeds, distances, team shape) for the v2 synthetic tracking frames.
 - Stream over WebSocket or Server-Sent Events; Azure Event Hubs optional.

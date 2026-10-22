@@ -1,0 +1,16 @@
+Pitch Insights
+Copyright 2026 the Pitch Insights authors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This project uses or derives from the following third-party work:
+
+- RF-DETR by Roboflow (Apache-2.0), used as a dependency with its pre-trained
+  COCO weights as released: https://github.com/roboflow/rf-detr
+- SoccerTrack v2 by Scott et al. (CC BY 4.0): the video and ground truth behind
+  the video path, and the processed clip output in samples/video/.
+  https://atomscott.github.io/SoccerTrack-v2/ , arXiv:2508.01802
+- The tracker in backend/pitch_insights/video/track.py is our own code following
+  the idea of ByteTrack (Zhang et al., 2022), not its implementation.
+
+All clubs, players and matches in the synthetic data are fictional.

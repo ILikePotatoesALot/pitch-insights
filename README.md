@@ -10,7 +10,7 @@ Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Pipeline
 
-1. **Ingest**: synthetic match events, plus events derived from match video (YOLO detection, ByteTrack, pitch homography), in one shared event format.
+1. **Ingest**: synthetic match events, plus player positions and events derived from real, licensed match video (RF-DETR detection on tiles, ByteTrack-style tracking, a fitted image-to-pitch mapping), in one shared event format.
 2. **Interpret**: stats, patterns (momentum, pressure, chaos, tempo) and live player ratings, calculated in code.
 3. **Explain**: each moment is scored by how much it changed the match, and explained from an evidence pack of computed facts.
 4. **Render**: timed, machine-readable overlay cues, drawn on a Three.js 3D pitch.
@@ -20,7 +20,8 @@ Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
 
 | Folder | Contents |
 |---|---|
-| `backend/` | Python: event generator, video ingest, stats, agents, event stream |
+| `backend/` | Python: event generator, video loader and scoring (pure Python), stats, agents, event stream |
+| `video/` | The video path's detector and scripts, in their own environment (`video\.venv`: torch CPU, rfdetr, opencv) |
 | `frontend/` | Vite + React + Three.js viewer and overlays |
 | `docs/` | Plan and design notes |
 
@@ -109,12 +110,32 @@ cd backend
 
 First full run: 52 moments across the three demo matches, all grounded, none fell back. Commentary is labelled as AI-generated in the app, and "Why?" shows the facts it came from. Details and the engineering practices we follow: [docs/DESIGN.md](docs/DESIGN.md#agents).
 
+## Video path: real footage into the same messages
+
+The core pipeline runs on synthetic matches. As a second source, the video path turns real, licensed match video into the same `frame` and `event` messages: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), a fixed 4K panoramic camera over a whole pitch, amateur university players who consented, no names. Players are labelled by side and shirt number ("Left #7"), never with our fictional names.
+
+**RF-DETR** (small, pre-trained, no fine-tuning, on CPU) runs on 5 × 2 tiles of each frame. A 2-D polynomial, fitted on frames before the clip, maps feet in the image to pitch metres (one homography can't describe a stitched panorama). A ByteTrack-style tracker works in pitch metres, shirt colours give the teams, and possession of the tracked ball gives passes, carries and turnovers with a `confidence`.
+
+Benchmarked against SoccerTrack's ground truth on 100 s of match 117093 (38:00–39:40, the build-up to a goal, 500 frames at 5 fps):
+
+| | |
+|---|---|
+| Players found | 91% |
+| Position error | 0.78 m mean, 0.59 m median |
+| Precision | 85% (the rest are officials, who aren't in the ground truth, people behind the goals and spectators the filter missed) |
+| Team from shirt colour | 88% |
+| Events matching SoccerTrack's within ±5 s | 74% of ours; 38% of theirs found |
+| Detection time | 7.7 s a frame on CPU (64 min for the clip) |
+
+The team, ID and event settings were chosen on this clip, so those figures are optimistic until checked on another; details, limits and how to run it in [docs/DESIGN.md, Video path](docs/DESIGN.md#video-path). The output is in [`samples/video/`](samples/README.md#video-path-video).
+
 ## Credits
 
-- Player detection: [Roboflow football-players-detection](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc) (CC BY 4.0)
+- Player and ball detection: [RF-DETR](https://github.com/roboflow/rf-detr) by Roboflow (Apache-2.0), small model with its pre-trained COCO weights as released
 - Video and ground truth for the video path: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) by Scott et al. (CC BY 4.0), [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)
+- Tracking follows the idea of [ByteTrack](https://arxiv.org/abs/2110.06864) (Zhang et al.); the code is our own
 - All clubs, players and matches in the synthetic data are fictional.
 
 ## License
 
-[GNU AGPL-3.0](LICENSE)
+[Apache-2.0](LICENSE); see [NOTICE](NOTICE) for third-party work. The repo was AGPL-3.0 while YOLO (Ultralytics) was planned as the detector; it was relicensed on 22 Oct 2026 once RF-DETR (Apache-2.0) replaced it.

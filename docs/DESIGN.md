@@ -12,7 +12,7 @@ All messages are JSON Lines (one JSON object per line).
 |---|---|---|
 | `match_meta` | Once, at the start | Match info, teams, lineups, players, history, pitch directions |
 | `event` | Every on-ball action | See event types below |
-| `frame` | v2 only | Positions of all players and the ball, 10 times a second (see [Frame message](#frame-message-v2-planned)) |
+| `frame` | v2 only | Positions of all players and the ball, 10 times a second (see [Frame message](#frame-message-schema-11-as-built)) |
 
 Hidden generator values (match form, the script) go in a separate `match_debug` file, never in `match_meta`, so agents can't read them.
 
@@ -342,8 +342,16 @@ The judging criteria ask for "quality software development practices", pointing 
 | Memory (RAG) | The SDK's retries only (backoff, honours `retry-after-ms`); on failure, no memory facts and a pause, never a blocked match | Done |
 | Memory (RAG) | Evaluate retrieval with labelled pairs, including queries that should return nothing; later, Foundry's Document Retrieval evaluator over a labelled set | Partly: pairs checked by hand on the samples; tests for no-match queries |
 | Memory (RAG) | Check the model's retirement: `text-embedding-3-small` retires 9 Feb 2028, after judging | Checked |
+| Video (evaluation) | Score against a trusted ground truth (SoccerTrack's annotations) with several metrics, not one: recall, precision, position error (mean, median, 90th percentile), team accuracy, tracks per player, and event recall at two time windows | Done |
+| Video (evaluation) | Keep fitting data and test data apart: the image-to-pitch mapping is fitted only on frames before the clip, and its degree is chosen on held-out calibration frames; the clip is used only for scoring | Done |
+| Video (evaluation) | Training, validation and test data kept separate and non-overlapping: time stretches with 8-second gaps, the checkpoint chosen on validation only, the test frames used once, and the benchmark clip never trained on; training labels from a curated source (SoccerTrack's MOT boxes), not from the model's own output, which would only repeat its mistakes | Built, not yet run |
+| Video (testing) | Unit tests for every deterministic part (loader, coordinate conversion, tile merging, tracker, spectator filter, events, scoring, frame message), on hand-made snippets with no video, model or network | Done |
+| Video (MLOps) | Track each benchmark run in the Azure ML workspace with MLflow (parameters, metrics, the benchmark and calibration files as artifacts); `mlflow-skinny` for logging only; sign-in through azure-identity, no keys in code; the tracking URI from `.env` | Done 22 Oct: run `117093-38min-rfdetr-small-pretrained` in experiment `video-path-benchmark` of `ML-pitch-insights` (15 metrics, 10 parameters, 2 files), by `video/log_mlflow.py`. The subscription isn't in the account's home tenant, so the script looks up the subscription's tenant first; without that, every call returned 400 Bad Request |
+| Video (Responsible AI) | People are found as bodies with pseudonymous track IDs ("L-t12"); no faces, no identification; consented, licensed footage; real players labelled by side and number only | Done |
+| Video (Responsible AI) | A confidence on every detected player, ball and event, and the limits stated next to the numbers (5 fps, no shots, ball not scored, referees missing from the ground truth) | Done |
+| Video (cost) | CPU only, clips processed ahead of time and resumably; no GPU quota needed for the pre-trained model | Done |
 
-Sources: [transient fault handling](https://learn.microsoft.com/en-us/azure/architecture/best-practices/transient-faults), [Azure OpenAI quotas and limits](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/quota), [keyless connections](https://learn.microsoft.com/en-us/azure/developer/ai/keyless-connections), [Agent Framework observability](https://learn.microsoft.com/en-us/agent-framework/agents/observability), [monitoring and diagnostics](https://learn.microsoft.com/en-us/azure/architecture/best-practices/monitoring), [system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/system-message), [safety system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates), [transparency note](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/transparency-note), [RAG evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/rag-evaluators), [structured outputs](https://learn.microsoft.com/en-us/agent-framework/agents/structured-outputs), [middleware](https://learn.microsoft.com/en-us/agent-framework/agents/middleware/), [Well-Architected AI application design](https://learn.microsoft.com/en-us/azure/well-architected/ai/application-design), [API design](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design), [embeddings how-to](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings), [embeddings REST reference (`dimensions`)](https://learn.microsoft.com/en-us/rest/api/microsoft-foundry/azureopenai/embeddings), [quotas and limits](https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits), [model retirement schedule](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule), [RAG design and evaluation guide](https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-solution-design-and-evaluation-guide), [RAG enrichment](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-enrichment-phase), [RAG retrieval and its evaluation](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-information-retrieval), [vector search (keep embeddings current)](https://learn.microsoft.com/en-us/azure/architecture/guide/technology-choices/vector-search), [Foundry RAG evaluators](https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/rag-evaluators), [Content Safety Analyze Text](https://learn.microsoft.com/en-us/rest/api/contentsafety/text-operations/analyze-text?view=rest-contentsafety-2024-09-01), [Content Safety harm categories](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/harm-categories), [Translator: prevent translation](https://learn.microsoft.com/en-us/azure/ai-services/translator/text-translation/how-to/prevent-translation), [Translator service limits](https://learn.microsoft.com/en-us/azure/ai-services/translator/service-limits), [evaluation SDK](https://learn.microsoft.com/azure/ai-studio/how-to/develop/evaluate-sdk), [Agent Framework context providers](https://learn.microsoft.com/en-us/agent-framework/concepts/agents/conversations/context-providers), [Agent Framework vector stores](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/vector-stores/).
+Sources: [transient fault handling](https://learn.microsoft.com/en-us/azure/architecture/best-practices/transient-faults), [Azure OpenAI quotas and limits](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/quota), [keyless connections](https://learn.microsoft.com/en-us/azure/developer/ai/keyless-connections), [Agent Framework observability](https://learn.microsoft.com/en-us/agent-framework/agents/observability), [monitoring and diagnostics](https://learn.microsoft.com/en-us/azure/architecture/best-practices/monitoring), [system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/system-message), [safety system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates), [transparency note](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/transparency-note), [RAG evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/rag-evaluators), [structured outputs](https://learn.microsoft.com/en-us/agent-framework/agents/structured-outputs), [middleware](https://learn.microsoft.com/en-us/agent-framework/agents/middleware/), [Well-Architected AI application design](https://learn.microsoft.com/en-us/azure/well-architected/ai/application-design), [API design](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design), [embeddings how-to](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings), [embeddings REST reference (`dimensions`)](https://learn.microsoft.com/en-us/rest/api/microsoft-foundry/azureopenai/embeddings), [quotas and limits](https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits), [model retirement schedule](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule), [RAG design and evaluation guide](https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-solution-design-and-evaluation-guide), [RAG enrichment](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-enrichment-phase), [RAG retrieval and its evaluation](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-information-retrieval), [vector search (keep embeddings current)](https://learn.microsoft.com/en-us/azure/architecture/guide/technology-choices/vector-search), [Foundry RAG evaluators](https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/rag-evaluators), [Content Safety Analyze Text](https://learn.microsoft.com/en-us/rest/api/contentsafety/text-operations/analyze-text?view=rest-contentsafety-2024-09-01), [Content Safety harm categories](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/harm-categories), [Translator: prevent translation](https://learn.microsoft.com/en-us/azure/ai-services/translator/text-translation/how-to/prevent-translation), [Translator service limits](https://learn.microsoft.com/en-us/azure/ai-services/translator/service-limits), [evaluation SDK](https://learn.microsoft.com/azure/ai-studio/how-to/develop/evaluate-sdk), [Agent Framework context providers](https://learn.microsoft.com/en-us/agent-framework/concepts/agents/conversations/context-providers), [Agent Framework vector stores](https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/vector-stores/), [Well-Architected: test and evaluate AI workloads](https://learn.microsoft.com/en-us/azure/well-architected/ai/test), [configure MLflow for Azure Machine Learning](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-use-mlflow-configure-tracking), [query and compare runs with MLflow](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-track-experiments-mlflow), [Content Understanding video limits](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/video/overview), [Microsoft Responsible AI principles](https://www.microsoft.com/ai/principles-and-approach).
 
 ### Tracing
 
@@ -372,77 +380,130 @@ During development keys live in `.env` (ignored by git; `.env.example` holds pla
 - **Foundry Agent Service:** possible now, but Agent Framework running in our own backend already gives us the handoffs, shared state and failure handling the Multi-Agent prize judges, with less to deploy.
 - **AI Gateway (API Management):** it caps token use per project but doesn't add quota, and it costs money; the budget alert and low rate limits do the same job here.
 - **Fine-tuning:** not needed for commentary from evidence packs.
+- **Azure AI Content Understanding (video) for the video path:** it samples about one frame a second at 512 × 512 px, so distant players and quick touches are lost; player tracking needs a detector on tiles of every sampled frame. (Azure AI Vision's Spatial Analysis, which tracked people, was retired in March 2025.)
 
 ### Rules this supports
 
 - Microsoft Foundry is the first "hero technology" under Technological Implementation (20% of every score). Agent Framework and "Azure Apps and AI Services" are on the same list.
 - The Multi-Agent prize accepts Agent Framework with any model provider; only the Foundry prize needs Foundry itself. A project can win one grand prize and up to one category prize (rule 8.2).
 
-## Video path (planned)
+## Video path
 
-Designed 21 Oct 2026. Turns real match video into the same messages as the synthetic generator: `frame` messages with player positions, and `event` messages with `source: "video"` and a `confidence` below 1.
+Designed 21 Oct 2026, built 22 Oct on branch `video-path`. Turns real, licensed match video into the same messages as the synthetic generator: `frame` messages with player positions, and `event` messages with `source: "video"` and a `confidence` below 1. Keep-or-cut decision on 24 Oct.
 
 ### Source: SoccerTrack v2
 
 - [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)): 10 full amateur university matches, 4K panoramic video from a fixed camera covering the whole pitch, 25 fps.
 - License: CC BY 4.0 for video and annotations (MIT for their code). Players gave informed consent, collection had ethics approval, and there are no names, only shirt numbers. Credit in the README and the demo video.
 - Hosted on Hugging Face (`atomscott/soccertrack-v2`), gated: downloads need a Hugging Face read token (`HF_TOKEN` in `.env`) from an account that has accepted the terms.
-- Downloaded (21 Oct): match `117093`, first half, into the git-ignored `data/soccertrack/117093/`: video (3.35 GB), GSR tracking (2.71 GB; much larger than the video's annotations suggest, because it holds every frame) and BAS events (0.5 MB).
-- In the demo, label these players by team side and shirt number ("Left #7"), never with our fictional names.
+- Downloaded (21 Oct): match `117093`, first half, into the git-ignored `data/soccertrack/117093/`: video (3.35 GB; 4096 × 1080, 25 fps, 67,625 frames, 45:05), GSR tracking (2.71 GB, every frame) and BAS events (0.5 MB, both halves).
+- In anything shown, label these players by team side and shirt number ("Left #7"), never with our fictional names. Our own tracks are labelled by team and track ID ("L-t12"), since video can't read shirt numbers.
 
-### Their annotations, and what to watch for
+### Their annotations, as shipped (checked 22 Oct)
 
-- **GSR (tracking ground truth):** per frame, each player's, goalkeeper's and referee's pitch position in metres, track ID, role, team side and shirt number. **The ball is not included.**
-- **BAS (event ground truth):** 12 timestamped classes. A shot that scores is two annotations (`Shot` and `Goal`) at the same time. There is no penalty class.
-- **Format traps (from their own docs):**
-  - The shipped GSR files don't match the written spec. They are COCO-style objects (`images`, `annotations`, ...). Fields sit under `attributes`, shirt numbers are strings, and the position is `bbox_pitch.x_bottom_middle` / `y_bottom_middle`.
-  - The declared image size (3840 × 1504) is wrong for nine of the ten matches. Use real pixel sizes from the video.
-  - BAS `position` for second-half events counts from the start of the match, not the half. Subtract the first half's length (or use their loader's `t_ms_in_half`).
-  - Team `left`/`right` is fixed per half and can swap between halves for the same team.
-- Their loader (`src.data_utils.soccertrack_v2`) already handles some of this. Use it where possible, and check the result against a few frames by eye.
+- **GSR (tracking ground truth):** COCO-style: `info`, `images` (67,625, with the real 4096 × 1080 size for this match), `annotations`, `categories`. Annotations are grouped by frame in order; `images` comes first and maps each `image_id` to a frame through its `file_name` (`000123.jpg`, 1-based).
+  - People: fields under `attributes` (`role`, `jersey` as a string, `team` as `left`/`right`, `player_id`), the pitch position in `bbox_pitch.x_bottom_middle` / `y_bottom_middle`.
+  - Positions sit on a grid of 1% of the pitch (1.05 m × 0.68 m), so they carry up to about 0.6 m of rounding.
+  - `bbox_image` boxes are approximate: every box is exactly 43 px tall and they sit 10–40 px off the players. We use the pitch positions as the truth and never the image boxes.
+  - The frames we read (the clip, and one every 5 s before it) have 22 people each: 20 players and 2 goalkeepers. **No referees and no ball.**
+  - The GSR file has no camera calibration: each frame has a `pitch` annotation with line end points, which we don't use. (Calibration is in `raw/`, below.)
+- **Other files in the dataset** (found 22 Oct while preparing fine-tuning; the first four are the small files downloaded into `data/soccertrack/117093/hf/`):
+  - **`mot/117093.txt` (6.2 MB): tight boxes.** The curated subset of the MMSports 2025 challenge: 22 boxes a frame (players and goalkeepers; no referees, no ball) for the **first four minutes of the half**, MOT frame *k* (0-based) being video frame *k* + 1 (found by matching feet positions against the GSR frames). Their heights follow the image row as our own detector's do (43.9 against 44.5 px, 72.8 against 72.8 px), so, unlike the GSR image boxes, they are usable as detector labels. A paired 305 MB clip exists; we don't need it, because the frames are in the half's video.
+  - **`ball/117093_1st_ball.npz` (0.13 MB): a ball track, but a reconstruction.** One row per frame, anchored at the annotated events and interpolated in straight constant-speed lines between them, per the dataset's README. It carries event timing, not the ball's real path, so it can't score per-frame ball tracking (only, roughly, the ball's position at event frames; not done).
+  - **`raw/117093/`: SoccerTrack's own calibration.** 65 hand-annotated pitch keypoints, camera intrinsics, distortion maps (`mapx`, `mapy`) and a homography. We downloaded the homography, intrinsics, keypoints and padding file, not the 26 MB maps or the 216 MB tracker boxes. Our fitted polynomial (0.76 m on held-out frames) doesn't use them; undistorting with the intrinsics and applying the homography might fit better, and is untried.
+  - `README.md` and `CHANGES_v1_*.md`: the dataset's own notes (frame and time conventions: game-state frame *k* is video frame *k*).
+- **BAS (event ground truth):** 12 classes; `position` is in ms. This file's header says it counts from the half's own video, not from kickoff, so the loader only corrects second-half times when they are clearly match time. **A goal here is a lone `GOAL`, not `SHOT` plus `GOAL`.** No penalty class.
+- `left`/`right` is the side in that half; the left team attacks +x. Sides swap at half-time, so the same team has a different label in each half.
+- We don't use their loader (`src.data_utils.soccertrack_v2`): ours streams the file (about 25 s to the clip, never more than one annotation in memory) and needs no extra packages.
 
 ### Coordinates
 
-- SoccerTrack: metres, origin at the centre spot, x from −52.5 to +52.5 (towards the right goal), y from −34 to +34.
+- SoccerTrack: metres, origin at the centre spot, x from −52.5 to +52.5 (towards the right goal), y from −34 to +34 (towards the camera).
 - Ours: 0–105 × 0–68 from the acting team's attacking direction.
-- The team on the left side at kickoff attacks towards +x in that half: `x = x_st + 52.5`, `y = y_st + 34`. The other team: `x = 52.5 − x_st`, `y = 34 − y_st`. This is the same 180° flip the generator uses, so both sources line up.
+- The left team attacks towards +x: `x = x_st + 52.5`, `y = y_st + 34`. The right team: `x = 52.5 − x_st`, `y = 34 − y_st`. This is the same 180° flip the generator uses, so both sources line up. Code: `pitch_insights/video/soccertrack.py` (`to_our_frame`, `from_our_frame`).
 
-### Frame message (v2, planned)
+### Frame message (schema 1.1, as built)
 
 ```json
 {"type": "frame", "schema": "1.1", "match_id": "ST-117093", "source": "video",
- "period": 1, "t": 12.48, "clock": "1'",
- "players": [{"id": "L-07", "team_id": "L", "x": 61.2, "y": 30.4, "speed": 5.8, "confidence": 0.91}],
+ "period": 1, "t": 2280.0, "clock": "39'", "ref_team_id": "L",
+ "players": [{"id": "L-t12", "team_id": "L", "x": 61.2, "y": 30.4, "speed": 5.8, "confidence": 0.91}],
  "ball": {"x": 63.0, "y": 31.1, "confidence": 0.42}}
 ```
 
-- Positions in our attacking-team frame for each player's own team. `ball` is null when not detected.
-- 10 frames a second for the stream (sampled from 25 fps). Speed is smoothed over about 0.5 s.
-- The synthetic generator will produce the same message in v2, by interpolating its event positions and calibrating movement against SoccerTrack's real tracking.
+- The Pydantic model is `Frame` in `events/schema.py`, exported to `docs/schema/frame.schema.json`.
+- Players' positions are in their own team's attacking frame. `ref_team_id` (added while building) names the team whose frame the ball and teamless people (referees, unclassified tracks: `team_id` null) use.
+- `ball` is null when not detected; `speed` is null when a track is too short to measure, or over 12 m/s (a tracking glitch). Speed is smoothed over about 0.5 s.
+- Positions just off the pitch (a throw-in taker) are clamped to its edge.
+- Built at **5 frames a second**, not the planned 10: detection costs about 8 s a frame on CPU. The synthetic generator will produce the same message in v2.
 
-### Detector
+### Pipeline as built
 
-- **Chosen (21 Oct), needs no GPU quota:** RF-DETR (small) as released, already trained to find people and footballs, run on a short clip (one to two minutes, a few frames a second, each 4K frame cut into overlapping tiles). Scored against the GSR ground truth.
-- **Main, if T4 GPU quota arrives in Azure ML:** RF-DETR (small), Apache-2.0, fine-tuned on SoccerTrack's player boxes. **Fallback:** YOLO (Ultralytics, AGPL-3.0). If time allows, fine-tune both on the same frames and compare.
-- Classes: player, goalkeeper, referee, ball. The ball has no GSR ground truth, so its detection is a bonus, not a dependency.
-- Panoramic view: players are small, so train and detect at 1280–1920 px, or on overlapping tiles.
-- Before training, check current versions, licenses and GPU memory against the actual GPU.
+| Step | Code | What it does |
+|---|---|---|
+| 1. Ground truth | `video/extract_gsr.py` | Streams the 2.7 GB GSR once (about 25 s): the clip's truth at 5 fps, and calibration pairs from frames **before** the clip only |
+| 2. Detect | `video/detect.py`, `video/detector.py` | RF-DETR small (COCO weights as released), the pitch band (rows 90–790) cut into 5 × 2 tiles with 96 px overlap, merged across tiles (`video/tiles.py` in the backend package); people and footballs kept; a shirt colour per person. Resumable |
+| 3. Calibrate | `video/calibrate.py`, `video/calibration.py` | Fits image pixels to pitch metres (below) |
+| 4. Track, teams, ball, messages, benchmark | `video/process.py` | Seconds; re-run freely |
+| 5. Preview | `video/preview.py` | Draws our tracks and the ground truth on the clip (`data/video/117093/preview.mp4`, git-ignored) |
 
-### Training
+The pure-Python parts (loader, tile merging, tracker, events, scoring) live in `backend/pitch_insights/video/` and are covered by `backend/tests/test_video.py`; the backend gains no new dependencies. The detector runs in its own environment, `video\.venv` (torch CPU, rfdetr 1.11.2, opencv, supervision, truststore).
 
-- **Data:** a script turns SoccerTrack's image boxes into the detector's training format. Sample frames spaced out in time (not every frame), and split by time so test frames never sit next to training frames.
-- **Where:** an Azure ML compute cluster in workspace `ML-pitch-insights` (East US 2) once T4 quota (family NCASv3_T4, low priority if offered) is granted on the Pay-As-You-Go subscription, or Austin's GPU machine.
-- **Azure:** the run logs metrics and the final model to an Azure ML workspace through MLflow, which needs no compute quota. The model is registered in Azure ML.
-- **Serving:** CPU detection in a container on Azure Container Apps. Clips are processed ahead of time, so speed is not critical.
+**Tiles.** The whole frame at the model's 512 px input finds only 7 people. On the first clip frame: 4 × 2 tiles over the whole frame found 42 people in 6.4 s; 5 × 2 over the pitch band found 54 in 7.1 s; 6 × 2 found 57 in 8.2 s. 5 × 2 was chosen. A player cut off at a tile's edge is merged with the whole one by how much of the smaller box lies inside the other, not only by IoU; containment is checked first, because a crop that is exactly half of the whole box has an IoU of exactly the duplicate threshold and used to be kept alone, with the feet cut off (found in review, 22 Oct).
 
-### From detections to messages
+**Pitch positions.** SoccerTrack ships no calibration, and one homography can't describe a stitched panorama (4.2 m mean error). A 2-D polynomial of degree 5 does. It is fitted from **our detected feet** (the bottom middle of the RF-DETR box) to the GSR positions, on 76 frames before the clip (one every 30 s, 1,283 pairs). Fitting on SoccerTrack's own image boxes would have built their 10–40 px offset into every position. Degree chosen on held-out frames: 3 → 1.57 m, 4 → 0.97 m, **5 → 0.76 m** mean error. The fit is stored in `samples/video/117093-38min.calibration.json`. A detection counts as on the pitch only if it lies inside the pitch outline (plus 2 m) in the image *and* maps inside it, so the polynomial can't fold the stands back onto the pitch.
 
-1. **Detect** players (and, when possible, the ball) in each frame.
-2. **Track** with ByteTrack for stable IDs.
-3. **Team:** shirt-colour clustering. SoccerTrack's team labels are used only to score this, not as input.
-4. **Pitch position:** from SoccerTrack's calibration maps (fixed camera), so speed and distance are measured, not estimated.
-5. **Frames:** write `frame` messages.
-6. **Events** (when the ball is tracked well enough): the nearest player within about 1.5 m has possession. A change of possession between teammates is a `pass`, a run with the ball is a `carry`, a change to an opponent is a turnover (`interception` or `tackle`), and fast ball movement towards goal is a `shot`. Each gets a `confidence`.
+**Spectators.** The stand behind the far touchline is raised, so from this camera spectators' feet land on the far touchline and map onto the pitch; on the first 14 frames they were about 220 of 255 false detections. Filtering whole tracks didn't hold up over the full clip (a spectator's track hops to the next person on the stand), so detections are filtered *before* tracking: in the strip within 10 m of the far touchline, or just behind a goal line, a 2 m grid cell occupied in at least 15% of frames *and* in at least 3 of 5 equal parts of the clip is a static spot, and detections there are dropped (`static_spots` in `track.py`). Two grids offset by half a cell catch someone standing on a cell edge; the time spread keeps a player who holds one spot for a while; a keeper standing still on the pitch isn't in those zones. The same test over the whole pitch, without the time spread, removes the spare balls lying around it. It needs the whole clip, so it is an offline filter; a live version would need some seconds of history.
+
+**Tracking.** supervision 0.31 no longer includes ByteTrack (it moved to Roboflow's separate `trackers` package). Rather than add a package, `video/track.py` follows ByteTrack's idea in pitch metres: confident detections (0.5 or more) match tracks first, then leftover tracks get a second chance with the low-confidence ones (0.3–0.5), which are often half-hidden players. Matching is closest pairs first, by distance after a constant-velocity prediction, within a 6 m gate that widens while a track is missing; tracks end after 5 s unseen. A 2.5 m gate with 2 s patience kept a player's ID for 69% of their frames; 6 m and 5 s, 80% (tuned on the first half of this clip). At 5 fps a running player can move a whole box width per frame, so box overlap would match poorly.
+
+**Teams.** Each detection's shirt colour is the mean Lab colour of the upper body, grass masked out; each track's colour is the mean over its detections, and k-means puts the tracks in 4 groups. The two groups with the most detections are the teams; the others (keepers, officials, odd crops) get no team. With 3 groups the referee's dark shirt joined Left's blue. Per detection, Left's blue and Right's white separate only about 89% of the time even with the best possible grouping (far players are a few pixels wide and shadows change the lightness), and a track that hops between players mixes colours, so team accuracy is about 89%. The team with the lower mean x over the clip is Left, since a team defending the left goal sits deeper on average. SoccerTrack's labels are used only to score this.
+
+**Ball.** RF-DETR's "sports ball" class, score 0.2 or more, on the pitch. Each frame takes the candidate nearest the previous ball (within 3 m plus 30 m/s), else a confident one (0.4 or more). No ground truth, so not scored directly.
+
+**Events** (`pitch_insights/video/events.py`): the nearest player with a team within 2.5 m of the ball has it, over at least 2 frames (2 m found too few owners on this clip, 3 m is loose; one frame doubled the events but cut their precision from 63% to 36% on the first 60 s). Same team, different player next: `pass` (complete). Opponent next: `interception` (and the passer's `pass` incomplete) if the ball travelled 3 m or more, otherwise `tackle`. A player who moves 3 m or more with the ball: `carry`. Shots aren't attempted: at 5 fps the ball is often missed in flight, and the outcome can't be seen from the ball alone. Fields video can't see take neutral values (`height` ground, `kind` open_play, `difficulty` 0.5). Confidence is 0.9 × the mean ball-detection score around the event.
+
+### Clip
+
+Match 117093, first half, **38:00.0 to 39:40.0** (100 s, frames 57,001–59,500, 500 frames at 5 fps). Chosen from the BAS events: Left's attack that ends in their second goal (39:35), with three crosses, a free kick, a shot, three outs and a throw-in on the way. Defined in `video/clip.py`.
+
+### Benchmark (22 Oct)
+
+Pre-trained RF-DETR small, no fine-tuning, CPU, 500 frames (100 s at 5 fps). Ground truth: 22 people a frame (11,000 in all); the GSR file has no referees or ball.
+
+| Measure | Result |
+|---|---|
+| Players found (recall, within 3 m) | **91%** (10,000 of 11,000) |
+| Precision (our people that are a real player) | **85%** (11,762 output); the rest are the referee and assistant referees (not in the ground truth), people behind the right goal, and spectators the filter missed by the far-left corner |
+| People we gave a team | 96% precision, 83% recall (keepers and officials get no team) |
+| Position error, matched players | **0.78 m mean, 0.59 m median**, 1.7 m at the 90th percentile |
+| Team from shirt colour | **88%** right |
+| Track IDs | 60 tracks for 22 players; a player keeps their most common ID for 72% of their frames |
+| Image-to-pitch mapping (held-out calibration frames) | 0.76 m mean, 0.57 m median |
+| Before filtering (detections on the pitch) | 91% recall, 51% precision: spectators on the far stand, removed by the static-spot filter (7,630 detections) |
+| Ball | Followed in 227 of 500 frames (45%), after removing 8 spots where spare balls lie; not scored (SoccerTrack's ball file is a reconstruction, not per-frame truth) |
+| Events: 19 derived (9 passes, 7 carries, 3 interceptions) | 37 BAS events in the clip (`Out` left out) |
+| Event recall within ±1 s / ±5 s | 24% / **38%** (passes 30% / 40%, carries 20% / 40%, shots 0 of 2) |
+| Event precision within ±1 s / ±5 s | 47% / **74%** |
+| Time | Detection 7.7 s a frame (64 min for the clip, about 65 min wall clock; plus 11 min for the 76 calibration frames); ground-truth extraction 25 s; everything after detection 1 s; the preview video 1 min |
+
+How much of this to trust:
+
+- **Fitted apart from the test:** only the image-to-pitch mapping, which uses frames before the clip.
+- **Chosen while looking at the clip:** the static-spot filter's settings, 4 colour groups, the tracker's 6 m gate and 5 s patience, and the 2.5 m possession radius were each picked by comparing a few settings on the first half of the clip. Detection, positions and the mapping weren't tuned on it. Treat the team, ID and event figures as optimistic until they are checked on a second clip.
+- **Merge order:** the stored detections, the calibration and the benchmark above were made before that tile-merge fix. On 9 clip frames the fix changes about 4% of person boxes (19 of about 450). Detection has to be re-run (about 75 min) to refresh the figures; until then they describe the old merge.
+- Recall and position error are the solid numbers: the mapping is honest, and SoccerTrack's own positions carry up to about 0.6 m of rounding, so 0.59 m median is close to that floor.
+
+Positions are matched to the ground truth in pitch metres (closest pairs first, within 3 m). We didn't run SoccerTrack's `gs_hota` or `bas_map` scripts (they need their repository and packages); our numbers are simpler but computed the same way for every run. Full figures in `samples/video/117093-38min.benchmark.json`.
+
+### Outputs (in `samples/video/`)
+
+- `117093-38min.frames.jsonl`: 500 `frame` messages.
+- `117093-38min.events.jsonl`: the derived events (event format v1, `source: "video"`).
+- `117093-38min.benchmark.json`: the benchmark.
+- `117093-38min.calibration.json`: the fitted mapping.
+
+No video, weights or ground truth are committed; intermediate files are in the git-ignored `data/video/117093/`.
 
 ### Mapping SoccerTrack events to ours (for scoring)
 
@@ -461,13 +522,26 @@ Designed 21 Oct 2026. Turns real match video into the same messages as the synth
 | Ball Player Block | `interception` (or a blocked `shot`) |
 | Player Successful Tackle | `tackle`, outcome won |
 
-This conversion also lets the Interpreter run directly on SoccerTrack's ground-truth events, as a check that it works on real data.
+Scoring leaves out `Out` (it changes the previous pass, it isn't an action) and counts `Goal` as a `shot`. Throw-ins and free kicks are `pass`es here, as in the table.
 
-### Benchmark
+### Fine-tuning (built 22 Oct, run on a separate GPU machine)
 
-- **Tracking:** average position error in metres against GSR, and the share of players found. Use their `gs_hota` evaluation script for the standard score.
-- **Events:** the share of BAS events we detect within ±1 s and ±5 s, by class (their `bas_map` script).
-- Results go in the README and the demo video, for example "positions within X m; Y% of passes detected".
+Code in `video/finetune/` (steps for the machine in its README), with the pure logic in `backend/pitch_insights/video/mot.py` and tests. Nothing here has trained yet.
+
+- **Labels:** the MOT boxes (above), the only tight image boxes we have. (The GSR boxes are loose, and an earlier plan to use our own detections matched to the GSR positions would only have taught the model what it already does.)
+- **Data:** each chosen frame is cut into the detector's own 5 × 2 tiles (`tiles_for`), each tile saved with the boxes inside it (clipped; kept when at least half is visible). People the file doesn't box (spectators, referees, staff) are background, which is what should teach the model to ignore them. About 3,900 train tiles (on a few frames, 26 of 30 tiles were kept), 400 valid and 400 test, in RF-DETR's Roboflow layout.
+- **Splits:** stretches of the four minutes with 8-second gaps: train 0:00–2:24 (every 8th frame, 450 frames), valid 2:32–3:12 (40), test 3:20–3:59 (40). The benchmark clip (38:00–39:40) is a further test and is never trained on. The checkpoint is chosen on `valid`; `test` is used once, by `eval_boxes.py`.
+- **Model:** RF-DETR small from the COCO weights, the head replaced by one class (`player`), 512 px input, batch 8 × accumulation 2, learning rate 1e-4, early stopping. RF-DETR realigns its head to a checkpoint's class count on load, so the fine-tuned file loads like any other.
+- **Ball:** the labels have none, so a fine-tuned model would lose it. The detector therefore runs two models: people from the fine-tuned one, the ball from the COCO one (`TiledDetector(weights=...)`).
+- **Checking it:** `eval_boxes.py` scores pre-trained and fine-tuned side by side on the test frames (precision and recall at IoU 0.5 and 0.75, raw and after the pitch filter), independent of our calibration. On two test frames the pre-trained model gives recall 98% at IoU 0.5 (91% at 0.75) but precision only 43% (73% on the pitch), so precision is where a gain should show. Then `VIDEO_TAG=_ft` runs the whole pipeline on the benchmark clip into separate files (`117093-38min_ft.*`) so the two benchmarks compare directly.
+- **Caveats:** one match, one camera, four minutes of labels, so this adapts the model to this pitch and does not make it general. Referees and staff count as false positives for both models in the box check, because the file doesn't box them.
+- **Not tested here:** training needs the `rfdetr[train]` extras (PyTorch Lightning and COCO-evaluation packages), which aren't installed on this organisation laptop, so only the data builder, the evaluation and the option names were run here (the builder on a few frames, the evaluation on two, the options accepted by RF-DETR's `TrainConfig`). The guide starts with a one-epoch smoke run.
+
+### Later
+
+- **Fine-tuning** (built, not yet run; see the next section). Azure ML GPU quota can't be requested from this account (the request is refused: Austin lacks a support role on the subscription), so it runs on Austin's own GPU machine, with the run logged to Azure ML afterwards.
+- **Serving:** CPU detection in a container on Azure Container Apps; clips are processed ahead of time, so speed isn't critical.
+- A `match_meta` for video matches, so the Interpreter can run on video events; and the Interpreter on SoccerTrack's ground-truth events, as a check on real data.
 
 ### Rules
 
