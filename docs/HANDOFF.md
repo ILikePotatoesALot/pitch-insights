@@ -41,7 +41,7 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 140 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 150 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -80,7 +80,7 @@ npm run dev
 
 Then open http://localhost:5173. In Claude Code, both servers are also set up in `C:\Users\austin\.claude\launch.json` as `pitch-replay-server` and `pitch-frontend`. If port 8000 is taken (for example by another session's server), the replay server moves to 8001; use `pitch-frontend-8001` (port 5174), which points the app at 8001 through `PITCH_API`. The replay server doesn't reload, so restart it after backend changes.
 
-**Memory embeddings** (needs the Foundry values in `.env`; embeds only descriptions not already stored, so re-running costs nothing when nothing changed). Run it before the stored commentary whenever the moments or their descriptions change:
+**Memory embeddings** (needs the Foundry values in `.env`; embeds only descriptions not already stored, so re-running costs nothing when nothing changed). The files record the deployment the vectors came from, and a changed `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` embeds everything again even if the cache is complete. The three sample files don't record it yet (they were made before it was stored): the next run stamps them without calling the model. Run it before the stored commentary whenever the moments or their descriptions change:
 
 ```
 cd backend

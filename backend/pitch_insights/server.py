@@ -4,7 +4,7 @@
 
 GET  /api/matches                list of demo matches in samples/
 GET  /api/matches/{name}         that match's match_meta
-WS   /ws/replay/{name}?speed=20&from=0&lang=en
+WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0
 
 The WebSocket sends, in order:
   {"type": "meta", "meta": ..., "commentary": {...}, "languages": {...}, "lang": "de"}
@@ -20,13 +20,15 @@ The WebSocket sends, in order:
   {"type": "state", "state": ...}                       about once a second
   {"type": "end"}
 The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"} or {"cmd": "resume"}.
-To seek, it reconnects with a different `from` minute.
+To seek, it reconnects with a different `from` minute, or `at` (match seconds, which wins when both are
+given): a minute on the broadcast clock can say 47:00 of the second half but not 45+2 of the first.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 from pathlib import Path
 
@@ -127,7 +129,14 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     await ws.send_json({"type": "meta", "meta": meta, "commentary": commentary_info(stored),
                         "languages": languages, "lang": lang})
 
-    start = start_seconds(events, from_minute) if from_minute > 0 else 0.0
+    try:  # exact match seconds: a reconnect that must land on the same second, which a minute can't
+        at = float(ws.query_params["at"]) if "at" in ws.query_params else None  # (no `from` for 45+2')
+    except ValueError:
+        at = None
+    if at is not None and math.isfinite(at):
+        start = max(0.0, at)
+    else:
+        start = start_seconds(events, from_minute) if from_minute > 0 else 0.0
     times = match_seconds(events)
     first = next((i for i, t in enumerate(times) if t >= start), len(events))
     for ev in events[:first]:

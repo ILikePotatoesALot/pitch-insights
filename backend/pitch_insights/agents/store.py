@@ -45,7 +45,8 @@ def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
     rec = stored["moments"].get(moment["id"])
     if not rec or rec.get("input_hash") != input_hash(moment, meta):
         return moment
-    return moment | {"commentary": rec}
+    # A draft kept as `pending` hasn't passed the safety check: it never leaves the server.
+    return moment | {"commentary": {k: v for k, v in rec.items() if k != "pending"}}
 
 
 def summarise(records: list[dict]) -> dict:

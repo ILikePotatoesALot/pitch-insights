@@ -83,3 +83,28 @@ def test_replay_adds_memory_from_stored_vectors():
             pass
     m = next(m for m in msg["moments"] if m["id"] == "M-23")  # Madekuta's second goal, at 61'
     assert any(f["kind"] == "memory" and f["value"].get("moment_id") for f in m["facts"])
+
+
+def test_reconnect_at_match_seconds_stays_in_first_half_stoppage_time():
+    """A language change in first-half stoppage time reconnects at the same second. `from` is a
+    broadcast minute, where anything over 45 means the second half, so it can't say 45+2."""
+    from pitch_insights.generator.io import read_match
+    from pitch_insights.server import SAMPLES
+
+    _, events = read_match(SAMPLES / "comeback-POT-CAR.jsonl")
+    first_half_end = max(e["t"] for e in events if e["period"] == 1)
+    at = first_half_end - 60
+    assert at > 45 * 60  # the sample has stoppage time, so this is after 45:00
+    with client.websocket_connect(f"/ws/replay/comeback-POT-CAR?speed=0&at={at}") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        catchup = ws.receive_json()
+        assert catchup["type"] == "catchup" and catchup["state"]["period"] == 1
+        assert catchup["state"]["match_minute"] > 45  # not rewound to 45:00
+        first = ws.receive_json()
+        assert first["type"] == "event" and first["event"]["period"] == 1 and first["event"]["t"] >= at
+
+
+def test_a_bad_at_value_falls_back_to_from():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0&from=abc&at=soon") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        assert ws.receive_json()["event"]["seq"] == 1
