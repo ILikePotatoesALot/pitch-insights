@@ -9,6 +9,7 @@ drives. Chosen 22 Oct from the BAS events (see docs/DESIGN.md, "Video path").
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -31,15 +32,21 @@ BAS = SOURCE / f"{MATCH}_12_class_events.json"
 WORK = ROOT / "data" / "video" / MATCH  # git-ignored intermediate files
 GSR_CLIP = WORK / "gsr_clip.jsonl"
 CALIB_PAIRS = WORK / "calib_pairs.json"
-DETECTIONS = WORK / "detections.jsonl"
+# A run with other detector weights (fine-tuned) sets VIDEO_TAG, for example "_ft", so every file it
+# makes sits next to the baseline's instead of replacing it.
+TAG = os.environ.get("VIDEO_TAG", "")
+DETECTIONS = WORK / f"detections{TAG}.jsonl"
+DETECTOR_META = WORK / f"detections{TAG}.meta.json"  # which weights made them
 
-DETECTIONS_CALIB = WORK / "detections_calib.jsonl"
+DETECTIONS_CALIB = WORK / f"detections_calib{TAG}.jsonl"
 
 # Small outputs kept in git. Not in samples/ itself: the replay server and the
 # commentary scripts treat every samples/*.jsonl as a demo match.
 SAMPLES = ROOT / "samples" / "video"
-STEM = f"{MATCH}-38min"
+BASELINE_STEM = f"{MATCH}-38min"  # the pre-trained run, whatever VIDEO_TAG is
+STEM = f"{BASELINE_STEM}{TAG}"
 CALIBRATION = SAMPLES / f"{STEM}.calibration.json"
+BASELINE_CALIBRATION = SAMPLES / f"{BASELINE_STEM}.calibration.json"  # fitted before the clip, on the baseline
 FRAMES_OUT = SAMPLES / f"{STEM}.frames.jsonl"
 EVENTS_OUT = SAMPLES / f"{STEM}.events.jsonl"
 BENCHMARK = SAMPLES / f"{STEM}.benchmark.json"

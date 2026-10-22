@@ -36,6 +36,14 @@ BALL_MAX_SPEED = 30.0  # m/s, for following the ball from frame to frame
 BALL_LOST_AFTER_S = 2.0
 
 
+def detector_meta() -> dict:
+    """Which weights made the detections. The baseline's were made before the sidecar existed, on a CPU."""
+    if clip.DETECTOR_META.exists():
+        return json.loads(clip.DETECTOR_META.read_text(encoding="utf-8"))
+    return {"model": "RF-DETR small (rfdetr 1.11.2), COCO weights as released, no fine-tuning",
+            "weights": None, "fine_tuned": False, "device": "CPU"}
+
+
 def load_rows(path) -> list[dict]:
     """JSON Lines sorted by frame; a half-written last line (an interrupted run) is skipped."""
     return sorted(clip.read_jsonl(path), key=lambda r: r["frame"])
@@ -223,9 +231,8 @@ def main() -> None:
     bench = {
         "clip": {"match": clip.MATCH, "half": 1, "from": "38:00.0", "to": "39:40.0", "frames": len(rows),
                  "fps_processed": clip.FPS / clip.STRIDE},
-        "detector": {"model": "RF-DETR small (rfdetr 1.11.2), COCO weights as released, no fine-tuning",
-                     "tiles": "5 x 2 over rows 90-790, 96 px overlap", "person_min_score": clip.PERSON_MIN_SCORE,
-                     "device": "CPU"},
+        "detector": detector_meta() | {"tiles": "5 x 2 over rows 90-790, 96 px overlap",
+                                       "person_min_score": clip.PERSON_MIN_SCORE},
         "calibration": json.loads(clip.CALIBRATION.read_text(encoding="utf-8"))["held_out_by_degree"],
         "detections_on_pitch": raw_score.summary(),
         "tracked_players": out_score.summary() | {

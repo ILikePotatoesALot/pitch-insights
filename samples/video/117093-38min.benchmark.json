@@ -9,9 +9,11 @@
  },
  "detector": {
   "model": "RF-DETR small (rfdetr 1.11.2), COCO weights as released, no fine-tuning",
+  "weights": null,
+  "fine_tuned": false,
+  "device": "CPU",
   "tiles": "5 x 2 over rows 90-790, 96 px overlap",
-  "person_min_score": 0.3,
-  "device": "CPU"
+  "person_min_score": 0.3
  },
  "calibration": {
   "3": {
@@ -137,6 +139,6 @@
   "detect_seconds_per_frame_mean": 7.7,
   "detect_seconds_per_frame_median": 7.29,
   "detect_minutes_total": 64.1,
-  "process_seconds": 2.1
+  "process_seconds": 1.5
  }
 }

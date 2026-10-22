@@ -13,6 +13,9 @@ from pydantic import ValidationError
 from pitch_insights.events.schema import Frame, display_clock, dump
 from pitch_insights.video.bench import DetectionScore, event_recall, match_points
 from pitch_insights.video.events import Moment, PlayerAt, derive, to_messages
+from pitch_insights.video.mot import (
+    DEFAULT_SPLIT, BoxScore, CocoBuilder, TimeSplit, clip_to_tile, load_mot,
+)
 from pitch_insights.video.soccertrack import (
     from_our_frame, iter_gsr, iter_top_level, parse_bas, to_our_frame,
 )
@@ -385,3 +388,66 @@ def test_frame_message_rejects_positions_off_the_pitch():
                                                (1, 2705, ("45+1'", 45)), (2, 60, ("47'", 47))])
 def test_display_clock(period, t, expected):
     assert display_clock(period, t) == expected
+
+
+# ------------------------------------------------------------- MOT boxes and fine-tuning data
+
+def test_load_mot_names_the_bad_line(tmp_path):
+    p = tmp_path / "mot.txt"
+    p.write_text("0,1,100.5,200.0,20.0,50.0\n1,2,300.0\n")
+    with pytest.raises(ValueError, match="line 2"):
+        load_mot(p)
+
+
+def test_load_mot_converts_to_corner_boxes_and_one_based_video_frames(tmp_path):
+    p = tmp_path / "mot.txt"
+    p.write_text("0,1,100.5,200.0,20.0,50.0,-1,-1,-1,-1\n0,2,300.0,210.0,16.0,44.0,-1,-1,-1,-1\n\n5,1,110.0,200.0,20.0,50.0,-1,-1,-1,-1\n")
+    boxes = load_mot(p)
+    assert sorted(boxes) == [1, 6]  # MOT frame 0 is video frame 1
+    assert boxes[1] == [(100.5, 200.0, 120.5, 250.0), (300.0, 210.0, 316.0, 254.0)]
+
+
+def test_default_split_has_gaps_and_no_overlap():
+    s = DEFAULT_SPLIT.as_dict()
+    assert len(s["train"]) == 450 and len(s["valid"]) == 40 and len(s["test"]) == 40
+    assert max(s["train"]) + 200 <= min(s["valid"]) and max(s["valid"]) + 200 <= min(s["test"])
+    assert max(s["test"]) <= 5976  # the file's last frame
+    with pytest.raises(ValueError, match="apart"):
+        TimeSplit(train=range(1, 100), valid=range(50, 60), test=range(400, 410))  # overlap
+    with pytest.raises(ValueError, match="apart"):
+        TimeSplit(train=range(1, 101, 10), valid=range(200, 260, 10), test=range(500, 510))  # touching: 91 -> 200
+    with pytest.raises(ValueError, match="empty"):
+        TimeSplit(train=range(0), valid=range(500, 510), test=range(900, 910))
+    TimeSplit(train=range(1, 101, 10), valid=range(300, 310), test=range(600, 610))  # gaps of 200 or more are fine
+
+
+@pytest.mark.parametrize("box,expected", [
+    ((120, 120, 140, 170), (20, 20, 40, 70)),  # fully inside: shifted into tile coordinates
+    ((90, 120, 110, 170), (0, 20, 10, 70)),  # half inside: kept, clipped
+    ((95, 120, 105, 170), (0, 20, 5, 70)),  # exactly half inside: kept
+    ((98, 120, 118, 170), (0, 20, 18, 70)),  # 90% inside
+    ((60, 120, 102, 170), None),  # 5% inside: a sliver, dropped
+    ((500, 500, 520, 540), None),  # outside
+])
+def test_clip_to_tile(box, expected):
+    assert clip_to_tile(box, (100, 100, 400, 300)) == expected
+
+
+def test_coco_builder_layout():
+    b = CocoBuilder()
+    i = b.add_image("a.jpg", 896, 398, [(10, 20, 30, 70)])
+    b.add_image("b.jpg", 896, 398, [])  # an empty tile is a valid negative example
+    d = b.to_dict()
+    assert i == 1 and [im["id"] for im in d["images"]] == [1, 2] and len(d["annotations"]) == 1
+    assert d["annotations"][0]["bbox"] == [10, 20, 20, 50] and d["annotations"][0]["area"] == 1000
+    assert d["categories"] == [{"id": 1, "name": "player"}]
+
+
+def test_box_score_greedy_matching():
+    s = BoxScore(iou=0.5)
+    truth = [(0, 0, 10, 20), (50, 0, 60, 20)]
+    predicted = [((0, 1, 10, 21), 0.9), ((1, 0, 11, 20), 0.6), ((200, 0, 210, 20), 0.8)]  # one match, a duplicate, a stray
+    s.add_image(predicted, truth)
+    assert (s.tp, s.fp, s.fn) == (1, 2, 1)
+    out = s.summary()
+    assert out["precision"] == pytest.approx(1 / 3) and out["recall"] == pytest.approx(0.5)

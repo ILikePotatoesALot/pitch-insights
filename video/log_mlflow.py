@@ -94,10 +94,14 @@ def main() -> None:
     bench = json.loads(clip.BENCHMARK.read_text(encoding="utf-8"))
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment(EXPERIMENT)
-    with mlflow.start_run(run_name=f"{clip.STEM}-rfdetr-small-pretrained") as run:
-        mlflow.set_tags({"match": clip.MATCH, "source": "SoccerTrack v2 (CC BY 4.0)", "stage": "pre-trained"})
+    detector = bench["detector"]
+    stage = "finetuned" if detector["fine_tuned"] else "pretrained"
+    with mlflow.start_run(run_name=f"{clip.STEM}-rfdetr-small-{stage}") as run:
+        mlflow.set_tags({"match": clip.MATCH, "source": "SoccerTrack v2 (CC BY 4.0)",
+                         "stage": "fine-tuned" if detector["fine_tuned"] else "pre-trained"})
         mlflow.log_params({
-            "model": "rf-detr-small", "weights": "COCO, as released", "fine_tuned": False,
+            "model": "rf-detr-small", "weights": detector["weights"] or "COCO, as released",
+            "fine_tuned": detector["fine_tuned"], "device": detector["device"],
             "tiles": "5x2 rows 90-790 overlap 96", "person_min_score": clip.PERSON_MIN_SCORE,
             "ball_min_score": clip.BALL_MIN_SCORE, "fps_processed": clip.FPS / clip.STRIDE,
             "clip": f"{bench['clip']['from']}-{bench['clip']['to']}", "calibration_degree":
