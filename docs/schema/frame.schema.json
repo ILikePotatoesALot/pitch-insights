@@ -48,6 +48,7 @@
               "type": "null"
             }
           ],
+          "default": null,
           "description": "None when the team isn't known (referees, unclassified)",
           "title": "Team Id"
         },
@@ -87,7 +88,6 @@
       },
       "required": [
         "id",
-        "team_id",
         "x",
         "y",
         "confidence"
@@ -162,6 +162,7 @@
           "type": "null"
         }
       ],
+      "default": null,
       "description": "None when the ball isn't detected"
     }
   },
@@ -172,8 +173,7 @@
     "t",
     "clock",
     "ref_team_id",
-    "players",
-    "ball"
+    "players"
   ],
   "title": "Frame",
   "type": "object"

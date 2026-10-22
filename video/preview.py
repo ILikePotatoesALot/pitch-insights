@@ -26,8 +26,8 @@ OUT = clip.WORK / "preview.mp4"
 
 def main() -> None:
     cal = Calibration.load(clip.CALIBRATION)
-    frames = [json.loads(line) for line in clip.FRAMES_OUT.read_text(encoding="utf-8").splitlines()]
-    gt = {json.loads(line)["frame"]: json.loads(line)["objects"] for line in clip.GSR_CLIP.read_text(encoding="utf-8").splitlines()}
+    frames = clip.read_jsonl(clip.FRAMES_OUT)
+    gt = {row["frame"]: row["objects"] for row in clip.read_jsonl(clip.GSR_CLIP)}
     by_frame = {round(f["t"] * clip.FPS) + 1: f for f in frames}
     outline = cal.pitch_outline().astype(np.int32)
 

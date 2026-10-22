@@ -225,7 +225,7 @@ FRAME_SCHEMA_VERSION = "1.1"
 
 class FramePlayer(_Strict):
     id: str = Field(description="Stable within the match, e.g. a tracker ID such as 'L-t12'")
-    team_id: str | None = Field(description="None when the team isn't known (referees, unclassified)")
+    team_id: str | None = Field(None, description="None when the team isn't known (referees, unclassified)")
     x: X = Field(description="In the attacking frame of the player's own team (of `ref_team_id` when team_id is None)")
     y: Y
     speed: float | None = Field(None, ge=0, description="m/s, smoothed over about 0.5 s")
@@ -250,7 +250,7 @@ class Frame(_Strict):
     clock: str
     ref_team_id: str = Field(description="The team whose attacking frame the ball and teamless players use")
     players: list[FramePlayer]
-    ball: FrameBall | None = Field(description="None when the ball isn't detected")
+    ball: FrameBall | None = Field(None, description="None when the ball isn't detected")
 
     model_config = ConfigDict(extra="forbid", frozen=True, populate_by_name=True)
 

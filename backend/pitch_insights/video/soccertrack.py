@@ -64,9 +64,10 @@ def attacks_plus_x(side: str) -> bool:
 class _Stream:
     """A growing text buffer over a file, for `json.JSONDecoder.raw_decode`."""
 
-    def __init__(self, f: TextIO, chunk_size: int) -> None:
+    def __init__(self, f: TextIO, chunk_size: int, max_value_chars: int) -> None:
         self.f = f
         self.chunk_size = chunk_size
+        self.max_value_chars = max_value_chars
         self.buf = ""
         self.pos = 0
         self.eof = False
@@ -106,7 +107,10 @@ class _Stream:
             try:
                 obj, end = decoder.raw_decode(self.buf, self.pos)
             except json.JSONDecodeError:
-                if self._fill():
+                # Incomplete (read more) or malformed: a value can't be bigger
+                # than the limit, so a bad byte fails here, not after reading
+                # the rest of a multi-gigabyte file into memory.
+                if len(self.buf) - self.pos <= self.max_value_chars and self._fill():
                     continue
                 raise
             # A number can end exactly at the buffer's end and still go on.
@@ -116,15 +120,18 @@ class _Stream:
             return obj
 
 
-def iter_top_level(path: str | Path, chunk_size: int = 1 << 20) -> Iterator[tuple[str, Any]]:
+def iter_top_level(
+    path: str | Path, chunk_size: int = 1 << 20, max_value_chars: int = 64 << 20,
+) -> Iterator[tuple[str, Any]]:
     """Stream a JSON object's top-level members.
 
     Yields `(key, item)` for each item of a top-level array, and `(key, value)`
     for any other value, so a multi-gigabyte array is never held in memory.
+    A single item or value larger than `max_value_chars` is treated as an error.
     """
     decoder = json.JSONDecoder()
     with open(path, encoding="utf-8") as f:
-        s = _Stream(f, chunk_size)
+        s = _Stream(f, chunk_size, max_value_chars)
         s.expect("{")
         while True:
             ch = s.peek()

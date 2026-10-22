@@ -96,21 +96,20 @@ class PitchTracker:
         tr.history.append((t, p))
 
 
-def smoothed_speed(history: list[tuple[float, Point]], t: float, half_window: float = 0.25) -> float | None:
-    """Speed in m/s at time `t`, from the positions about `half_window` s either side."""
+def smoothed_speeds(history: list[tuple[float, Point]], half_window: float = 0.25) -> dict[float, float | None]:
+    """Speed in m/s at each time in a track's history (in time order), from the
+    positions up to `half_window` s either side; None where there is no neighbour."""
     times = [h[0] for h in history]
-    if t not in times:
-        return None
-    i = times.index(t)
-    lo = i
-    while lo > 0 and t - times[lo - 1] <= half_window + 1e-9:
-        lo -= 1
-    hi = i
-    while hi < len(times) - 1 and times[hi + 1] - t <= half_window + 1e-9:
-        hi += 1
-    if hi == lo:
-        return None
-    return math.dist(history[hi][1], history[lo][1]) / (times[hi] - times[lo])
+    out: dict[float, float | None] = {}
+    lo = hi = 0
+    for i, t in enumerate(times):
+        while t - times[lo] > half_window + 1e-9:
+            lo += 1
+        hi = max(hi, i)
+        while hi < len(times) - 1 and times[hi + 1] - t <= half_window + 1e-9:
+            hi += 1
+        out[t] = None if hi == lo else math.dist(history[hi][1], history[lo][1]) / (times[hi] - times[lo])
+    return out
 
 
 FAR_STRIP_Y = -27.0  # SoccerTrack y; the far touchline is at -34

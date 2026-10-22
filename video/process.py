@@ -25,7 +25,7 @@ from pitch_insights.events.schema import Frame, display_clock
 from pitch_insights.video.bench import DetectionScore, event_recall
 from pitch_insights.video.events import Moment, PlayerAt, derive, to_messages
 from pitch_insights.video.soccertrack import load_bas, to_our_frame
-from pitch_insights.video.track import PitchTracker, smoothed_speed, spectator_tracks
+from pitch_insights.video.track import PitchTracker, smoothed_speeds, spectator_tracks
 
 MATCH_RADIUS_M = 3.0
 TEAMS = {"left": "L", "right": "R"}
@@ -37,8 +37,8 @@ BALL_LOST_AFTER_S = 2.0
 
 
 def load_rows(path) -> list[dict]:
-    with open(path, encoding="utf-8") as f:
-        return sorted((json.loads(line) for line in f if line.strip()), key=lambda r: r["frame"])
+    """JSON Lines sorted by frame; a half-written last line (an interrupted run) is skipped."""
+    return sorted(clip.read_jsonl(path), key=lambda r: r["frame"])
 
 
 def bottom_middle(box) -> tuple[float, float]:
@@ -65,6 +65,9 @@ def assign_teams(colours_by_track: dict[int, list[list[float]]], x_by_track: dic
         for c in cols:
             samples.append(c)
             owners.append(tid)
+    if len(samples) < COLOUR_GROUPS:
+        print(f"only {len(samples)} shirt colours: no teams assigned")
+        return {}
     data = np.array(samples, dtype=np.float32)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.1)
     cv2.setRNGSeed(7)
@@ -77,6 +80,9 @@ def assign_teams(colours_by_track: dict[int, list[list[float]]], x_by_track: dic
     for tid, lab in track_label.items():
         weight[lab] += len(colours_by_track[tid])
     teams = [lab for lab, _ in weight.most_common(2)]
+    if len(teams) < 2:
+        print("every track fell in one colour group: no teams assigned")
+        return {}
     mean_x = {lab: mean(x for tid, l in track_label.items() if l == lab for x in x_by_track[tid]) for lab in teams}
     left = min(teams, key=lambda lab: mean_x[lab])
     side = {left: "L", next(lab for lab in teams if lab != left): "R"}
@@ -150,6 +156,7 @@ def main() -> None:
     per_frame = [(fr, t, [p for p in people if p["track"] not in spectators], balls)
                  for fr, t, people, balls in per_frame]
     history = {tid: h for tid, h in history.items() if tid not in spectators}
+    speed = {tid: smoothed_speeds(h) for tid, h in history.items()}
 
     colours, xs = defaultdict(list), defaultdict(list)
     for _, t, people, _ in per_frame:
@@ -171,7 +178,7 @@ def main() -> None:
         for p in people:
             team = team_of.get(p["track"])
             x, y = clamp(*to_our_frame(*p["xy"], plus[team or REF_TEAM]))
-            sp = smoothed_speed(history[p["track"]], t)
+            sp = speed[p["track"]].get(t)
             players.append({
                 "id": f"{team or 'X'}-t{p['track']}", "team_id": team, "x": round(x, 1), "y": round(y, 1),
                 "speed": round(sp, 1) if sp is not None and sp <= 12 else None, "confidence": round(p["score"], 2),
@@ -180,7 +187,7 @@ def main() -> None:
                 at.append(PlayerAt(f"{team}-t{p['track']}", team, p["xy"]))
         ball_msg = None
         if ball:
-            bx, by = clamp(*to_our_frame(*ball["xy"], True))
+            bx, by = clamp(*to_our_frame(*ball["xy"], plus[REF_TEAM]))
             ball_msg = {"x": round(bx, 1), "y": round(by, 1), "confidence": round(ball["score"], 2)}
         clock, _ = display_clock(1, t)
         # Every field kept, nulls included: `team_id` and `ball` are null by design.

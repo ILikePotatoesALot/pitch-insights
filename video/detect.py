@@ -38,10 +38,7 @@ def main() -> None:
     args = ap.parse_args()
     out = output_for(args.which)
     out.parent.mkdir(parents=True, exist_ok=True)
-    done: set[int] = set()
-    if out.exists():
-        with open(out, encoding="utf-8") as f:
-            done = {json.loads(line)["frame"] for line in f if line.strip()}
+    done = {row["frame"] for row in clip.read_jsonl(out, repair=True)}
     todo = [fr for fr in frames_for(args.which) if fr not in done]
     print(f"{len(todo)} frames to detect ({len(done)} already done)", flush=True)
     if not todo:

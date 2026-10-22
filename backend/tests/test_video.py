@@ -10,14 +10,14 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from pitch_insights.events.schema import Frame, display_clock
+from pitch_insights.events.schema import Frame, display_clock, dump
 from pitch_insights.video.bench import DetectionScore, event_recall, match_points
 from pitch_insights.video.events import Moment, PlayerAt, derive, to_messages
 from pitch_insights.video.soccertrack import (
     from_our_frame, iter_gsr, iter_top_level, parse_bas, to_our_frame,
 )
 from pitch_insights.video.tiles import Detection, make_tiles, merge, shift
-from pitch_insights.video.track import PitchTracker, smoothed_speed, spectator_tracks
+from pitch_insights.video.track import PitchTracker, smoothed_speeds, spectator_tracks
 
 
 def _person(image_id, track, side, jersey, x, y, role="player"):
@@ -61,6 +61,15 @@ def test_iter_top_level_streams_array_items_whatever_the_chunk_size(tmp_path, ch
     p.write_text(json.dumps(data, indent=2), encoding="utf-8")
     got = list(iter_top_level(p, chunk_size=chunk))
     assert got == [("a", 12345), ("b", 1), ("b", {"x": [2, 3]}), ("b", "s"), ("c", {"d": None})]
+
+
+def test_iter_top_level_fails_fast_on_a_malformed_item(tmp_path):
+    p = tmp_path / "t.json"
+    p.write_text('{"a": [{"b": 1}, {"b": 2 x}, ' + ", ".join(['{"c": 1}'] * 5000) + "]}", encoding="utf-8")
+    it = iter_top_level(p, chunk_size=16, max_value_chars=64)
+    assert next(it) == ("a", {"b": 1})
+    with pytest.raises(ValueError):
+        next(it)
 
 
 def test_iter_top_level_rejects_a_truncated_file(tmp_path):
@@ -202,11 +211,13 @@ def test_tracker_drops_tracks_after_max_missed():
     assert new != tid
 
 
-def test_smoothed_speed():
-    hist = [(0.0, (0.0, 0.0)), (0.2, (1.0, 0.0)), (0.4, (2.0, 0.0))]
-    assert smoothed_speed(hist, 0.2) == pytest.approx(5.0)
-    assert smoothed_speed(hist, 0.3) is None
-    assert smoothed_speed([(0.0, (0.0, 0.0))], 0.0) is None
+def test_smoothed_speeds():
+    hist = [(0.0, (0.0, 0.0)), (0.2, (1.0, 0.0)), (0.4, (2.0, 0.0)), (2.0, (9.0, 0.0))]
+    sp = smoothed_speeds(hist)
+    assert sp[0.0] == pytest.approx(5.0)  # one-sided at the start
+    assert sp[0.2] == pytest.approx(5.0)  # both neighbours
+    assert sp[2.0] is None  # nothing within 0.25 s
+    assert smoothed_speeds([(0.0, (0.0, 0.0))]) == {0.0: None}
 
 
 def test_spectator_tracks_are_still_people_by_the_far_touchline():
@@ -304,6 +315,13 @@ def test_frame_message_matches_the_design_example():
            "ball": None}
     frame = Frame.model_validate(msg)
     assert frame.model_dump(mode="json", by_alias=True) == msg
+
+
+def test_frame_message_survives_the_wire_helper_that_drops_nulls():
+    frame = Frame.model_validate({"match_id": "m", "source": "video", "period": 1, "t": 0, "clock": "1'",
+                                  "ref_team_id": "L", "ball": None,
+                                  "players": [{"id": "X-t3", "team_id": None, "x": 1, "y": 2, "confidence": 0.5}]})
+    assert Frame.model_validate(dump(frame)) == frame
 
 
 def test_frame_message_rejects_positions_off_the_pitch():

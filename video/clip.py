@@ -8,6 +8,7 @@ drives. Chosen 22 Oct from the BAS events (see docs/DESIGN.md, "Video path").
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -34,8 +35,10 @@ DETECTIONS = WORK / "detections.jsonl"
 
 DETECTIONS_CALIB = WORK / "detections_calib.jsonl"
 
-SAMPLES = ROOT / "samples"  # small outputs kept in git
-STEM = f"video-{MATCH}-38min"
+# Small outputs kept in git. Not in samples/ itself: the replay server and the
+# commentary scripts treat every samples/*.jsonl as a demo match.
+SAMPLES = ROOT / "samples" / "video"
+STEM = f"{MATCH}-38min"
 CALIBRATION = SAMPLES / f"{STEM}.calibration.json"
 FRAMES_OUT = SAMPLES / f"{STEM}.frames.jsonl"
 EVENTS_OUT = SAMPLES / f"{STEM}.events.jsonl"
@@ -52,3 +55,23 @@ def clip_frames() -> range:
 def frame_t(frame: int) -> float:
     """Seconds since the half's video started, for a 1-based frame number."""
     return (frame - 1) / FPS
+
+
+def read_jsonl(path: Path, repair: bool = False) -> list[dict]:
+    """Rows of a JSON Lines file. A half-written last line (a run killed mid-write)
+    is skipped, and with `repair` removed from the file so appending can go on."""
+    if not path.exists():
+        return []
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = []
+    for n, line in enumerate(lines):
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            if n != len(lines) - 1:
+                raise
+            print(f"skipping a half-written last line in {path.name}")
+            if repair:
+                with open(path, "w", encoding="utf-8", newline="\n") as f:
+                    f.writelines(good + "\n" for good in lines[:-1])
+    return rows

@@ -104,7 +104,8 @@ class Calibration:
     def save(self, path: Path, extra: dict | None = None) -> None:
         d = {"to_pitch": self.to_pitch.to_json(), "to_image": self.to_image.to_json(), "margin_m": self.margin_m}
         d.update(extra or {})
-        path.write_text(json.dumps(d, indent=1), encoding="utf-8")
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps(d, indent=1) + "\n")
 
     @classmethod
     def load(cls, path: Path) -> Calibration:

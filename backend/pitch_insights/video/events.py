@@ -18,6 +18,7 @@ import math
 from dataclasses import dataclass
 
 from ..events.schema import PITCH_LENGTH, PITCH_WIDTH, display_clock, dump, event_adapter
+from .soccertrack import to_our_frame
 
 Point = tuple[float, float]
 
@@ -141,8 +142,6 @@ def to_messages(
     Fields video can't see take neutral values: passes are `ground`,
     `open_play`, difficulty 0.5.
     """
-    from .soccertrack import to_our_frame
-
     out = []
     for n, e in enumerate(events):
         plus = attacks_plus_x[e.team]
