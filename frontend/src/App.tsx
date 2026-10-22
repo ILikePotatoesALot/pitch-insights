@@ -41,12 +41,14 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
-  const { meta, aiInfo, languages, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } =
+  const { meta, aiInfo, languages, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek, seekAt } =
     useReplay(name, lang, onEvent, onReset);
   // A new language reconnects from the current moment (not the start of the minute, so nothing replays).
+  // It goes by match seconds, because a minute can't say first-half stoppage time (45+2'). Before the first
+  // state arrives there is no current moment, so the reconnect keeps the jump already made.
   const changeLang = (l: string) => {
-    const m = state?.match_minute ?? 0;
-    seek(state?.period === 1 ? Math.min(m, 45) : m); // first-half stoppage stays in the first half
+    if (state?.period === 1) seekAt(state.match_minute * 60);
+    else if (state) seekAt((firstHalfEnd.current ?? 2700) + (state.match_minute - 45) * 60);
     setLang(l);
   };
 

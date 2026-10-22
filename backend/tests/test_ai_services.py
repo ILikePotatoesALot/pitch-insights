@@ -246,11 +246,31 @@ def test_an_unreachable_safety_service_keeps_the_draft_to_screen_later(match):
     assert ok["status"] == "ok" and ok["casual"] == lines.casual and "pending" not in ok and ok["reason"] is None
 
 
-def test_an_unchecked_stored_line_isnt_downgraded_when_the_service_is_down(match):
+def test_an_unchecked_stored_line_is_hidden_while_the_service_is_down(match):
     meta, moments = match
     goal = [m for m in moments if m["type"] == "goal"][-1]
     old = {"moment_id": goal["id"], "status": "ok", "casual": "a", "analyst": "b", "attempts": 1}
-    assert run(CommentaryDesk(FakeWriter(None), meta, safety=ErrorSafety()).screen(old, goal)) is old
+    hidden = run(CommentaryDesk(FakeWriter(None), meta, safety=ErrorSafety()).screen(old, goal))
+    # Not shown: the plain headline stands in, the old text waits as `pending`.
+    assert hidden["status"] == "fallback" and hidden["casual"] == goal["headline"] + "."
+    assert hidden["analyst"] != "b" and hidden["pending"] == {"casual": "a", "analyst": "b"}
+    assert hidden["reason"].startswith("safety check unavailable")
+    # Still down: left alone. Back up: screened and shown again, without the model.
+    assert run(CommentaryDesk(FakeWriter(None), meta, safety=ErrorSafety()).screen(hidden, goal)) is hidden
+    back = run(CommentaryDesk(FakeWriter(None), meta, safety=FakeSafety(True)).screen(hidden, goal))
+    assert back["status"] == "ok" and (back["casual"], back["analyst"]) == ("a", "b") and "pending" not in back
+
+
+def test_a_pending_draft_never_reaches_the_viewer(match):
+    from pitch_insights.agents.store import input_hash, with_commentary
+
+    meta, moments = match
+    goal = [m for m in moments if m["type"] == "goal"][-1]
+    rec = {"moment_id": goal["id"], "input_hash": input_hash(goal, meta), "status": "fallback",
+           "casual": "headline.", "analyst": "headline.", "pending": {"casual": "unchecked", "analyst": "unchecked"}}
+    shown = with_commentary(goal, {"moments": {goal["id"]: rec}}, meta)["commentary"]
+    assert "pending" not in shown and "unchecked" not in json.dumps(shown)
+    assert "pending" in rec  # the stored record keeps it for the next run
 
 
 def test_network_errors_are_retried():

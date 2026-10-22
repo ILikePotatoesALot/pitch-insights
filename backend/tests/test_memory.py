@@ -297,3 +297,110 @@ def test_memory_for_warns_when_vectors_are_missing(tmp_path, caplog):
     assert agent.embedder.vectors == {} and "memory_vectors_missing" in caplog.text
     path = SAMPLES / "comeback-POT-CAR.jsonl"
     assert memory.memory_for(path, meta).embedder is memory.memory_for(path, meta).embedder  # loaded once
+
+
+# ------------------------------------------------- the stored-vector cache (scripts/embed_moments.py)
+
+
+def _stored(tmp_path, deployment, model="text-embedding-3-small", texts=("a", "b")):
+    path = tmp_path / "x.jsonl"
+    v = [1.0] + [0.0] * (DIMENSIONS - 1)
+    write_vectors(path, model, {t: v for t in texts}, deployment)
+    return load_vectors(path)
+
+
+def _fake_embed(model="text-embedding-3-small"):
+    calls = []
+
+    def embed(texts):
+        calls.append(list(texts))
+        return model, [[0.0, 1.0] + [0.0] * (DIMENSIONS - 2) for _ in texts]
+
+    return embed, calls
+
+
+def test_the_deployment_is_stored_with_the_vectors(tmp_path):
+    assert _stored(tmp_path, "emb-small").deployment == "emb-small"
+    assert json.loads(memory.memory_path(tmp_path / "x.jsonl").read_text(encoding="utf-8"))["deployment"] == "emb-small"
+
+
+def test_an_unchanged_deployment_with_a_complete_cache_embeds_nothing(tmp_path):
+    stored = _stored(tmp_path, "emb-small")
+    embed, calls = _fake_embed()
+    model, n, changed = memory.refresh_vectors(stored, ["a", "b"], "emb-small", embed)
+    assert calls == [] and n == 0 and model == "text-embedding-3-small" and not changed
+
+
+def test_a_changed_deployment_with_a_complete_cache_embeds_everything_again(tmp_path):
+    """The cache is complete, so nothing needs embedding, but the vectors come from another model
+    and can't be compared with the ones the new deployment makes."""
+    stored = _stored(tmp_path, "emb-small")
+    embed, calls = _fake_embed(model="text-embedding-3-large")
+    model, n, changed = memory.refresh_vectors(stored, ["a", "b"], "emb-large", embed)
+    assert calls == [["a", "b"]] and n == 2 and model == "text-embedding-3-large" and changed
+    assert stored.deployment == "emb-large" and stored.vector("a")[1] == 1.0  # the new vectors, not the old
+
+
+def test_a_file_from_before_the_deployment_was_stored_is_kept_and_stamped(tmp_path):
+    stored = _stored(tmp_path, "")  # as the sample files are: no deployment recorded, so no way to tell
+    embed, calls = _fake_embed()
+    _, n, changed = memory.refresh_vectors(stored, ["a", "b"], "emb-small", embed)
+    assert calls == [] and n == 0 and stored.deployment == "emb-small" and not changed
+
+
+def test_force_and_new_texts_still_work(tmp_path):
+    embed, calls = _fake_embed()
+    memory.refresh_vectors(_stored(tmp_path, "emb-small"), ["a", "b"], "emb-small", embed, force=True)
+    assert calls == [["a", "b"]]
+    embed, calls = _fake_embed()
+    stored = _stored(tmp_path, "emb-small")
+    memory.refresh_vectors(stored, ["a", "b", "c"], "emb-small", embed)
+    assert calls == [["c"]] and set(stored.vectors) == {"a", "b", "c"}
+
+
+def test_a_model_that_changed_under_the_same_deployment_redoes_the_lot(tmp_path):
+    stored = _stored(tmp_path, "emb-small")
+    embed, calls = _fake_embed(model="text-embedding-3-large")  # the deployment was re-pointed
+    _, n, changed = memory.refresh_vectors(stored, ["a", "b", "c"], "emb-small", embed)
+    assert calls == [["c"], ["a", "b", "c"]] and n == 3
+
+
+def test_the_embed_script_keeps_a_complete_cache_and_redoes_it_when_the_deployment_changes(tmp_path, monkeypatch, capsys):
+    import importlib.util
+    import shutil
+    import sys
+
+    spec = importlib.util.spec_from_file_location(
+        "embed_moments", Path(__file__).resolve().parents[1] / "scripts" / "embed_moments.py")
+    script = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(script)
+    shutil.copy(SAMPLES / "comeback-POT-CAR.jsonl", tmp_path / "m.jsonl")
+    # A complete cache from before the deployment was stored (the committed sample may be stamped by now).
+    legacy = json.loads((SAMPLES / "comeback-POT-CAR.memory.json").read_text(encoding="utf-8"))
+    legacy.pop("deployment", None)
+    (tmp_path / "m.memory.json").write_text(json.dumps(legacy), encoding="utf-8")
+    monkeypatch.setattr(script, "SAMPLES", tmp_path)
+    monkeypatch.setattr(sys, "argv", ["embed_moments.py"])
+    embeddings = FakeEmbeddings()
+    closed = []
+
+    def run_script(deployment, client_allowed):
+        monkeypatch.setattr(script, "load_settings", lambda: SimpleNamespace(embedding_model=deployment))
+
+        def make_client(settings):
+            assert client_allowed, "nothing needed embedding, so no client should be made"
+            return SimpleNamespace(embeddings=embeddings, close=lambda: closed.append(1))
+
+        monkeypatch.setattr(script, "make_embeddings_client", make_client)
+        assert script.main() == 0
+        return capsys.readouterr().out
+
+    out = run_script("emb-small", client_allowed=False)  # an old file: kept, and stamped
+    assert "0 embedded" in out and load_vectors(tmp_path / "m.jsonl").deployment == "emb-small"
+    out = run_script("emb-small", client_allowed=False)  # same deployment again: still nothing to do
+    assert "0 embedded" in out and not embeddings.calls
+    total = len(load_vectors(tmp_path / "m.jsonl").vectors)
+    out = run_script("emb-large", client_allowed=True)  # a different deployment: everything again
+    assert "embedded everything again" in out and f"{total} embedded" in out
+    assert sum(embeddings.calls) == total and closed == [1]
+    assert load_vectors(tmp_path / "m.jsonl").deployment == "emb-large"

@@ -110,8 +110,10 @@ class CommentaryDesk:
     async def screen(self, record: dict, moment: dict) -> dict:
         """Run the safety check on a stored record that hasn't had one (no model call): a line written
         before the check existed, or a grounded draft kept as `pending` because the service couldn't be
-        reached. A blocked line becomes the plain headline; if the service still can't answer, the record
-        is left as it is, to try again next time."""
+        reached. A blocked line becomes the plain headline. If the service still can't answer, a record that
+        already waits as `pending` is left as it is, and an older line that was never screened is taken out of
+        view too: it becomes the plain headline with its text kept as `pending`, so nothing unchecked is shown
+        and the next run screens it again."""
         if self.safety is None:
             return record
         pending = record.get("pending")
@@ -123,7 +125,11 @@ class CommentaryDesk:
             return record
         res = await self.safety.check(f"{casual}\n{analyst}")
         if res.error:
-            return record
+            if pending:
+                return record  # already the headline, with the draft kept
+            lines = fallback_lines(moment)
+            return record | {"status": "fallback", "casual": lines.casual, "analyst": lines.analyst,
+                             "pending": {"casual": casual, "analyst": analyst}, "reason": res.reason}
         record = {k: v for k, v in record.items() if k != "pending"} | {"safety": res.to_dict()}
         if res.passed:
             return record | {"status": "ok", "casual": casual, "analyst": analyst, "reason": None}
