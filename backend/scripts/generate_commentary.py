@@ -6,8 +6,9 @@
     python scripts/generate_commentary.py --limit 5           # first 5 moments only, printed, not saved
 
 Moments already written from the same facts, by the same provider, model and prompt version, are
-kept, so re-running is cheap. Uses the provider in .env (LLM_PROVIDER). Stops without
-saving if the provider refuses the key, access or deployment.
+kept, so re-running is cheap. Kept lines written before the safety check existed are screened
+by Azure AI Content Safety without calling the model again. Uses the provider in .env
+(LLM_PROVIDER). Stops without saving if the provider refuses the key, access or deployment.
 """
 
 from __future__ import annotations
@@ -21,8 +22,10 @@ from pathlib import Path
 from pitch_insights.agents.desk import CommentaryDesk, ProviderConfigError, file_header, writer_from_settings
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.prompts import input_hash
+from pitch_insights.agents.safety import safety_from_settings
 from pitch_insights.agents.settings import load_settings
 from pitch_insights.agents.store import load_commentary, summarise, write_commentary
+from pitch_insights.agents.tracing import flush_tracing, setup_tracing
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 
@@ -30,10 +33,10 @@ SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 
 
 async def run_match(path: Path, writer, header: dict, force: bool, limit: int | None,
-                    concurrency: int) -> dict:
+                    concurrency: int, safety=None) -> dict:
     meta, events = read_match(path)
     brain = MatchBrain(meta, memory=memory_for(path, meta))
-    desk = CommentaryDesk(writer, meta)
+    desk = CommentaryDesk(writer, meta, safety=safety)
     for ev in events:
         brain.update(ev)
     moments = [m for m in brain.moments if desk.wants(m)][:limit]
@@ -43,9 +46,10 @@ async def run_match(path: Path, writer, header: dict, force: bool, limit: int | 
 
     async def one(m: dict) -> dict:
         kept = old["moments"].get(m["id"]) if reuse else None
-        if (kept and kept["status"] == "ok" and kept.get("input_hash") == input_hash(m, meta)
+        if (kept and (kept["status"] == "ok" or kept.get("pending")) and kept.get("input_hash") == input_hash(m, meta)
                 and kept.get("provider", header["provider"]) == header["provider"]):
-            return kept
+            async with sem:
+                return await desk.screen(kept, m)
         async with sem:
             return await desk.comment(m)
 
@@ -72,7 +76,11 @@ async def main() -> int:
     logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING, format="%(message)s")
 
     settings = load_settings()
+    tracing = setup_tracing(settings, "pitch-insights-commentary")
     writer = writer_from_settings(settings)
+    safety = safety_from_settings(settings)
+    if safety is None:
+        print("Content Safety isn't configured in .env, so no line is screened; see .env.example")
     header = file_header(writer)
     paths = [SAMPLES / f"{n}.jsonl" for n in args.names] if args.names else sorted(SAMPLES.glob("*.jsonl"))
     missing = [p.name for p in paths if not p.exists()]
@@ -81,12 +89,16 @@ async def main() -> int:
         return 1
     try:
         for path in paths:
-            await run_match(path, writer, header, args.force, args.limit, settings.concurrency)
+            await run_match(path, writer, header, args.force, args.limit, settings.concurrency, safety)
     except ProviderConfigError as e:
         print(f"Stopped, nothing saved for {path.stem}: {e}")
         return 2
     finally:
         await writer.aclose()
+        if safety is not None:
+            await safety.aclose()
+        if tracing:
+            flush_tracing()
     return 0
 
 

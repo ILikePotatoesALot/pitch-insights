@@ -29,6 +29,13 @@ class AgentSettings:
     max_tokens: int = 220        # rate limits count max_tokens, so keep it near the real output size
     temperature: float = 0.4
     concurrency: int = 3         # model calls in flight at once, to avoid bursts that trip rate limits
+    safety_endpoint: str = ""    # Azure AI Content Safety
+    safety_key: str = field(default="", repr=False)
+    safety_block_at: int = 2     # severity (0, 2, 4, 6) at which a line is blocked
+    translator_endpoint: str = "https://api.cognitive.microsofttranslator.com/"
+    translator_key: str = field(default="", repr=False)
+    translator_region: str = "global"
+    appinsights: str = field(default="", repr=False)  # Application Insights connection string, for tracing
 
     @property
     def configured(self) -> bool:
@@ -74,4 +81,11 @@ def load_settings(env_file: Path | None = ENV_FILE) -> AgentSettings:
         max_tokens=_num(env, "AGENT_MAX_TOKENS", 220, int, 16, 4096),
         temperature=_num(env, "AGENT_TEMPERATURE", 0.4, float, 0, 2),
         concurrency=_num(env, "AGENT_CONCURRENCY", 3, int, 1, 32),
+        safety_endpoint=env.get("AZURE_CONTENT_SAFETY_ENDPOINT", ""),
+        safety_key=env.get("AZURE_CONTENT_SAFETY_KEY", ""),
+        safety_block_at=_num(env, "SAFETY_BLOCK_AT", 2, int, 2, 6),
+        translator_endpoint=env.get("AZURE_TRANSLATOR_ENDPOINT", "https://api.cognitive.microsofttranslator.com/"),
+        translator_key=env.get("AZURE_TRANSLATOR_KEY", ""),
+        translator_region=env.get("AZURE_TRANSLATOR_REGION", "global"),
+        appinsights=env.get("APPLICATIONINSIGHTS_CONNECTION_STRING", ""),
     )

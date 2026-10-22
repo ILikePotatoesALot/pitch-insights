@@ -1,0 +1,2144 @@
+{
+ "service": "azure-translator",
+ "api_version": "3.0",
+ "version": "2026-10-22.2",
+ "source": "en",
+ "languages": [
+  "es",
+  "fr",
+  "de",
+  "nl",
+  "zh-Hans"
+ ],
+ "machine_translated": true,
+ "kept_english": {
+  "es": 0,
+  "fr": 0,
+  "de": 0,
+  "nl": 0,
+  "zh-Hans": 1
+ },
+ "moments": {
+  "M-1": {
+   "source_hash": "0d037f2e63aeba41",
+   "es": {
+    "headline": "Madekuta abre el marcador",
+    "fact.0": "Ahora está Potato 1–0 Carrot.",
+    "fact.1": "Las probabilidades de ganar de Potato pasaron del 49% al 85%.",
+    "fact.2": "Asistido por Sakinelli.",
+    "fact.3": "Una gran posibilidad, xG 0,59.",
+    "fact.4": "Su tercer gol de la temporada.",
+    "fact.5": "Potato jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.6": "La calificación en directo de Madekuta es de 6,0.",
+    "fact.7": "Disparos hasta ahora: Potato 1 (xG 0,59), Carrot 0 (xG 0,00).",
+    "fact.8": "Madekuta ahora tiene 25 goles para Potato.",
+    "casual": "Madekuta anotó pronto para Potato, poniendo el marcador 1–0 contra Carrot.",
+    "analyst": "El gol de Madekuta, asistido por Sakinelli, le da a Potato una ventaja de 1–0 y aumenta su probabilidad de victoria del 49% al 85%. Una gran probabilidad con xG 0,59, marca el tono desde el principio."
+   },
+   "fr": {
+    "headline": "Madekuta ouvre le score",
+    "fact.0": "C’est maintenant Potato 1–0 Carrot.",
+    "fact.1": "Les chances de victoire de Potato sont passées de 49 % à 85 %.",
+    "fact.2": "Assisté par Sakinelli.",
+    "fact.3": "Une grande chance, xG 0,59.",
+    "fact.4": "Son 3e but de la saison.",
+    "fact.5": "Potato joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.6": "Madekuta en direct est de 6,0.",
+    "fact.7": "Tirs jusqu’à présent : Potato 1 (xG 0,59), Carrot 0 (xG 0,00).",
+    "fact.8": "Madekuta compte maintenant 25 buts pour Potato.",
+    "casual": "Madekuta marque tôt pour Potato, portant le score à 1–0 contre Carrot.",
+    "analyst": "Madekuta but, assisté par Sakinelli, donne à Potato une avance de 1–0 et augmente leur probabilité de victoire de 49 % à 85 %. Une grande chance avec xG 0,59, elle donne le ton dès le début."
+   },
+   "de": {
+    "headline": "Madekuta eröffnet die Punktewertung",
+    "fact.0": "Jetzt steht es Potato 1:0 Carrot.",
+    "fact.1": "Die Gewinnchance von Potato stieg von 49 % auf 85 %.",
+    "fact.2": "Unterstützt von Sakinelli.",
+    "fact.3": "Eine große Chance, xG 0,59.",
+    "fact.4": "Sein drittes Saisontor.",
+    "fact.5": "Potato spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.6": "Madekuta hat eine Live-Bewertung von 6,0.",
+    "fact.7": "Bisherige Aufnahmen: Potato 1 (xG 0,59), Carrot 0 (xG 0,00).",
+    "fact.8": "Madekuta hat jetzt 25 Tore für Potato.",
+    "casual": "Madekuta trifft früh für Potato und macht damit 1:0 gegen Carrot.",
+    "analyst": "Das Tor von Madekuta, unterstützt von Sakinelli, verschafft Potato eine 1:0-Führung und erhöht ihre Gewinnwahrscheinlichkeit von 49 % auf 85 %. Eine große Chance mit xG 0,59, das setzt früh den Ton."
+   },
+   "nl": {
+    "headline": "Madekuta opent de score",
+    "fact.0": "Het staat nu Potato 1–0 Carrot.",
+    "fact.1": "De kans van Potato om te winnen steeg van 49% naar 85%.",
+    "fact.2": "Geassisteerd door Sakinelli.",
+    "fact.3": "Een grote kans, xG 0,59.",
+    "fact.4": "Zijn derde doelpunt van het seizoen.",
+    "fact.5": "Potato speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.6": "De live rating van Madekuta is 6,0.",
+    "fact.7": "Tot nu toe foto's: Potato 1 (xG 0,59), Carrot 0 (xG 0,00).",
+    "fact.8": "Madekuta heeft nu 25 doelpunten voor Potato.",
+    "casual": "Madekuta scoort vroeg voor Potato en maakt het 1–0 tegen Carrot.",
+    "analyst": "Het doelpunt van Madekuta, geassisteerd door Sakinelli, geeft Potato een 1–0 voorsprong en verhoogt hun winstkans van 49% naar 85%. Een grote kans met xG 0,59, het zet vroeg de toon."
+   },
+   "zh-Hans": {
+    "headline": "Madekuta 开局得分",
+    "fact.0": "现在比分 Potato 1比0 Carrot。",
+    "fact.1": "Potato的获胜概率从49%提升到了85%。",
+    "fact.2": "协助者为 Sakinelli。",
+    "fact.3": "概率很大，xG 0.59。",
+    "fact.4": "这是他本赛季的第三个进球。",
+    "fact.5": "Potato 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.6": "Madekuta的现场评分是6.0。",
+    "fact.7": "目前射击数： Potato 1（xG 0.59）， Carrot 0（xG 0.00）。",
+    "fact.8": "Madekuta 现在已经 Potato场打进25球。",
+    "casual": "Madekuta 为 Potato早早得分，比分变为1比0，战胜 Carrot。",
+    "analyst": "Madekuta的进球由 Sakinelli助攻，帮助 Potato 取得1比0领先，胜率从49%提升到85%。以xG为0.59，这是一个大机会，早早定下基调。"
+   }
+  },
+  "M-2": {
+   "source_hash": "861cb2d69788618e",
+   "es": {
+    "headline": "Madekuta se le niega una gran oportunidad",
+    "fact.0": "El disparo de Madekuta fue salvado: xG 0,44, así que entra unas 44 veces en 100.",
+    "fact.1": "Salvado por Alissandro.",
+    "fact.2": "El marcador es Potato 1–0 Carrot.",
+    "fact.3": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,81 de su equipo).",
+    "fact.4": "Potato jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.5": "Potato tuvo 4 disparos (xG 1.13) y 1 córner en los últimos cinco minutos.",
+    "fact.6": "Antes en este partido, a las 1': Madekuta anotó con un disparo de Sakinelli por la izquierda (xG 0,59).",
+    "fact.7": "Eso hace 2 goles Potato o grandes ocasiones en este partido.",
+    "casual": "Madekuta falla una oportunidad de oro para doblar la ventaja de Potato al principio. Alissandro realiza una parada clave.",
+    "analyst": "Madekuta paradas, con un xG de 0,44, impidió que Potato ampliara su ventaja a 2–0. Potato dominaron los primeros minutos, con 4 disparos y un 100% de pase en el último tercio en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Madekuta se voit refuser une grande chance",
+    "fact.0": "Le tir de Madekuta a été sauvé : xG 0,44, donc il entre environ 44 fois sur 100.",
+    "fact.1": "Sauvé par Alissandro.",
+    "fact.2": "Le score est Potato 1–0 Carrot.",
+    "fact.3": "Potato ont pris l’avantage dans les cinq dernières minutes (élan +0,81 de leur côté).",
+    "fact.4": "Potato joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.5": "Potato a tiré 4 fois (xG 1,13) et 1 corner dans les cinq dernières minutes.",
+    "fact.6": "Plus tôt dans ce match, à 1': Madekuta marqué sur une passe de Sakinelli sur la gauche (xG 0,59).",
+    "fact.7": "Cela fait 2 buts Potato ou de grandes occasions dans ce match.",
+    "casual": "Madekuta rate une occasion en or de doubler l’avance de Potato en début de match. Alissandro réalise un arrêt clé.",
+    "analyst": "Madekuta arrêté, avec un xG de 0,44, empêche Potato d’étendre son avance à 2–0. Potato dominent les premières minutes, avec 4 tirs et un taux de passe à 100 % dans le dernier tiers dans les cinq dernières minutes."
+   },
+   "de": {
+    "headline": "Madekuta wird eine große Chance verwehrt",
+    "fact.0": "Madekuta's Schuss wurde gerettet: xG 0,44, also geht er etwa 44 Mal in 100.",
+    "fact.1": "Gerettet von Alissandro.",
+    "fact.2": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "fact.3": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,81 von ihrer Seite).",
+    "fact.4": "Potato spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.5": "Potato hatte in den letzten fünf Minuten 4 Schüsse (xG 1,13) und 1 Ecke.",
+    "fact.6": "Früher in diesem Spiel, um 1': Madekuta erzielte mit einem Schuss von Sakinelli's Pass auf der linken Seite (xG 0,59).",
+    "fact.7": "Das macht 2 Potato Tore oder große Chancen in diesem Spiel.",
+    "casual": "Madekuta verpasst früh eine goldene Chance, Potato's Führung zu verdoppeln. Alissandro zeigt eine wichtige Parade.",
+    "analyst": "Madekuta parierte Schuss mit einem xG von 0,44 verhindert, dass Potato ihre Führung auf 2:0 ausbaut. Potato dominieren die Anfangsminuten, mit 4 Schüssen und 100 % Passspiel im letzten Drittel in den letzten fünf Minuten."
+   },
+   "nl": {
+    "headline": "Madekuta wordt een grote kans ontzegd",
+    "fact.0": "Madekuta schot werd gered: xG 0,44, dus hij gaat ongeveer 44 keer in 100.",
+    "fact.1": "Gered door Alissandro.",
+    "fact.2": "De stand is Potato 1–0 Carrot.",
+    "fact.3": "Potato had de overhand in de laatste vijf minuten (momentum +0,81 van hun kant).",
+    "fact.4": "Potato speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.5": "Potato had 4 schoten (xG 1,13) en 1 corner in de laatste vijf minuten.",
+    "fact.6": "Eerder in deze wedstrijd, op 1': Madekuta scoorde met een schot uit een pass van Sakinelli links (xG 0,59).",
+    "fact.7": "Dat maakt 2 Potato doelpunten of grote kansen in deze wedstrijd.",
+    "casual": "Madekuta mist een gouden kans om Potato's voorsprong vroeg in de wedstrijd te verdubbelen. Alissandro maakt een cruciale redding.",
+    "analyst": "Madekuta redde schot, met een xG van 0,44, voorkomt dat Potato hun voorsprong uitbreidt tot 2–0. Potato domineren de openingsminuten, met 4 schoten en 100% passing in het laatste derde deel in de laatste vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Madekuta 被剥夺了很大的机会",
+    "fact.0": "Madekuta的射门被保存了：xG 0.44，所以大约100次进44次。",
+    "fact.1": "Alissandro救了。",
+    "fact.2": "比分 Potato 1比0 Carrot。",
+    "fact.3": "Potato 在最后五分钟占据上风（势头+0.81）。",
+    "fact.4": "Potato 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.5": "Potato 在最后五分钟门4次（xG1.13）和1个角球。",
+    "fact.6": "本场比赛早些时候， 1'： Madekuta 接 Sakinelli左路传球射门得分（xG 0.59）。",
+    "fact.7": "这场比赛中已有2个 Potato 进球或重大机会。",
+    "casual": "Madekuta 错失了早期扩大领先优势的绝佳机会 Potato。 Alissandro 做出关键扑救。",
+    "analyst": "Madekuta的扑救射门，x进球数为0.44，阻止 Potato 将领先优势扩大到2比0。 Potato 在开场几分钟占据主导，最后五分钟射门4次，传球命中率100%。"
+   }
+  },
+  "M-3": {
+   "source_hash": "3c013d5f732cb83f",
+   "es": {
+    "headline": "Potato encima",
+    "fact.0": "Potato tienen un impulso de 0,87 de su lado, tan unilateral como se puede ser.",
+    "fact.1": "Potato dominaron en los últimos cinco minutos (impulso +0,87 por parte de su equipo).",
+    "fact.2": "Potato jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "Potato tuvo 4 tiros (xG 1.13) y 2 córners en los últimos cinco minutos.",
+    "fact.4": "El marcador es Potato 1–0 Carrot.",
+    "casual": "Potato FC dominan Carrot FC y dominan la posesión y las ocasiones al principio.",
+    "analyst": "Potato FC tienen el control total, con el 100% de los pases del último tercio y 4 tiros que logran un xG de 1,13."
+   },
+   "fr": {
+    "headline": "Potato au sommet",
+    "fact.0": "Potato ont un élan de 0,87 de leur côté, à peu près aussi à sens unique que possible.",
+    "fact.1": "Potato ont eu l’avantage dans les cinq dernières minutes (élan +0,87 de leur côté).",
+    "fact.2": "Potato joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Potato a réalisé 4 tirs (xG 1,13) et 2 corners dans les cinq dernières minutes.",
+    "fact.4": "Le score est Potato 1–0 Carrot.",
+    "casual": "Potato FC dominent Carrot FC possession et occasions dès le début.",
+    "analyst": "Potato FC contrôlent totalement, avec 100 % des passes du dernier tiers et 4 tirs qui donnent un xG de 1,13."
+   },
+   "de": {
+    "headline": "Potato oben",
+    "fact.0": "Potato haben von ihrer Seite einen Schwung von 0,87, so einseitig, wie es nur geht.",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,87 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.3": "Potato hatte in den letzten fünf Minuten 4 Schüsse (xG 1,13) und 2 Eckstöße.",
+    "fact.4": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "casual": "Potato FC sind überall Carrot FC und dominieren früh den Ballbesitz und die Chancen.",
+    "analyst": "Potato FC haben die volle Kontrolle, wobei 100 % der letzten Dreisel-Pässe und 4 Schüsse ein xG von 1,13 ergeben."
+   },
+   "nl": {
+    "headline": "Potato bovenop",
+    "fact.0": "Potato hebben momentum 0,87 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Potato had in de laatste vijf minuten de overhand (momentum +0,87 van hun kant).",
+    "fact.2": "Potato speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "Potato had 4 schoten (xG 1,13) en 2 corners in de laatste vijf minuten.",
+    "fact.4": "De stand is Potato 1–0 Carrot.",
+    "casual": "Potato FC zijn overal Carrot FC en domineren balbezit en kansen in het begin.",
+    "analyst": "Potato FC hebben volledige controle, met 100% van de passes in het laatste derde deel en 4 schoten die een xG van 1,13 opleveren."
+   },
+   "zh-Hans": {
+    "headline": "Potato 在上面",
+    "fact.0": "Potato 队势头领先0.87，几乎是一边倒。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.87）。",
+    "fact.2": "Potato 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.3": "Potato 在最后五分钟门4次（xG1.13）和2个角球。",
+    "fact.4": "比分 Potato 1比0 Carrot。",
+    "casual": "Potato FCCarrot FC处占据主导，早期掌控球权和机会。",
+    "analyst": "Potato FC 完全掌控比赛，最后三分之一传球命中率100%，4次射门的xG为1.13。"
+   }
+  },
+  "M-4": {
+   "source_hash": "9ee795668514837d",
+   "es": {
+    "headline": "Carrot tomar el control",
+    "fact.0": "En los últimos diez minutos Potato dominaban (impulso 0,87 por su lado); ahora Carrot están (0,47 por su lado).",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,47 de su equipo).",
+    "fact.2": "Carrot jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "Carrot tuvo 4 tiros (xG 0,4) y 2 córners en los últimos cinco minutos.",
+    "fact.4": "El marcador es Potato 1–0 Carrot.",
+    "casual": "Carrot están presionando, manteniendo el balón en la parte alta y creando ocasiones.",
+    "analyst": "Carrot han cambiado el rumbo, dominando los últimos cinco minutos con el 100% de los pases en el último tercio y 4 disparos."
+   },
+   "fr": {
+    "headline": "Carrot prendre le contrôle",
+    "fact.0": "Au cours des dix dernières minutes, Potato dominaient (momentum 0,87 de leur côté) ; maintenant Carrot sont (0,47 de leur côté).",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,47 de leur côté).",
+    "fact.2": "Carrot joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Carrot a réalisé 4 tirs (xG 0,4) et 2 corners dans les cinq dernières minutes.",
+    "fact.4": "Le score est Potato 1–0 Carrot.",
+    "casual": "Carrot mettent la pression, gardant le ballon en profondeur et créant des occasions.",
+    "analyst": "Carrot ont inversé la tendance, dominant les cinq dernières minutes avec 100 % de passes dans le dernier tiers et 4 tirs."
+   },
+   "de": {
+    "headline": "Carrot übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Potato an der Spitze (Momentum 0,87 von ihrer Seite); jetzt sind Carrot es (0,47 von ihrer Seite).",
+    "fact.1": "Carrot hatte in den letzten fünf Minuten die Oberhand (Schwung +0,47 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.3": "Carrot hatte in den letzten fünf Minuten 4 Schüsse (xG 0,4) und 2 Ecken.",
+    "fact.4": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "casual": "Carrot üben den Druck auf, halten den Ball nach vorne und kreieren Chancen.",
+    "analyst": "Carrot haben das Blatt gewendet und dominierten die letzten fünf Minuten mit 100 % der Pässe im letzten Drittel und 4 Schüssen."
+   },
+   "nl": {
+    "headline": "Carrot neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Potato bovenaan (momentum 0,87 van hun kant); nu zijn Carrot dat (0,47 van hun kant).",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,47 van hun kant).",
+    "fact.2": "Carrot speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "Carrot had 4 schoten (xG 0,4) en 2 corners in de laatste vijf minuten.",
+    "fact.4": "De stand is Potato 1–0 Carrot.",
+    "casual": "Carrot zetten de druk op, houden de bal hoog in het veld en creëren kansen.",
+    "analyst": "Carrot hebben het tij gekeerd en domineerden de laatste vijf minuten met 100% passes in het laatste derde deel en 4 schoten."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 掌控局面",
+    "fact.0": "最后十分钟内， Potato 占据上风（势头领先自己方0.87）;现在 Carrot 领先（领先己方0.47）。",
+    "fact.1": "Carrot 在最后五分钟占据上风（势头+0.47）。",
+    "fact.2": "Carrot 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.3": "Carrot 在最后五分钟门4次（x进球0.4）和2个角球。",
+    "fact.4": "比分 Potato 1比0 Carrot。",
+    "casual": "Carrot 不断施压，保持球权在前场，创造机会。",
+    "analyst": "Carrot 扭转了局势，最后五分钟以100%的最后三分之一传球和4次射门占据主导。"
+   }
+  },
+  "M-5": {
+   "source_hash": "f3d5417a269dd5d2",
+   "es": {
+    "headline": "Carrot sube el volumen de prensa",
+    "fact.0": "Carrot están haciendo 2,6 presiones altas por minuto, frente a 1,41 de media en este partido.",
+    "fact.1": "Carrot tuvieron la ventaja en los últimos cinco minutos (impulso +0,60 de su equipo).",
+    "fact.2": "Carrot jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "Carrot tuvo 3 tiros (xG 0,36) y 2 córners en los últimos cinco minutos.",
+    "fact.4": "El marcador es Potato 1–0 Carrot.",
+    "casual": "Carrot están presionando, manteniendo a Potato sujetos.",
+    "analyst": "La presión de Carrot se intensifica, con 2,6 presiones altas por minuto y el 100% de los pases del último tercio en los últimos 5 minutos."
+   },
+   "fr": {
+    "headline": "Carrot montez le volume de la presse",
+    "fact.0": "Carrot exercent 2,6 pressions élevées par minute, contre 1,41 en moyenne ce match.",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,60 de leur côté).",
+    "fact.2": "Carrot joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Carrot a réalisé 3 tirs (xG 0,36) et 2 corners dans les cinq dernières minutes.",
+    "fact.4": "Le score est Potato 1–0 Carrot.",
+    "casual": "Carrot mettent la pression, Potato clouent au sol.",
+    "analyst": "Le pressing de Carrot s’intensifie, avec 2,6 pressions élevées par minute et 100 % des passes du dernier tiers dans les 5 dernières minutes."
+   },
+   "de": {
+    "headline": "Carrot die Presse aufdrehen",
+    "fact.0": "Carrot setzen 2,6 hohe Druckangriffe pro Minute aus, im Schnitt 1,41 in diesem Spiel.",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,60 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.3": "Carrot hatte in den letzten fünf Minuten 3 Schüsse (xG 0,36) und 2 Eckstöße.",
+    "fact.4": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "casual": "Carrot erhöhen den Druck und halten Potato zurück.",
+    "analyst": "Carrot Pressing intensiviert sich, mit 2,6 hohen Druckattacken pro Minute und 100 % der letzten Drittel-Pässe in den letzten 5 Minuten."
+   },
+   "nl": {
+    "headline": "Carrot zet de pers harder",
+    "fact.0": "Carrot maken 2,6 hoge druk per minuut, tegenover gemiddeld 1,41 in deze wedstrijd.",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,60 van hun kant).",
+    "fact.2": "Carrot speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "Carrot had 3 schoten (xG 0,36) en 2 corners in de laatste vijf minuten.",
+    "fact.4": "De stand is Potato 1–0 Carrot.",
+    "casual": "Carrot zetten de druk op en houden Potato tegen.",
+    "analyst": "Carrot druk neemt toe, met 2,6 hoge druk per minuut en 100% van passes in het laatste derde deel in de laatste 5 minuten."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 把新闻加大点",
+    "fact.0": "Carrot 每分钟制造2.6次高压，而本场比赛平均为1.41次。",
+    "fact.1": "Carrot 在最后五分钟占据上风（势头+0.60）。",
+    "fact.2": "Carrot 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.3": "Carrot 在最后五分钟门3次（xG0.36）和2个角球。",
+    "fact.4": "比分 Potato 1比0 Carrot。",
+    "casual": "Carrot 不断加大压力，把 Potato 压制在后面。",
+    "analyst": "Carrot的逼抢加剧，最后5分钟内每分钟2.6次高压，最后三分之一传球率达到100%。"
+   }
+  },
+  "M-6": {
+   "source_hash": "cfdf2fd531dccd12",
+   "es": {
+    "headline": "Penalización a Potato",
+    "fact.0": "Konavadi cometió falta Sakinelli dentro del área.",
+    "fact.1": "El marcador es Potato 1–0 Carrot.",
+    "fact.2": "Las penalizaciones se anotan aproximadamente el 78% de las veces.",
+    "casual": "Potato FC cometer un penalti tras Sakinelli falta en el área. Podrían doblar su ventaja.",
+    "analyst": "Potato FC tienen una gran oportunidad de ampliar su ventaja de 1–0, ya que los penaltis se anotan el 78% de las veces. Sakinelli gana tras ser derribado por Konavadi."
+   },
+   "fr": {
+    "headline": "Pénalité à Potato",
+    "fact.0": "Konavadi a fait faute Sakinelli dans la surface.",
+    "fact.1": "Le score est Potato 1–0 Carrot.",
+    "fact.2": "Les pénalités sont inscrites environ 78 % du temps.",
+    "casual": "Potato FC obtenir une pénalité après Sakinelli faute dans la surface. Ils pourraient doubler leur avance.",
+    "analyst": "Potato FC ont une belle chance d’augmenter leur avance de 1–0 puisque les tirs au but sont inscrits 78 % du temps. Sakinelli remporte le match après avoir été victime d’une faute de Konavadi."
+   },
+   "de": {
+    "headline": "Strafe gegen Potato",
+    "fact.0": "Konavadi foulte Sakinelli im Strafraum.",
+    "fact.1": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "fact.2": "Strafen werden etwa 78 % der Zeit verhängt.",
+    "casual": "Potato FC haben einen Elfmeter, nachdem Sakinelli im Strafraum gefoult wurde. Sie könnten ihren Vorsprung verdoppeln.",
+    "analyst": "Potato FC haben eine großartige Chance, ihre 1:0-Führung auszubauen, da 78 % der Straftritte erzielt werden. Sakinelli gewinnt den Sieg, nachdem er von Konavadi gefoult wurde."
+   },
+   "nl": {
+    "headline": "Straf voor Potato",
+    "fact.0": "Konavadi maakte een overtreding op Sakinelli in het strafschopgebied.",
+    "fact.1": "De stand is Potato 1–0 Carrot.",
+    "fact.2": "Straffen worden ongeveer 78% van de tijd gescoord.",
+    "casual": "Potato FC krijgen een penalty nadat Sakinelli in het strafschopgebied is overtreden. Ze kunnen hun voorsprong verdubbelen.",
+    "analyst": "Potato FC hebben een grote kans om hun 1–0 voorsprong uit te breiden, want er worden 78% van de gevallen strafschoppen gescoord. Sakinelli wint de wedstrijd nadat hij is gestraft door Konavadi."
+   },
+   "zh-Hans": {
+    "headline": "对Potato的处罚",
+    "fact.0": "Konavadi 在禁区内犯规 Sakinelli 。",
+    "fact.1": "比分 Potato 1比0 Carrot。",
+    "fact.2": "罚球大约有78%的判罚率。",
+    "casual": "Potato FC 在禁区内被犯规后 Sakinelli 获得点球。他们可能会扩大领先优势。",
+    "analyst": "Potato FC 有很大机会扩大1比0领先优势，因为78%的判罚率是点球。 Sakinelli 在被 Konavadi犯规后赢得了比赛。"
+   }
+  },
+  "M-7": {
+   "source_hash": "44875d868c9c00a6",
+   "es": {
+    "headline": "Se detiene el penalti de Haalmer",
+    "fact.0": "El disparo de Haalmer fue salvado: xG 0,78, así que entra unas 78 veces en 100.",
+    "fact.1": "Salvado por Alissandro.",
+    "fact.2": "El marcador es Potato 1–0 Carrot.",
+    "fact.3": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,42 de su equipo).",
+    "fact.4": "Potato jugó el 88% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.5": "Potato tuvo 3 disparos (xG 1.13) y 1 córner en los últimos cinco minutos.",
+    "casual": "Haalmer falla una gran oportunidad para doblar la ventaja de Potato cuando Alissandro detiene su penalti.",
+    "analyst": "El penalti de Haalmer, con un xG de 0,78, es detenido por Alissandro, manteniendo el marcador en 1–0. Potato dominan los últimos cinco minutos con un 88% de pases en el último tercio y 3 disparos, pero no logran aprovecharlo."
+   },
+   "fr": {
+    "headline": "Le penalty de Haalmer est arrêté",
+    "fact.0": "Le tir de Haalmer a été sauvé : xG 0,78, donc il entre environ 78 fois sur 100.",
+    "fact.1": "Sauvé par Alissandro.",
+    "fact.2": "Le score est Potato 1–0 Carrot.",
+    "fact.3": "Potato ont eu l’avantage dans les cinq dernières minutes (élan +0,42 de leur côté).",
+    "fact.4": "Potato joué 88 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.5": "Potato a réalisé 3 tirs (xG 1,13) et 1 corner dans les cinq dernières minutes.",
+    "casual": "Haalmer rate une grosse occasion de doubler l’avance de Potato alors que Alissandro arrête sa pénalité.",
+    "analyst": "La pénalité de Haalmer, avec un xG de 0,78, est arrêtée par Alissandro, maintenant le score à 1–0. Potato domine les cinq dernières minutes avec 88 % de passes dans le dernier tiers et 3 tirs, mais ne parvient pas à en profiter."
+   },
+   "de": {
+    "headline": "Haalmer's Elfmeter wird gehalten",
+    "fact.0": "Haalmer Schuss wurde gerettet: xG 0,78, also geht er etwa 78 Mal in 100.",
+    "fact.1": "Gerettet von Alissandro.",
+    "fact.2": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "fact.3": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,42 von ihrer Seite).",
+    "fact.4": "Potato spielte in den letzten fünf Minuten 88 % der Pässe im letzten Drittel.",
+    "fact.5": "Potato hatte in den letzten fünf Minuten 3 Schüsse (xG 1,13) und 1 Ecke.",
+    "casual": "Haalmer verpasst eine große Chance, Potato Führung zu verdoppeln, als Alissandro seinen Straftritt pariert.",
+    "analyst": "Der Straftritt von Haalmer mit einem xG von 0,78 wird von Alissandro gehalten, sodass der Spielstand bei 1:0 bleibt. Potato dominieren die letzten fünf Minuten mit 88 % Pässen im letzten Drittel und 3 Schüssen, können aber nicht profitieren."
+   },
+   "nl": {
+    "headline": "Haalmer's penalty wordt gered",
+    "fact.0": "Haalmer schot werd gered: xG 0,78, dus het gaat ongeveer 78 keer in 100.",
+    "fact.1": "Gered door Alissandro.",
+    "fact.2": "De stand is Potato 1–0 Carrot.",
+    "fact.3": "Potato had in de laatste vijf minuten de overhand (momentum +0,42 van hun kant).",
+    "fact.4": "Potato speelde 88% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.5": "Potato had 3 schoten (xG 1,13) en 1 corner in de laatste vijf minuten.",
+    "casual": "Haalmer mist een grote kans om Potato's voorsprong te verdubbelen terwijl Alissandro zijn penalty redt.",
+    "analyst": "Haalmer's penalty, met een xG van 0,78, wordt gestopt door Alissandro, waardoor de stand 1–0 blijft. Potato domineren de laatste vijf minuten met 88% passes in het laatste derde deel en 3 schoten, maar slaagt er niet in te profiteren."
+   },
+   "zh-Hans": {
+    "headline": "Haalmer的罚则被保留",
+    "fact.0": "Haalmer的射门被保存了：xG 0.78，所以100次大约进78次。",
+    "fact.1": "Alissandro救了。",
+    "fact.2": "比分 Potato 1比0 Carrot。",
+    "fact.3": "Potato 在最后五分钟占据上风（势头+0.42）。",
+    "fact.4": "Potato 在最后五分钟完成了88%的最后三分之一传球。",
+    "fact.5": "Potato 在最后五分钟射门3次（xG1.13）和1个角球。",
+    "casual": "Haalmer 错失 Potato了扩大比分两倍的大好机会， Alissandro 扑出了罚球。",
+    "analyst": "Haalmer的点球（xG为0.78）被 Alissandro扑出，比分保持在1比0。 Potato 在最后五分钟占据主导，88%的最后三分之一传球成功率和3次射门，但未能把握住机会。"
+   }
+  },
+  "M-8": {
+   "source_hash": "237db328b50cd8cf",
+   "es": {
+    "headline": "Alissandro creciendo en el juego",
+    "fact.0": "La calificación en directo de Alissandro es de 7,0.",
+    "fact.1": "Subió desde 6,2 en los últimos diez minutos.",
+    "fact.2": "20' salvación (+0,69).",
+    "fact.3": "5' salvación (+0,42).",
+    "fact.4": "1' gol encajado (-0,15)."
+   },
+   "fr": {
+    "headline": "Alissandro évoluant dans le jeu",
+    "fact.0": "Alissandro en direct est de 7,0.",
+    "fact.1": "En hausse par rapport à 6,2 en dix minutes.",
+    "fact.2": "20' sauvegarde (+0,69).",
+    "fact.3": "5' sauvegarde (+0,42).",
+    "fact.4": "1' but encaissé (-0,15)."
+   },
+   "de": {
+    "headline": "Alissandro in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Alissandro liegt bei 7,0.",
+    "fact.1": "Erhöht von 6,2 in den letzten zehn Minuten.",
+    "fact.2": "20' Speicher (+0,69).",
+    "fact.3": "5' Speicher (+0,42).",
+    "fact.4": "1' Gegentor (-0,15)."
+   },
+   "nl": {
+    "headline": "Alissandro groeien in het spel",
+    "fact.0": "De live rating van Alissandro is 7,0.",
+    "fact.1": "Gestegen van 6,2 in de laatste tien minuten.",
+    "fact.2": "20' redden (+0,69).",
+    "fact.3": "5' redding (+0,42).",
+    "fact.4": "1' doelpunt tegengekregen (-0,15)."
+   },
+   "zh-Hans": {
+    "headline": "Alissandro 逐渐融入游戏",
+    "fact.0": "Alissandro的现场评分为7.0。",
+    "fact.1": "从最后十分钟的6.2有所上升。",
+    "fact.2": "20' 存档（+0.69）。",
+    "fact.3": "5' 存档（+0.42）。",
+    "fact.4": "失1'球（-0.15）。"
+   }
+  },
+  "M-9": {
+   "source_hash": "510f3317389612e4",
+   "es": {
+    "headline": "Potato tomar el control",
+    "fact.0": "En los últimos diez minutos Carrot dominaban (impulso 0,69 de su lado); ahora Potato están (0,75 de su lado).",
+    "fact.1": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,75 de su equipo).",
+    "fact.2": "Potato jugó el 95% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 1–0 Carrot.",
+    "fact.4": "Potato tienen un impulso de 0,75 de su lado, tan unilateral como puede ser.",
+    "casual": "Potato FC ahora dominan firmemente, dominando la jugada en la mitad de Carrot FC.",
+    "analyst": "Potato FC han tomado el control, con el 95% de los pases en el último tercio en los últimos 5 minutos y un 0,75% de impulso."
+   },
+   "fr": {
+    "headline": "Potato prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Carrot étaient en tête (momentum 0,69 de leur côté) ; maintenant Potato sont (0,75 de leur côté).",
+    "fact.1": "Potato a eu l’avantage dans les cinq dernières minutes (élan +0,75 de leur côté).",
+    "fact.2": "Potato joué 95 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 1–0 Carrot.",
+    "fact.4": "Potato ont un élan de 0,75 de leur côté, à peu près aussi unilatéral que possible.",
+    "casual": "Potato FC dominent désormais fermement, dominant le jeu dans la moitié de Carrot FC.",
+    "analyst": "Potato FC ont pris le contrôle, avec 95 % des passes du dernier tiers dans les 5 dernières minutes et 0,75 de vitesse."
+   },
+   "de": {
+    "headline": "Potato übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Carrot vorne (Schwung 0,69 von ihrer Seite); jetzt sind Potato es (0,75 von ihrer Seite).",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,75 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 95 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "fact.4": "Potato haben von ihrer Seite 0,75 Momentum, so einseitig, wie es nur geht.",
+    "casual": "Potato FC sind jetzt fest an der Spitze und dominieren das Spiel in Carrot FC Hälfte.",
+    "analyst": "Potato FC haben die Kontrolle übernommen, mit 95 % der Pässe im letzten Drittel in den letzten 5 Minuten und 0,75 Momentum."
+   },
+   "nl": {
+    "headline": "Potato neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Carrot bovenaan (momentum 0,69 van hun kant); nu zijn Potato dat (0,75 van hun kant).",
+    "fact.1": "Potato had de overhand in de laatste vijf minuten (momentum +0,75 van hun kant).",
+    "fact.2": "Potato speelde 95% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 1–0 Carrot.",
+    "fact.4": "Potato hebben momentum 0,75 van hun kant, zo eenzijdig als het maar kan.",
+    "casual": "Potato FC staan nu stevig aan de hand en domineren het spel in de helft van Carrot FC.",
+    "analyst": "Potato FC hebben de controle overgenomen, met 95% van de passes in het laatste derde deel van de laatste 5 minuten en 0,75 momentum."
+   },
+   "zh-Hans": {
+    "headline": "Potato 掌控局面",
+    "fact.0": "最后十分钟内， Carrot 占据上风（对方领先0.69分）;现在 Potato 领先（对方0.75分）。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.75）。",
+    "fact.2": "Potato 在最后五分钟完成了95%的最后三分之一传球。",
+    "fact.3": "比分 Potato 1比0 Carrot。",
+    "fact.4": "Potato 队的势头只有0.75，几乎是一边倒。",
+    "casual": "Potato FC 现在牢牢掌控了 Carrot FC半场的比赛节奏。",
+    "analyst": "Potato FC 已经掌控了比赛，过去5分钟内完成了95%的最后三分之一传球，势头仅剩0.75。"
+   }
+  },
+  "M-10": {
+   "source_hash": "40d37885094fbb66",
+   "es": {
+    "headline": "Gvardosz creciendo en el juego",
+    "fact.0": "La valoración en directo de Gvardosz es de 6,7.",
+    "fact.1": "Subió desde 6,0 en los últimos diez minutos.",
+    "fact.2": "24' de luz (+0,17).",
+    "fact.3": "16' ganó la bola suelta (+0,14).",
+    "fact.4": "22' ganó la bola suelta (+0,14)."
+   },
+   "fr": {
+    "headline": "Gvardosz évoluant dans le jeu",
+    "fact.0": "Gvardosz en direct est de 6,7.",
+    "fact.1": "En hausse par rapport à 6,0 en dix minutes.",
+    "fact.2": "24' dégagement (+0,17).",
+    "fact.3": "16' a gagné la balle libre (+0,14).",
+    "fact.4": "22' a gagné la balle libre (+0,14)."
+   },
+   "de": {
+    "headline": "Gvardosz in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Gvardosz liegt bei 6,7.",
+    "fact.1": "Anstieg von 6,0 in den letzten zehn Minuten.",
+    "fact.2": "24' Abstand (+0,17).",
+    "fact.3": "16' gewann die lose Kugel (+0,14).",
+    "fact.4": "22' gewann die lose Kugel (+0,14)."
+   },
+   "nl": {
+    "headline": "Gvardosz groeien in het spel",
+    "fact.0": "De live rating van Gvardosz is 6,7.",
+    "fact.1": "Omhoog van 6,0 in de laatste tien minuten.",
+    "fact.2": "24' ruimte (+0,17).",
+    "fact.3": "16' won de losse bal (+0,14).",
+    "fact.4": "22' won de losse bal (+0,14)."
+   },
+   "zh-Hans": {
+    "headline": "Gvardosz 逐渐融入游戏",
+    "fact.0": "Gvardosz的现场评分为6.7。",
+    "fact.1": "从最后十分钟的6.0提升。",
+    "fact.2": "24' 净空率（+0.17）。",
+    "fact.3": "16' 赢得了松散的球（+0.14）。",
+    "fact.4": "22' 赢得了松散的球（+0.14）。"
+   }
+  },
+  "M-11": {
+   "source_hash": "e580efe16b60860c",
+   "es": {
+    "headline": "Carrot sube el volumen de prensa",
+    "fact.0": "Carrot están haciendo 2,4 presiones altas por minuto, frente a 1,38 de media en este partido.",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,34 de su equipo).",
+    "fact.2": "Carrot jugó el 65% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 1–0 Carrot."
+   },
+   "fr": {
+    "headline": "Carrot montez le volume de la presse",
+    "fact.0": "Carrot exercent 2,4 pressions élevées par minute, contre 1,38 en moyenne ce match.",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,34 de leur côté).",
+    "fact.2": "Carrot joué 65 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 1–0 Carrot."
+   },
+   "de": {
+    "headline": "Carrot die Presse aufdrehen",
+    "fact.0": "Carrot setzen in diesem Spiel 2,4 hohe Druckangriffe pro Minute aus, im Schnitt 1,38.",
+    "fact.1": "Carrot hatte in den letzten fünf Minuten die Oberhand (Momentum +0,34 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 65 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 1:0 Carrot."
+   },
+   "nl": {
+    "headline": "Carrot zet de pers harder",
+    "fact.0": "Carrot maken 2,4 hoge druk per minuut, tegenover gemiddeld 1,38 in deze wedstrijd.",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,34 van hun kant).",
+    "fact.2": "Carrot speelde 65% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 1–0 Carrot."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 把新闻加大点",
+    "fact.0": "Carrot 每分钟制造2.4次高压，而本场比赛平均为1.38次。",
+    "fact.1": "Carrot 在最后五分钟占据上风（他们势头+0.34）。",
+    "fact.2": "Carrot 在最后五分钟完成了65%的最后三分之一传球。",
+    "fact.3": "比分 Potato 1比0 Carrot。"
+   }
+  },
+  "M-12": {
+   "source_hash": "e8f878e5e17100bd",
+   "es": {
+    "headline": "Carrot tomar el control",
+    "fact.0": "En los últimos diez minutos Potato dominaban (impulso 0,89 por su lado); ahora Carrot lo están (0,43 por su lado).",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,43 de su lado).",
+    "fact.2": "Carrot jugó el 33% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 1–0 Carrot.",
+    "fact.4": "Carrot también tomó el control del partido en 12'.",
+    "fact.5": "Es la segunda vez Carrot toman el control en este partido.",
+    "casual": "Carrot están empezando a tomar el control a medida que el juego se adapta a su favor.",
+    "analyst": "Carrot recuperan el control por segunda vez, dominando los últimos cinco minutos con el 33% de los pases en el último tercio."
+   },
+   "fr": {
+    "headline": "Carrot prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Potato étaient en tête (momentum 0,89 de leur côté) ; maintenant Carrot sont (0,43 de leur côté).",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,43 de leur côté).",
+    "fact.2": "Carrot joué 33 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 1–0 Carrot.",
+    "fact.4": "Carrot a également pris le contrôle du jeu à 12'.",
+    "fact.5": "C’est la deuxième fois Carrot reprenez le contrôle de ce match.",
+    "casual": "Carrot commencent à prendre le contrôle à mesure que le jeu évolue vers eux.",
+    "analyst": "Carrot reprennent le contrôle pour la deuxième fois, dominant les cinq dernières minutes avec 33 % des passes du dernier tiers."
+   },
+   "de": {
+    "headline": "Carrot übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Potato vorne (Schwung 0,89 von ihrer Seite); jetzt sind Carrot es (0,43 von ihrer Seite).",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,43 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 33 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 1:0 Carrot.",
+    "fact.4": "Carrot übernahm auch die Kontrolle über das Spiel bei 12'.",
+    "fact.5": "Das ist das zweite Mal, dass Carrot in diesem Match die Kontrolle übernommen hast.",
+    "casual": "Carrot beginnen, das Kommando zu übernehmen, da sich das Spiel in ihre Richtung verschiebt.",
+    "analyst": "Carrot zum zweiten Mal die Kontrolle zurück und dominiert die letzten fünf Minuten mit 33 % der letzten Drittel-Pässe."
+   },
+   "nl": {
+    "headline": "Carrot neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Potato bovenaan (momentum 0,89 van hun kant); nu zijn Carrot dat (0,43 van hun kant).",
+    "fact.1": "Carrot had de overhand in de laatste vijf minuten (momentum +0,43 van hun kant).",
+    "fact.2": "Carrot speelde 33% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 1–0 Carrot.",
+    "fact.4": "Carrot nam ook de controle over het spel op 12'.",
+    "fact.5": "Dat is de tweede keer dat Carrot de controle in deze wedstrijd neemt.",
+    "casual": "Carrot beginnen de leiding te nemen nu het spel hun kant op gaat.",
+    "analyst": "Carrot herwinnen voor de tweede keer de controle en domineren de laatste vijf minuten met 33% van de passes in het laatste derde deel."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 掌控局面",
+    "fact.0": "最后十分钟内， Potato 占据上风（对方势头为0.89）;现在 Carrot 领先（对方0.43）。",
+    "fact.1": "Carrot 在最后五分钟占据上风（势头+0.43）。",
+    "fact.2": "Carrot 在最后五分钟完成了33%的最后三分之一传球。",
+    "fact.3": "比分 Potato 1比0 Carrot。",
+    "fact.4": "Carrot 也在 12'时掌控了比赛。",
+    "fact.5": "这是 Carrot 第二次掌控比赛。",
+    "casual": "随着比赛的转变，Carrot开始掌控局面。",
+    "analyst": "Carrot 第二次重新掌控比赛，在最后五分钟以33%的最后三分之一传球率占据主导。"
+   }
+  },
+  "M-13": {
+   "source_hash": "1fdcffd0cdfcbdd1",
+   "es": {
+    "headline": "Mbeulier iguala para Carrot",
+    "fact.0": "Ahora es Potato 1–1 Carrot.",
+    "fact.1": "La probabilidad de ganar de Carrot pasó del 10% al 23%.",
+    "fact.2": "Asistido por Virtzano.",
+    "fact.3": "Un final poco probable: xG 0,08, así que unos 8 de cada 100 disparos como ese entrá.",
+    "fact.4": "Su quinto gol de la temporada.",
+    "fact.5": "Carrot jugó el 24% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.6": "La valoración en directo de Mbeulier es de 7,1.",
+    "fact.7": "Disparos hasta ahora: Potato 10 (xG 2,53), Carrot 12 (xG 1,42).",
+    "fact.8": "Mbeulier ahora tiene 25 goles para Carrot.",
+    "fact.9": "Subió desde 6,2 en los últimos diez minutos.",
+    "casual": "Mbeulier empata el partido para Carrot con una definición brillante, poniendo el 1–1.",
+    "analyst": "El empate de Mbeulier para Carrot, asistido por Virtzano, desplaza su probabilidad de victoria del 10% al 23%. Su disparo xG de 0,08 refleja la rareza del gol, aumentando su valoración a 7,1."
+   },
+   "fr": {
+    "headline": "Mbeulier égalise pour Carrot",
+    "fact.0": "C’est maintenant Potato 1–1 Carrot.",
+    "fact.1": "La chance de victoire de Carrot est passée de 10 % à 23 %.",
+    "fact.2": "Assisté par Virtzano.",
+    "fact.3": "Une fin peu probable : xG 0,08, donc environ 8 tirs sur 100 comme celui-ci.",
+    "fact.4": "Son 5e but de la saison.",
+    "fact.5": "Carrot joué 24 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.6": "Mbeulier la note en direct est de 7,1.",
+    "fact.7": "Tirs jusqu’à présent : Potato 10 (xG 2,53), Carrot 12 (xG 1,42).",
+    "fact.8": "Mbeulier compte maintenant 25 buts pour Carrot.",
+    "fact.9": "En hausse par rapport à 6,2 en dix minutes.",
+    "casual": "Mbeulier égalise pour Carrot d’une finition brillante, portant le score à 1–1.",
+    "analyst": "L’égalisation de Mbeulier pour Carrot, assistée par Virtzano, fait passer leur chance de victoire de 10 % à 23 %. Son tir xG de 0,08 reflète la rareté de ce but, portant son rating à 7,1."
+   },
+   "de": {
+    "headline": "Mbeulier gleicht für Carrot",
+    "fact.0": "Jetzt steht es Potato 1:1 Carrot.",
+    "fact.1": "Die Gewinnchance von Carrot stieg von 10 % auf 23 %.",
+    "fact.2": "Unterstützt von Virtzano.",
+    "fact.3": "Ein unwahrscheinliches Finish: xG 0,08, also etwa 8 in 100 Schüssen, wie er eingebaut wird.",
+    "fact.4": "Sein fünftes Saisontor.",
+    "fact.5": "Carrot spielte in den letzten fünf Minuten 24 % der Pässe im letzten Drittel.",
+    "fact.6": "Die Live-Bewertung von Mbeulier liegt bei 7,1.",
+    "fact.7": "Bisherige Aufnahmen: Potato 10 (xG 2,53), Carrot 12 (xG 1,42).",
+    "fact.8": "Mbeulier hat jetzt 25 Tore für Carrot.",
+    "fact.9": "Erhöht von 6,2 in den letzten zehn Minuten.",
+    "casual": "Mbeulier glich das Spiel für Carrot mit einem brillanten Abschluss aus, sodass es 1:1 stand.",
+    "analyst": "Mbeulier Ausgleich für Carrot, vorbereitet von Virtzano, verschiebt ihre Siegchance von 10 % auf 23 %. Sein Schuss von 0,08 xG spiegelt die Seltenheit des Tores wider und erhöht seine Bewertung auf 7,1."
+   },
+   "nl": {
+    "headline": "Mbeulier gelijk voor Carrot",
+    "fact.0": "Het staat nu Potato 1–1 Carrot.",
+    "fact.1": "De kans van Carrot om te winnen ging van 10% naar 23%.",
+    "fact.2": "Geassisteerd door Virtzano.",
+    "fact.3": "Een onwaarschijnlijke finish: xG 0,08, dus ongeveer 8 van 100 schoten zoals hij erin gaat.",
+    "fact.4": "Zijn vijfde doelpunt van het seizoen.",
+    "fact.5": "Carrot speelde 24% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.6": "De live rating van Mbeulier is 7,1.",
+    "fact.7": "Opnamen tot nu toe: Potato 10 (xG 2,53), Carrot 12 (xG 1,42).",
+    "fact.8": "Mbeulier heeft nu 25 doelpunten voor Carrot.",
+    "fact.9": "Gestegen van 6,2 in de laatste tien minuten.",
+    "casual": "Mbeulier maakt de stand gelijk voor Carrot met een briljante afwerking, waardoor het 1–1 werd.",
+    "analyst": "Mbeulier gelijkmaker voor Carrot, geassisteerd door Virtzano, verschuift hun winstkans van 10% naar 23%. Zijn schot van 0,08 xG weerspiegelt de zeldzaamheid van het doelpunt, waardoor zijn rating steeg naar 7,1."
+   },
+   "zh-Hans": {
+    "headline": "Mbeulier 使 Carrot",
+    "fact.0": "现在 Potato 1比1 Carrot。",
+    "fact.1": "Carrot的中奖概率从10%提升到了23%。",
+    "fact.2": "协助者为 Virtzano。",
+    "fact.3": "一个不太可能的结局：xG 0.08，大约100发中有8发类似的射击。",
+    "fact.4": "这是他本赛季的第5个进球。",
+    "fact.5": "Carrot 在最后五分钟完成了24%的最后三分之一传球。",
+    "fact.6": "Mbeulier的现场评分为7.1。",
+    "fact.7": "目前射击数： Potato 10发（xG 2.53）， Carrot 12发（xG 1.42）。",
+    "fact.8": "Mbeulier 现在已经 Carrot场打进25球。",
+    "fact.9": "从最后十分钟的6.2有所上升。",
+    "casual": "Mbeulier 以精彩的进球将比分扳平， Carrot 1比1。",
+    "analyst": "Mbeulier在Virtzano助攻下为Carrot扳平比分，将胜率从10%提升至23%。他0.08的xG射门反映了该进球的稀有性，将他的评分提升至7.1。"
+   }
+  },
+  "M-14": {
+   "source_hash": "a848561f3973eee1",
+   "es": {
+    "headline": "Alissandro alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Alissandro es de 8,0.",
+    "casual": "Alissandro brilla con una impresionante valoración de 8,0.",
+    "analyst": "Emil Alissandro alcanza una destacada valoración de 8.0, reflejando su buen rendimiento hasta Carrot FC hasta ahora."
+   },
+   "fr": {
+    "headline": "Alissandro atteint une note de 8,0",
+    "fact.0": "La note en direct de Alissandro est de 8,0.",
+    "casual": "Alissandro brille avec une impressionnante note de 8,0.",
+    "analyst": "Emil Alissandro atteint une note remarquable de 8,0, reflétant sa performance solide jusqu’à présent en Carrot FC ."
+   },
+   "de": {
+    "headline": "Alissandro erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Alissandro liegt bei 8,0.",
+    "casual": "Alissandro glänzt mit einer beeindruckenden Bewertung von 8,0.",
+    "analyst": "Emil Alissandro erreicht eine herausragende Bewertung von 8,0, was seine starke Leistung für Carrot FC bisher widerspiegelt."
+   },
+   "nl": {
+    "headline": "Alissandro haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Alissandro is 8,0.",
+    "casual": "Alissandro straalt met een indrukwekkende 8,0 rating.",
+    "analyst": "Emil Alissandro bereikt een opvallende 8,0 rating, wat zijn sterke prestaties tot nu toe voor Carrot FC weerspiegelt."
+   },
+   "zh-Hans": {
+    "headline": "Alissandro 评分为8.0",
+    "fact.0": "Alissandro的现场评分为8.0。",
+    "casual": "Alissandro 以令人印象深刻的8.0评分闪耀。",
+    "analyst": "Emil Alissandro 获得了出色的8.0评分，反映了他迄今为止在 Carrot FC 中的出色表现。"
+   }
+  },
+  "M-15": {
+   "source_hash": "724761c3e36a913d",
+   "es": {
+    "headline": "Grimaldes creciendo en el juego",
+    "fact.0": "La audiencia en directo de Grimaldes es 6,5.",
+    "fact.1": "Subió desde 5,8 en los últimos diez minutos.",
+    "fact.2": "1' perdió el balón, lo que llevó a un gol (-0,28).",
+    "fact.3": "45+1' de espacio (+0,21).",
+    "fact.4": "41' ganó la bola suelta (+0,17)."
+   },
+   "fr": {
+    "headline": "Grimaldes évoluant dans le jeu",
+    "fact.0": "Grimaldes en direct est de 6,5.",
+    "fact.1": "En hausse par rapport à 5,8 en dix minutes.",
+    "fact.2": "1' a perdu le ballon, menant à un but (-0,28).",
+    "fact.3": "45+1' dégagement (+0,21).",
+    "fact.4": "41' a gagné la balle libre (+0,17)."
+   },
+   "de": {
+    "headline": "Grimaldes in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Grimaldes liegt bei 6,5.",
+    "fact.1": "Anstieg von 5,8 in den letzten zehn Minuten.",
+    "fact.2": "1' verlor den Ball, was zu einem Tor (-0,28) führte.",
+    "fact.3": "45+1' Abstand (+0,21).",
+    "fact.4": "41' gewann die lose Kugel (+0,17)."
+   },
+   "nl": {
+    "headline": "Grimaldes groeien in het spel",
+    "fact.0": "De live-rating van Grimaldes is 6,5.",
+    "fact.1": "Gestegen van 5,8 in de laatste tien minuten.",
+    "fact.2": "1' gaf de bal weg, wat leidde tot een doelpunt (-0,28).",
+    "fact.3": "45+1' ruimte (+0,21).",
+    "fact.4": "41' won de losse bal (+0,17)."
+   },
+   "zh-Hans": {
+    "headline": "Grimaldes 逐渐融入游戏",
+    "fact.0": "Grimaldes的现场评分是6.5。",
+    "fact.1": "从最后十分钟的5.8提升。",
+    "fact.2": "1' 丢球，导致进球（-0.28）。",
+    "fact.3": "45+1' 净空率（+0.21）。",
+    "fact.4": "41' 赢得了松散球（+0.17）。"
+   }
+  },
+  "M-16": {
+   "source_hash": "25ef81c3030ec424",
+   "es": {
+    "headline": "Potato encima",
+    "fact.0": "Potato tienen un impulso de 0,71 desde su lado, tan unilateral como se puede ser.",
+    "fact.1": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,71 de su equipo).",
+    "fact.2": "Potato jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 1–1 Carrot.",
+    "fact.4": "Potato también dominaban en 6'.",
+    "fact.5": "Ese es el segundo periodo de dominio de Potato en este partido.",
+    "casual": "Potato FC domina firmemente y la primera parte termina empatada 1–1.",
+    "analyst": "Potato FC dominan de nuevo, con el 100% de pases en el último tercio en los últimos cinco minutos, y el marcador es 1–1 al descanso."
+   },
+   "fr": {
+    "headline": "Potato au sommet",
+    "fact.0": "Potato ont une impulsion de 0,71 de leur côté, à peu près aussi unilatérale que possible.",
+    "fact.1": "Potato a eu l’avantage dans les cinq dernières minutes (élan +0,71 de leur côté).",
+    "fact.2": "Potato joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 1–1 Carrot.",
+    "fact.4": "Potato dominaient aussi à 6'.",
+    "fact.5": "C’est la deuxième période de domination de Potato dans ce match.",
+    "casual": "Potato FC dominent fermement la première mi-temps à égalité 1–1.",
+    "analyst": "Potato FC domine à nouveau, avec 100 % des passes du dernier tiers dans les cinq dernières minutes, alors que le score est de 1–1 à la pause."
+   },
+   "de": {
+    "headline": "Potato oben",
+    "fact.0": "Potato haben von ihrer Seite ein Schwung von 0,71, so einseitig, wie es nur geht.",
+    "fact.1": "Potato hatte in den letzten fünf Minuten die Oberhand (Momentum +0,71 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 1:1 Carrot.",
+    "fact.4": "Potato dominierten auch bei 6'.",
+    "fact.5": "Das ist Potato zweite Dominanzphase in diesem Match.",
+    "casual": "Potato FC haben fest die Kontrolle, da die erste Halbzeit mit 1:1 endet.",
+    "analyst": "Potato FC dominieren erneut, mit 100 % der Pässe im letzten Drittel in den letzten fünf Minuten, da es zur Pause 1:1 steht."
+   },
+   "nl": {
+    "headline": "Potato bovenop",
+    "fact.0": "Potato hebben momentum 0,71 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Potato had de overhand in de laatste vijf minuten (momentum +0,71 van hun kant).",
+    "fact.2": "Potato speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 1–1 Carrot.",
+    "fact.4": "Potato domineerden ook op 6'.",
+    "fact.5": "Dat is Potato tweede dominantieperiode in deze wedstrijd.",
+    "casual": "Potato FC hebben stevig de controle terwijl de eerste helft eindigt op 1–1.",
+    "analyst": "Potato FC domineren opnieuw, met 100% van de passes in het laatste derde deel in de laatste vijf minuten, en het staat 1–1 bij rust."
+   },
+   "zh-Hans": {
+    "headline": "Potato 在上面",
+    "fact.0": "Potato 队的势头是0.71，几乎是一边倒。",
+    "fact.1": "Potato 在最后五分钟占据上风（他们方面势头+0.71）。",
+    "fact.2": "Potato 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.3": "比分 Potato 1比1 Carrot。",
+    "fact.4": "Potato 在 6'时也占据了主导地位。",
+    "fact.5": "这是 Potato在这场比赛中的第二次统治。",
+    "casual": "上半场结束时，Potato FC队牢牢掌控比赛，比赛以1比1平局结束。",
+    "analyst": "Potato FC 再次占据主导，最后五分钟内完成了100%的最后三分之一传球，半场结束时比分为1比1。"
+   }
+  },
+  "M-17": {
+   "source_hash": "13effcc079ddf6f3",
+   "es": {
+    "headline": "Descanso: Potato 1–1 Carrot",
+    "fact.0": "Descanso: Potato 1–1 Carrot.",
+    "fact.1": "Disparos hasta ahora: Potato 12 (xG 3,01), Carrot 14 (xG 1,48).",
+    "fact.2": "Posesión: Potato 55,4%, Carrot 44,6%.",
+    "fact.3": "1' Madekuta abre el marcador.",
+    "fact.4": "36' Mbeulier iguala para Carrot.",
+    "fact.5": "Se detiene el penalti de 20' Haalmer.",
+    "casual": "Es el descanso y el 1–1 entre Potato y Carrot. Ambos equipos han tenido ocasiones, con un penalti parado que ha añadido dramatismo.",
+    "analyst": "Al descanso, Potato lideran en conteo de disparos y xG (12 disparos, 3,01 xG), pero están empatados a 1–1 con Carrot, que tiene 14 tiros y 1,48 xG. La posesión favorece ligeramente a Potato con un 55,4%."
+   },
+   "fr": {
+    "headline": "Mi-temps : Potato 1–1 Carrot",
+    "fact.0": "Mi-temps : Potato 1–1 Carrot.",
+    "fact.1": "Tirs jusqu’à présent : Potato 12 (xG 3,01), Carrot 14 (xG 1,48).",
+    "fact.2": "Possession : Potato 55,4 %, Carrot 44,6 %.",
+    "fact.3": "1' Madekuta ouvre le score.",
+    "fact.4": "36' Mbeulier égalise pour Carrot.",
+    "fact.5": "20' Haalmer est arrêté.",
+    "casual": "C’est la mi-temps et le score est de 1–1 entre Potato et Carrot. Les deux équipes ont eu des occasions, un penalty arrêté apportant du suspense.",
+    "analyst": "À la mi-temps, Potato en tête au nombre de tirs et en xG (12 tirs, 3,01 xG) mais sont à égalité 1–1 avec Carrot, qui a 14 tirs et 1,48 xG. La possession favorise légèrement Potato avec 55,4 %."
+   },
+   "de": {
+    "headline": "Halbzeit: Potato 1:1 Carrot",
+    "fact.0": "Halbzeit: Potato 1:1 Carrot.",
+    "fact.1": "Bisherige Aufnahmen: 12 Potato (xG 3,01), Carrot 14 (xG 1,48).",
+    "fact.2": "Ballbesitz: Potato 55,4 %, Carrot 44,6 %.",
+    "fact.3": "1' Madekuta eröffnet die Punkteausgleich.",
+    "fact.4": "36' Mbeulier gleicht für Carrot aus.",
+    "fact.5": "20' Haalmer Straftritt wird gerettet.",
+    "casual": "Es ist Halbzeitpause und es steht 1:1 zwischen Potato und Carrot. Beide Teams hatten Chancen, wobei ein gehaltener Elfmeter für Dramatik sorgte.",
+    "analyst": "Zur Halbzeit führen Potato die Schussanzahl und xG (12 Schüsse, 3,01 xG), sind aber mit 1–1 mit Carrot gleichauf, die 14 Schüsse und 1,48 xG haben. Der Ballbesitz begünstigt Potato leicht mit 55,4 %."
+   },
+   "nl": {
+    "headline": "Rust: Potato 1–1 Carrot",
+    "fact.0": "Rust: Potato 1–1 Carrot.",
+    "fact.1": "Tot nu toe foto's: Potato 12 (xG 3,01), Carrot 14 (xG 1,48).",
+    "fact.2": "Balbezit: Potato 55,4%, Carrot 44,6%.",
+    "fact.3": "1' Madekuta opent de score.",
+    "fact.4": "36' Mbeulier gelijkmaakt voor Carrot.",
+    "fact.5": "20' Haalmer's straf wordt gered.",
+    "casual": "Het is rust en het staat 1–1 tussen Potato en Carrot. Beide teams hebben kansen gehad, waarbij een gestopte penalty voor extra drama zorgde.",
+    "analyst": "Bij rust leiden Potato in het aantal schoten en xG (12 schoten, 3,01 xG), maar staan ze gelijk op 1–1 met Carrot, die 14 schoten en 1,48 xG hebben. Het balbezit is lichtjes in het voordeel van Potato met 55,4%."
+   },
+   "zh-Hans": {
+    "headline": "半场： Potato 1–1 Carrot",
+    "fact.0": "半场比分： Potato 1–1 Carrot。",
+    "fact.1": "目前射击数： Potato 12（xG 3.01）， Carrot 14（xG 1.48）。",
+    "fact.2": "控球率： Potato 55.4%， Carrot 44.6%。",
+    "fact.3": "1' Madekuta 开局得分。",
+    "fact.4": "36' Mbeulier 可以等于 Carrot。",
+    "fact.5": "20' Haalmer的罚球得以保住。",
+    "casual": "半场结束， Potato 和 Carrot1比1战平。双方都有机会，一次扑救点球为比赛增添了戏剧性。",
+    "analyst": "半场结束时， Potato 在射门次数和xG（12次射门，3.01个xG）上领先，但与 Carrot1比1持平，后者有14次射门和1.48个xG。控球率略占优势， Potato 为55.4%。"
+   }
+  },
+  "M-18": {
+   "source_hash": "8beaf71dc6b06384",
+   "es": {
+    "headline": "Carrot sube el volumen de prensa",
+    "fact.0": "Carrot están haciendo 3,0 presiones altas por minuto, frente a 1,33 de media en este partido.",
+    "fact.1": "Carrot estuvieron bajo presión en los últimos cinco minutos (impulso de -0,61 por parte de su equipo).",
+    "fact.2": "Carrot jugó el 33% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 1–1 Carrot.",
+    "fact.4": "Carrot también subió la presión a 29' (2,4 presiones altas por minuto).",
+    "fact.5": "Ese es el tercer ataque de presión de Carrot en el partido.",
+    "casual": "Carrot están presionando fuerte y tomando el control tras unos minutos difíciles.",
+    "analyst": "Carrot aumentan a 3,0 presiones altas por minuto, su tercer periodo de presión, cambiando impulso tras una fase difícil."
+   },
+   "fr": {
+    "headline": "Carrot montez le volume de la presse",
+    "fact.0": "Carrot exercent 3,0 pressions élevées par minute, contre 1,33 en moyenne ce match.",
+    "fact.1": "Carrot étaient sous pression dans les cinq dernières minutes (élan de -0,61 de leur côté).",
+    "fact.2": "Carrot joué 33 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 1–1 Carrot.",
+    "fact.4": "Carrot aussi augmenté la pression à 29' (2,4 hautes pressions par minute).",
+    "fact.5": "C’est la troisième période de pressage de Carrot dans le match.",
+    "casual": "Carrot poussent fort et prennent le contrôle après quelques minutes difficiles.",
+    "analyst": "Carrot monter à 3,0 pressions élevées par minute, leur troisième période de pressage, changeant d’élan après une phase difficile."
+   },
+   "de": {
+    "headline": "Carrot die Presse aufdrehen",
+    "fact.0": "Carrot setzen 3,0 hohe Druckangriffe pro Minute aus, im Vergleich zu 1,33 im Durchschnitt in diesem Spiel.",
+    "fact.1": "Carrot standen in den letzten fünf Minuten unter Druck (Schwung -0,61 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 33 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 1:1 Carrot.",
+    "fact.4": "Carrot erhöhte auch den Druck auf 29' (2,4 hohe Druckaufnahmen pro Minute).",
+    "fact.5": "Das ist Carrot dritter Pressing-Spell im Spiel.",
+    "casual": "Carrot drücken hart und übernehmen nach ein paar harten Minuten die Kontrolle.",
+    "analyst": "Carrot steigern auf 3,0 hohe Druckphasen pro Minute, ihren dritten Pressing-Zauber, und drehen nach einer schwierigen Phase das Momentum."
+   },
+   "nl": {
+    "headline": "Carrot zet de pers harder",
+    "fact.0": "Carrot maken 3,0 hoge druk per minuut, tegenover gemiddeld 1,33 in deze wedstrijd.",
+    "fact.1": "Carrot stonden in de laatste vijf minuten onder druk (momentum -0,61 van hun kant).",
+    "fact.2": "Carrot speelde 33% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 1–1 Carrot.",
+    "fact.4": "Carrot zette ook de press op 29' (2,4 hoge druk per minuut).",
+    "fact.5": "Dat is Carrot derde pressing spell van de wedstrijd.",
+    "casual": "Carrot druk hard en nemen na een paar zware minuten de controle over.",
+    "analyst": "Carrot verhogen naar 3,0 hoge druk per minuut, hun derde drukspell, en keren het momentum na een moeilijke fase."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 把新闻加大点",
+    "fact.0": "Carrot 每分钟制造3.0次高压，而本场比赛平均为1.33次。",
+    "fact.1": "Carrot 在最后五分钟承受了压力（球队势头-0.61）。",
+    "fact.2": "Carrot 在最后五分钟完成了33%的最后三分之一传球。",
+    "fact.3": "比分 Potato 1比1 Carrot。",
+    "fact.4": "Carrot 还把压力调高到 29' （每分钟2.4个高压）。",
+    "fact.5": "这是 Carrot本场比赛的第三次逼抢。",
+    "casual": "Carrot 在艰难的几分钟后强势施压，掌控了比赛。",
+    "analyst": "Carrot 将每分钟3.0个高压提升，这是他们的第三次逼抢阶段，在艰难阶段后扭转了势头。"
+   }
+  },
+  "M-19": {
+   "source_hash": "01dff2e42a22ae95",
+   "es": {
+    "headline": "Gvardosz creciendo en el juego",
+    "fact.0": "La valoración en directo de Gvardosz es de 7,8.",
+    "fact.1": "Subió desde 6,9 en los últimos diez minutos.",
+    "fact.2": "45+2' placaje ganado (+0,50).",
+    "fact.3": "24' de espacio (+0,21).",
+    "fact.4": "33' de espacio (+0,21)."
+   },
+   "fr": {
+    "headline": "Gvardosz évoluant dans le jeu",
+    "fact.0": "Gvardosz en direct est de 7,8.",
+    "fact.1": "En hausse par rapport à 6,9 en dix minutes.",
+    "fact.2": "45+2' plaquage gagné (+0,50).",
+    "fact.3": "24' dégagement (+0,21).",
+    "fact.4": "33' dégagement (+0,21)."
+   },
+   "de": {
+    "headline": "Gvardosz in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Gvardosz liegt bei 7,8.",
+    "fact.1": "Erhöht von 6,9 in den letzten zehn Minuten.",
+    "fact.2": "45+2' Tackle gewann (+0,50).",
+    "fact.3": "24' Abstand (+0,21).",
+    "fact.4": "33' Abstand (+0,21)."
+   },
+   "nl": {
+    "headline": "Gvardosz groeien in het spel",
+    "fact.0": "De live rating van Gvardosz is 7,8.",
+    "fact.1": "Gestegen van 6,9 in de laatste tien minuten.",
+    "fact.2": "45+2' tackle won (+0,50).",
+    "fact.3": "24' ruimte (+0,21).",
+    "fact.4": "33' ruimte (+0,21)."
+   },
+   "zh-Hans": {
+    "headline": "Gvardosz 逐渐融入游戏",
+    "fact.0": "Gvardosz的现场评分为7.8。",
+    "fact.1": "从最后十分钟的6.9有所上升。",
+    "fact.2": "45+2' 擒抱获胜（+0.50）。",
+    "fact.3": "24' 净空率（+0.21）。",
+    "fact.4": "33' 净空率（+0.21）。"
+   }
+  },
+  "M-20": {
+   "source_hash": "abdb601bb6dc0bf4",
+   "es": {
+    "headline": "Gyokerland pierde una gran oportunidad",
+    "fact.0": "El disparo de Gyokerland fue desviado: xG 0,65, así que entra unas 65 veces en 100.",
+    "fact.1": "El marcador es Potato 1–1 Carrot.",
+    "fact.2": "Carrot jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "casual": "Gyokerland falla una gran oportunidad para adelantar Carrot . El marcador sigue 1–1.",
+    "analyst": "Gyokerland fallo de , con un xG de 0,65, es un gran alivio para Potato. Carrot dominan el último tercio, completando todas las pasadas en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Gyokerland rate une grande occasion",
+    "fact.0": "Le tir de Gyokerland était hors cible : xG 0,65, donc il rentre environ 65 fois sur 100.",
+    "fact.1": "Le score est Potato 1–1 Carrot.",
+    "fact.2": "Carrot joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "casual": "Gyokerland rate une belle occasion de Carrot donner l’avantage. Le score reste 1–1.",
+    "analyst": "Gyokerland raté, avec un xG de 0,65, est un grand soulagement pour Potato. Carrot dominent le dernier tiers, complétant toutes les passes dans les cinq dernières minutes."
+   },
+   "de": {
+    "headline": "Gyokerland verpasst eine große Chance",
+    "fact.0": "Gyokerland's Schuss verfehlte das Ziel: xG 0,65, also geht er etwa 65 Mal in 100.",
+    "fact.1": "Der Spielstand lautet Potato 1:1 Carrot.",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "casual": "Gyokerland verpasst eine großartige Chance, Carrot in Führung zu bringen. Es steht immer noch 1:1.",
+    "analyst": "Gyokerland's Fehlschuss mit einem xG von 0,65 ist eine große Erleichterung für Potato. Carrot dominieren das letzte Drittel und vollenden alle Pässe in den letzten fünf Minuten."
+   },
+   "nl": {
+    "headline": "Gyokerland mist een grote kans",
+    "fact.0": "Gyokerland's schot ging naast het doel: xG 0,65, dus het gaat ongeveer 65 keer in 100.",
+    "fact.1": "De stand is Potato 1–1 Carrot.",
+    "fact.2": "Carrot speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "casual": "Gyokerland mist een geweldige kans om Carrot op voorsprong te zetten. Het is nog steeds 1–1.",
+    "analyst": "Gyokerland's misser, met een xG van 0,65, is een grote uitloper voor Potato. Carrot domineren het laatste derde deel en voltooien alle passes daar in de laatste vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 错失了一个大好机会",
+    "fact.0": "Gyokerland的射门偏离目标：xG值0.65，所以大约100次进了65球。",
+    "fact.1": "比分 Potato 1比1 Carrot。",
+    "fact.2": "Carrot 在最后五分钟完成了100%的最后三分之一传球。",
+    "casual": "Gyokerland 错失了一次绝佳机会， Carrot 领先。比分仍然是1比1。",
+    "analyst": "Gyokerland的失误以xG为0.65，对 Potato来说是一大幸运。 Carrot 主导了前三分之一区域，最后五分钟内完成了所有传球。"
+   }
+  },
+  "M-21": {
+   "source_hash": "f82e729e2fa18500",
+   "es": {
+    "headline": "Carrot tomar el control",
+    "fact.0": "En los últimos diez minutos Potato estaban por delante (impulso de 0,79 por parte de su equipo); ahora Carrot lo están (0,41 por parte de su equipo).",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,41 de su lado).",
+    "fact.2": "Carrot jugó el 78% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 1–1 Carrot.",
+    "fact.4": "Carrot también tomó el control del partido en 33'.",
+    "fact.5": "Es la tercera vez que Carrot toman el control en este partido.",
+    "casual": "Carrot ahora están al mando, mostrando más presencia en el último tercio.",
+    "analyst": "Carrot recuperan el control por tercera vez, dominando con el 78% de los pases en el último tercio en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Carrot prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Potato dominaient (momentum 0,79 de leur côté) ; maintenant Carrot sont (0,41 de leur côté).",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,41 de leur côté).",
+    "fact.2": "Carrot joué 78 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 1–1 Carrot.",
+    "fact.4": "Carrot a également pris le contrôle du jeu à 33'.",
+    "fact.5": "C’est la troisième fois Carrot reprenez le contrôle de ce match.",
+    "casual": "Carrot sont désormais aux commandes, montrant une plus grande présence dans le dernier tiers.",
+    "analyst": "Carrot reprennent le contrôle pour la troisième fois, dominant avec 78 % des passes du dernier tiers dans les cinq dernières minutes."
+   },
+   "de": {
+    "headline": "Carrot übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Potato vorne (Momentum 0,79 von ihrer Seite); jetzt sind Carrot es (0,41 von ihrer Seite).",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,41 von ihrer Seite).",
+    "fact.2": "Carrot spielte 78 % der letzten Drittel-Pässe in den letzten fünf Minuten.",
+    "fact.3": "Der Spielstand lautet Potato 1:1 Carrot.",
+    "fact.4": "Carrot übernahm auch die Kontrolle über das Spiel bei 33'.",
+    "fact.5": "Das ist das dritte Mal, dass Carrot in diesem Match die Kontrolle übernommen hast.",
+    "casual": "Carrot sind nun an der Spitze und zeigen mehr Präsenz im letzten Drittel.",
+    "analyst": "Carrot gewinnen zum dritten Mal die Kontrolle zurück und dominieren in den letzten fünf Minuten mit 78 % der letzten Drittel-Pässe."
+   },
+   "nl": {
+    "headline": "Carrot neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Potato bovenaan (momentum 0,79 van hun kant); nu zijn Carrot dat (0,41 van hun kant).",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,41 van hun kant).",
+    "fact.2": "Carrot speelde 78% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 1–1 Carrot.",
+    "fact.4": "Carrot nam ook de controle over het spel op 33'.",
+    "fact.5": "Dat is de derde keer dat Carrot de controle in deze wedstrijd overneem.",
+    "casual": "Carrot hebben nu de leiding en laten meer aanwezigheid zien in het laatste derde deel.",
+    "analyst": "Carrot herwinnen voor de derde keer de controle en domineren met 78% van de passes in het laatste derde deel van de laatste vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 掌控局面",
+    "fact.0": "最后十分钟内， Potato 占据上风（势头领先他们0.79）;现在 Carrot 领先（他们领先0.41）。",
+    "fact.1": "Carrot 在最后五分钟占据上风（他们方面势头+0.41）。",
+    "fact.2": "Carrot 在最后五分钟完成了78%的最后三分之一传球。",
+    "fact.3": "比分 Potato 1比1 Carrot。",
+    "fact.4": "Carrot 也在 33'时掌控了比赛。",
+    "fact.5": "这是 Carrot 第三次掌控比赛。",
+    "casual": "Carrot 现在掌控比赛，在前场展现更多存在感。",
+    "analyst": "Carrot 第三次重新掌控比赛，在最后五分钟内以78%的最后三分之一传球占据主导。"
+   }
+  },
+  "M-22": {
+   "source_hash": "a0163e63797881fb",
+   "es": {
+    "headline": "Carrot sube el volumen de prensa",
+    "fact.0": "Carrot están ejerciendo 2,6 presiones altas por minuto, frente a 1,49 de media en este partido.",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,40 de su lado).",
+    "fact.2": "Carrot jugó el 65% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "Carrot tuvo 3 disparos (xG 0,31) y 1 córner en los últimos cinco minutos.",
+    "fact.4": "El marcador es Potato 1–1 Carrot.",
+    "fact.5": "Carrot también subió la presión a 49' (3,0 presiones altas por minuto).",
+    "fact.6": "Ese es el cuarto spell de presión de Carrot en el partido.",
+    "casual": "Carrot FC están presionando fuerte y dominando el partido ahora mismo.",
+    "analyst": "Carrot FC intensificar de nuevo su juego de presión, logrando 2,6 presiones altas por minuto y controlando el 65% de los pases del último tercio."
+   },
+   "fr": {
+    "headline": "Carrot montez le volume de la presse",
+    "fact.0": "Carrot exercent 2,6 pressions élevées par minute, contre 1,49 en moyenne ce match.",
+    "fact.1": "Carrot avait l’avantage dans les cinq dernières minutes (élan +0,40 de leur côté).",
+    "fact.2": "Carrot joué 65 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Carrot a tiré 3 fois (xG 0,31) et 1 corner dans les cinq dernières minutes.",
+    "fact.4": "Le score est Potato 1–1 Carrot.",
+    "fact.5": "Carrot aussi monté la pression à 49' (3,0 hautes pressions par minute).",
+    "fact.6": "C’est le quatrième passage de pression de Carrot du match.",
+    "casual": "Carrot FC poussent fort et dominent le jeu en ce moment.",
+    "analyst": "Carrot FC intensifient à nouveau leur jeu de pression, réalisant 2,6 pressions élevées par minute et contrôlant 65 % des passes du dernier tiers."
+   },
+   "de": {
+    "headline": "Carrot die Presse aufdrehen",
+    "fact.0": "Carrot setzen 2,6 hohe Druckangriffe pro Minute aus, im Vergleich zu 1,49 im Durchschnitt in diesem Spiel.",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,40 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 65 % der Pässe im letzten Drittel.",
+    "fact.3": "Carrot hatte in den letzten fünf Minuten 3 Schüsse (xG 0,31) und 1 Ecke.",
+    "fact.4": "Der Spielstand lautet Potato 1:1 Carrot.",
+    "fact.5": "Carrot erhöhte außerdem die Presse auf 49' (3,0 hohe Druck pro Minute).",
+    "fact.6": "Das ist Carrot vierter Pressing-Spell im Spiel.",
+    "casual": "Carrot FC drücken gerade hart und dominieren das Spiel.",
+    "analyst": "Carrot FC steigern ihr Pressing erneut, setzen 2,6 hohe Druckattacken pro Minute und kontrollieren 65 % der Pässe im letzten Drittel."
+   },
+   "nl": {
+    "headline": "Carrot zet de pers harder",
+    "fact.0": "Carrot zetten 2,6 hoge druk per minuut uit, tegenover gemiddeld 1,49 in deze wedstrijd.",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,40 van hun kant).",
+    "fact.2": "Carrot speelde 65% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.3": "Carrot had 3 schoten (xG 0,31) en 1 corner in de laatste vijf minuten.",
+    "fact.4": "De stand is Potato 1–1 Carrot.",
+    "fact.5": "Carrot zette de druk ook op 49' (3,0 hoge druk per minuut).",
+    "fact.6": "Dat is Carrot vierde pressing spell van de wedstrijd.",
+    "casual": "Carrot FC druk nu hard en domineren het spel.",
+    "analyst": "Carrot FC hun pressing weer opvoeren, met 2,6 hoge druk per minuut en controle over 65% van de passes in het laatste derde deel."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 把新闻加大点",
+    "fact.0": "Carrot 每分钟制造2.6次高压，而本场比赛平均为1.49次。",
+    "fact.1": "Carrot 在最后五分钟占据上风（他们势头+0.40）。",
+    "fact.2": "Carrot 在最后五分钟完成了65%的最后三分之一传球。",
+    "fact.3": "Carrot 在最后五分钟门3次（xG0.31）和1个角球。",
+    "fact.4": "比分 Potato 1比1 Carrot。",
+    "fact.5": "Carrot 还将压力调高到 49' （每分钟3.0高压）。",
+    "fact.6": "这是 Carrot本场比赛的第四次逼抢。",
+    "casual": "Carrot FC 现在正全力施压，主宰了比赛。",
+    "analyst": "Carrot FC 再次提升逼抢进攻，每分钟制造2.6次高压，控制65%的最后三分之一传球。"
+   }
+  },
+  "M-23": {
+   "source_hash": "791bad3153458ae9",
+   "es": {
+    "headline": "Madekuta Potato adelanta",
+    "fact.0": "Ahora está Potato 2–1 Carrot.",
+    "fact.1": "La probabilidad de ganar de Potato pasó del 42% al 75%.",
+    "fact.2": "Asistido por Sakinelli.",
+    "fact.3": "Una gran posibilidad, xG 0,78.",
+    "fact.4": "Su segundo gol del partido.",
+    "fact.5": "Su cuarto gol de la temporada.",
+    "fact.6": "Contra el curso del juego: Carrot había dominado.",
+    "fact.7": "Potato estuvieron bajo presión en los últimos cinco minutos (impulso de -0,60 por parte de su equipo).",
+    "fact.8": "Potato jugó el 13% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.9": "La valoración en directo de Madekuta es de 8,3.",
+    "fact.10": "Disparos hasta ahora: Potato 13 (xG 3,79), Carrot 18 (xG 2,44).",
+    "fact.11": "Sakinelli tiene 5 asistencias esta temporada.",
+    "fact.12": "La audiencia en directo de Sakinelli es de 7,7.",
+    "fact.13": "Subió desde 6,9 en los últimos diez minutos.",
+    "fact.14": "Subió desde 7,6 en los últimos diez minutos.",
+    "fact.15": "Antes en este partido, a las 1': Madekuta anotó con un disparo de Sakinelli por la izquierda (xG 0,59).",
+    "fact.16": "Eso hace 4 goles Potato o grandes ocasiones en este partido.",
+    "casual": "Madekuta anota su segundo gol para poner el 2–1 a favor de Potato, dando la vuelta al partido después de que Carrot hubiera dominado.",
+    "analyst": "El segundo gol de Madekuta, asistido por Sakinelli, pone a Potato 2–1 con un xG alto de 0,78. Esto cambia su probabilidad de victoria del 42% al 75%, a pesar de Carrot dominante impulso recientemente."
+   },
+   "fr": {
+    "headline": "Madekuta Potato donne de l’avance",
+    "fact.0": "C’est maintenant Potato 2–1 Carrot.",
+    "fact.1": "Les chances de victoire de Potato sont passées de 42 % à 75 %.",
+    "fact.2": "Assisté par Sakinelli.",
+    "fact.3": "Une grande chance, xG 0,78.",
+    "fact.4": "Son deuxième but du match.",
+    "fact.5": "Son 4e but de la saison.",
+    "fact.6": "Contre le cours du jeu : Carrot avait dominé.",
+    "fact.7": "Potato étaient sous pression dans les cinq dernières minutes (élan de -0,60 de leur côté).",
+    "fact.8": "Potato joué 13 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.9": "Madekuta en direct est de 8,3.",
+    "fact.10": "Tirs jusqu’à présent : Potato 13 (xG 3,79), Carrot 18 (xG 2,44).",
+    "fact.11": "Sakinelli compte 5 passes décisives cette saison.",
+    "fact.12": "Sakinelli audience en direct est de 7,7.",
+    "fact.13": "En hausse par rapport à 6,9 en dix minutes.",
+    "fact.14": "En hausse par rapport à 7,6 en dix minutes.",
+    "fact.15": "Plus tôt dans ce match, à 1': Madekuta marqué sur une passe de Sakinelli sur la gauche (xG 0,59).",
+    "fact.16": "Cela fait 4 buts Potato ou de grandes occasions dans ce match.",
+    "casual": "Madekuta inscrit son deuxième but pour porter le score à 2–1 pour Potato, renversant la situation après Carrot avait pris l’avantage.",
+    "analyst": "Le deuxième but de Madekuta, assisté par Sakinelli, Potato place 2–1 avec un xG élevé de 0,78. Cela fait passer leur probabilité de victoire de 42 % à 75 %, malgré Carrot élan dominant récemment."
+   },
+   "de": {
+    "headline": "Madekuta setzt Potato voran",
+    "fact.0": "Jetzt steht es Potato 2:1 Carrot.",
+    "fact.1": "Die Gewinnchance von Potato stieg von 42 % auf 75 %.",
+    "fact.2": "Unterstützt von Sakinelli.",
+    "fact.3": "Eine große Chance, xG 0,78.",
+    "fact.4": "Sein zweites Tor des Spiels.",
+    "fact.5": "Sein viertes Saisontor.",
+    "fact.6": "Entgegen dem Spielverlauf: Carrot war oberste gewesen.",
+    "fact.7": "Potato standen in den letzten fünf Minuten unter Druck (Momentum -0,60 von ihrer Seite).",
+    "fact.8": "Potato spielte in den letzten fünf Minuten 13 % der Pässe im letzten Drittel.",
+    "fact.9": "Die Live-Bewertung von Madekuta liegt bei 8,3.",
+    "fact.10": "Bisherige Aufnahmen: 13 Potato (xG 3,79), Carrot 18 (xG 2,44).",
+    "fact.11": "Sakinelli hat in dieser Saison 5 Assists.",
+    "fact.12": "Die Live-Bewertung von Sakinelli liegt bei 7,7.",
+    "fact.13": "Erhöht von 6,9 in den letzten zehn Minuten.",
+    "fact.14": "Anstieg von 7,6 in den letzten zehn Minuten.",
+    "fact.15": "Früher in diesem Spiel, um 1': Madekuta erzielte mit einem Schuss von Sakinelli's Pass auf der linken Seite (xG 0,59).",
+    "fact.16": "Das macht 4 Potato Tore oder große Chancen in diesem Spiel.",
+    "casual": "Madekuta erzielte sein zweites Tor zum 2:1 für Potato und drehte das Spiel, nachdem Carrot die Oberhand hatte.",
+    "analyst": "Das zweite Tor von Madekuta, vorbereitet von Sakinelli, bringt Potato mit einem hohen xG von 0,78 mit 2:1 in Führung. Damit verschiebt sich ihre Gewinnwahrscheinlichkeit von 42 % auf 75 %, trotz Carrot dominanten Schwung in letzter Zeit."
+   },
+   "nl": {
+    "headline": "Madekuta zet Potato voorop",
+    "fact.0": "Het staat nu Potato 2–1 Carrot.",
+    "fact.1": "De kans van Potato om te winnen steeg van 42% naar 75%.",
+    "fact.2": "Geassisteerd door Sakinelli.",
+    "fact.3": "Een grote kans, xG 0,78.",
+    "fact.4": "Zijn tweede doelpunt van de wedstrijd.",
+    "fact.5": "Zijn vierde doelpunt van het seizoen.",
+    "fact.6": "Tegen de spelverloop in: Carrot stond bovenaan.",
+    "fact.7": "Potato stonden in de laatste vijf minuten onder druk (momentum -0,60 van hun kant).",
+    "fact.8": "Potato speelde 13% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.9": "De live-rating van Madekuta is 8,3.",
+    "fact.10": "Schoten tot nu toe: 13 Potato (xG 3,79), Carrot 18 (xG 2,44).",
+    "fact.11": "Sakinelli heeft dit seizoen 5 assists.",
+    "fact.12": "De live rating van Sakinelli is 7,7.",
+    "fact.13": "Gestegen van 6,9 in de laatste tien minuten.",
+    "fact.14": "Gestegen van 7,6 in de laatste tien minuten.",
+    "fact.15": "Eerder in deze wedstrijd, op 1': Madekuta scoorde met een schot uit een pass van Sakinelli links (xG 0,59).",
+    "fact.16": "Dat maakt 4 Potato doelpunten of grote kansen in deze wedstrijd.",
+    "casual": "Madekuta scoort zijn tweede doelpunt en maakt het 2–1 voor Potato, waarmee hij de wedstrijd keert nadat Carrot de overhand had genomen.",
+    "analyst": "Het tweede doelpunt van Madekuta, geassisteerd door Sakinelli, brengt Potato op een 2–1 voorsprong met een hoge xG van 0,78. Hierdoor verschuiven ze hun winstkans van 42% naar 75%, ondanks Carrot recente dominante momentum."
+   },
+   "zh-Hans": {
+    "headline": "Madekuta 让 Potato 领先",
+    "fact.0": "现在比分 Potato 2比1 Carrot。",
+    "fact.1": "Potato的获胜概率从42%降至75%。",
+    "fact.2": "协助者为 Sakinelli。",
+    "fact.3": "概率很高，xG 0.78。",
+    "fact.4": "这是他本场比赛的第二个进球。",
+    "fact.5": "这是他本赛季的第四个进球。",
+    "fact.6": "逆势而上： Carrot 一直占据上风。",
+    "fact.7": "Potato 在最后五分钟承受了压力（球队势头为-0.60）。",
+    "fact.8": "Potato 在最后五分钟完成了13%的最后三分之一传球。",
+    "fact.9": "Madekuta的现场评分是8.3。",
+    "fact.10": "目前射门数： Potato 13（xG 3.79）， Carrot 18（xG 2.44）。",
+    "fact.11": "Sakinelli 本赛季有5次助攻。",
+    "fact.12": "Sakinelli的现场评分为7.7。",
+    "fact.13": "从最后十分钟的6.9有所上升。",
+    "fact.14": "从最后十分钟的7.6有所上升。",
+    "fact.15": "本场比赛早些时候， 1'： Madekuta 接 Sakinelli左路传球射门得分（xG 0.59）。",
+    "fact.16": "这场比赛中共有4个 Potato 进球或大好机会。",
+    "casual": "Madekuta 再下一城，将比分改写为2比1 Potato，在 Carrot 领先后逆转了比赛。",
+    "analyst": "Madekuta的第二个进球由 Sakinelli助攻，使 Potato 以2比1领先，最高xG为0.78。 Carrot 尽管近期势头占据主导地位，这也使他们的胜率从42%提升至75%。"
+   }
+  },
+  "M-24": {
+   "source_hash": "25fdb92ec3aa25f7",
+   "es": {
+    "headline": "Potato tomar el control",
+    "fact.0": "En los últimos diez minutos Carrot dominaban (impulso 0,70 por su lado); ahora Potato (0,55 por su lado).",
+    "fact.1": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,55 de su lado).",
+    "fact.2": "Potato jugó el 71% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 2–1 Carrot.",
+    "fact.4": "Potato también tomó el control del partido en 22'.",
+    "fact.5": "Es la segunda vez Potato toman el control en este partido.",
+    "casual": "Potato vuelven a estar al mando, avanzando y controlando el juego.",
+    "analyst": "Potato recuperan el control con el 71% de los pases en el último tercio en los últimos 5 minutos, liderando 2–1."
+   },
+   "fr": {
+    "headline": "Potato prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Carrot dominaient (momentum 0,70 de leur côté) ; maintenant Potato sont (0,55 de leur côté).",
+    "fact.1": "Potato a eu l’avantage dans les cinq dernières minutes (élan +0,55 de leur côté).",
+    "fact.2": "Potato joué 71 % des dernières passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 2–1 Carrot.",
+    "fact.4": "Potato a également pris le contrôle du jeu à 22'.",
+    "fact.5": "C’est la deuxième fois Potato reprenez le contrôle de ce match.",
+    "casual": "Potato sont de retour aux commandes, avançant et contrôlant le jeu.",
+    "analyst": "Potato reprend le contrôle avec 71 % des passes du dernier tiers dans les 5 dernières minutes, menant 2–1."
+   },
+   "de": {
+    "headline": "Potato übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Carrot vorne (Momentum 0,70 von ihrer Seite); jetzt sind Potato (0,55 von ihrer Seite).",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,55 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 71 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 2:1 Carrot.",
+    "fact.4": "Potato übernahm auch die Kontrolle über das Spiel bei 22'.",
+    "fact.5": "Das ist das zweite Mal, dass Potato in diesem Match die Kontrolle übernommen hast.",
+    "casual": "Potato sind wieder an der Spitze, drängen voran und kontrollieren das Spiel.",
+    "analyst": "Potato eroberten die Kontrolle mit 71 % der letzten Pässe im letzten 5 Minuten zurück und führten mit 2:1."
+   },
+   "nl": {
+    "headline": "Potato neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Carrot bovenaan (momentum 0,70 van hun kant); nu staan Potato (0,55 van hun kant).",
+    "fact.1": "Potato had in de laatste vijf minuten de overhand (momentum +0,55 van hun kant).",
+    "fact.2": "Potato speelde 71% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 2–1 Carrot.",
+    "fact.4": "Potato nam ook de controle over het spel op 22'.",
+    "fact.5": "Dat is de tweede keer dat Potato de controle in deze wedstrijd neemt.",
+    "casual": "Potato zijn weer aan de macht, gaan vooruit en controleren het spel.",
+    "analyst": "Potato herwinnen de controle met 71% van de passes in het laatste derde deel in de laatste 5 minuten, met een 2–1 voorsprong in de punten."
+   },
+   "zh-Hans": {
+    "headline": "Potato 掌控局面",
+    "fact.0": "最后十分钟内 Carrot 占据上风（势头领先0.70）;现在 Potato 领先（领先0.55）。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.55）。",
+    "fact.2": "Potato 在最后五分钟完成了71%的最后三分之一传球。",
+    "fact.3": "比分 Potato 2比1 Carrot。",
+    "fact.4": "Potato 也在 22'时掌控了比赛。",
+    "fact.5": "这是 Potato 第二次掌控比赛。",
+    "casual": "Potato 重新掌控局面，积极推进并掌控比赛。",
+    "analyst": "Potato 在最后5分钟以71%的最后三分之一传球成功率重新掌控比赛，以2比1领先。"
+   }
+  },
+  "M-25": {
+   "source_hash": "57b72ad88ec0ddf0",
+   "es": {
+    "headline": "Konavadi creciendo en el juego",
+    "fact.0": "La audiencia en directo de Konavadi es 6,5.",
+    "fact.1": "Subió desde 5,8 en los últimos diez minutos.",
+    "fact.2": "65' intercepción (+0,45).",
+    "fact.3": "20' placaje fallado (-0,32).",
+    "fact.4": "17' fue regateado más allá de (-0,27)."
+   },
+   "fr": {
+    "headline": "Konavadi évoluant dans le jeu",
+    "fact.0": "Konavadi en direct est de 6,5.",
+    "fact.1": "En hausse par rapport à 5,8 en dix minutes.",
+    "fact.2": "65' interception (+0,45).",
+    "fact.3": "20' plaquage manqué (-0,32).",
+    "fact.4": "17' a été dribblé au-delà (-0,27)."
+   },
+   "de": {
+    "headline": "Konavadi in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Konavadi liegt bei 6,5.",
+    "fact.1": "Anstieg von 5,8 in den letzten zehn Minuten.",
+    "fact.2": "65' Interception (+0,45).",
+    "fact.3": "20' verfehlte Tackle (-0,32).",
+    "fact.4": "17' wurde (-0,27) überholt."
+   },
+   "nl": {
+    "headline": "Konavadi groeien in het spel",
+    "fact.0": "De live-rating van Konavadi is 6,5.",
+    "fact.1": "Gestegen van 5,8 in de laatste tien minuten.",
+    "fact.2": "65' interceptie (+0,45).",
+    "fact.3": "20' miste tackle (-0,32).",
+    "fact.4": "17' werd voorbij gedribbeld (-0,27)."
+   },
+   "zh-Hans": {
+    "headline": "Konavadi 逐渐融入游戏",
+    "fact.0": "Konavadi的现场评分是6.5。",
+    "fact.1": "从最后十分钟的5.8提升。",
+    "fact.2": "65' 拦截（+0.45）。",
+    "fact.3": "20' 失误擒抱（-0.32）。",
+    "fact.4": "17' 被运球越过网球（-0.27）。"
+   }
+  },
+  "M-26": {
+   "source_hash": "11663f1faf66f66d",
+   "es": {
+    "headline": "Gvardosz alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Gvardosz es de 8,0.",
+    "casual": "Gvardosz brilla por Carrot FC, alcanzando una impresionante valoración de 8.0.",
+    "analyst": "Aurelio Gvardosz alcanza una puntuación de 8.0, reflejando su importante contribución para Carrot FC en este combate."
+   },
+   "fr": {
+    "headline": "Gvardosz atteint une note de 8,0",
+    "fact.0": "La note en direct de Gvardosz est de 8,0.",
+    "casual": "Gvardosz brille pour Carrot FC, atteignant une impressionnante note de 8,0.",
+    "analyst": "Aurelio Gvardosz atteint un score de 8,0, témoignant de sa contribution significative à Carrot FC dans ce match."
+   },
+   "de": {
+    "headline": "Gvardosz erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Gvardosz liegt bei 8,0.",
+    "casual": "Gvardosz glänzt für Carrot FC und erreicht eine beeindruckende Bewertung von 8,0.",
+    "analyst": "Aurelio Gvardosz erreicht eine Bewertung von 8,0, was seinen bedeutenden Beitrag für Carrot FC in diesem Match widerspiegelt."
+   },
+   "nl": {
+    "headline": "Gvardosz haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Gvardosz is 8,0.",
+    "casual": "Gvardosz straalt voor Carrot FC en haalt een indrukwekkende 8,0 rating.",
+    "analyst": "Aurelio Gvardosz bereikt een rating van 8,0, wat zijn belangrijke bijdrage aan Carrot FC in deze wedstrijd weerspiegelt."
+   },
+   "zh-Hans": {
+    "headline": "Gvardosz 评分为8.0",
+    "fact.0": "Gvardosz的现场评分为8.0。",
+    "casual": "GvardoszCarrot FC表现出色，获得了令人印象深刻的8.0评分。",
+    "analyst": "Aurelio Gvardosz 获得了8.0的评分，反映出他在这场比赛中为 Carrot FC 做出了重要贡献。"
+   }
+  },
+  "M-27": {
+   "source_hash": "8d15cc2d1da5a907",
+   "es": {
+    "headline": "Gvardosz creciendo en el juego",
+    "fact.0": "La valoración en directo de Gvardosz es de 8,3.",
+    "fact.1": "Subió desde 7,5 en los últimos diez minutos.",
+    "fact.2": "45+2' placaje ganado (+0,45).",
+    "fact.3": "66' placaje ganado (+0,45).",
+    "fact.4": "67' placaje ganado (+0,45)."
+   },
+   "fr": {
+    "headline": "Gvardosz évoluant dans le jeu",
+    "fact.0": "Gvardosz en direct est de 8,3.",
+    "fact.1": "En hausse par rapport à 7,5 en dix minutes.",
+    "fact.2": "45+2' plaquage gagné (+0,45).",
+    "fact.3": "66' plaquage gagné (+0,45).",
+    "fact.4": "67' plaquage gagné (+0,45)."
+   },
+   "de": {
+    "headline": "Gvardosz in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Gvardosz liegt bei 8,3.",
+    "fact.1": "Anstieg von 7,5 in den letzten zehn Minuten.",
+    "fact.2": "45+2' Tackle gewonnen (+0,45).",
+    "fact.3": "66' Tackle gewonnen (+0,45).",
+    "fact.4": "67' Tackle gewonnen (+0,45)."
+   },
+   "nl": {
+    "headline": "Gvardosz groeien in het spel",
+    "fact.0": "De live-rating van Gvardosz is 8,3.",
+    "fact.1": "Gestegen van 7,5 in de laatste tien minuten.",
+    "fact.2": "45+2' tackle won (+0,45).",
+    "fact.3": "66' tackle won (+0,45).",
+    "fact.4": "67' tackle won (+0,45)."
+   },
+   "zh-Hans": {
+    "headline": "Gvardosz 逐渐融入游戏",
+    "fact.0": "Gvardosz的现场评分是8.3。",
+    "fact.1": "从最后十分钟的7.5提升。",
+    "fact.2": "45+2' 擒抱获胜（+0.45）。",
+    "fact.3": "66' 擒抱获胜（+0.45）。",
+    "fact.4": "67' 擒抱获胜（+0.45）。"
+   }
+  },
+  "M-28": {
+   "source_hash": "79a789ee9a3f2e6c",
+   "es": {
+    "headline": "Hechizo de extremo a extremo",
+    "fact.0": "La posesión cambia de manos 3,8 veces por minuto."
+   },
+   "fr": {
+    "headline": "Sort de bout en bout",
+    "fact.0": "La possession change de mains 3,8 fois par minute."
+   },
+   "de": {
+    "headline": "End-to-End-Zauber",
+    "fact.0": "Der Ballbesitz ist 3,8 Mal pro Minute den Besitzer."
+   },
+   "nl": {
+    "headline": "End-to-end spreuk",
+    "fact.0": "Balbezit wisselt 3,8 keer per minuut."
+   },
+   "zh-Hans": {
+    "headline": "端到端咒语",
+    "fact.0": "控球权每分钟易手3.8次。"
+   }
+  },
+  "M-29": {
+   "source_hash": "d4c33170074eae4a",
+   "es": {
+    "headline": "Carrot tomar el control",
+    "fact.0": "En los últimos diez minutos Potato dominaban (impulso 0,57 por su lado); ahora Carrot están (0,54 por su lado).",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,54 de su equipo).",
+    "fact.2": "Carrot jugó el 84% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 2–1 Carrot.",
+    "fact.4": "Carrot también tomó el control del partido en 52'.",
+    "fact.5": "Es la cuarta vez Carrot tomas el control en este partido.",
+    "casual": "Carrot están presionando con fuerza, dominando los últimos cinco minutos mientras persiguen el empate.",
+    "analyst": "Carrot han tomado el control por cuarta vez, completando el 84% de los pases del último tercio en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Carrot prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Potato étaient en tête (momentum 0,57 de leur côté) ; maintenant Carrot sont (0,54 de leur côté).",
+    "fact.1": "Carrot a eu l’avantage dans les cinq dernières minutes (élan +0,54 de leur côté).",
+    "fact.2": "Carrot joué 84 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 2–1 Carrot.",
+    "fact.4": "Carrot a également pris le contrôle du jeu à 52'.",
+    "fact.5": "C’est la 4e fois Carrot prennent le contrôle dans ce match.",
+    "casual": "Carrot poussent maintenant fort, dominant les cinq dernières minutes en cherchant l’égalisation.",
+    "analyst": "Carrot ont pris le contrôle pour la quatrième fois, complétant 84 % des passes du dernier tiers en cinq minutes."
+   },
+   "de": {
+    "headline": "Carrot übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Potato vorne (Momentum 0,57 von ihrer Seite); jetzt sind Carrot es (0,54 von ihrer Seite).",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,54 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 84 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 2:1 Carrot.",
+    "fact.4": "Carrot übernahm auch die Kontrolle über das Spiel bei 52'.",
+    "fact.5": "Das ist das vierte Mal, dass Carrot in diesem Match die Kontrolle übernommen hast.",
+    "casual": "Carrot drücken jetzt hart und dominieren die letzten fünf Minuten, während sie den Ausgleich verfolgen.",
+    "analyst": "Carrot haben zum vierten Mal die Kontrolle übernommen und in den letzten fünf Minuten 84 % der letzten Drittel-Pässe vervollständigt."
+   },
+   "nl": {
+    "headline": "Carrot neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Potato bovenaan (momentum 0,57 van hun kant); nu zijn Carrot dat (0,54 van hun kant).",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,54 van hun kant).",
+    "fact.2": "Carrot speelde 84% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 2–1 Carrot.",
+    "fact.4": "Carrot nam ook de controle over het spel op 52'.",
+    "fact.5": "Dat is de vierde keer dat Carrot de controle in deze wedstrijd overneem.",
+    "casual": "Carrot zetten nu druk en domineren de laatste vijf minuten terwijl ze op jacht zijn naar de gelijkmaker.",
+    "analyst": "Carrot hebben voor de vierde keer de controle overgenomen en voltooiden 84% van de passes in het laatste derde deel van de afgelopen vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 掌控局面",
+    "fact.0": "最后十分钟内， Potato 占据上风（势头领先他们0.57）;现在 Carrot 领先（领先他们0.54）。",
+    "fact.1": "Carrot 在最后五分钟占据上风（他们方面势头+0.54）。",
+    "fact.2": "Carrot 在最后五分钟完成了84%的最后三分之一传球。",
+    "fact.3": "比分 Potato 2比1 Carrot。",
+    "fact.4": "Carrot 也在 52'时掌控了比赛。",
+    "fact.5": "这是 Carrot 第四次掌控比赛。",
+    "casual": "Carrot 现在全力以赴，在最后五分钟占据主导，努力追平比分。",
+    "analyst": "Carrot 第四次掌控比赛，过去五分钟内完成了84%的最后三分之一传球。"
+   }
+  },
+  "M-30": {
+   "source_hash": "6f520f6741719e13",
+   "es": {
+    "headline": "Sabeliba alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Sabeliba es de 8,0.",
+    "casual": "Sabeliba brilla con una impresionante valoración de 8,0.",
+    "analyst": "Oskar Sabeliba alcanza una puntuación de 8.0, reflejando su actuación destacada en este combate para Potato FC."
+   },
+   "fr": {
+    "headline": "Sabeliba atteint une note de 8,0",
+    "fact.0": "La note en direct de Sabeliba est de 8,0.",
+    "casual": "Sabeliba brille avec une impressionnante note de 8,0.",
+    "analyst": "Oskar Sabeliba atteint un score de 8,0, reflétant sa performance remarquable dans ce match pour Potato FC."
+   },
+   "de": {
+    "headline": "Sabeliba erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Sabeliba liegt bei 8,0.",
+    "casual": "Sabeliba glänzt mit einer beeindruckenden Bewertung von 8,0.",
+    "analyst": "Oskar Sabeliba erreicht eine Bewertung von 8,0, was seine herausragende Leistung in diesem Match für Potato FC widerspiegelt."
+   },
+   "nl": {
+    "headline": "Sabeliba haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Sabeliba is 8,0.",
+    "casual": "Sabeliba straalt met een indrukwekkende 8,0 rating.",
+    "analyst": "Oskar Sabeliba bereikt een rating van 8,0, wat zijn opvallende prestatie in deze wedstrijd voor Potato FC weerspiegelt."
+   },
+   "zh-Hans": {
+    "headline": "Sabeliba 评分为8.0",
+    "fact.0": "Sabeliba的现场评分为8.0。",
+    "casual": "Sabeliba 以令人印象深刻的8.0评分闪耀。",
+    "analyst": "Oskar Sabeliba 获得了8.0的评分，反映了他在这场比赛中的出色表现，代表 Potato FC。"
+   }
+  },
+  "M-31": {
+   "source_hash": "18a26a51bc27e43e",
+   "es": {
+    "headline": "Carrot encima",
+    "fact.0": "Carrot tienen un impulso de 0,74 desde su lado, tan unilateral como puede ser.",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,74 de su equipo).",
+    "fact.2": "Carrot jugó el 82% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "Carrot tuvo 3 tiros (xG 0,47) y 4 córners en los últimos cinco minutos.",
+    "fact.4": "El marcador es Potato 2–1 Carrot.",
+    "casual": "Carrot están presionando mientras buscan el empate.",
+    "analyst": "Carrot domina con un 82% de pases en el último tercio, 3 disparos (xG 0,47) y 4 córners en 5 minutos."
+   },
+   "fr": {
+    "headline": "Carrot au sommet",
+    "fact.0": "Carrot ont un élan de 0,74 de leur côté, à peu près aussi à sens unique que possible.",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,74 de leur côté).",
+    "fact.2": "Carrot joué 82 % des dernières passes dans le dernier tiers des cinq dernières minutes.",
+    "fact.3": "Carrot a réalisé 3 tirs (xG 0,47) et 4 corners dans les cinq dernières minutes.",
+    "fact.4": "Le score est Potato 2–1 Carrot.",
+    "casual": "Carrot mettent la pression en cherchant à égaliser.",
+    "analyst": "Carrot dominent avec 82 % des passes du dernier tiers, 3 tirs (xG 0,47) et 4 corners en 5 minutes."
+   },
+   "de": {
+    "headline": "Carrot oben",
+    "fact.0": "Carrot haben von ihrer Seite ein Momentum von 0,74, so einseitig, wie es nur geht.",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Schwung +0,74 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 82 % der Pässe im letzten Drittel.",
+    "fact.3": "Carrot hatte in den letzten fünf Minuten 3 Schüsse (xG 0,47) und 4 Ecken.",
+    "fact.4": "Der Spielstand lautet Potato 2:1 Carrot.",
+    "casual": "Carrot erhöhen den Druck, während sie auf den Ausgleich drängen.",
+    "analyst": "Carrot dominieren mit 82 % der Pässe im letzten Drittel, 3 Schüssen (xG 0,47) und 4 Eckbällen in 5 Minuten."
+   },
+   "nl": {
+    "headline": "Carrot bovenop",
+    "fact.0": "Carrot hebben momentum 0,74 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,74 van hun kant).",
+    "fact.2": "Carrot speelde 82% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "Carrot had 3 schoten (xG 0,47) en 4 corners in de laatste vijf minuten.",
+    "fact.4": "De stand is Potato 2–1 Carrot.",
+    "casual": "Carrot zetten de druk op terwijl ze aandringen op een gelijkmaker.",
+    "analyst": "Carrot domineren met 82% van de passes in het laatste derde deel, 3 schoten (xG 0,47) en 4 corners in 5 minuten."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 在上面",
+    "fact.0": "Carrot 队有0.74的势头，几乎是一边倒的。",
+    "fact.1": "Carrot 在最后五分钟占据上风（势头+0.74）。",
+    "fact.2": "Carrot 在最后五分钟完成了82%的最后三分之一传球。",
+    "fact.3": "Carrot 在最后五分钟射门3次（xG0.47）和4个角球。",
+    "fact.4": "比分 Potato 2比1 Carrot。",
+    "casual": "Carrot 在争取扳平的同时施加压力。",
+    "analyst": "Carrot 在5分钟内以82%的最后三分之一传球命中率、3次射门（xG0.47）和4个角球占据主导地位。"
+   }
+  },
+  "M-32": {
+   "source_hash": "cecf916a972f5d4c",
+   "es": {
+    "headline": "Davineau creciendo en el juego",
+    "fact.0": "La valoración en directo de Davineau es de 6,7.",
+    "fact.1": "Subió desde 6,0 en los últimos diez minutos.",
+    "fact.2": "70' pase que añade amenaza (+0,13).",
+    "fact.3": "63' ganó la bola suelta (+0,11).",
+    "fact.4": "73' ganó la bola suelta (+0,11)."
+   },
+   "fr": {
+    "headline": "Davineau évoluant dans le jeu",
+    "fact.0": "Davineau en direct est de 6,7.",
+    "fact.1": "En hausse par rapport à 6,0 en dix minutes.",
+    "fact.2": "70' passe cette menace supplémentaire (+0,13).",
+    "fact.3": "63' a gagné la balle libre (+0,11).",
+    "fact.4": "73' a gagné la balle libre (+0,11)."
+   },
+   "de": {
+    "headline": "Davineau in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Davineau liegt bei 6,7.",
+    "fact.1": "Anstieg von 6,0 in den letzten zehn Minuten.",
+    "fact.2": "70' Pass, der die Gefahr erhöhte (+0,13).",
+    "fact.3": "63' gewann den losen Ball (+0,11).",
+    "fact.4": "73' gewann den losen Ball (+0,11)."
+   },
+   "nl": {
+    "headline": "Davineau groeien in het spel",
+    "fact.0": "De live rating van Davineau is 6,7.",
+    "fact.1": "Omhoog van 6,0 in de laatste tien minuten.",
+    "fact.2": "70' pass die extra dreiging toevoegde (+0,13).",
+    "fact.3": "63' won de losse bal (+0,11).",
+    "fact.4": "73' won de losse bal (+0,11)."
+   },
+   "zh-Hans": {
+    "headline": "Davineau 逐渐融入游戏",
+    "fact.0": "Davineau的现场评分为6.7。",
+    "fact.1": "从最后十分钟的6.0提升。",
+    "fact.2": "70' 传球，增加了威胁（+0.13）。",
+    "fact.3": "63' 赢得了松散球（+0.11）。",
+    "fact.4": "73' 赢得了松散球（+0.11）。"
+   }
+  },
+  "M-33": {
+   "source_hash": "988c7bf4dd735859",
+   "es": {
+    "headline": "Potato tomar el control",
+    "fact.0": "En los últimos diez minutos Carrot dominaban (impulso 0,81 de su lado); ahora Potato están (0,49 de su lado).",
+    "fact.1": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,49 de su equipo).",
+    "fact.2": "Potato jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 2–1 Carrot.",
+    "fact.4": "Potato también tomó el control del partido en 65'.",
+    "fact.5": "Es la tercera vez que Potato toman el control en este partido.",
+    "casual": "Potato vuelven a dominar los últimos minutos.",
+    "analyst": "Potato recuperar el control por tercera vez, dominando los últimos cinco minutos con todos los pases del último tercio completados."
+   },
+   "fr": {
+    "headline": "Potato prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Carrot étaient en tête (momentum 0,81 de leur côté) ; maintenant Potato sont (0,49 de leur côté).",
+    "fact.1": "Potato a eu l’avantage dans les cinq dernières minutes (élan +0,49 de leur côté).",
+    "fact.2": "Potato joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 2–1 Carrot.",
+    "fact.4": "Potato a également pris le contrôle du jeu à 65'.",
+    "fact.5": "C’est la troisième fois Potato reprenez le contrôle de ce match.",
+    "casual": "Potato reprennent le dessus en dominant les dernières minutes.",
+    "analyst": "Potato reprend le contrôle pour la troisième fois, dominant les cinq dernières minutes avec toutes les passes du dernier tiers complétées."
+   },
+   "de": {
+    "headline": "Potato übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Carrot an der Spitze (Momentum 0,81 von ihrer Seite); jetzt sind Potato es (0,49 von ihrer Seite).",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,49 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Potato 2:1 Carrot.",
+    "fact.4": "Potato übernahm auch die Kontrolle über das Spiel bei 65'.",
+    "fact.5": "Das ist das dritte Mal, dass Potato in diesem Match die Kontrolle übernommen hast.",
+    "casual": "Potato sind wieder an der Spitze und dominieren die letzten Minuten.",
+    "analyst": "Potato zum dritten Mal die Kontrolle zurück und beherrscht die letzten fünf Minuten, wobei alle Pässe im letzten Drittel abgeschlossen sind."
+   },
+   "nl": {
+    "headline": "Potato neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Carrot aan de top (momentum 0,81 van hun kant); nu zijn Potato dat (0,49 van hun kant).",
+    "fact.1": "Potato had de overhand in de laatste vijf minuten (momentum +0,49 van hun kant).",
+    "fact.2": "Potato speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 2–1 Carrot.",
+    "fact.4": "Potato nam ook de controle over het spel op 65'.",
+    "fact.5": "Dat is de derde keer dat Potato de controle in deze wedstrijd overneem.",
+    "casual": "Potato staan weer bovenaan terwijl ze de laatste minuten domineren.",
+    "analyst": "Potato herwinnen voor de derde keer de controle en nemen de laatste vijf minuten in handen met alle passes in het laatste derde deel."
+   },
+   "zh-Hans": {
+    "headline": "Potato 掌控局面",
+    "fact.0": "最后十分钟内， Carrot 占据上风（势头领先他们0.81）;现在 Potato 领先（他们领先0.49）。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.49）。",
+    "fact.2": "Potato 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.3": "比分 Potato 2比1 Carrot。",
+    "fact.4": "Potato 也在 65'时掌控了比赛。",
+    "fact.5": "这是 Potato 第三次掌控比赛。",
+    "casual": "Potato 重新掌控比赛，掌控了最后几分钟。",
+    "analyst": "Potato 第三次重新掌控比赛，掌控了最后五分钟，且所有最后三分之一传球完成。"
+   }
+  },
+  "M-34": {
+   "source_hash": "8585a568f984601d",
+   "es": {
+    "headline": "Musialetti iguala para Carrot",
+    "fact.0": "Ahora está Potato 2–2 Carrot.",
+    "fact.1": "Las probabilidades de Carrot de ganar pasaron del 1% al 14%.",
+    "fact.2": "Asistido por Mbeulier.",
+    "fact.3": "Una gran posibilidad, xG 0,43.",
+    "fact.4": "Su sexto gol de la temporada.",
+    "fact.5": "Contra el curso del juego: Potato había dominado.",
+    "fact.6": "Carrot estuvieron bajo presión en los últimos cinco minutos (impulso de -0,35 por parte de su equipo).",
+    "fact.7": "Carrot jugó el 30% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.8": "La valoración en directo de Musialetti es de 7,8.",
+    "fact.9": "Disparos hasta ahora: Potato 15 (xG 3,88), Carrot 23 (xG 3,42).",
+    "fact.10": "Mbeulier tiene 5 asistencias esta temporada.",
+    "fact.11": "La valoración en directo de Mbeulier es de 8,0.",
+    "fact.12": "Subió desde 6,7 en los últimos diez minutos.",
+    "casual": "Musialetti anotó al final para poner el 2–2 a favor de Carrot contra el curso del juego.",
+    "analyst": "El empate de Musialetti en 88' igualó el partido a 2–2, desplazando la probabilidad de victoria de Carrot del 1% al 14%. Con la ayuda de Mbeulier, fue una gran oportunidad (xG 0,43) a pesar del dominio de Potato."
+   },
+   "fr": {
+    "headline": "Musialetti égalise pour Carrot",
+    "fact.0": "C’est maintenant Potato 2–2 Carrot.",
+    "fact.1": "La chance de victoire de Carrot est passée de 1 % à 14 %.",
+    "fact.2": "Assisté par Mbeulier.",
+    "fact.3": "Une grande chance, xG 0,43.",
+    "fact.4": "Son 6e but de la saison.",
+    "fact.5": "Contre le cours du jeu : Potato avait dominé.",
+    "fact.6": "Carrot étaient sous pression dans les cinq dernières minutes (momentum de -0,35 de leur côté).",
+    "fact.7": "Carrot joué 30 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.8": "Musialetti en direct est de 7,8.",
+    "fact.9": "Tirs jusqu’à présent : Potato 15 (xG 3,88), Carrot 23 (xG 3,42).",
+    "fact.10": "Mbeulier compte 5 passes décisives cette saison.",
+    "fact.11": "La note en direct de Mbeulier est de 8,0.",
+    "fact.12": "En hausse par rapport à 6,7 en dix minutes.",
+    "casual": "Musialetti a marqué tard pour porter le score à 2–2 pour Carrot contre le cours du jeu.",
+    "analyst": "L’égalisation de Musialetti à 88' égalise le match à 2–2, faisant passer la probabilité de victoire de Carrot de 1 % à 14 %. Assisté par Mbeulier, c’était une grosse occasion (xG 0,43) malgré la domination de Potato."
+   },
+   "de": {
+    "headline": "Musialetti gleicht für Carrot",
+    "fact.0": "Jetzt steht es Potato 2–2 Carrot.",
+    "fact.1": "Die Gewinnchance von Carrot stieg von 1 % auf 14 %.",
+    "fact.2": "Unterstützt von Mbeulier.",
+    "fact.3": "Eine große Chance, xG 0,43.",
+    "fact.4": "Sein sechstes Saisontor.",
+    "fact.5": "Entgegen dem Spielverlauf: Potato war oberste gewesen.",
+    "fact.6": "Carrot standen in den letzten fünf Minuten unter Druck (Schwung -0,35 von ihrer Seite).",
+    "fact.7": "Carrot spielte in den letzten fünf Minuten 30 % der Pässe im letzten Drittel.",
+    "fact.8": "Die Live-Bewertung von Musialetti liegt bei 7,8.",
+    "fact.9": "Bisherige Aufnahmen: 15 Potato (xG 3,88), Carrot 23 (xG 3,42).",
+    "fact.10": "Mbeulier hat in dieser Saison 5 Assists.",
+    "fact.11": "Die Live-Bewertung von Mbeulier liegt bei 8,0.",
+    "fact.12": "Anstieg von 6,7 in den letzten zehn Minuten.",
+    "casual": "Musialetti trifft spät zum 2:2 für Carrot gegen den Spielverlauf.",
+    "analyst": "Musialetti's Ausgleich bei 88' gleicht das Spiel auf 2:2 aus und verschiebt Carrot's Siegwahrscheinlichkeit von 1 % auf 14 %. Unterstützt von Mbeulier war es trotz Potato Dominanz eine große Chance (xG 0,43)."
+   },
+   "nl": {
+    "headline": "Musialetti gelijk voor Carrot",
+    "fact.0": "Het is nu Potato 2–2 Carrot.",
+    "fact.1": "De kans van Carrot om te winnen ging van 1% naar 14%.",
+    "fact.2": "Geassisteerd door Mbeulier.",
+    "fact.3": "Een grote kans, xG 0,43.",
+    "fact.4": "Zijn zesde doelpunt van het seizoen.",
+    "fact.5": "Tegen de spelverloop in: Potato stond bovenaan.",
+    "fact.6": "Carrot stonden in de laatste vijf minuten onder druk (momentum -0,35 van hun kant).",
+    "fact.7": "Carrot speelde 30% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.8": "De live rating van Musialetti is 7,8.",
+    "fact.9": "Schoten tot nu toe: Potato 15 (xG 3,88), Carrot 23 (xG 3,42).",
+    "fact.10": "Mbeulier heeft dit seizoen 5 assists.",
+    "fact.11": "De live rating van Mbeulier is 8,0.",
+    "fact.12": "Gestegen van 6,7 in de laatste tien minuten.",
+    "casual": "Musialetti scoort laat en brengt het 2–2 voor Carrot tegen het spelverloop in.",
+    "analyst": "Musialetti's gelijkmaker op 88' brengt de wedstrijd op 2–2, waardoor Carrot's winkans verschoof van 1% naar 14%. Met hulp van Mbeulier was het een grote kans (xG 0,43) ondanks de dominantie van Potato."
+   },
+   "zh-Hans": {
+    "headline": "Musialetti 使 Carrot",
+    "fact.0": "现在比分 Potato 2比2 Carrot。",
+    "fact.1": "Carrot的获胜概率从1%降至14%。",
+    "fact.2": "协助者为 Mbeulier。",
+    "fact.3": "概率很大，xG 0.43。",
+    "fact.4": "这是他本赛季的第六个进球。",
+    "fact.5": "逆势而上： Potato 一直占据上风。",
+    "fact.6": "Carrot 在最后五分钟承受了压力（球队势头为-0.35）。",
+    "fact.7": "Carrot 在最后五分钟完成了30%的最后三分之一传球。",
+    "fact.8": "Musialetti的现场评分为7.8。",
+    "fact.9": "目前射击 Potato 15（xG 3.88）， Carrot 23（xG 3.42）。",
+    "fact.10": "Mbeulier 本赛季有5次助攻。",
+    "fact.11": "Mbeulier的现场评分为8.0。",
+    "fact.12": "从最后十分钟的6.7提升。",
+    "casual": "Musialetti 在比赛末段得分，将比分改写为2比2 Carrot 逆势而上。",
+    "analyst": "Musialetti在 88' 的扳平比分，将比分扳成2比2， Carrot的胜率从1%提升至14%。在 Mbeulier助攻下，尽管 Potato占据主导地位，这仍是一次大好机会（xG 0.43）。"
+   }
+  },
+  "M-35": {
+   "source_hash": "19963b06d54349a9",
+   "es": {
+    "headline": "Davineau creciendo en el juego",
+    "fact.0": "La audiencia en directo de Davineau es de 7,9.",
+    "fact.1": "Subió desde 7,0 en los últimos diez minutos.",
+    "fact.2": "90+6' placaje ganado (+0,44).",
+    "fact.3": "70' pase que añade amenaza (+0,16).",
+    "fact.4": "88' pase que añade amenaza (+0,16)."
+   },
+   "fr": {
+    "headline": "Davineau évoluant dans le jeu",
+    "fact.0": "Davineau en direct est de 7,9.",
+    "fact.1": "En hausse par rapport à 7,0 dans les dix dernières minutes.",
+    "fact.2": "90+6' plaquage gagné (+0,44).",
+    "fact.3": "70' passe cette menace supplémentaire (+0,16).",
+    "fact.4": "88' passe cette menace supplémentaire (+0,16)."
+   },
+   "de": {
+    "headline": "Davineau in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Davineau liegt bei 7,9.",
+    "fact.1": "Anstieg von 7,0 in den letzten zehn Minuten.",
+    "fact.2": "90+6' Tackling gewann (+0,44).",
+    "fact.3": "70' Pass, der die Gefahr erhöhte (+0,16).",
+    "fact.4": "88' Pass, der die Gefahr erhöhte (+0,16)."
+   },
+   "nl": {
+    "headline": "Davineau groeien in het spel",
+    "fact.0": "De live kijkcijfers van Davineau zijn 7,9.",
+    "fact.1": "Gestegen van 7,0 in de laatste tien minuten.",
+    "fact.2": "90+6' tackle won (+0,44).",
+    "fact.3": "70' pass die extra dreiging toevoegde (+0,16).",
+    "fact.4": "88' pass die extra dreiging toevoegde (+0,16)."
+   },
+   "zh-Hans": {
+    "headline": "Davineau 逐渐融入游戏",
+    "fact.0": "Davineau的现场评分为7.9。",
+    "fact.1": "从最后十分钟的7.0提升。",
+    "fact.2": "90+6' 擒抱获胜（+0.44）。",
+    "fact.3": "70' 传球，增加了威胁（+0.16）。",
+    "fact.4": "88' 传球，增加了威胁（+0.16）。"
+   }
+  },
+  "M-36": {
+   "source_hash": "081026d2a8ea2ac3",
+   "es": {
+    "headline": "Davineau alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Davineau es de 8,0.",
+    "casual": "Teddy Davineau brilla con una impresionante valoración de 8,0 en el minuto 96.",
+    "analyst": "Teddy Davineau alcanza una destacada puntuación de 8.0, reflejando su actuación impactante a medida que el combate se acerca a su conclusión."
+   },
+   "fr": {
+    "headline": "Davineau atteint une note de 8,0",
+    "fact.0": "La note en direct de Davineau est de 8,0.",
+    "casual": "Teddy Davineau brille avec un impressionnant 8,0 à la 96e minute.",
+    "analyst": "Teddy Davineau obtient une note remarquable de 8,0, reflétant sa performance marquante à l’approche de la fin du match."
+   },
+   "de": {
+    "headline": "Davineau erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Davineau liegt bei 8,0.",
+    "casual": "Teddy Davineau glänzt mit einer beeindruckenden 8,0-Bewertung in der 96. Minute.",
+    "analyst": "Teddy Davineau erreicht eine herausragende Bewertung von 8,0, was seine eindrucksvolle Leistung widerspiegelt, während das Match sich dem Ende nähert."
+   },
+   "nl": {
+    "headline": "Davineau haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Davineau is 8,0.",
+    "casual": "Teddy Davineau schittert met een indrukwekkende 8,0 rating in de 96e minuut.",
+    "analyst": "Teddy Davineau behaalt een opvallende 8,0 rating, wat zijn indrukwekkende optreden weerspiegelt naarmate de wedstrijd ten einde loopt."
+   },
+   "zh-Hans": {
+    "headline": "Davineau 评分为8.0",
+    "fact.0": "Davineau的现场评分为8.0。",
+    "casual": "Teddy Davineau 在第96分钟以令人印象深刻的8.0评分闪耀。",
+    "analyst": "Teddy Davineau 获得了8.0的高分，反映出他在比赛接近尾声时的出色表现。"
+   }
+  },
+  "M-37": {
+   "source_hash": "59bc7f7ad3c55338",
+   "es": {
+    "headline": "Carrot sube el volumen de prensa",
+    "fact.0": "Carrot están ejerciendo 2,2 presiones altas por minuto, frente a 1,24 de media en este partido.",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,36 de su equipo).",
+    "fact.2": "Carrot jugó el 94% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Potato 2–2 Carrot.",
+    "fact.4": "Carrot también subió la prensa a 59' (2,6 presiones altas por minuto).",
+    "fact.5": "Ese es el quinto spell de presión de Carrot en el partido.",
+    "casual": "Carrot están presionando fuerte en el tiempo añadido, manteniendo la presión sobre Potato.",
+    "analyst": "Carrot están presionando intensamente con 2,2 altas presiones por minuto, dominando el último tercio en los últimos minutos."
+   },
+   "fr": {
+    "headline": "Carrot montez le volume de la presse",
+    "fact.0": "Carrot exercent 2,2 pressions élevées par minute, contre 1,24 en moyenne ce match.",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,36 de leur côté).",
+    "fact.2": "Carrot joué 94 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Potato 2–2 Carrot.",
+    "fact.4": "Carrot aussi monté la pression à 59' (2,6 hautes pressions par minute).",
+    "fact.5": "C’est le cinquième passage de pression de Carrot dans le match.",
+    "casual": "Carrot poussent fort dans le temps additionnel, maintenant la pression sur Potato.",
+    "analyst": "Carrot pressent intensément avec 2,2 pressions élevées par minute, dominant le dernier tiers en fin de match."
+   },
+   "de": {
+    "headline": "Carrot die Presse aufdrehen",
+    "fact.0": "Carrot setzen 2,2 hohe Druckangriffe pro Minute aus, im Schnitt 1,24 in diesem Spiel.",
+    "fact.1": "Carrot hatte in den letzten fünf Minuten die Oberhand (Momentum +0,36 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 94 % der letzten Drittel-Pässe.",
+    "fact.3": "Der Spielstand lautet Potato 2:2 Carrot.",
+    "fact.4": "Carrot erhöhte auch den Druck auf 59' (2,6 hohe Druckaufnahmen pro Minute).",
+    "fact.5": "Das ist Carrot fünfter Pressing-Spell des Matches.",
+    "casual": "Carrot drücken in der Nachspielzeit hart und halten den Druck auf Potato.",
+    "analyst": "Carrot pressen intensiv mit 2,2 hohen Drucken pro Minute und dominieren das letzte Drittel in der späten Partie."
+   },
+   "nl": {
+    "headline": "Carrot zet de pers harder",
+    "fact.0": "Carrot zetten 2,2 hoge druk per minuut neer, tegenover gemiddeld 1,24 in deze wedstrijd.",
+    "fact.1": "Carrot had de overhand in de laatste vijf minuten (momentum +0,36 van hun kant).",
+    "fact.2": "Carrot speelde 94% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.3": "De stand is Potato 2–2 Carrot.",
+    "fact.4": "Carrot zette ook de press op 59' (2,6 hoge druk per minuut).",
+    "fact.5": "Dat is Carrot vijfde pressing spell van de wedstrijd.",
+    "casual": "Carrot zetten hard door in blessuretijd en houden de druk op Potato.",
+    "analyst": "Carrot druk intens met 2,2 hoge druk per minuut en domineren het laatste derde deel laat in de wedstrijd."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 把新闻加大点",
+    "fact.0": "Carrot 每分钟制造2.2次高压，而本场比赛平均为1.24次。",
+    "fact.1": "Carrot 在最后五分钟占据上风（他们势头+0.36）。",
+    "fact.2": "Carrot 在最后五分钟完成了94%的最后三分之一传球。",
+    "fact.3": "比分 Potato 2比2 Carrot。",
+    "fact.4": "Carrot 还将压力调高到 59' （每分钟2.6个高压）。",
+    "fact.5": "这是 Carrot本场比赛的第五次逼抢。",
+    "casual": "Carrot 在补时阶段全力施压，持续给 Potato施加压力。",
+    "analyst": "Carrot 以每分钟2.2次高压压紧逼抢，在最后三分之一区域占据主导。"
+   }
+  },
+  "M-38": {
+   "source_hash": "afcde965aa050dee",
+   "es": {
+    "headline": "Szobalenko Carrot pone por delante al final",
+    "fact.0": "Ahora es Potato 2–3 Carrot.",
+    "fact.1": "La probabilidad de ganar de Carrot pasó del 3% al 97%.",
+    "fact.2": "Asistido por Musialetti.",
+    "fact.3": "Un final poco probable: xG 0,08, así que unos 8 de cada 100 disparos como ese entrá.",
+    "fact.4": "Su segundo gol de la temporada.",
+    "fact.5": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,36 de su equipo).",
+    "fact.6": "Carrot jugó el 94% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.7": "La valoración en directo de Szobalenko es de 7,3.",
+    "fact.8": "Disparos hasta ahora: Potato 15 (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.9": "Musialetti tiene 5 asistencias esta temporada.",
+    "fact.10": "La valoración en directo de Musialetti es de 8,4.",
+    "fact.11": "Subió desde 6,0 en los últimos diez minutos.",
+    "casual": "Szobalenko anotó en el minuto 96 para poner el 3–2 para Carrot. ¡Un gol dramático y decisivo en los últimos minutos!",
+    "analyst": "El gol de Szobalenko en el minuto 96, asistido por Musialetti, reduce la probabilidad de victoria de Carrot del 3% al 97%. A pesar de su bajo xG de 0,08, el dominio de Carrot en los últimos minutos da sus frutos."
+   },
+   "fr": {
+    "headline": "Szobalenko met Carrot en avance en fin de match",
+    "fact.0": "C’est maintenant Potato 2–3 Carrot.",
+    "fact.1": "La chance de victoire de Carrot est passée de 3 % à 97 %.",
+    "fact.2": "Assisté par Musialetti.",
+    "fact.3": "Une fin peu probable : xG 0,08, donc environ 8 tirs sur 100 comme celui-ci.",
+    "fact.4": "Son deuxième but de la saison.",
+    "fact.5": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,36 de leur côté).",
+    "fact.6": "Carrot joué 94 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.7": "Szobalenko en direct est de 7,3.",
+    "fact.8": "Tirs jusqu’à présent : Potato 15 (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.9": "Musialetti compte 5 passes décisives cette saison.",
+    "fact.10": "Musialetti en direct est de 8,4.",
+    "fact.11": "En hausse par rapport à 6,0 en dix minutes.",
+    "casual": "Szobalenko marque à la 96e minute pour porter le score à 3–2 pour Carrot. Un but victorieux dramatique en fin de match !",
+    "analyst": "Le but de Szobalenko à la 96e minute, assisté par Musialetti, fait passer la probabilité de victoire de Carrot de 3 % à 97 %. Malgré son faible xG de 0,08, la domination de Carrot dans les dernières minutes porte ses fruits."
+   },
+   "de": {
+    "headline": "Szobalenko bringt Carrot spät in Führung",
+    "fact.0": "Jetzt steht es Potato 2–3 Carrot.",
+    "fact.1": "Die Gewinnchance von Carrot stieg von 3 % auf 97 %.",
+    "fact.2": "Unterstützt von Musialetti.",
+    "fact.3": "Ein unwahrscheinliches Finish: xG 0,08, also etwa 8 in 100 Schüssen, wie er eingebaut wird.",
+    "fact.4": "Sein zweites Saisontor.",
+    "fact.5": "Carrot hatte in den letzten fünf Minuten die Oberhand (Momentum +0,36 von ihrer Seite).",
+    "fact.6": "Carrot spielte in den letzten fünf Minuten 94 % der letzten Drittel-Pässe.",
+    "fact.7": "Die Live-Bewertung von Szobalenko liegt bei 7,3.",
+    "fact.8": "Bisherige Aufnahmen: 15 Potato (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.9": "Musialetti hat in dieser Saison 5 Assists.",
+    "fact.10": "Die Live-Bewertung von Musialetti beträgt 8,4.",
+    "fact.11": "Anstieg von 6,0 in den letzten zehn Minuten.",
+    "casual": "Szobalenko trifft in der 96. Minute zum 3:2 für Carrot. Ein dramatischer später Siegtreffer!",
+    "analyst": "Das Tor von Szobalenko in der 96. Minute, vorbereitet von Musialetti, erhöht die Gewinnwahrscheinlichkeit von Carrot von 3 % auf 97 %. Trotz des niedrigen xG von 0,08 zahlt sich Carrot Dominanz in den letzten Minuten aus."
+   },
+   "nl": {
+    "headline": "Szobalenko zet Carrot laat op voorsprong",
+    "fact.0": "Het staat nu Potato 2–3 Carrot.",
+    "fact.1": "De kans van Carrot om te winnen steeg van 3% naar 97%.",
+    "fact.2": "Geassisteerd door Musialetti.",
+    "fact.3": "Een onwaarschijnlijke finish: xG 0,08, dus ongeveer 8 van 100 schoten zoals hij erin gaat.",
+    "fact.4": "Zijn tweede doelpunt van het seizoen.",
+    "fact.5": "Carrot had de overhand in de laatste vijf minuten (momentum +0,36 van hun kant).",
+    "fact.6": "Carrot speelde 94% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.7": "De live rating van Szobalenko is 7,3.",
+    "fact.8": "Tot nu toe foto's: 15 Potato (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.9": "Musialetti heeft dit seizoen 5 assists.",
+    "fact.10": "De live rating van Musialetti is 8,4.",
+    "fact.11": "Omhoog van 6,0 in de laatste tien minuten.",
+    "casual": "Szobalenko scoort in de 96e minuut om het 3–2 voor Carrot te maken. Een dramatische late winnende treffer!",
+    "analyst": "Het doelpunt van Szobalenko in de 96e minuut, geassisteerd door Musialetti, brengt Carrot's winkans van 3% naar 97%. Ondanks de lage xG van 0,08 betaalt Carrot's dominantie in de laatste minuten zich uit."
+   },
+   "zh-Hans": {
+    "headline": "Szobalenko 让 Carrot 在最后时刻领先",
+    "fact.0": "现在 Potato 2–3 Carrot。",
+    "fact.1": "Carrot的中奖概率从3%提升到了97%。",
+    "fact.2": "协助者为 Musialetti。",
+    "fact.3": "一个不太可能的结局：xG 0.08，大约100发中有8发类似的射击。",
+    "fact.4": "这是他本赛季的第二个进球。",
+    "fact.5": "Carrot 在最后五分钟占据上风（他们势头+0.36）。",
+    "fact.6": "Carrot 在最后五分钟完成了94%的最后三分之一传球。",
+    "fact.7": "Szobalenko的现场评分为7.3。",
+    "fact.8": "目前射击数： Potato 15（xG 3.88）， Carrot 25（xG 3.54）。",
+    "fact.9": "Musialetti 本赛季有5次助攻。",
+    "fact.10": "Musialetti的现场评分为8.4。",
+    "fact.11": "从最后十分钟的6.0提升。",
+    "casual": "Szobalenko 在第96分钟进球，将比分改写为3比2 Carrot。戏剧性的绝杀！",
+    "analyst": "Szobalenko在第96分钟由 Musialetti助攻打进一球，将 Carrot的胜率从3%提升到97%。尽管xG仅0.08， Carrot在最后几分钟的统治力依然奏效。"
+   }
+  },
+  "M-39": {
+   "source_hash": "42dbc776cc6a6495",
+   "failed": {
+    "zh-Hans": [
+     "fact.7"
+    ]
+   },
+   "es": {
+    "headline": "Tiempo completo: Potato 2–3 Carrot",
+    "fact.0": "Tiempo completo: Potato 2–3 Carrot.",
+    "fact.1": "Disparos hasta ahora: Potato 15 (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.2": "Posesión: Potato 55,6%, Carrot 44,4%.",
+    "fact.3": "Jugador del partido: Tiago Madekuta (8,5).",
+    "fact.4": "90+6' Szobalenko Carrot pone por delante al final.",
+    "fact.5": "61' Madekuta Potato adelanta.",
+    "fact.6": "1' Madekuta abre el marcador.",
+    "fact.7": "Potato había estado invicto en 5 jornadas.",
+    "fact.8": "Carrot están invictos en 6 partidos de liga.",
+    "casual": "Carrot FC gana 3–2 contra Potato FC tras un gol tardío en el tiempo añadido.",
+    "analyst": "Carrot FC aseguran una victoria por 3–2 sobre Potato FC, rompiendo la racha invicta de sus locales. A pesar de la mayor xG de Potato de 3,88 frente a 3,54 de Carrot, Carrot's Szobalenko asegura la victoria en el minuto 96."
+   },
+   "fr": {
+    "headline": "Temps plein : Potato 2–3 Carrot",
+    "fact.0": "Temps plein : Potato 2–3 Carrot.",
+    "fact.1": "Tirs jusqu’à présent : Potato 15 (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.2": "Possession : Potato 55,6 %, Carrot 44,4 %.",
+    "fact.3": "Joueur du match : Tiago Madekuta (8,5).",
+    "fact.4": "90+6' Szobalenko met Carrot devant en fin de match.",
+    "fact.5": "61' Madekuta met Potato en avant.",
+    "fact.6": "1' Madekuta ouvre le score.",
+    "fact.7": "Potato était invaincu en 5 matchs.",
+    "fact.8": "Carrot sont invaincus en 6 matchs de championnat.",
+    "casual": "Carrot FC l’emportent 3–2 contre Potato FC après un but tardif dans le temps additionnel.",
+    "analyst": "Carrot FC s’imposent 3–2 contre Potato FC, mettant fin à la série d’invincibilité de leurs hôtes. Malgré un xG plus élevé de Potato de 3,88 contre 3,54 de Carrot, Carrot's Szobalenko scellent la victoire à la 96e minute."
+   },
+   "de": {
+    "headline": "Vollzeit: Potato 2–3 Carrot",
+    "fact.0": "Vollzeit: Potato 2–3 Carrot.",
+    "fact.1": "Bisherige Aufnahmen: 15 Potato (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.2": "Ballbesitz: Potato 55,6 %, Carrot 44,4 %.",
+    "fact.3": "Spieler des Spiels: Tiago Madekuta (8,5).",
+    "fact.4": "90+6' Szobalenko bringt Carrot spät in Führung.",
+    "fact.5": "61' Madekuta setzt Potato voran.",
+    "fact.6": "1' Madekuta eröffnet die Punkteausgleich.",
+    "fact.7": "Potato war in 5 Jahren ungeschlagen.",
+    "fact.8": "Carrot sind in 6 Ligaspielen ungeschlagen.",
+    "casual": "Carrot FC gewann mit 3:2 gegen Potato FC nach einem späten Tor in der Nachspielzeit.",
+    "analyst": "Carrot FC sicherten sich einen 3:2-Sieg über Potato FC und beendeten damit die ungeschlagene Serie der Gastgeber. Trotz Potato's höherem xG von 3,88 zu Carrot's 3,54 sicherte Carrot's Szobalenko in der 96. Minute den Sieg."
+   },
+   "nl": {
+    "headline": "Voltijd: Potato 2–3 Carrot",
+    "fact.0": "Voltijd: Potato 2–3 Carrot.",
+    "fact.1": "Tot nu toe foto's: 15 Potato (xG 3,88), Carrot 25 (xG 3,54).",
+    "fact.2": "Posbezit: Potato 55,6%, Carrot 44,4%.",
+    "fact.3": "Speler van de wedstrijd: Tiago Madekuta (8,5).",
+    "fact.4": "90+6' Szobalenko zet Carrot laat voor.",
+    "fact.5": "61' Madekuta zet Potato voorop.",
+    "fact.6": "1' Madekuta opent de score.",
+    "fact.7": "Potato was ongeslagen in 5 jaar.",
+    "fact.8": "Carrot zijn ongeslagen in 6 competitiewedstrijden.",
+    "casual": "Carrot FC winnen met 3–2 van Potato FC na een laat doelpunt in de extra tijd.",
+    "analyst": "Carrot FC boekten een 3–2 overwinning op Potato FC en doorbraken daarmee de ongeslagen reeks van hun thuisploeg. Ondanks Potato's hogere xG van 3,88 tegenover Carrot's 3,54, Carrot's Szobalenko de overwinning in de 96e minuut."
+   },
+   "zh-Hans": {
+    "headline": "全场结束： Potato 2–3 Carrot",
+    "fact.0": "全场： Potato 2–3 Carrot。",
+    "fact.1": "目前射击数： Potato 15（xG 3.88）， Carrot 25（xG 3.54）。",
+    "fact.2": "控球率： Potato 55.6%， Carrot 44.4%。",
+    "fact.3": "本场最佳球员： Tiago Madekuta （8.5分）。",
+    "fact.4": "90+6' Szobalenko 在最后时刻让 Carrot 领先。",
+    "fact.5": "61' Madekuta 让 Potato 领先。",
+    "fact.6": "1' Madekuta 开局得分。",
+    "fact.8": "Carrot 在6场联赛中保持不败。",
+    "casual": "Carrot FC 在补时阶段最后进球后以3比2战胜 Potato FC 。",
+    "analyst": "Carrot FC以3比2战胜Potato FC，终结了主队的不败纪录。尽管Potato的xG为3.88，高于Carrot的3.54，CarrotSzobalenko在第96分钟锁定胜局。"
+   }
+  }
+ }
+}

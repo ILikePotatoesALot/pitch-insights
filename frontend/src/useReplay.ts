@@ -8,10 +8,12 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  * Events go to `onEvent` (for the 3D pitch) instead of React state, so a busy
  * match doesn't re-render the page on every pass.
  */
-export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
+export function useReplay(name: string | null, lang: string, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
                           onReset: () => void) {
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
+  // Languages the server has stored translations for (code -> name), English always first.
+  const [languages, setLanguages] = useState<Record<string, string>>({ en: "English" });
   const [state, setState] = useState<LiveState | null>(null);
   const [moments, setMoments] = useState<Moment[]>([]);
   // The latest moment that arrived live, not from a catch-up, for the banner over the pitch.
@@ -19,8 +21,12 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
   const [status, setStatus] = useState<Status>("connecting");
   const [speed, setSpeedState] = useState(20);
   // A jump belongs to the match it was made in; `n` makes a repeat jump to the same minute reconnect.
-  const [jump, setJump] = useState<{ match: string | null; minute: number; n: number }>({ match: null, minute: 0, n: 0 });
+  // `at` is exact match seconds (it wins over `minute`), for a reconnect that must land on the same
+  // second: a broadcast minute can't say first-half stoppage time (45+2').
+  const [jump, setJump] = useState<{ match: string | null; minute: number; at: number | null; n: number }>(
+    { match: null, minute: 0, at: null, n: 0 });
   const from = jump.match === name ? jump.minute : 0;
+  const at = jump.match === name ? jump.at : null;
   const ws = useRef<WebSocket | null>(null);
   const metaRef = useRef<MatchMeta | null>(null);
   const onEventRef = useRef(onEvent);
@@ -29,6 +35,10 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
   onResetRef.current = onReset;
   const speedRef = useRef(speed);
   speedRef.current = speed;
+  // Paused by the viewer, and the language the open connection uses: a language change reconnects,
+  // and a paused replay should stay paused through it.
+  const pausedRef = useRef(false);
+  const langRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!name) return;
@@ -38,9 +48,12 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
     setState(null);
     setAiInfo(null);
     onResetRef.current();
+    const keepPaused = pausedRef.current && langRef.current !== null && langRef.current !== lang;
+    langRef.current = lang;
+    pausedRef.current = keepPaused;
     let ended = false;
     const proto = location.protocol === "https:" ? "wss" : "ws";
-    const socket = new WebSocket(`${proto}://${location.host}/ws/replay/${name}?speed=${speedRef.current}&from=${from}`);
+    const socket = new WebSocket(`${proto}://${location.host}/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&lang=${encodeURIComponent(lang)}`);
     ws.current = socket;
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
@@ -49,7 +62,9 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
           metaRef.current = data.meta;
           setMeta(data.meta);
           setAiInfo(data.commentary ?? null);
-          setStatus("live");
+          setLanguages(data.languages ?? { en: "English" });
+          if (keepPaused) socket.send(JSON.stringify({ cmd: "pause" }));
+          setStatus(keepPaused ? "paused" : "live");
           break;
         case "catchup":
           setMoments(data.moments);
@@ -82,7 +97,7 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
       ended = true; // closing on purpose (new match or jump), not a lost connection
       socket.close();
     };
-  }, [name, from, jump.n]);
+  }, [name, from, jump.n, lang]);
 
   const send = (cmd: object) => ws.current?.readyState === WebSocket.OPEN && ws.current.send(JSON.stringify(cmd));
 
@@ -90,9 +105,10 @@ export function useReplay(name: string | null, onEvent: (ev: MatchEvent, meta: M
     setSpeedState(value);
     send({ cmd: "speed", value });
   }, []);
-  const pause = useCallback(() => { send({ cmd: "pause" }); setStatus("paused"); }, []);
-  const resume = useCallback(() => { send({ cmd: "resume" }); setStatus("live"); }, []);
-  const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, n: j.n + 1 })), [name]);
+  const pause = useCallback(() => { send({ cmd: "pause" }); pausedRef.current = true; setStatus("paused"); }, []);
+  const resume = useCallback(() => { send({ cmd: "resume" }); pausedRef.current = false; setStatus("live"); }, []);
+  const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, at: null, n: j.n + 1 })), [name]);
+  const seekAt = useCallback((seconds: number) => setJump((j) => ({ match: name, minute: 0, at: seconds, n: j.n + 1 })), [name]);
 
-  return { meta, aiInfo, state, moments, liveMoment, status, speed, from, setSpeed, pause, resume, seek };
+  return { meta, aiInfo, languages, state, moments, liveMoment, status, speed, from, setSpeed, pause, resume, seek, seekAt };
 }

@@ -11,6 +11,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from pitch_insights.agents.prompts import input_hash
+
 
 def sibling_path(match_path: Path, suffix: str) -> Path:
     """A file stored next to a match: samples/<name><suffix>."""
@@ -37,6 +39,16 @@ def load_commentary(match_path: Path) -> dict:
     return data
 
 
+def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
+    """The moment plus its stored commentary, if the agents wrote some from these same facts.
+    Commentary written for different facts (the file is older than the code) is left out."""
+    rec = stored["moments"].get(moment["id"])
+    if not rec or rec.get("input_hash") != input_hash(moment, meta):
+        return moment
+    # A draft kept as `pending` hasn't passed the safety check: it never leaves the server.
+    return moment | {"commentary": {k: v for k, v in rec.items() if k != "pending"}}
+
+
 def summarise(records: list[dict]) -> dict:
     ok = [r for r in records if r["status"] == "ok"]
     scores = [r["grounding"]["score"] for r in records if r.get("grounding")]
@@ -44,6 +56,8 @@ def summarise(records: list[dict]) -> dict:
         "moments": len(records), "ok": len(ok), "fallback": len(records) - len(ok),
         "retried": sum(r["attempts"] > 1 for r in records),
         "grounding_mean": round(sum(scores) / len(scores), 3) if scores else None,
+        "safety_checked": sum(bool(r.get("safety")) for r in records),
+        "safety_blocked": sum(bool(r.get("safety")) and not r["safety"]["passed"] for r in records),
     }
 
 

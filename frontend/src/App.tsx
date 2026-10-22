@@ -11,6 +11,7 @@ export default function App() {
   const [name, setName] = useState<string | null>(null);
   const [mode, setMode] = useState<ViewMode>("analyst");
   const [favourite, setFavourite] = useState<string | null>(null);
+  const [lang, setLang] = useState("en");
   const [seekTo, setSeekTo] = useState(0);
   const sceneRef = useRef<PitchScene | null>(null);
   const pitchEl = useRef<HTMLDivElement>(null);
@@ -40,7 +41,16 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
-  const { meta, aiInfo, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } = useReplay(name, onEvent, onReset);
+  const { meta, aiInfo, languages, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek, seekAt } =
+    useReplay(name, lang, onEvent, onReset);
+  // A new language reconnects from the current moment (not the start of the minute, so nothing replays).
+  // It goes by match seconds, because a minute can't say first-half stoppage time (45+2'). Before the first
+  // state arrives there is no current moment, so the reconnect keeps the jump already made.
+  const changeLang = (l: string) => {
+    if (state?.period === 1) seekAt(state.match_minute * 60);
+    else if (state) seekAt((firstHalfEnd.current ?? 2700) + (state.match_minute - 45) * 60);
+    setLang(l);
+  };
 
   useEffect(() => {
     if (meta) sceneRef.current?.setMatch(meta);
@@ -61,6 +71,9 @@ export default function App() {
         <h1>Pitch Insights <small>live football intelligence</small></h1>
         <select value={name ?? ""} onChange={(e) => setName(e.target.value)} aria-label="Match">
           {matches.map((m) => <option key={m.name} value={m.name}>{m.home.name} v {m.away.name} ({m.name.split("-")[0]})</option>)}
+        </select>
+        <select value={lang} onChange={(e) => changeLang(e.target.value)} aria-label="Language">
+          {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
         </select>
         <div className="segmented" role="group" aria-label="Viewer mode">
           {(["casual", "analyst"] as ViewMode[]).map((v) => (

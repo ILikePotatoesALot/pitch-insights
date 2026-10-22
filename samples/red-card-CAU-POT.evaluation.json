@@ -1,0 +1,67 @@
+{
+ "evaluator": "azure-ai-evaluation GroundednessEvaluator",
+ "judge_model": "gpt-4o",
+ "scale": "1-5, pass at 3",
+ "summary": {
+  "moments": 9,
+  "mean": 4.78,
+  "min": 4.0,
+  "passed": 9
+ },
+ "moments": {
+  "M-1": {
+   "text_hash": "934d9c08bea178e6",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE states that Potato FC are in control, keeping Cauliflower FC pinned back, and mentions their dominance with 88% of final-third passes in the last five minutes. This aligns with the CONTEXT, which highlights Potato FC's momentum (+0.75) and their dominance in final-third passes (88%). However, the RESPONSE does not explicitly mention why this moment matters, such as the significance of the momentum or the implications of their dominance. While the RESPONSE is accurate and partially addresses the QUERY, it lacks completeness in explaining the importance of the moment. Therefore, it is partially correct."
+  },
+  "M-2": {
+   "text_hash": "8f1883803e5e137b",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The RESPONSE accurately describes the football moment using the facts provided in the CONTEXT. It mentions Raisman being sent off for a second yellow card, Potato being reduced to 10 players, the score being 0–0, and the drop in Potato's win probability from 43% to 28%. These details are directly grounded in the CONTEXT and fully address the QUERY, which asks for a description of the moment and its significance. No extraneous or incorrect information is introduced, and the RESPONSE is complete and precise."
+  },
+  "M-3": {
+   "text_hash": "0a82546cfe11cf1a",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Potato FC's control, their dominance in final-third passes (95%), and their 3 shots in the last five minutes. While these details are accurate and grounded in the CONTEXT, the RESPONSE omits other relevant facts, such as the xG value (0.28), the corner kick, and the broader significance of this being Potato's second spell of dominance in the match. Therefore, the RESPONSE is partially correct but incomplete, as it does not fully address the QUERY with all the relevant details from the CONTEXT."
+  },
+  "M-5": {
+   "text_hash": "2597261ab0cf126d",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Bissolatte scoring his first goal of the season with a header, the low xG chance of 0.06, the 1–0 lead for Cauliflower, and the boost in their win probability to 73%. Additionally, it highlights Kudalah's assist and Cauliflower's dominance in the final third. All these details are grounded in the context and directly address the query, making the response complete and fully correct."
+  },
+  "M-6": {
+   "text_hash": "812df1fcb43195e1",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response describes the football moment and its significance using facts from the context. It mentions Cauliflower's dominance in the last five minutes with 73% of final-third passes and their reversal of Potato's earlier momentum advantage. These details are accurate and directly grounded in the context. The response does not introduce unrelated or incorrect information and fully addresses the query by explaining why the moment matters."
+  },
+  "M-7": {
+   "text_hash": "bc745b8de6784861",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes the half-time score (Cauliflower 1–0 Potato), mentions Bissolatte's goal and Raisman's red card, and notes the possession and xG statistics. It also explains the significance of these events, stating that the goal and red card have shifted the balance in Cauliflower's favor. All details are grounded in the CONTEXT, and no extraneous or incorrect information is introduced. The RESPONSE is complete and fully addresses the QUERY using the provided facts."
+  },
+  "M-8": {
+   "text_hash": "a9813733bf2cf578",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The RESPONSE accurately describes the football moment using the facts provided in the CONTEXT. It mentions Potato FC's dominance in the last five minutes, supported by the fact that they completed 85% of final-third passes during this period. Additionally, it acknowledges the scoreline of 1–0 in favor of Cauliflower FC, which is relevant to the QUERY. The RESPONSE is fully grounded in the CONTEXT and does not introduce any extraneous or incorrect information."
+  },
+  "M-9": {
+   "text_hash": "bf88e159a23bd254",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Woodelson's goal, the assist by Mbeumonte, the xG of 0.20, the change in Cauliflower's win probability from 77% to 96%, and the fact that the goal was scored against the run of play. Additionally, it notes the relief of pressure, which aligns with the context stating Cauliflower was under pressure in the last five minutes. The response is complete, relevant, and does not introduce any extraneous or incorrect information."
+  },
+  "M-13": {
+   "text_hash": "9909eab102e858f9",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment and its significance using the facts provided in the context. It mentions the 2–0 victory by Cauliflower FC, the end of Potato FC's unbeaten streak, the standout performance of Konsatou (player of the match with an 8.4 rating), and Raisman's early red card. Additionally, it notes that Cauliflower FC was outshot and trailed in possession, which are relevant details from the context. The response is fully grounded in the context and does not introduce any extraneous or incorrect information."
+  }
+ }
+}

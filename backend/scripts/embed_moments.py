@@ -8,6 +8,12 @@ Runs each match through MatchBrain with the Memory agent, collects the descripti
 moment it remembers, and embeds the ones not already stored (Foundry, text-embedding-3-small,
 256 dimensions) in as few requests as the service allows. Writes samples/<name>.memory.json,
 so replays and the stored commentary never call the network. Nothing to embed means no call.
+
+The file records the deployment the vectors came from. If AZURE_OPENAI_EMBEDDING_DEPLOYMENT has changed
+since, everything is embedded again, even when the cache is complete: vectors from different models
+can't be compared. A file from before the deployment was recorded is checked once: one of its texts is
+embedded with the current deployment and compared with the stored vector. A match means the same model,
+so the file is kept and stamped; a mismatch means everything is embedded again.
 """
 
 from __future__ import annotations
@@ -17,7 +23,7 @@ import sys
 from pathlib import Path
 
 from pitch_insights.agents.clients import make_embeddings_client
-from pitch_insights.agents.memory import MemoryAgent, embed_batch, load_vectors, write_vectors
+from pitch_insights.agents.memory import MemoryAgent, embed_batch, load_vectors, refresh_vectors, write_vectors
 from pitch_insights.agents.settings import load_settings
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
@@ -35,27 +41,27 @@ def main() -> int:
         print("No such sample: " + ", ".join(missing))
         return 1
     settings, client = load_settings(), None
+
+    def embed(todo: list[str]):
+        nonlocal client
+        client = client or make_embeddings_client(settings)  # only when something needs embedding
+        return embed_batch(client, settings.embedding_model, todo)
+
     try:
         for path in paths:
             meta, events = read_match(path)
             stored = load_vectors(path)
-            if args.force:
-                stored.vectors = {}
+            before = stored.deployment or "an unrecorded deployment"
             brain = MatchBrain(meta, memory=MemoryAgent(meta, stored))
             for ev in events:
                 brain.update(ev)
             texts = list(stored.asked)
-            todo = [t for t in texts if t not in stored.vectors]
-            model = stored.model
-            if todo:
-                client = client or make_embeddings_client(settings)
-                model, vectors = embed_batch(client, settings.embedding_model, todo)
-                if stored.model and model != stored.model and len(todo) < len(texts):
-                    todo = texts  # vectors from different models can't be compared: redo the lot
-                    model, vectors = embed_batch(client, settings.embedding_model, todo)
-                stored.vectors.update(zip(todo, vectors))
-            out = write_vectors(path, model, {t: stored.vectors[t] for t in texts})
-            print(f"{path.stem}: {len(texts)} moments remembered, {len(todo)} embedded  ->  {out.name}")
+            model, embedded, changed = refresh_vectors(stored, texts, settings.embedding_model, embed, force=args.force)
+            if changed:
+                print(f"{path.stem}: vectors were from {before}, not {settings.embedding_model}: "
+                      "embedded everything again")
+            out = write_vectors(path, model, {t: stored.vectors[t] for t in texts}, settings.embedding_model)
+            print(f"{path.stem}: {len(texts)} moments remembered, {embedded} embedded  ->  {out.name}")
     finally:
         if client is not None:
             client.close()

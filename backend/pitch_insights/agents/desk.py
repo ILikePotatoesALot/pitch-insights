@@ -19,6 +19,7 @@ import time
 from typing import Protocol
 
 import openai
+from opentelemetry import trace
 from pydantic import BaseModel
 
 from pitch_insights.agents import grounding
@@ -26,8 +27,10 @@ from pitch_insights.agents.middleware import RunLogMiddleware, moment_id_var
 from pitch_insights.agents.prompts import (
     EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, input_hash, moment_input, retry_input,
 )
+from pitch_insights.agents.safety import ContentSafety
 
 log = logging.getLogger("pitch_insights.agents")
+tracer = trace.get_tracer("pitch_insights.agents")  # a no-op until tracing is set up (agents/tracing.py)
 
 EXPLAINER_TYPES = {"goal", "red_card", "penalty_awarded", "big_chance_missed", "half_time", "full_time"}
 COMMENTED_TIERS = {"headline", "notable"}
@@ -95,21 +98,60 @@ def fallback_lines(moment: dict) -> Lines:
 
 
 class CommentaryDesk:
-    def __init__(self, writer: Writer, meta: dict, timeout_s: float = 45.0):
+    def __init__(self, writer: Writer, meta: dict, timeout_s: float = 45.0, safety: ContentSafety | None = None):
         self.writer = writer
         self.meta = meta
         self.timeout_s = timeout_s  # the whole draft, including the SDK's own retries
+        self.safety = safety        # Azure AI Content Safety; None skips the check (tests, no .env values)
 
     def wants(self, moment: dict) -> bool:
         return moment["tier"] in COMMENTED_TIERS
 
+    async def screen(self, record: dict, moment: dict) -> dict:
+        """Run the safety check on a stored record that hasn't had one (no model call): a line written
+        before the check existed, or a grounded draft kept as `pending` because the service couldn't be
+        reached. A blocked line becomes the plain headline. If the service still can't answer, a record that
+        already waits as `pending` is left as it is, and an older line that was never screened is taken out of
+        view too: it becomes the plain headline with its text kept as `pending`, so nothing unchecked is shown
+        and the next run screens it again."""
+        if self.safety is None:
+            return record
+        pending = record.get("pending")
+        if pending:
+            casual, analyst = pending["casual"], pending["analyst"]
+        elif record["status"] == "ok" and not record.get("safety"):
+            casual, analyst = record["casual"], record["analyst"]
+        else:
+            return record
+        res = await self.safety.check(f"{casual}\n{analyst}")
+        if res.error:
+            if pending:
+                return record  # already the headline, with the draft kept
+            lines = fallback_lines(moment)
+            return record | {"status": "fallback", "casual": lines.casual, "analyst": lines.analyst,
+                             "pending": {"casual": casual, "analyst": analyst}, "reason": res.reason}
+        record = {k: v for k, v in record.items() if k != "pending"} | {"safety": res.to_dict()}
+        if res.passed:
+            return record | {"status": "ok", "casual": casual, "analyst": analyst, "reason": None}
+        lines = fallback_lines(moment)
+        return record | {"status": "fallback", "casual": lines.casual, "analyst": lines.analyst, "reason": res.reason}
+
     async def comment(self, moment: dict) -> dict:
         """Commentary for one moment. Always returns a record; status says how it was made."""
+        with tracer.start_as_current_span("commentary", attributes={"pitch.moment_id": moment["id"]}) as span:
+            record = await self._comment(moment)
+            span.set_attributes({"pitch.agent": record["agent"], "pitch.status": record["status"],
+                                 "pitch.attempts": record["attempts"], "pitch.reason": record["reason"] or "",
+                                 "pitch.grounding_score": (record["grounding"] or {}).get("score", -1.0),
+                                 "pitch.safety_passed": bool((record["safety"] or {}).get("passed"))})
+            return record
+
+    async def _comment(self, moment: dict) -> dict:
         token = moment_id_var.set(moment["id"])
         role = agent_for(moment)
         started = time.perf_counter()
         prompt = moment_input(moment, self.meta)
-        attempts, lines, check, reason = 0, None, None, ""
+        attempts, lines, check, reason, safety = 0, None, None, "", None
         corrected: list[str] = []  # what the groundedness check caught in earlier drafts
         try:
             while attempts < MAX_ATTEMPTS:
@@ -135,6 +177,13 @@ class CommentaryDesk:
                 corrected += check.unsupported
                 prompt = retry_input(moment, self.meta, check.unsupported)
             ok = lines is not None and check is not None and check.passed
+            pending = None
+            if ok and self.safety is not None:  # only grounded text is worth screening
+                safety = await self.safety.check(f"{lines.casual}\n{lines.analyst}")
+                if not safety.passed:
+                    ok, reason = False, safety.reason
+                    if safety.error:  # unchecked, not unsafe: keep the draft to screen again later
+                        pending = {"casual": lines.casual, "analyst": lines.analyst}
             if not ok:
                 lines = fallback_lines(moment)
             record = {
@@ -142,11 +191,15 @@ class CommentaryDesk:
                 "status": "ok" if ok else "fallback",
                 "casual": lines.casual, "analyst": lines.analyst, "attempts": attempts,
                 "grounding": check.to_dict() if check else None, "corrected": corrected,
+                "safety": safety.to_dict() if safety else None,
                 "reason": reason or None, "provider": self.writer.provider, "model": self.writer.model,
             }
+            if pending:
+                record["pending"] = pending
             log.info(json.dumps({"event": "commentary", "moment_id": moment["id"], "agent": role,
                                  "status": record["status"], "attempts": attempts, "reason": reason or None,
                                  "grounding": record["grounding"],
+                                 "safety_passed": safety.passed if safety else None,
                                  "ms": round((time.perf_counter() - started) * 1000)}))
             return record
         finally:

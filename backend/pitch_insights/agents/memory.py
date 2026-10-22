@@ -49,6 +49,7 @@ log = logging.getLogger("pitch_insights.agents")
 DIMENSIONS = 256          # text-embedding-3-small shortened from 1,536; plenty for one-sentence moments
 THRESHOLD = 0.83          # cosine similarity; calibrated on the three samples (see docs/DESIGN.md)
 BATCH = 512               # inputs per embeddings request (the service allows 2,048 and 300,000 tokens)
+PROBE_MIN_COSINE = 0.98   # a legacy cache is adopted if one text embeds this close to its stored vector (same model: ~1.0)
 COMMENTED_TIERS = {"headline", "notable"}
 
 # Moment type -> family. Only moments of the same family are compared.
@@ -106,9 +107,10 @@ class StoredVectors:
     """Vectors computed ahead of time, looked up by the exact text. Remembers every text it was
     asked for, so scripts/embed_moments.py knows what to embed."""
 
-    def __init__(self, vectors: dict[str, list[float]] | None = None, model: str = ""):
+    def __init__(self, vectors: dict[str, list[float]] | None = None, model: str = "", deployment: str = ""):
         self.vectors = vectors or {}
-        self.model = model
+        self.model = model            # what the service reported when it made them
+        self.deployment = deployment  # the deployment we asked; "" in files from before it was stored
         self.asked: dict[str, None] = {}  # insertion-ordered set
 
     def vector(self, text: str) -> list[float] | None:
@@ -132,13 +134,46 @@ def load_vectors(match_path: Path) -> StoredVectors:
         return StoredVectors()
     if any(len(v) != DIMENSIONS for v in vectors.values()):
         return StoredVectors()
-    return StoredVectors(vectors, data.get("model", ""))
+    return StoredVectors(vectors, data.get("model", ""), data.get("deployment", ""))
 
 
-def write_vectors(match_path: Path, model: str, vectors: dict[str, list[float]]) -> Path:
-    data = {"model": model, "dimensions": DIMENSIONS, "match": match_path.stem,
+def write_vectors(match_path: Path, model: str, vectors: dict[str, list[float]], deployment: str = "") -> Path:
+    data = {"model": model, "deployment": deployment, "dimensions": DIMENSIONS, "match": match_path.stem,
             "vectors": {text: pack(v) for text, v in vectors.items()}}
     return write_json(memory_path(match_path), data)
+
+
+def refresh_vectors(stored: StoredVectors, texts: list[str], deployment: str, embed, force: bool = False,
+                    ) -> tuple[str, int, bool]:
+    """Bring `stored` up to date for `texts` (what scripts/embed_moments.py does for each match).
+
+    `embed(texts)` returns `(model, vectors)`. Vectors from different models can't be compared, so they
+    are all made again when `force` is set, when the configured deployment isn't the one the stored
+    vectors came from (even if the cache is complete and nothing else needs embedding), or when the
+    service reports another model for the new ones. A file from before the deployment was stored can't
+    say where its vectors came from, so one of its texts is embedded with the configured deployment and
+    compared (same reported model, same vector within rounding) before the file is adopted and stamped.
+    Returns the model, how many texts were embedded, and whether stored vectors were thrown away because
+    they didn't come from this deployment."""
+    changed = bool(stored.deployment) and stored.deployment != deployment
+    if force or changed:
+        stored.vectors = {}
+    elif not stored.deployment:
+        probe = next((t for t in texts if t in stored.vectors), None)
+        if probe is not None:
+            probe_model, (fresh,) = embed([probe])
+            if probe_model != stored.model or cosine(fresh, stored.vectors[probe]) < PROBE_MIN_COSINE:
+                stored.vectors, changed = {}, True
+    todo = [t for t in texts if t not in stored.vectors]
+    model = stored.model
+    if todo:
+        model, vectors = embed(todo)
+        if stored.model and model != stored.model and len(todo) < len(texts):
+            todo = list(texts)  # the deployment now serves a different model: redo the lot
+            model, vectors = embed(todo)
+        stored.vectors.update(zip(todo, vectors))
+    stored.model, stored.deployment = model, deployment
+    return model, len(todo), changed
 
 
 def embed_batch(client: openai.OpenAI, deployment: str, texts: list[str]) -> tuple[str, list[list[float]]]:

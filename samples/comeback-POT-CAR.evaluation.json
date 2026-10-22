@@ -1,0 +1,187 @@
+{
+ "evaluator": "azure-ai-evaluation GroundednessEvaluator",
+ "judge_model": "gpt-4o",
+ "scale": "1-5, pass at 3",
+ "summary": {
+  "moments": 29,
+  "mean": 4.45,
+  "min": 4.0,
+  "passed": 29
+ },
+ "moments": {
+  "M-1": {
+   "text_hash": "0c7ecce8a31409f2",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Madekuta's early goal, the score change to 1–0, the assist by Sakinelli, the xG value of 0.59, and the significant increase in Potato's win probability from 49% to 85%. These details are directly grounded in the context and fully address the query about describing the moment and its importance. No extraneous or incorrect information is introduced, and the response is complete and precise."
+  },
+  "M-2": {
+   "text_hash": "a2072f2c888c0848",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE correctly identifies Madekuta's missed chance and Alissandro's save, including the xG value of 0.44 and its impact on the scoreline (preventing Potato from extending their lead to 2–0). It also mentions Potato's dominance in the opening minutes, referencing the 4 shots and 100% final-third passing in the last five minutes. All these details are grounded in the CONTEXT and directly address the QUERY without introducing extraneous or incorrect information. The RESPONSE is accurate, complete, and fully grounded in the CONTEXT."
+  },
+  "M-3": {
+   "text_hash": "16dc43b48a97de63",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE states that Potato FC are dominating possession and chances early on, mentions their control with 100% of final-third passes, and notes 4 shots yielding an xG of 1.13. While the RESPONSE captures some of the facts from the CONTEXT, such as the final-third passes and xG, it introduces the idea of 'dominating possession' and 'early on,' which are not explicitly supported by the CONTEXT. Additionally, the RESPONSE does not mention the score (1–0) or the significance of the dominance at 6' as highlighted in the CONTEXT. Therefore, the RESPONSE is partially correct but incomplete, omitting key details and introducing unsupported information."
+  },
+  "M-4": {
+   "text_hash": "47368d6afc043596",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE states that Carrot are piling on the pressure, keeping the ball upfield, and creating chances, which aligns with the CONTEXT's mention of Carrot dominating the last five minutes with 100% of final-third passes and 4 shots. However, the RESPONSE does not mention the momentum swing at 12' or the significance of Carrot's actions in the context of the match score (Potato 1–0 Carrot). While the RESPONSE is accurate in describing Carrot's dominance, it omits key details about the momentum shift and the importance of these actions in the match's context, making it incomplete."
+  },
+  "M-5": {
+   "text_hash": "40d1080ebdf9e5d5",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot's pressing intensifying with 2.6 high pressures per minute and 100% of final-third passes in the last five minutes, which are accurate and grounded in the CONTEXT. However, the RESPONSE omits other relevant details from the CONTEXT, such as Carrot's upper hand in momentum (+0.60), their 3 shots (xG 0.36), and 2 corners in the last five minutes, which are important for fully describing the moment and its significance. Therefore, the RESPONSE is partially correct but incomplete."
+  },
+  "M-6": {
+   "text_hash": "a4f65c62a8159ce5",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The RESPONSE accurately describes the football moment using the facts provided in the CONTEXT. It mentions that Potato FC have a penalty after Sakinelli is fouled in the box by Konavadi, which aligns with the CONTEXT. The RESPONSE also highlights the significance of the moment by stating that penalties are scored 78% of the time and that Potato FC could double their lead, which is relevant and grounded in the CONTEXT. The RESPONSE is complete, accurate, and does not introduce any extraneous information, fully addressing the QUERY."
+  },
+  "M-7": {
+   "text_hash": "71a4a81d84a2dc51",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE accurately describes the moment where Haalmer's penalty, with an xG of 0.78, is saved by Alissandro, keeping the score at 1–0. It also mentions Potato's dominance in the last five minutes, including their 88% final-third passes and 3 shots, but notes their failure to capitalize. All details in the RESPONSE are grounded in the CONTEXT, and the significance of the moment is clearly explained. The RESPONSE is complete, accurate, and directly addresses the QUERY without introducing extraneous information."
+  },
+  "M-9": {
+   "text_hash": "355b515d1ce5f81c",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE states that Potato FC are firmly on top, dominating play in Carrot FC's half, and mentions their control with 95% of final-third passes and 0.75 momentum. This aligns with the CONTEXT, which specifies that Potato FC have momentum 0.75, played 95% of final-third passes in the last five minutes, and are now in control after a momentum swing. However, the RESPONSE does not explicitly mention the score (1–0) or the notable momentum swing at 22', which are relevant details for fully describing the moment and its importance. Therefore, the RESPONSE is accurate but incomplete, omitting key elements from the CONTEXT."
+  },
+  "M-12": {
+   "text_hash": "1cdce8fe1572b87d",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions that Carrot are starting to take charge and regaining control for the second time, which aligns with the CONTEXT stating that Carrot took control at 33' and this is the second time they have done so in the match. The RESPONSE also notes Carrot's dominance in the last five minutes with 33% of final-third passes, which is accurate according to the CONTEXT. However, the RESPONSE does not mention the score (Potato 1–0 Carrot) or the momentum swing details (momentum 0.89 for Potato earlier, now 0.43 for Carrot), which are relevant to fully describing the moment and its significance. Therefore, the RESPONSE is partially correct but incomplete, as it omits key details from the CONTEXT that are necessary for a complete answer."
+  },
+  "M-13": {
+   "text_hash": "08247c4f041dc571",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The RESPONSE accurately describes the football moment using the facts provided in the CONTEXT. It mentions Mbeulier's equaliser for Carrot, the score change to 1–1, the assist by Virtzano, the shift in Carrot's win chance from 10% to 23%, and the rarity of the goal with an xG of 0.08. Additionally, it notes the boost in Mbeulier's rating to 7.1. All these details are grounded in the CONTEXT and directly address the QUERY, which asks for a description of the football moment and its significance using only the facts given. The RESPONSE is complete, accurate, and does not introduce any extraneous information."
+  },
+  "M-14": {
+   "text_hash": "c8377aa6e49fed48",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The CONTEXT provides specific details about a football match moment involving Emil Alissandro, his team Carrot FC, and his live rating of 8.0 at the 45+1' milestone. The QUERY asks for a description of this football moment and its significance using only the facts given. The RESPONSE mentions Alissandro's 8.0 rating and his strong performance for Carrot FC, which aligns with the CONTEXT. However, it does not explicitly mention the milestone at 45+1', which is a notable detail from the CONTEXT. While the RESPONSE is accurate and relevant, it omits a key detail, making it partially correct and incomplete."
+  },
+  "M-16": {
+   "text_hash": "dceb403df620185a",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE mentions Potato FC's dominance and the score being 1–1 at the break, which aligns with the CONTEXT. It also highlights Potato FC's control in the last five minutes with 100% of final-third passes, which is accurate according to the CONTEXT. However, the RESPONSE does not explicitly mention the momentum value (+0.71) or the fact that this is Potato's second spell of dominance in the match, which are relevant details from the CONTEXT. Therefore, while the RESPONSE is correct, it is incomplete as it omits key elements needed for a full understanding."
+  },
+  "M-17": {
+   "text_hash": "bf846f833ff369dc",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes the half-time score (1–1), mentions the saved penalty as a dramatic moment, and provides details about shots, xG, and possession statistics for both teams. All information in the RESPONSE is directly grounded in the CONTEXT, and no extraneous or incorrect information is introduced. The RESPONSE fully addresses the QUERY and includes all relevant details from the CONTEXT."
+  },
+  "M-18": {
+   "text_hash": "40484efd01a81101",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE states that Carrot are pressing hard and taking control after a tough few minutes, ramping up to 3.0 high pressures per minute, their 3rd pressing spell, and turning momentum after a difficult phase. This aligns well with the CONTEXT, which mentions Carrot's pressing spell at 49', their high pressure rate of 3.0 per minute, and their momentum shift after a challenging period. The RESPONSE does not introduce any extraneous or incorrect information and fully addresses the QUERY with relevant details from the CONTEXT. Therefore, the RESPONSE is fully correct and complete."
+  },
+  "M-20": {
+   "text_hash": "625858e400cf3bc0",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The RESPONSE accurately describes the football moment using the facts provided in the CONTEXT. It mentions Gyokerland's missed chance, the xG value of 0.65, the current score of 1–1, and Carrot's dominance in the final third with 100% pass completion in the last five minutes. All these details are directly grounded in the CONTEXT and fully address the QUERY, which asks for a description of the moment and its significance. The RESPONSE does not introduce any extraneous or incorrect information, making it fully correct and complete."
+  },
+  "M-21": {
+   "text_hash": "edb3b44e1ef43071",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE states that Carrot are now in charge, showing more presence in the final third, and mentions that Carrot regained control for the third time, dominating with 78% of final-third passes in the last five minutes. This aligns with the CONTEXT, which mentions Carrot's momentum swing, their dominance in the final-third passes (78%), and their regaining control for the third time. The RESPONSE is accurate, relevant, and complete based on the CONTEXT, addressing both the description and significance of the moment. No extraneous or incorrect information is introduced."
+  },
+  "M-22": {
+   "text_hash": "ecfe01618f09497f",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot FC ramping up their pressing game and provides some details, such as 2.6 high pressures per minute and controlling 65% of final-third passes. However, it omits other key facts from the CONTEXT, such as the score being 1–1, Carrot's momentum advantage (+0.40), their 3 shots (xG 0.31), 1 corner, and the fact that this is their 4th pressing spell of the match. While the RESPONSE is partially correct, it is incomplete and does not fully address the significance of the moment as requested in the QUERY."
+  },
+  "M-23": {
+   "text_hash": "a78e1e179203d392",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE accurately describes the moment, stating that Madekuta scored his second goal to make it 2–1 for Potato, assisted by Sakinelli, with a high xG of 0.78. It also mentions the shift in win probability from 42% to 75% and notes that Carrot had been dominating momentum recently. All these details are grounded in the CONTEXT and directly address the QUERY without introducing extraneous or incorrect information. The RESPONSE is complete and fully correct based on the provided facts."
+  },
+  "M-24": {
+   "text_hash": "69ab834d67bb7fcb",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions that Potato are back in charge, controlling the game, and regaining control with 71% of final-third passes in the last 5 minutes, while leading 2–1. This aligns partially with the CONTEXT, which states that Potato had the upper hand in the last five minutes with 71% of final-third passes and a momentum swing at 65'. However, the RESPONSE omits key details such as the momentum values (0.55 for Potato and 0.70 for Carrot earlier), the fact that this is the second time Potato have taken control in the match, and the significance of the momentum swing at 65'. Therefore, the RESPONSE is partially correct but incomplete, as it does not fully address the QUERY using all relevant facts from the CONTEXT."
+  },
+  "M-26": {
+   "text_hash": "eb18ac87f5a3f622",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The CONTEXT provides specific details about a football match involving Carrot FC and a player named Aurelio Gvardosz, who achieved a live rating of 8.0 at a notable moment in the match. The QUERY asks for a description of this football moment and its significance, using only the facts given. The RESPONSE accurately mentions Gvardosz's 8.0 rating and his contribution to Carrot FC, which aligns with the CONTEXT. However, the RESPONSE does not explicitly mention the milestone at 66' or why the rating matters, which are key elements of the QUERY. Therefore, while the RESPONSE is correct, it is incomplete as it omits important details from the CONTEXT."
+  },
+  "M-29": {
+   "text_hash": "abd8f1544582a1e7",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot's dominance in the last five minutes, their completion of 84% of final-third passes, and their 4th instance of taking control in the match. These details are accurate and grounded in the CONTEXT. However, the RESPONSE introduces the idea that Carrot are 'chasing an equaliser,' which is not supported by the CONTEXT, as the score is Potato 2–1 Carrot, and there is no explicit mention of Carrot actively pursuing an equaliser. This addition makes the RESPONSE partially correct but not fully grounded in the CONTEXT."
+  },
+  "M-30": {
+   "text_hash": "9a9e3225ab9ca200",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The CONTEXT provides details about a football match involving Potato FC and Carrot FC, highlighting a notable moment where Oskar Sabeliba achieved a live rating of 8.0 at the 77th minute. The QUERY asks for a description of this football moment and its significance, using only the facts given. The RESPONSE accurately mentions Sabeliba's 8.0 rating and his standout performance for Potato FC, which aligns with the CONTEXT. However, it does not explicitly mention the milestone at the 77th minute, which is a notable detail from the CONTEXT. Therefore, while the RESPONSE is correct, it is incomplete as it omits a key detail from the CONTEXT."
+  },
+  "M-31": {
+   "text_hash": "79e71ba51b65f865",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot's dominance in the last five minutes, citing specific statistics such as 82% of final-third passes, 3 shots (xG 0.47), and 4 corners. These details are directly grounded in the CONTEXT. However, the RESPONSE adds an interpretation that Carrot are 'piling on the pressure as they push for an equaliser,' which is not explicitly stated in the CONTEXT. While this interpretation aligns with the facts, it introduces an inferred element not strictly grounded in the provided data. Therefore, the RESPONSE is accurate but slightly extends beyond the CONTEXT, making it partially correct."
+  },
+  "M-33": {
+   "text_hash": "babce6e667d4cf47",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE states that 'Potato are back on top as they dominate the final minutes,' which aligns with the CONTEXT indicating Potato had the upper hand in the last five minutes and completed all final-third passes during that time. It also mentions 'Potato regain control for the third time,' which is accurate as the CONTEXT notes this is the third time Potato have taken control in the match. However, the RESPONSE does not explicitly mention the score (2–1) or the momentum swing at 87', which are significant details from the CONTEXT that could enhance the description of why this moment matters. Therefore, while the RESPONSE is mostly correct, it is incomplete as it omits key details from the CONTEXT."
+  },
+  "M-34": {
+   "text_hash": "ddf8f5525937f7f8",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment and its significance using the facts provided in the context. It mentions Musialetti's late equaliser at 88', the score being levelled at 2–2, the shift in Carrot's win probability from 1% to 14%, and the assist by Mbeulier. Additionally, it notes that the goal was against the run of play, aligning with the context's mention of Potato's dominance. The response does not introduce any extraneous or incorrect information and fully addresses the query using the relevant details from the context."
+  },
+  "M-36": {
+   "text_hash": "4744555c32b30739",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The context provides specific details about a football match moment, including the match teams, the notable milestone at 90+6', the team and player involved, and the player's live rating of 8.0. The query asks for a description of the football moment and its significance, using only the facts given. The response accurately mentions Teddy Davineau's 8.0 rating and ties it to the 96th minute, reflecting the match's conclusion. However, it does not explicitly mention the milestone at 90+6' or why the rating matters, which are key elements of the context and query. While the response is correct, it is incomplete as it omits important details from the context."
+  },
+  "M-37": {
+   "text_hash": "8421b2b5c338b626",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot's intense pressing in stoppage time, citing the 2.2 high pressures per minute and their dominance in the final third. While this aligns with the CONTEXT, the RESPONSE omits key details such as the score being 2–2, the momentum value (+0.36), and the fact that this is Carrot's 5th pressing spell of the match. These omissions make the RESPONSE incomplete, though it is accurate in the information it does provide."
+  },
+  "M-38": {
+   "text_hash": "444df9af1dbcbec6",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Szobalenko's goal in the 96th minute, the score change to 3–2 for Carrot, the dramatic nature of the goal, the assist by Musialetti, the shift in win probability from 3% to 97%, and the low xG of 0.08. Additionally, it highlights Carrot's dominance in the final minutes, which aligns with the context's details about their momentum and final-third passes. The response is fully correct and complete, addressing the query comprehensively without introducing extraneous information."
+  },
+  "M-39": {
+   "text_hash": "3277ce8e3595c016",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment and its significance using the facts provided in the context. It mentions Carrot FC's 3–2 victory over Potato FC, the late goal by Szobalenko in added time, and the breaking of Potato's unbeaten streak. Additionally, it correctly references the xG statistics from the context. The response is fully grounded in the context and does not introduce any extraneous or incorrect information."
+  }
+ }
+}

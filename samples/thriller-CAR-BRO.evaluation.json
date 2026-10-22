@@ -1,0 +1,97 @@
+{
+ "evaluator": "azure-ai-evaluation GroundednessEvaluator",
+ "judge_model": "gpt-4o",
+ "scale": "1-5, pass at 3",
+ "summary": {
+  "moments": 14,
+  "mean": 4.79,
+  "min": 4.0,
+  "passed": 14
+ },
+ "moments": {
+  "M-1": {
+   "text_hash": "7c60e37a13f85521",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Shacroft's early goal for Broccoli, the assist by Bowerman, the xG value of 0.31, the score change to 1–0, and the increase in Broccoli's win probability from 26% to 61%. Additionally, it ties Broccoli's recent final-third control to the goal, which is relevant and grounded in the context. The response is complete, precise, and does not introduce any extraneous or incorrect information."
+  },
+  "M-2": {
+   "text_hash": "c9df0a7e3350dffb",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Gyokerland's equaliser, his 14th goal of the season, the assist by Mbeulier, the score being 1–1, and the increase in Carrot's win chance from 30% to 57%. Additionally, it highlights Carrot's dominant spell with 72% of final-third passes and 4 shots (xG 0.51). All these details are directly grounded in the context and fully address the query without introducing extraneous information or omitting relevant facts."
+  },
+  "M-4": {
+   "text_hash": "28ba775c512ef096",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot FC's dominance, their control with 89% of final-third passes in the last five minutes, and strong momentum. These points are grounded in the CONTEXT, which states Carrot FC's momentum (+0.70) and their 89% final-third passes. However, the RESPONSE does not explicitly mention the score (1–1) or why this dominance matters in the context of the game. While the RESPONSE is accurate and partially grounded, it omits key details that would make it fully complete. Therefore, it is partially correct."
+  },
+  "M-5": {
+   "text_hash": "365f7c13dd0572e5",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions Carrot FC's dominance and their completion of 90% of final-third passes during their second dominant spell, which aligns with the CONTEXT. However, the RESPONSE does not explicitly mention the momentum value (+0.79) or the score (1–1), which are relevant details that could enhance the completeness of the answer. While the RESPONSE is accurate and partially grounded in the CONTEXT, it omits some key facts, making it incomplete."
+  },
+  "M-6": {
+   "text_hash": "1b49b74f266f96eb",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Phillwood scoring his first goal of the season, assisted by Gallasher, and highlights Broccoli taking a 2-1 lead against the run of play. It also notes Carrot's dominance with 13 shots and xG 1.59, and Broccoli's win chance increasing to 46%. All these details are grounded in the context and directly address the query, making the response both complete and accurate."
+  },
+  "M-7": {
+   "text_hash": "bf34270bf9a813d4",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes Gyokerland's second goal of the match, assisted by Szobalenko, which ties the game at 2–2. It also highlights Carrot's attacking dominance in the last five minutes, supported by the facts about final-third passes, shots, and xG. All details in the RESPONSE are grounded in the CONTEXT, and no extraneous or incorrect information is introduced. The RESPONSE is complete and fully addresses the QUERY using the provided facts."
+  },
+  "M-8": {
+   "text_hash": "290d9003ea046838",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE correctly mentions Gyokerland's missed shot (xG 0.34) just before half-time, the score remaining 2–2, and Carrot FC's dominance in the closing minutes with 65% of final-third passes and momentum (+0.51). These details are accurate and directly drawn from the CONTEXT. The RESPONSE does not introduce any extraneous or incorrect information and fully addresses the QUERY with relevant details, making it a complete and grounded answer."
+  },
+  "M-9": {
+   "text_hash": "8a6dc663ededcc82",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes the half-time score (2–2), mentions Carrot FC's dominance in possession (68.8%) and shots (15 with xG 2.11), and notes Broccoli FC's efficiency with fewer shots (6 with xG 0.74). These details are directly grounded in the CONTEXT and align with the facts provided. The RESPONSE does not introduce any extraneous or incorrect information and fully addresses the QUERY with relevant details, making it complete and accurate."
+  },
+  "M-10": {
+   "text_hash": "0b9a5dc78218bedb",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The RESPONSE accurately describes the football moment using the facts provided in the CONTEXT. It mentions Bowerman's 5th goal of the season, the improbable nature of the strike (xG 0.03), the score change to 3–2, the boost in Broccoli's win probability from 18% to 50%, and Bowerman's live rating increase to 7.9. All these details are directly grounded in the CONTEXT and fully address the QUERY, which asks for a description of the moment and its significance using only the given facts."
+  },
+  "M-12": {
+   "text_hash": "bfaea0386109cb8e",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The CONTEXT provides specific details about a football match involving Carrot FC and Broccoli FC, highlighting Jordy Bowerman's milestone of achieving an 8.0 rating at the 68th minute. The QUERY asks for a description of this football moment and its significance, using only the facts given. The RESPONSE mentions Bowerman's 8.0 rating and his strong influence in the match, which aligns with the CONTEXT. However, it does not explicitly mention the milestone at the 68th minute, which is a notable detail from the CONTEXT. While the RESPONSE is accurate and relevant, it omits this key detail, making it incomplete. Therefore, the RESPONSE is partially correct."
+  },
+  "M-14": {
+   "text_hash": "728b79af3a7abd50",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The response accurately describes the football moment using the facts provided in the context. It mentions Calvertson scoring his 12th goal of the season, making the score 4–2 to Broccoli, and notes Zahara's assist. Additionally, it highlights the increase in Broccoli's win probability from 62% to 90% and references the team's strong five-minute spell with 3 shots and 1 corner. All these details are grounded in the context and directly address the query, making the response both complete and accurate."
+  },
+  "M-16": {
+   "text_hash": "b642b83b8dd19e37",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes Zahara missing a high-quality chance with an xG of 0.37 and notes Broccoli's dominance in the final-third play with 88% of passes in the last five minutes. It also mentions the potential impact of the missed chance on extending Broccoli's lead, which aligns with the CONTEXT. The RESPONSE is fully grounded in the provided facts and does not introduce any extraneous or incorrect information."
+  },
+  "M-18": {
+   "text_hash": "14b6f2d58f9d6e6a",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE accurately describes Gyokerland's third goal of the match, the score (3–4), the assist by Szobalenko, and the low xG chance (0.16). It also mentions Broccoli's dominance and Carrot's low win probability (2%), which are relevant to the significance of the moment. The RESPONSE does not introduce any extraneous or incorrect information and fully utilizes the CONTEXT to address the QUERY comprehensively."
+  },
+  "M-20": {
+   "text_hash": "3dd467dae421b5da",
+   "score": 5.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes the match result (Broccoli winning 4–3), mentions Carrot's unbeaten run ending, and highlights Broccoli's victory despite Carrot's dominance in possession and xG. It also correctly identifies Anders Gyokerland as the Player of the Match with an 8.9 rating. All these details are grounded in the CONTEXT, and no extraneous or incorrect information is introduced. The RESPONSE is complete and fully addresses the QUERY using the provided facts."
+  }
+ }
+}

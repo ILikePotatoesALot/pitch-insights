@@ -4,11 +4,13 @@
 
 GET  /api/matches                list of demo matches in samples/
 GET  /api/matches/{name}         that match's match_meta
-WS   /ws/replay/{name}?speed=20&from=0
+WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0
 
 The WebSocket sends, in order:
-  {"type": "meta", "meta": ..., "commentary": {...}}     commentary: who wrote the stored commentary
-                                                        (model, prompt version, groundedness summary)
+  {"type": "meta", "meta": ..., "commentary": {...}, "languages": {...}, "lang": "de"}
+                                                        commentary: who wrote the stored commentary
+                                                        (model, prompt version, groundedness summary);
+                                                        languages: those with stored translations
   {"type": "catchup", "moments": [...], "state": ..., "recent_events": [...]}
                                                         only when starting after kick-off; recent_events
                                                         (the last 3 minutes) let the pitch redraw at once
@@ -18,13 +20,15 @@ The WebSocket sends, in order:
   {"type": "state", "state": ...}                       about once a second
   {"type": "end"}
 The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"} or {"cmd": "resume"}.
-To seek, it reconnects with a different `from` minute.
+To seek, it reconnects with a different `from` minute, or `at` (match seconds, which wins when both are
+given): a minute on the broadcast clock can say 47:00 of the second half but not 45+2 of the first.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 from pathlib import Path
 
@@ -32,8 +36,8 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from pitch_insights.agents.memory import memory_for
-from pitch_insights.agents.prompts import input_hash
-from pitch_insights.agents.store import load_commentary
+from pitch_insights.agents.store import load_commentary, with_commentary
+from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
@@ -75,15 +79,6 @@ def get_match(name: str) -> dict:
     return meta
 
 
-def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
-    """The moment plus its stored commentary, if the agents wrote some from these same facts.
-    Commentary written for different facts (the file is older than the code) is left out."""
-    rec = stored["moments"].get(moment["id"])
-    if not rec or rec.get("input_hash") != input_hash(moment, meta):
-        return moment
-    return moment | {"commentary": rec}
-
-
 def commentary_info(stored: dict) -> dict | None:
     """Who wrote the stored commentary, for the app's AI-generated label."""
     if not stored["moments"]:
@@ -120,9 +115,28 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         from_minute = 0.0
     brain = MatchBrain(meta, memory=memory_for(path, meta))  # stored vectors: no network
     stored = load_commentary(path)
-    await ws.send_json({"type": "meta", "meta": meta, "commentary": commentary_info(stored)})
+    saved = load_translations(path)  # stored too: no network; a file made by an older method isn't used
+    translations = saved["moments"] if saved.get("version") == TRANSLATION_VERSION else {}
+    languages = {"en": "English"} | (LANGUAGES if translations else {})
+    lang = ws.query_params.get("lang", "en")
+    lang = lang if lang in languages else "en"
 
-    start = start_seconds(events, from_minute) if from_minute > 0 else 0.0
+    def shown(m: dict) -> dict:
+        """A moment as this viewer sees it: with its stored commentary, in their language."""
+        m = with_commentary(m, stored, meta)
+        return translated_moment(m, translations.get(m["id"]), lang)
+
+    await ws.send_json({"type": "meta", "meta": meta, "commentary": commentary_info(stored),
+                        "languages": languages, "lang": lang})
+
+    try:  # exact match seconds: a reconnect that must land on the same second, which a minute can't
+        at = float(ws.query_params["at"]) if "at" in ws.query_params else None  # (no `from` for 45+2')
+    except ValueError:
+        at = None
+    if at is not None and math.isfinite(at):
+        start = max(0.0, at)
+    else:
+        start = start_seconds(events, from_minute) if from_minute > 0 else 0.0
     times = match_seconds(events)
     first = next((i for i, t in enumerate(times) if t >= start), len(events))
     for ev in events[:first]:
@@ -130,7 +144,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if first:
         recent = [ev for ev, t in zip(events[:first], times[:first])
                   if t >= times[first - 1] - 180 or (ev["type"] == "match_state" and ev["state"] == "half_time")]
-        await ws.send_json({"type": "catchup", "moments": [with_commentary(m, stored, meta) for m in brain.moments],
+        await ws.send_json({"type": "catchup", "moments": [shown(m) for m in brain.moments],
                             "state": state_message(brain), "recent_events": recent})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
@@ -162,7 +176,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})
             for m in out["moments"]:
-                await ws.send_json({"type": "moment", "moment": with_commentary(m, stored, meta)})
+                await ws.send_json({"type": "moment", "moment": shown(m)})
             if loop.time() - last_state >= STATE_EVERY_S or ev["type"] in ("shot", "match_state") or out["moments"]:
                 await ws.send_json({"type": "state", "state": state_message(brain)})
                 last_state = loop.time()
