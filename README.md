@@ -10,7 +10,7 @@ Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Pipeline
 
-1. **Ingest**: synthetic match events, plus events derived from match video (YOLO detection, ByteTrack, pitch homography), in one shared event format.
+1. **Ingest**: synthetic match events, plus player positions and events derived from real, licensed match video (RF-DETR detection on tiles, ByteTrack-style tracking, a fitted image-to-pitch mapping), in one shared event format.
 2. **Interpret**: stats, patterns (momentum, pressure, chaos, tempo) and live player ratings, calculated in code.
 3. **Explain**: each moment is scored by how much it changed the match, and explained from an evidence pack of computed facts.
 4. **Render**: timed, machine-readable overlay cues, drawn on a Three.js 3D pitch.
@@ -111,7 +111,7 @@ First full run: 52 moments across the three demo matches, all grounded, none fel
 
 ## Credits
 
-- Player detection: [Roboflow football-players-detection](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc) (CC BY 4.0)
+- Player and ball detection: [RF-DETR](https://github.com/roboflow/rf-detr) by Roboflow (Apache-2.0), small model with its pre-trained COCO weights as released
 - Video and ground truth for the video path: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) by Scott et al. (CC BY 4.0), [arXiv:2508.01802](https://arxiv.org/abs/2508.01802)
 - All clubs, players and matches in the synthetic data are fictional.
 

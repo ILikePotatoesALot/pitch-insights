@@ -12,7 +12,7 @@ import random
 from dataclasses import dataclass, field
 
 from pitch_insights.events.schema import (
-    PITCH_LENGTH, PITCH_WIDTH, SCHEMA_VERSION, MatchMeta, dump, event_adapter,
+    PITCH_LENGTH, PITCH_WIDTH, SCHEMA_VERSION, MatchMeta, display_clock, dump, event_adapter,
 )
 from pitch_insights.generator.players import (
     FORMATIONS, ClubDef, PlayerDef, club_strength, league_info, load_clubs,
@@ -135,14 +135,7 @@ class MatchEngine:
         return 45 + self.t / 60
 
     def clock(self) -> tuple[str, int]:
-        m = int(self.t // 60) + 1
-        cap = 45
-        if self.period == 2:
-            m += 45
-            cap = 90
-        if m > cap:
-            return f"{cap}+{m - cap}'", cap
-        return f"{m}'", m
+        return display_clock(self.period, self.t)
 
     # ------------------------------------------------------------ helpers
 

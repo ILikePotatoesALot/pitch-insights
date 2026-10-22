@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "FrameBall": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "description": "In the attacking frame of `ref_team_id`",
+          "maximum": 105.0,
+          "minimum": 0,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "maximum": 68.0,
+          "minimum": 0,
+          "title": "Y",
+          "type": "number"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "confidence"
+      ],
+      "title": "FrameBall",
+      "type": "object"
+    },
+    "FramePlayer": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Stable within the match, e.g. a tracker ID such as 'L-t12'",
+          "title": "Id",
+          "type": "string"
+        },
+        "team_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "None when the team isn't known (referees, unclassified)",
+          "title": "Team Id"
+        },
+        "x": {
+          "description": "In the attacking frame of the player's own team (of `ref_team_id` when team_id is None)",
+          "maximum": 105.0,
+          "minimum": 0,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "maximum": 68.0,
+          "minimum": 0,
+          "title": "Y",
+          "type": "number"
+        },
+        "speed": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "m/s, smoothed over about 0.5 s",
+          "title": "Speed"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "team_id",
+        "x",
+        "y",
+        "confidence"
+      ],
+      "title": "FramePlayer",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Positions of everyone on the pitch at one moment (v2; see DESIGN.md, Frame message).",
+  "properties": {
+    "type": {
+      "const": "frame",
+      "default": "frame",
+      "title": "Type",
+      "type": "string"
+    },
+    "schema": {
+      "const": "1.1",
+      "default": "1.1",
+      "title": "Schema",
+      "type": "string"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "synthetic",
+        "video"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "period": {
+      "enum": [
+        1,
+        2
+      ],
+      "title": "Period",
+      "type": "integer"
+    },
+    "t": {
+      "description": "Seconds since the current period started",
+      "minimum": 0,
+      "title": "T",
+      "type": "number"
+    },
+    "clock": {
+      "title": "Clock",
+      "type": "string"
+    },
+    "ref_team_id": {
+      "description": "The team whose attacking frame the ball and teamless players use",
+      "title": "Ref Team Id",
+      "type": "string"
+    },
+    "players": {
+      "items": {
+        "$ref": "#/$defs/FramePlayer"
+      },
+      "title": "Players",
+      "type": "array"
+    },
+    "ball": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FrameBall"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "None when the ball isn't detected"
+    }
+  },
+  "required": [
+    "match_id",
+    "source",
+    "period",
+    "t",
+    "clock",
+    "ref_team_id",
+    "players",
+    "ball"
+  ],
+  "title": "Frame",
+  "type": "object"
+}
