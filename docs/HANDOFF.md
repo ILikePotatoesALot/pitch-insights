@@ -116,7 +116,7 @@ video\.venv\Scripts\python video\process.py            # 2 s: tracking, teams, b
 video\.venv\Scripts\python video\preview.py            # 1 min: data\video\117093\preview.mp4 to check by eye
 ```
 
-The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples/` itself: the server and the commentary scripts read every `samples/*.jsonl` as a match). `video/log_mlflow.py` logs the benchmark to Azure ML once its packages are approved (see Waiting on Austin).
+The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples/` itself: the server and the commentary scripts read every `samples/*.jsonl` as a match). `video/log_mlflow.py` logs the benchmark run to the Azure ML workspace through MLflow (the first run needs a browser sign-in; see Waiting on Austin).
 
 **Demo matches** (in `samples/`): `comeback-POT-CAR` (seed 52: Potato lead 2–1, Carrot win 3–2 with an 88' equaliser and a 96th-minute winner; the hero match), `thriller-CAR-BRO` (seed 4: Broccoli win 4–3 away), `red-card-CAU-POT` (seed 24: Potato down to ten at 20', Cauliflower win 2–0).
 
@@ -169,7 +169,7 @@ The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples
 ## Waiting on Austin
 
 1. **Video path: keep or cut (by 24 Oct).** It works on a 100 s clip (numbers above and in [DESIGN.md, Benchmark](DESIGN.md#benchmark-22-oct)); watch `data\video\117093\preview.mp4` to judge it.
-2. **MLflow logging to Azure ML:** approve installing `mlflow-skinny` 3.15.0 and `azureml-mlflow` 1.62.0.post6 (plus dependencies, roughly 20–30 MB) in `video\.venv`, add the workspace's MLflow tracking URI to `.env` as `MLFLOW_TRACKING_URI` (portal > `ML-pitch-insights` > Essentials), and sign in once in the browser window it opens. Then run `video\.venv\Scripts\python video\log_mlflow.py`.
+2. **MLflow logging to Azure ML:** approved 22 Oct; `mlflow-skinny` 3.15.0 and `azureml-mlflow` 1.62.0.post6 are installed in `video\.venv`, and `MLFLOW_TRACKING_URI` is in `.env` (placeholder in `.env.example`). The first run of `video\.venv\Scripts\python video\log_mlflow.py` opens a browser window for Austin to sign in, so it runs only with Austin at the machine.
 3. **License:** Ultralytics isn't used (the detector is RF-DETR, Apache-2.0), so the repo could move from AGPL-3.0 to Apache-2.0 or MIT.
 4. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
 

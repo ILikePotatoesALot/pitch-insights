@@ -6,8 +6,8 @@ workspace's tracking URI in `MLFLOW_TRACKING_URI` (read from the repo-root
 sign-in through azure-identity (Azure CLI, or a browser window the first time).
 No compute is used, so no quota is needed.
 
-Needs `mlflow-skinny` and `azureml-mlflow` in video\\.venv, which aren't
-installed yet (waiting on Austin's go-ahead).
+Needs `mlflow-skinny` 3.15.0 and `azureml-mlflow` 1.62.0.post6 in video\\.venv
+(installed 22 Oct). The first run opens a browser window to sign in.
 
     video\\.venv\\Scripts\\python video\\log_mlflow.py
 """
@@ -55,6 +55,9 @@ def flat_metrics(bench: dict) -> dict[str, float]:
 
 
 def main() -> None:
+    import truststore
+
+    truststore.inject_into_ssl()  # the network inspects HTTPS; use the Windows certificate store
     try:
         import mlflow
     except ImportError:
