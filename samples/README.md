@@ -13,3 +13,14 @@ Regenerate any of them with, for example:
 ```
 python -m pitch_insights.generate --seed 52 --home POT --away CAR --out ../samples --name comeback-POT-CAR
 ```
+
+## Video path (`video/`)
+
+Output of the video path on real, licensed footage: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), match 117093, first half, 38:00–39:40. Kept in their own folder because every `.jsonl` directly in `samples/` is read as a demo match. Players are labelled by team and track ID ("L-t12"); SoccerTrack's players have no names, only side and shirt number. See [docs/DESIGN.md, Video path](../docs/DESIGN.md#video-path).
+
+| File | Contents |
+|---|---|
+| `117093-38min.frames.jsonl` | 500 `frame` messages (schema 1.1), 5 a second |
+| `117093-38min.events.jsonl` | Events derived from the tracked ball and players (`source: "video"`) |
+| `117093-38min.benchmark.json` | Scores against SoccerTrack's ground truth |
+| `117093-38min.calibration.json` | The fitted image-to-pitch mapping |

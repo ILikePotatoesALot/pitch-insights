@@ -17,7 +17,7 @@ from pitch_insights.video.soccertrack import (
     from_our_frame, iter_gsr, iter_top_level, parse_bas, to_our_frame,
 )
 from pitch_insights.video.tiles import Detection, make_tiles, merge, shift
-from pitch_insights.video.track import PitchTracker, smoothed_speeds, spectator_tracks
+from pitch_insights.video.track import PitchTracker, at_static_spot, smoothed_speeds, static_spots
 
 
 def _person(image_id, track, side, jersey, x, y, role="player"):
@@ -220,12 +220,44 @@ def test_smoothed_speeds():
     assert smoothed_speeds([(0.0, (0.0, 0.0))]) == {0.0: None}
 
 
-def test_spectator_tracks_are_still_people_by_the_far_touchline():
-    still = [(k * 0.2, (10.0 + 0.1 * (k % 3), -33.0)) for k in range(20)]
-    runner = [(k * 0.2, (10.0 + k, -32.0)) for k in range(20)]
-    keeper = [(k * 0.2, (-47.0, 0.5 * (k % 2))) for k in range(20)]  # still, but not by the far touchline
-    brief = still[:3]
-    assert spectator_tracks({1: still, 2: runner, 3: keeper, 4: brief}) == {1}
+def test_static_spots_are_people_standing_still_off_the_field_of_play():
+    frames = []
+    for k in range(20):
+        frames.append([
+            (10.2 + 0.1 * (k % 3), -33.2),  # spectator on the stand (maps onto the far touchline)
+            (53.5, 2.2),  # someone behind the right goal line
+            (-47.2, 0.2),  # keeper standing still, but on the pitch
+            (-20.0 + k, -32.0),  # a player running along the far touchline
+        ])
+    spots = static_spots(frames)
+    assert at_static_spot((10.3, -33.2), spots)
+    assert at_static_spot((53.5, 2.2), spots)
+    assert not at_static_spot((-47.2, 0.2), spots)
+    assert not any(at_static_spot((-20.0 + k, -32.0), spots) for k in range(20))
+
+
+def test_static_spot_on_a_cell_edge_is_still_found():
+    # Jitters across x = 0, a cell edge of the first grid, half the time on each side.
+    frames = [[((-0.2 if k % 2 else 0.2), -33.0)] for k in range(20)]
+    assert at_static_spot((0.1, -33.0), static_spots(frames))
+
+
+def test_someone_still_for_only_part_of_the_clip_is_not_a_static_spot():
+    # Stands still by the far touchline for the first 30% of the clip, then runs off.
+    frames = [[(5.0, -30.0)] if k < 30 else [(5.0 + k, -10.0)] for k in range(100)]
+    assert static_spots(frames) == set()
+
+
+def test_static_spots_anywhere_catches_a_spare_ball_on_the_pitch():
+    frames = [[(30.0, 10.0), (-20.0 + 2 * k, 5.0)] for k in range(20)]  # spare ball, match ball
+    assert static_spots(frames) == set()  # on the pitch: not checked by default
+    spots = static_spots(frames, anywhere=True, min_slices=1)
+    assert at_static_spot((30.0, 10.0), spots, anywhere=True)
+    # Seen only in the first 30% of the clip (hidden later): still a spare ball with min_slices=1.
+    part = [[(30.0, 10.0)] if k < 30 else [] for k in range(100)]
+    assert static_spots(part, anywhere=True) == set()
+    assert at_static_spot((30.0, 10.0), static_spots(part, anywhere=True, min_slices=1), anywhere=True)
+    assert not at_static_spot((0.0, 5.0), spots, anywhere=True)
 
 
 # ---------------------------------------------------------------- events

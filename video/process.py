@@ -25,7 +25,7 @@ from pitch_insights.events.schema import Frame, display_clock
 from pitch_insights.video.bench import DetectionScore, event_recall
 from pitch_insights.video.events import Moment, PlayerAt, derive, to_messages
 from pitch_insights.video.soccertrack import load_bas, to_our_frame
-from pitch_insights.video.track import PitchTracker, smoothed_speeds, spectator_tracks
+from pitch_insights.video.track import PitchTracker, at_static_spot, smoothed_speeds, static_spots
 
 MATCH_RADIUS_M = 3.0
 TEAMS = {"left": "L", "right": "R"}
@@ -53,29 +53,22 @@ def on_pitch(cal: Calibration, dets: list[dict]) -> list[dict]:
 
 
 def assign_teams(colours_by_track: dict[int, list[list[float]]], x_by_track: dict[int, list[float]]) -> dict[int, str | None]:
-    """Shirt-colour clustering (k-means over every tracked detection's shirt colour).
+    """Shirt-colour clustering: k-means over each track's mean shirt colour.
 
-    The two groups seen most are the teams; the rest (keepers, officials, odd
-    crops) get no team. The team defending the left goal
-    sits deeper on average, so the group with the lower mean x is Left. Only
-    colour and position are used; SoccerTrack's team labels are for scoring.
+    The two groups with the most detections are the teams; the rest (keepers,
+    officials, odd crops) get no team. The team defending the left goal sits
+    deeper on average, so the group with the lower mean x is Left. Only colour
+    and position are used; SoccerTrack's team labels are for scoring.
     """
-    samples, owners = [], []
-    for tid, cols in colours_by_track.items():
-        for c in cols:
-            samples.append(c)
-            owners.append(tid)
-    if len(samples) < COLOUR_GROUPS:
-        print(f"only {len(samples)} shirt colours: no teams assigned")
+    tids = [tid for tid, cols in colours_by_track.items() if cols]
+    if len(tids) < COLOUR_GROUPS:
+        print(f"only {len(tids)} tracks with shirt colours: no teams assigned")
         return {}
-    data = np.array(samples, dtype=np.float32)
+    data = np.array([np.mean(colours_by_track[tid], axis=0) for tid in tids], dtype=np.float32)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.1)
     cv2.setRNGSeed(7)
-    _, labels, _ = cv2.kmeans(data, COLOUR_GROUPS, None, criteria, 5, cv2.KMEANS_PP_CENTERS)
-    votes: dict[int, Counter] = defaultdict(Counter)
-    for tid, lab in zip(owners, labels.ravel()):
-        votes[tid][int(lab)] += 1
-    track_label = {tid: v.most_common(1)[0][0] for tid, v in votes.items()}
+    _, labels, _ = cv2.kmeans(data, COLOUR_GROUPS, None, criteria, 10, cv2.KMEANS_PP_CENTERS)
+    track_label = {tid: int(lab) for tid, lab in zip(tids, labels.ravel())}
     weight = Counter()
     for tid, lab in track_label.items():
         weight[lab] += len(colours_by_track[tid])
@@ -135,14 +128,28 @@ def main() -> None:
     rows = [r for r in rows if r["frame"] in gt]
     print(f"{len(rows)} frames with detections")
 
-    tracker = PitchTracker()
-    per_frame = []  # (frame, t, people, balls)
+    people_by_frame, balls_by_frame = [], []
     raw_score = DetectionScore(MATCH_RADIUS_M)
     for r in rows:
-        t = clip.frame_t(r["frame"])
         people = on_pitch(cal, [d for d in r["detections"] if d["class_id"] == PERSON and d["score"] >= clip.PERSON_MIN_SCORE])
-        balls = on_pitch(cal, [d for d in r["detections"] if d["class_id"] == BALL and d["score"] >= clip.BALL_MIN_SCORE])
         raw_score.add_frame([p["xy"] for p in people], [(o["x_st"], o["y_st"]) for o in gt[r["frame"]]])
+        people_by_frame.append(people)
+        balls_by_frame.append(on_pitch(cal, [d for d in r["detections"] if d["class_id"] == BALL and d["score"] >= clip.BALL_MIN_SCORE]))
+    # Spectators on the stand and people behind the goals: removed before tracking.
+    spots = static_spots([[p["xy"] for p in people] for people in people_by_frame])
+    dropped = 0
+    # Spare balls lying around the pitch.
+    ball_spots = static_spots([[b["xy"] for b in balls] for balls in balls_by_frame], anywhere=True, min_slices=1)
+    balls_by_frame = [[b for b in balls if not at_static_spot(b["xy"], ball_spots, anywhere=True)]
+                      for balls in balls_by_frame]
+
+    tracker = PitchTracker()
+    per_frame = []  # (frame, t, people, balls)
+    for r, people, balls in zip(rows, people_by_frame, balls_by_frame):
+        t = clip.frame_t(r["frame"])
+        kept = [p for p in people if not at_static_spot(p["xy"], spots)]
+        dropped += len(people) - len(kept)
+        people = kept
         ids = tracker.update(t, [p["xy"] for p in people], [p["score"] for p in people])
         for p, tid in zip(people, ids):
             p["track"] = tid
@@ -152,10 +159,6 @@ def main() -> None:
     for _, t, people, _ in per_frame:
         for p in people:
             history[p["track"]].append((t, p["xy"]))
-    spectators = spectator_tracks(history)
-    per_frame = [(fr, t, [p for p in people if p["track"] not in spectators], balls)
-                 for fr, t, people, balls in per_frame]
-    history = {tid: h for tid, h in history.items() if tid not in spectators}
     speed = {tid: smoothed_speeds(h) for tid, h in history.items()}
 
     colours, xs = defaultdict(list), defaultdict(list)
@@ -172,7 +175,7 @@ def main() -> None:
     out_score = DetectionScore(MATCH_RADIUS_M)
     teamed_score = DetectionScore(MATCH_RADIUS_M)  # only people given a team: referees mostly drop out
     team_right = team_total = 0
-    gt_ids: dict[int, set[int]] = defaultdict(set)
+    gt_ids: dict[int, list[int]] = defaultdict(list)  # our track IDs matched to each true player, frame by frame
     for (frame, t, people, _), ball in zip(per_frame, ball_of):
         players, at = [], []
         for p in people:
@@ -202,7 +205,7 @@ def main() -> None:
         pairs = out_score.add_frame([p["xy"] for p in people], truth_xy)
         teamed_score.add_frame([p["xy"] for p in people if team_of.get(p["track"])], truth_xy)
         for i, j, _ in pairs:
-            gt_ids[truth[j]["track_id"]].add(people[i]["track"])
+            gt_ids[truth[j]["track_id"]].append(people[i]["track"])
             team = team_of.get(people[i]["track"])
             if team:
                 team_total += 1
@@ -228,13 +231,18 @@ def main() -> None:
         "tracked_players": out_score.summary() | {
             "team_accuracy": team_right / team_total if team_total else None,
             "tracks": len(history),
-            "spectator_tracks_dropped": len(spectators),
+            "static_spots": len(spots),
+            "static_detections_dropped": dropped,
             "ground_truth_players": len(gt_ids),
-            "tracks_per_ground_truth_player_mean": mean(len(v) for v in gt_ids.values()) if gt_ids else None,
+            "tracks_per_ground_truth_player_mean": mean(len(set(v)) for v in gt_ids.values()) if gt_ids else None,
+            # Share of a true player's matched frames carrying their most common track ID.
+            "id_consistency": (sum(Counter(v).most_common(1)[0][1] for v in gt_ids.values())
+                               / sum(len(v) for v in gt_ids.values())) if gt_ids else None,
         },
         "players_with_a_team": {k: v for k, v in teamed_score.summary().items()
                                 if k in ("recall", "precision", "detections", "matched")},
         "ball": {"frames_with_ball": sum(b is not None for b in ball_of), "frames": len(ball_of),
+                 "spare_ball_spots": len(ball_spots),
                  "note": "SoccerTrack has no ball ground truth; not scored"},
         "events": {
             "predicted": dict(Counter(e["type"] for e in events)),

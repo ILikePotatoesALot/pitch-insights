@@ -22,7 +22,7 @@ from .soccertrack import to_our_frame
 
 Point = tuple[float, float]
 
-POSSESSION_RADIUS_M = 2.0
+POSSESSION_RADIUS_M = 2.5  # 2.0 found too few owners on the 38-minute clip; 3.0 is loose
 MIN_SEGMENT_FRAMES = 2  # a ball passing a player in a single frame isn't possession
 MAX_GAP_S = 3.0  # longer without anyone on the ball and the chain breaks
 CARRY_MIN_M = 3.0
