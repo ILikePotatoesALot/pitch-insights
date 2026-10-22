@@ -220,3 +220,83 @@ def test_server_falls_back_to_english_for_unknown_languages():
     with TestClient(app).websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=95&lang=klingon") as ws:
         msg = ws.receive_json()
     assert msg["type"] == "meta" and msg["lang"] == "en" and msg["languages"]["en"] == "English"
+
+
+# ---------------------------------------------------------------- review fixes
+
+class ErrorSafety:
+    def __init__(self):
+        self.checked = []
+
+    async def check(self, text):
+        self.checked.append(text)
+        return SafetyResult(False, error="HTTP 429")
+
+
+def test_an_unreachable_safety_service_keeps_the_draft_to_screen_later(match):
+    meta, moments = match
+    goal = [m for m in moments if m["type"] == "goal"][-1]
+    lines = Lines(casual="Carrot FC win it late.", analyst="Carrot FC win it late.")
+    rec = run(CommentaryDesk(FakeWriter(lines), meta, safety=ErrorSafety()).comment(goal))
+    assert rec["status"] == "fallback" and rec["pending"] == {"casual": lines.casual, "analyst": lines.analyst}
+    # Still down next time: left alone, so it can be tried again.
+    assert run(CommentaryDesk(FakeWriter(None), meta, safety=ErrorSafety()).screen(rec, goal)) is rec
+    # Back up: the kept draft is screened and shown, without calling the model.
+    ok = run(CommentaryDesk(FakeWriter(None), meta, safety=FakeSafety(True)).screen(rec, goal))
+    assert ok["status"] == "ok" and ok["casual"] == lines.casual and "pending" not in ok and ok["reason"] is None
+
+
+def test_an_unchecked_stored_line_isnt_downgraded_when_the_service_is_down(match):
+    meta, moments = match
+    goal = [m for m in moments if m["type"] == "goal"][-1]
+    old = {"moment_id": goal["id"], "status": "ok", "casual": "a", "analyst": "b", "attempts": 1}
+    assert run(CommentaryDesk(FakeWriter(None), meta, safety=ErrorSafety()).screen(old, goal)) is old
+
+
+def test_network_errors_are_retried():
+    calls = []
+
+    def handler(req):
+        calls.append(req)
+        if len(calls) == 1:
+            raise httpx.ReadTimeout("slow", request=req)
+        return httpx.Response(200, json=severities())
+    assert run(ContentSafety("https://cs.example/", "k", client=mock(handler)).check("x")).passed
+    assert len(calls) == 2
+
+
+def test_the_whole_safety_check_has_a_time_limit():
+    async def never(req):
+        await asyncio.Event().wait()
+    res = run(ContentSafety("https://cs.example/", "k", client=mock(never), total_timeout_s=0.05).check("x"))
+    assert not res.passed and res.error == "timeout"
+
+
+def test_translator_waits_between_requests_not_after_the_last(monkeypatch):
+    waits = []
+
+    async def record(seconds):
+        waits.append(seconds)
+    monkeypatch.setattr(translate.asyncio, "sleep", record)
+    t = Translator("https://tr.example/", "k", per_minute=30_000, client=mock(
+        lambda req: httpx.Response(200, json=[{"translations": [{"to": "de", "text": i["Text"]}]}
+                                              for i in json.loads(req.content)])))
+    run(t.translate(["a" * 900, "b" * 900, "c" * 900], ["de"]))
+    assert len(waits) == 2 and waits[0] == pytest.approx(60 * 900 / 30_000)
+
+
+def test_bare_s_endings_stay_joined_but_french_s_apostrophe_gets_its_space():
+    s = '<span class="notranslate">Potato</span>'
+    assert unprotect(s + "s Sieg", "de") == "Potatos Sieg"
+    assert unprotect(s + "s'impose", "fr") == "Potato s'impose"
+
+
+def test_server_ignores_translations_made_by_an_older_method(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from pitch_insights import server
+
+    monkeypatch.setattr(server, "load_translations", lambda path: {"version": "old", "moments": {"M-1": {}}})
+    with TestClient(server.app).websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=95&lang=de") as ws:
+        msg = ws.receive_json()
+    assert msg["languages"] == {"en": "English"} and msg["lang"] == "en"

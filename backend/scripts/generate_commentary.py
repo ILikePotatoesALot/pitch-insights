@@ -46,7 +46,7 @@ async def run_match(path: Path, writer, header: dict, force: bool, limit: int | 
 
     async def one(m: dict) -> dict:
         kept = old["moments"].get(m["id"]) if reuse else None
-        if (kept and kept["status"] == "ok" and kept.get("input_hash") == input_hash(m, meta)
+        if (kept and (kept["status"] == "ok" or kept.get("pending")) and kept.get("input_hash") == input_hash(m, meta)
                 and kept.get("provider", header["provider"]) == header["provider"]):
             async with sem:
                 return await desk.screen(kept, m)

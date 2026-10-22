@@ -31,6 +31,10 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   onResetRef.current = onReset;
   const speedRef = useRef(speed);
   speedRef.current = speed;
+  // Paused by the viewer, and the language the open connection uses: a language change reconnects,
+  // and a paused replay should stay paused through it.
+  const pausedRef = useRef(false);
+  const langRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!name) return;
@@ -40,6 +44,9 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
     setState(null);
     setAiInfo(null);
     onResetRef.current();
+    const keepPaused = pausedRef.current && langRef.current !== null && langRef.current !== lang;
+    langRef.current = lang;
+    pausedRef.current = keepPaused;
     let ended = false;
     const proto = location.protocol === "https:" ? "wss" : "ws";
     const socket = new WebSocket(`${proto}://${location.host}/ws/replay/${name}?speed=${speedRef.current}&from=${from}&lang=${encodeURIComponent(lang)}`);
@@ -52,7 +59,8 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
           setMeta(data.meta);
           setAiInfo(data.commentary ?? null);
           setLanguages(data.languages ?? { en: "English" });
-          setStatus("live");
+          if (keepPaused) socket.send(JSON.stringify({ cmd: "pause" }));
+          setStatus(keepPaused ? "paused" : "live");
           break;
         case "catchup":
           setMoments(data.moments);
@@ -93,8 +101,8 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
     setSpeedState(value);
     send({ cmd: "speed", value });
   }, []);
-  const pause = useCallback(() => { send({ cmd: "pause" }); setStatus("paused"); }, []);
-  const resume = useCallback(() => { send({ cmd: "resume" }); setStatus("live"); }, []);
+  const pause = useCallback(() => { send({ cmd: "pause" }); pausedRef.current = true; setStatus("paused"); }, []);
+  const resume = useCallback(() => { send({ cmd: "resume" }); pausedRef.current = false; setStatus("live"); }, []);
   const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, n: j.n + 1 })), [name]);
 
   return { meta, aiInfo, languages, state, moments, liveMoment, status, speed, from, setSpeed, pause, resume, seek };

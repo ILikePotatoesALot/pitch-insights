@@ -43,10 +43,10 @@ export default function App() {
 
   const { meta, aiInfo, languages, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } =
     useReplay(name, lang, onEvent, onReset);
-  // A new language reconnects from the current minute, so the match carries on where it was.
+  // A new language reconnects from the current moment (not the start of the minute, so nothing replays).
   const changeLang = (l: string) => {
     const m = state?.match_minute ?? 0;
-    seek(Math.floor(state?.period === 1 ? Math.min(m, 45) : m)); // first-half stoppage stays in the first half
+    seek(state?.period === 1 ? Math.min(m, 45) : m); // first-half stoppage stays in the first half
     setLang(l);
   };
 

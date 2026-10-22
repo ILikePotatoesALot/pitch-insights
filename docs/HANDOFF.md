@@ -41,7 +41,7 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 133 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 140 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -142,6 +142,7 @@ Order after changing moments: `embed_moments.py`, then `generate_commentary.py`,
 - The high press creates many pressures but not many extra high turnovers, so Carrot's PPDA isn't as low as a real pressing side's (the pressure index shows the pressing correctly).
 - Synthetic speed and distance don't exist yet; they come with the v2 tracking frames (estimates) and the video path (measured).
 - The app's JavaScript bundle is large (Three.js); fine for now.
+- Machine translation can get idioms wrong while keeping every name and number ("turn up the pressure" came out as "turn up the news" in Chinese), and the check can't catch that. The app labels translations as machine-made.
 
 ## Data on this machine
 

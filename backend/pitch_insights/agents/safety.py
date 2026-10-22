@@ -13,6 +13,7 @@ https://learn.microsoft.com/en-us/rest/api/contentsafety/text-operations/analyze
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass, field
 
@@ -47,10 +48,11 @@ class SafetyResult:
 
 class ContentSafety:
     def __init__(self, endpoint: str, key: str, block_at: int = 2, timeout_s: float = 10.0,
-                 client: httpx.AsyncClient | None = None):
+                 client: httpx.AsyncClient | None = None, total_timeout_s: float = 30.0):
         self.url = endpoint.rstrip("/") + f"/contentsafety/text:analyze?api-version={API_VERSION}"
         self._key = key
         self.block_at = block_at
+        self.total_timeout_s = total_timeout_s  # the whole check, retries included, so a slow service can't hold a moment
         self.client = client or httpx.AsyncClient(verify=ssl_context(), timeout=timeout_s)
 
     async def aclose(self) -> None:
@@ -58,11 +60,14 @@ class ContentSafety:
 
     async def check(self, text: str) -> SafetyResult:
         try:
-            r = await post_with_retry(self.client, self.url, headers={"Ocp-Apim-Subscription-Key": self._key},
-                                      json={"text": text[:MAX_CHARS], "categories": list(CATEGORIES),
-                                            "outputType": "FourSeverityLevels"})
+            r = await asyncio.wait_for(post_with_retry(
+                self.client, self.url, headers={"Ocp-Apim-Subscription-Key": self._key},
+                json={"text": text[:MAX_CHARS], "categories": list(CATEGORIES), "outputType": "FourSeverityLevels"}),
+                self.total_timeout_s)
             r.raise_for_status()
             severities = {c["category"]: int(c.get("severity") or 0) for c in r.json()["categoriesAnalysis"]}
+        except TimeoutError:
+            return SafetyResult(False, error="timeout")
         except httpx.HTTPStatusError as e:
             return SafetyResult(False, error=f"HTTP {e.response.status_code}")
         except (httpx.HTTPError, KeyError, TypeError, ValueError) as e:

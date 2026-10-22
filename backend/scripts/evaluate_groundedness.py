@@ -29,10 +29,9 @@ import truststore
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.prompts import moment_input
 from pitch_insights.agents.settings import load_settings
-from pitch_insights.agents.store import load_commentary, sibling_path, write_json
+from pitch_insights.agents.store import load_commentary, sibling_path, with_commentary, write_json
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
-from pitch_insights.server import with_commentary
 
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 API_VERSION = "2024-10-21"  # the evaluator's Azure OpenAI client needs a dated API version
@@ -66,19 +65,24 @@ def run_match(path: Path, evaluator, model: str) -> dict:
         if old.get(m["id"], {}).get("text_hash") == h:
             results[m["id"]] = old[m["id"]]
             continue
-        r = evaluator(query=QUERY, context=context, response=response)
+        try:
+            r = evaluator(query=QUERY, context=context, response=response)
+        except Exception as e:  # a rate limit or timeout: record it unscored, so the next run tries again
+            results[m["id"]] = {"text_hash": None, "score": None, "result": None, "error": type(e).__name__}
+            continue
         results[m["id"]] = {"text_hash": h, "score": r.get("groundedness"), "result": r.get("groundedness_result"),
                             "reason": r.get("groundedness_reason")}
     scores = [r["score"] for r in results.values() if isinstance(r.get("score"), (int, float))]
     summary = {"moments": len(results), "mean": round(statistics.fmean(scores), 2) if scores else None,
                "min": min(scores) if scores else None,
-               "passed": sum(r.get("result") == "pass" for r in results.values())}
+               "passed": sum(r.get("result") == "pass" for r in results.values()),
+               "not_scored": sum(bool(r.get("error")) for r in results.values())}
     write_json(out_path, {"evaluator": "azure-ai-evaluation GroundednessEvaluator", "judge_model": model,
                           "scale": "1-5, pass at 3", "summary": summary, "moments": results})
     low = {k: v for k, v in results.items() if isinstance(v.get("score"), (int, float)) and v["score"] < 4}
     print(f"{path.stem}: {summary}  ->  {out_path.name}")
     for k, v in low.items():
-        print(f"  {k} scored {v['score']}: {v['reason'][:200]}")
+        print(f"  {k} scored {v['score']}: {(v.get('reason') or '')[:200]}")
     return summary
 
 

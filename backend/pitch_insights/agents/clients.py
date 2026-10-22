@@ -32,9 +32,16 @@ async def post_with_retry(client: httpx.AsyncClient, url: str, *, headers: dict,
                           params=None) -> httpx.Response:
     """POST, retried on 429 and 5xx with backoff that honours Retry-After, as Microsoft's transient
     fault guidance says. For the Azure AI services called over REST (Content Safety, Translator),
-    whose free tiers allow only a few requests a second. Other errors return at once."""
+    whose free tiers allow only a few requests a second. Network errors (a reset, a read timeout)
+    are retried the same way and raised after the last try; other status codes return at once."""
     for attempt in range(retries + 1):
-        r = await client.post(url, headers=headers, json=json, params=params)
+        try:
+            r = await client.post(url, headers=headers, json=json, params=params)
+        except httpx.TransportError:
+            if attempt == retries:
+                raise
+            await asyncio.sleep(2.0 ** attempt)
+            continue
         if (r.status_code != 429 and r.status_code < 500) or attempt == retries:
             return r
         try:

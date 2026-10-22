@@ -74,9 +74,11 @@ def protect(text: str, pattern: re.Pattern) -> str:
 
 def unprotect(text: str, lang: str = "") -> str:
     """Plain text again. The service drops the space next to a protected span ("Potatozweite"),
-    so outside Chinese, put one back where a word runs into a name."""
+    so outside Chinese, put one back where a word runs into a name. A bare "s" after a name is an
+    ending the language added (German "Potatos Sieg") and stays joined; French "s'" is a word
+    ("Carrot s'impose") and gets its space."""
     if lang != "zh-Hans":
-        text = re.sub(r"(</span>)(?=\w)", r"\1 ", text)
+        text = re.sub(r"(</span>)(?=\w)(?!s(?![\w'’]))", r"\1 ", text)
         text = re.sub(r'(?<=\w)(<span class="notranslate">)', r" \1", text)
     return html.unescape(SPAN.sub(r"\1", text))
 
@@ -109,6 +111,7 @@ class Translator:
         self.client = client or httpx.AsyncClient(verify=ssl_context(), timeout=timeout_s)
         self.characters = 0  # characters counted (source x languages), for the free tier's 2 million a month
         self.per_minute = per_minute
+        self._wait = 0.0  # owed before the next request, from the size of the last one
 
     async def aclose(self) -> None:
         await self.client.aclose()
@@ -122,6 +125,8 @@ class Translator:
         async def flush():
             if not batch:
                 return
+            if self._wait:  # spread the minute's budget evenly: wait before a request, never after the last
+                await asyncio.sleep(self._wait)
             r = await post_with_retry(
                 self.client, self.url, headers=self._headers, json=[{"Text": t} for t in batch],
                 params=[("api-version", API_VERSION), ("from", "en"), ("textType", "html")]
@@ -132,8 +137,7 @@ class Translator:
             counted = sum(len(t) for t in batch) * len(languages)
             self.characters += counted
             batch.clear()
-            if self.per_minute:
-                await asyncio.sleep(60.0 * counted / self.per_minute)  # spread the minute's budget evenly
+            self._wait = 60.0 * counted / self.per_minute if self.per_minute else 0.0
 
         size = 0
         for t in texts:

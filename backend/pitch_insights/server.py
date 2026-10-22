@@ -34,9 +34,8 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from pitch_insights.agents.memory import memory_for
-from pitch_insights.agents.prompts import input_hash
-from pitch_insights.agents.store import load_commentary
-from pitch_insights.agents.translate import LANGUAGES, load_translations, translated_moment
+from pitch_insights.agents.store import load_commentary, with_commentary
+from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
@@ -78,15 +77,6 @@ def get_match(name: str) -> dict:
     return meta
 
 
-def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
-    """The moment plus its stored commentary, if the agents wrote some from these same facts.
-    Commentary written for different facts (the file is older than the code) is left out."""
-    rec = stored["moments"].get(moment["id"])
-    if not rec or rec.get("input_hash") != input_hash(moment, meta):
-        return moment
-    return moment | {"commentary": rec}
-
-
 def commentary_info(stored: dict) -> dict | None:
     """Who wrote the stored commentary, for the app's AI-generated label."""
     if not stored["moments"]:
@@ -123,7 +113,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         from_minute = 0.0
     brain = MatchBrain(meta, memory=memory_for(path, meta))  # stored vectors: no network
     stored = load_commentary(path)
-    translations = load_translations(path)["moments"]  # stored too: no network
+    saved = load_translations(path)  # stored too: no network; a file made by an older method isn't used
+    translations = saved["moments"] if saved.get("version") == TRANSLATION_VERSION else {}
     languages = {"en": "English"} | (LANGUAGES if translations else {})
     lang = ws.query_params.get("lang", "en")
     lang = lang if lang in languages else "en"

@@ -18,14 +18,13 @@ from pathlib import Path
 
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.settings import load_settings
-from pitch_insights.agents.store import load_commentary
+from pitch_insights.agents.store import load_commentary, with_commentary
 from pitch_insights.agents.translate import (
     LANGUAGES, TRANSLATION_VERSION, _names_pattern, check, load_translations, moment_texts, names_for, protect, source_hash,
     translator_from_settings, unprotect, write_translations,
 )
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
-from pitch_insights.server import with_commentary
 
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 

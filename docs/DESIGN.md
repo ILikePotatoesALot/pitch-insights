@@ -261,7 +261,7 @@ Code in `backend/pitch_insights/agents/safety.py`, over plain REST (Content Safe
 - **What's screened:** each moment's two lines together, after they pass the groundedness check. Ungrounded drafts never reach the service, since they fall back anyway.
 - **Categories and threshold:** hate, self-harm, sexual and violence, at the four-level scale (0, 2, 4, 6). A line at **2 or more** in any category is blocked (`SAFETY_BLOCK_AT` in `.env`, 2 to 6). Commentary from match facts should score 0, so the strictest level costs nothing.
 - **Threshold test (22 Oct):** all 104 stored lines scored 0 in every category, and so did rough football wording ("a crunching tackle", "hacked down in the box", "murdering them on the counter", "kill the game off"). A clearly threatening line about a referee scored Violence 4 and was blocked.
-- **Fails closed:** a timeout, a network error or an error status means the line isn't shown; the plain headline is (built in code from the facts, so it needs no check). The free tier allows only a few requests a second, so 429s are retried with backoff that honours `Retry-After` (`clients.post_with_retry`, shared with the Translator).
+- **Fails closed:** a timeout (30 s for the whole check, retries included), a network error or an error status means the line isn't shown; the plain headline is (built in code from the facts, so it needs no check). An unchecked line isn't an unsafe one, so its draft is kept in the record as `pending`, and the next run of `generate_commentary.py` screens it again without calling the model; a stored line that hasn't been screened is left alone while the service is down. The free tier allows only a few requests a second, so 429s are retried with backoff that honours `Retry-After` (`clients.post_with_retry`, shared with the Translator).
 - **Stored commentary:** each record keeps the result (`safety`: passed, severities, flagged). Lines written before the check existed are screened by `generate_commentary.py` without calling the model again. All 52 stored moments are screened, none blocked.
 
 ### Translations
@@ -276,6 +276,7 @@ Code in `backend/pitch_insights/agents/translate.py` and `scripts/translate_mome
 - **Free tier:** characters count once per target language; the tier allows 2 million a month and about 33,300 a minute, so requests carry at most 1,000 source characters and are paced to 30,000 a minute.
 - **Results (22 Oct):** 636 texts across the three samples, so 3,180 translations; 9 kept their English after the check (German 5, Simplified Chinese 4, Dutch 1). About 670,000 characters were counted across the day's runs and fixes, a third of the month's free allowance; re-running when nothing changed costs nothing.
 - **Labelled:** the app says moments are machine-translated, and "Why?" names Azure AI Translator.
+- **Known limit:** idioms can come out wrong while every name and number survives, so the check can't catch them. "Carrot turn up the pressure" became "把新闻加大点" in Chinese (roughly "turn up the news"). Changing language keeps the match where it was, paused or not.
 
 ### Stored commentary for the demo
 

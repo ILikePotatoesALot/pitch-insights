@@ -108,16 +108,27 @@ class CommentaryDesk:
         return moment["tier"] in COMMENTED_TIERS
 
     async def screen(self, record: dict, moment: dict) -> dict:
-        """Run the safety check on a stored record written before the check existed (no model call).
-        A blocked line becomes the plain headline, as it would have when it was written."""
-        if record["status"] != "ok" or record.get("safety") or self.safety is None:
+        """Run the safety check on a stored record that hasn't had one (no model call): a line written
+        before the check existed, or a grounded draft kept as `pending` because the service couldn't be
+        reached. A blocked line becomes the plain headline; if the service still can't answer, the record
+        is left as it is, to try again next time."""
+        if self.safety is None:
             return record
-        res = await self.safety.check(f"{record['casual']}\n{record['analyst']}")
-        record = record | {"safety": res.to_dict()}
-        if not res.passed:
-            lines = fallback_lines(moment)
-            record |= {"status": "fallback", "casual": lines.casual, "analyst": lines.analyst, "reason": res.reason}
-        return record
+        pending = record.get("pending")
+        if pending:
+            casual, analyst = pending["casual"], pending["analyst"]
+        elif record["status"] == "ok" and not record.get("safety"):
+            casual, analyst = record["casual"], record["analyst"]
+        else:
+            return record
+        res = await self.safety.check(f"{casual}\n{analyst}")
+        if res.error:
+            return record
+        record = {k: v for k, v in record.items() if k != "pending"} | {"safety": res.to_dict()}
+        if res.passed:
+            return record | {"status": "ok", "casual": casual, "analyst": analyst, "reason": None}
+        lines = fallback_lines(moment)
+        return record | {"status": "fallback", "casual": lines.casual, "analyst": lines.analyst, "reason": res.reason}
 
     async def comment(self, moment: dict) -> dict:
         """Commentary for one moment. Always returns a record; status says how it was made."""
@@ -160,10 +171,13 @@ class CommentaryDesk:
                 corrected += check.unsupported
                 prompt = retry_input(moment, self.meta, check.unsupported)
             ok = lines is not None and check is not None and check.passed
+            pending = None
             if ok and self.safety is not None:  # only grounded text is worth screening
                 safety = await self.safety.check(f"{lines.casual}\n{lines.analyst}")
                 if not safety.passed:
                     ok, reason = False, safety.reason
+                    if safety.error:  # unchecked, not unsafe: keep the draft to screen again later
+                        pending = {"casual": lines.casual, "analyst": lines.analyst}
             if not ok:
                 lines = fallback_lines(moment)
             record = {
@@ -174,6 +188,8 @@ class CommentaryDesk:
                 "safety": safety.to_dict() if safety else None,
                 "reason": reason or None, "provider": self.writer.provider, "model": self.writer.model,
             }
+            if pending:
+                record["pending"] = pending
             log.info(json.dumps({"event": "commentary", "moment_id": moment["id"], "agent": role,
                                  "status": record["status"], "attempts": attempts, "reason": reason or None,
                                  "grounding": record["grounding"],

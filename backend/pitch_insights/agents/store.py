@@ -11,6 +11,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from pitch_insights.agents.prompts import input_hash
+
 
 def sibling_path(match_path: Path, suffix: str) -> Path:
     """A file stored next to a match: samples/<name><suffix>."""
@@ -35,6 +37,15 @@ def load_commentary(match_path: Path) -> dict:
         return {"moments": {}}
     data.setdefault("moments", {})
     return data
+
+
+def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
+    """The moment plus its stored commentary, if the agents wrote some from these same facts.
+    Commentary written for different facts (the file is older than the code) is left out."""
+    rec = stored["moments"].get(moment["id"])
+    if not rec or rec.get("input_hash") != input_hash(moment, meta):
+        return moment
+    return moment | {"commentary": rec}
 
 
 def summarise(records: list[dict]) -> dict:
