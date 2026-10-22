@@ -203,7 +203,7 @@ Designed 21 Oct 2026; the core (steps 3, 4 and 7 below, plus stored commentary) 
 
 - **Subscription:** Austin's personal Pay-As-You-Go subscription (a free trial upgraded, so the free credit is spent first), with a US$20 monthly budget alert. Everything is in resource group `rg-pitch-insights`, region **East US 2**.
 - **Deployed and tested (21 Oct):** `gpt-4o` (model version 2024-11-20, retires April 2027, after judging ends on 10 Nov) and `text-embedding-3-small`, both on the Foundry resource's **v1 API** (no API version needed).
-- **Requested:** quota for `gpt-6-luna` (GPT-6's small, cheap tier: about US$0.10 / US$0.50 per million input / output tokens, far cheaper than GPT-4o). If it's approved, switch by changing the deployment name in `.env`.
+- **Refused (21 Oct):** quota for `gpt-6-luna` (GPT-6's small, cheap tier). The agents stay on `gpt-4o`, so stored commentary and a low `max_tokens` keep costs down.
 - **Why not the school subscription:** the Azure for Students subscription could only deploy to five Asian regions, had no chat-model quota in any of them, and quota requests were refused automatically. It's no longer used.
 
 ### Chat model provider
@@ -212,7 +212,7 @@ One setting in `.env`, `LLM_PROVIDER`, picks where chat calls go. The agent code
 
 | Provider | Use | Notes |
 |---|---|---|
-| `foundry` (default) | Development, stored commentary, live mode | Foundry deployment from `.env` (GPT-4o now, GPT-6 Luna if approved), low rate limit |
+| `foundry` (default) | Development, stored commentary, live mode | Foundry deployment from `.env` (GPT-4o), low rate limit |
 | `github` | Fallback if Foundry has problems | GitHub Models: free with a GitHub token (`GITHUB_TOKEN`, Models permission); daily rate limits |
 | `foundry_local` | Offline experiments | Foundry Local through Agent Framework's `FoundryLocalClient`; small models (Phi, Qwen) on the CPU, slow but free |
 
@@ -356,7 +356,7 @@ Designed 21 Oct 2026. Turns real match video into the same messages as the synth
 
 ### Detector
 
-- **First step (recommended, needs no GPU quota):** RF-DETR (small) as released, already trained to find people and footballs, run on a short clip (one to two minutes, a few frames a second, each 4K frame cut into overlapping tiles). Scored against the GSR ground truth.
+- **Chosen (21 Oct), needs no GPU quota:** RF-DETR (small) as released, already trained to find people and footballs, run on a short clip (one to two minutes, a few frames a second, each 4K frame cut into overlapping tiles). Scored against the GSR ground truth.
 - **Main, if T4 GPU quota arrives in Azure ML:** RF-DETR (small), Apache-2.0, fine-tuned on SoccerTrack's player boxes. **Fallback:** YOLO (Ultralytics, AGPL-3.0). If time allows, fine-tune both on the same frames and compare.
 - Classes: player, goalkeeper, referee, ball. The ball has no GSR ground truth, so its detection is a bonus, not a dependency.
 - Panoramic view: players are small, so train and detect at 1280–1920 px, or on overlapping tiles.
@@ -405,7 +405,7 @@ This conversion also lets the Interpreter run directly on SoccerTrack's ground-t
 
 ### Rules
 
-The core pipeline stays on synthetic data (rule 4.7); SoccerTrack is licensed footage for the video path only. Mention it in the clarification question to the organisers.
+The core pipeline stays on synthetic data (rule 4.7); SoccerTrack is licensed footage for the video path only, which Austin confirmed on 21 Oct is fine.
 
 ## Later (not v1)
 
