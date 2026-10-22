@@ -42,7 +42,7 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Video path (SoccerTrack v2 + RF-DETR) | Built on `video-path` (22 Oct) on a 100 s clip, reviewed; keep-or-cut decision 24 Oct. 91% of players found at 85% precision, 0.78 m mean position error, 88% teams, 19 events (74% match SoccerTrack's within 5 s) | `video/`, `backend/pitch_insights/video/`, [DESIGN.md, Video path](DESIGN.md#video-path) |
 | Azure deployment | Not started | |
 
-**Tests:** 190 passing (40 of them for the video path, on hand-made snippets: no video, model or network) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 194 passing (40 of them for the video path, on hand-made snippets: no video, model or network) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -81,7 +81,7 @@ npm run dev
 
 Then open http://localhost:5173. In Claude Code, both servers are also set up in `C:\Users\austin\.claude\launch.json` as `pitch-replay-server` and `pitch-frontend`. If port 8000 is taken (for example by another session's server), the replay server moves to 8001; use `pitch-frontend-8001` (port 5174), which points the app at 8001 through `PITCH_API`. The replay server doesn't reload, so restart it after backend changes.
 
-**Memory embeddings** (needs the Foundry values in `.env`; embeds only descriptions not already stored, so re-running costs nothing when nothing changed). The files record the deployment the vectors came from, and a changed `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` embeds everything again even if the cache is complete. The three sample files don't record it yet (they were made before it was stored): the next run stamps them without calling the model. Run it before the stored commentary whenever the moments or their descriptions change:
+**Memory embeddings** (needs the Foundry values in `.env`; embeds only descriptions not already stored, so re-running costs nothing when nothing changed). The files record the deployment the vectors came from, and a changed `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` embeds everything again even if the cache is complete. A file from before the deployment was recorded is verified once instead of assumed: one text is embedded with the current deployment and compared with the stored vector, and only a match stamps the file. The three sample files were verified and stamped on 22 Oct (`text-embedding-3-small`, no vectors changed). Run it before the stored commentary whenever the moments or their descriptions change:
 
 ```
 cd backend

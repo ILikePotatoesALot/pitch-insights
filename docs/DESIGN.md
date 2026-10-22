@@ -336,7 +336,7 @@ The judging criteria ask for "quality software development practices", pointing 
 | Memory (RAG) | Embed a written description of each moment (enrichment), not the raw data or the whole evidence pack | Done |
 | Memory (RAG) | Filter on fields in code first (family, team, earlier only), then rank by cosine similarity, the metric recommended for Azure OpenAI embeddings | Done |
 | Memory (RAG) | A similarity threshold set from test data and a small top-k; nothing returned when nothing is similar (vector search alone always returns k) | Done |
-| Memory (RAG) | Same model for stored and query vectors; model, deployment and dimensions stored with the vectors; regenerate when any of them changes, checked even when the cache is complete (files from before the deployment was stored are kept and stamped) | Done |
+| Memory (RAG) | Same model for stored and query vectors; model, deployment and dimensions stored with the vectors; regenerate when any of them changes, checked even when the cache is complete (a file from before the deployment was stored is verified once, not assumed: one of its texts is embedded with the configured deployment and compared with the stored vector, and only a match, the same model and the same vector within rounding, lets the file be stamped; the three samples were verified and stamped on 22 Oct) | Done |
 | Memory (RAG) | `dimensions` 256 instead of 1,536 to keep files small; vectors normalised in code | Done |
 | Memory (RAG) | Batch inputs (at most 2,048 a request and 300,000 tokens, or the request fails with 400); one request per match | Done |
 | Memory (RAG) | The SDK's retries only (backoff, honours `retry-after-ms`); on failure, no memory facts and a pause, never a blocked match | Done |

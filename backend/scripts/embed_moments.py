@@ -11,7 +11,9 @@ so replays and the stored commentary never call the network. Nothing to embed me
 
 The file records the deployment the vectors came from. If AZURE_OPENAI_EMBEDDING_DEPLOYMENT has changed
 since, everything is embedded again, even when the cache is complete: vectors from different models
-can't be compared. Files from before the deployment was recorded are kept and stamped.
+can't be compared. A file from before the deployment was recorded is checked once: one of its texts is
+embedded with the current deployment and compared with the stored vector. A match means the same model,
+so the file is kept and stamped; a mismatch means everything is embedded again.
 """
 
 from __future__ import annotations
@@ -49,14 +51,14 @@ def main() -> int:
         for path in paths:
             meta, events = read_match(path)
             stored = load_vectors(path)
-            before = stored.deployment
+            before = stored.deployment or "an unrecorded deployment"
             brain = MatchBrain(meta, memory=MemoryAgent(meta, stored))
             for ev in events:
                 brain.update(ev)
             texts = list(stored.asked)
             model, embedded, changed = refresh_vectors(stored, texts, settings.embedding_model, embed, force=args.force)
             if changed:
-                print(f"{path.stem}: stored with deployment {before}, now {settings.embedding_model}: "
+                print(f"{path.stem}: vectors were from {before}, not {settings.embedding_model}: "
                       "embedded everything again")
             out = write_vectors(path, model, {t: stored.vectors[t] for t in texts}, settings.embedding_model)
             print(f"{path.stem}: {len(texts)} moments remembered, {embedded} embedded  ->  {out.name}")

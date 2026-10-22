@@ -49,6 +49,7 @@ log = logging.getLogger("pitch_insights.agents")
 DIMENSIONS = 256          # text-embedding-3-small shortened from 1,536; plenty for one-sentence moments
 THRESHOLD = 0.83          # cosine similarity; calibrated on the three samples (see docs/DESIGN.md)
 BATCH = 512               # inputs per embeddings request (the service allows 2,048 and 300,000 tokens)
+PROBE_MIN_COSINE = 0.98   # a legacy cache is adopted if one text embeds this close to its stored vector (same model: ~1.0)
 COMMENTED_TIERS = {"headline", "notable"}
 
 # Moment type -> family. Only moments of the same family are compared.
@@ -150,11 +151,19 @@ def refresh_vectors(stored: StoredVectors, texts: list[str], deployment: str, em
     are all made again when `force` is set, when the configured deployment isn't the one the stored
     vectors came from (even if the cache is complete and nothing else needs embedding), or when the
     service reports another model for the new ones. A file from before the deployment was stored can't
-    be checked: it is kept, and stamped with the current deployment. Returns the model, how many texts
-    were embedded, and whether the deployment had changed."""
+    say where its vectors came from, so one of its texts is embedded with the configured deployment and
+    compared (same reported model, same vector within rounding) before the file is adopted and stamped.
+    Returns the model, how many texts were embedded, and whether stored vectors were thrown away because
+    they didn't come from this deployment."""
     changed = bool(stored.deployment) and stored.deployment != deployment
     if force or changed:
         stored.vectors = {}
+    elif not stored.deployment:
+        probe = next((t for t in texts if t in stored.vectors), None)
+        if probe is not None:
+            probe_model, (fresh,) = embed([probe])
+            if probe_model != stored.model or cosine(fresh, stored.vectors[probe]) < PROBE_MIN_COSINE:
+                stored.vectors, changed = {}, True
     todo = [t for t in texts if t not in stored.vectors]
     model = stored.model
     if todo:
