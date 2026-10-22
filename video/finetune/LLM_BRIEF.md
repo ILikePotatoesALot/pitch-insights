@@ -1,6 +1,9 @@
 # Brief for the coding assistant on the GPU machine
 
-You are a coding assistant (for example Claude Code) working for **Austin** on a Windows machine with an NVIDIA GPU.
+You are a coding assistant (for example Claude Code) working for **Austin** on a Windows 11 machine with an **AMD GPU, using ROCm** (AMD's PyTorch wheels for Windows; if Austin says
+the machine is NVIDIA instead, use the CUDA route in the README). ROCm builds of PyTorch use the `torch.cuda` calls, so
+`torch.cuda.is_available()` is `True` on a working AMD setup. Austin may still be installing ROCm when you start: check
+`torch.cuda.is_available()` in `video\.venv` before anything else.
 Read this whole file first, then do the task. Austin is not watching every step, so follow the rules, stop at the
 stop conditions, and report in the format at the end.
 
@@ -27,9 +30,11 @@ Background and reasons are in [docs/DESIGN.md, Video path](../../docs/DESIGN.md#
    - Commit locally as often as you like. **Push `video-finetune-results` only when Austin says so.**
    - Commit only small files: scripts, docs, and the JSON/JSONL results in `samples/video/`. **Never commit** anything in
      `data/`, model weights (`*.pth`, `*.pt`), video, or `.env`. They are git-ignored; do not force-add them.
-3. **Installs.** Use only `video\.venv` (Python 3.12) and what `video\requirements.txt` lists, plus PyTorch with CUDA.
-   Do not install anything else, and do not use the machine's default Python. If something else is needed, say what and
-   why, and wait.
+3. **Installs.** Use only `video\.venv` (Python 3.12) and what `video\requirements.txt` lists, plus the GPU build of PyTorch:
+   for AMD, the ROCm 7.2.1 wheels from `repo.radeon.com` named in the README (all PyTorch packages in one command, so pip
+   cannot swap in the CPU build); for NVIDIA, the CUDA build from pytorch.org. Do not install anything else (no other ROCm
+   release, no HIP SDK or driver installer, no WSL or Linux), and do not use the machine's default Python. If Austin's
+   driver is missing or too old, say which version AMD names and wait. If something else is needed, say what and why, and wait.
 4. **Honest results.** Do not change the benchmark clip (`video/clip.py`: frames 57,001-59,500), the splits
    (`DEFAULT_SPLIT` in `backend/pitch_insights/video/mot.py`), the detection thresholds, or the calibration to make the
    numbers look better. Never train on the benchmark clip or the `test` frames. Choose settings on `valid`, not on `test`.
@@ -50,7 +55,11 @@ Background and reasons are in [docs/DESIGN.md, Video path](../../docs/DESIGN.md#
 Stop and report (do not loop or improvise) if:
 - the smoke run (`train.py --smoke`) fails and the README's "If something goes wrong" section does not fix it within two
   attempts. Report the full error text (redacted) and what you tried;
-- `torch.cuda.is_available()` is False after installing, or the GPU has less than 8 GB of memory;
+- `torch.cuda.is_available()` is False after installing (on AMD: with the `+rocm` build and the README's two commands in the
+  same venv), or the GPU has less than 8 GB of memory, or the card isn't on AMD's Windows list for ROCm 7.2.1 (report it);
+- on AMD, training fails with a HIP / "no kernel image" / driver error after one retry at `--batch-size 2 --grad-accum 8`.
+  ROCm on Windows is newer than CUDA and this model has not been run on it, so a clean failure report is a useful result.
+  Do not fall back to CPU training;
 - the Hugging Face download is refused (401/403) or the files do not match the sizes in the README (video about 3.35 GB,
   GSR about 2.7 GB);
 - a script needs a change to run. You may make a **minimal** fix, but commit it on its own with a clear message, and list it
@@ -62,9 +71,11 @@ Stop and report (do not loop or improvise) if:
 Follow `video/finetune/README.md` steps 1 to 5 (step 6, pushing, only when Austin says). Then report to Austin, in this order,
 in plain language:
 
-1. **Machine:** GPU name and memory, driver, Python and PyTorch versions.
+1. **Machine:** GPU name and memory, driver version, Python and PyTorch versions (the full `torch.__version__`, for example
+   `2.9.1+rocm7.2.1`).
 2. **Smoke run:** whether it passed.
-3. **Training:** the configuration(s) you ran, how long each took, the epoch it stopped at, and the checkpoint file used
+3. **Training:** the configuration(s) you ran, how long each took (and whether the AMD card trained without errors or warnings
+   worth Austin's attention), the epoch it stopped at, and the checkpoint file used
    (`data\finetune\runs\<name>\checkpoint_best_total.pth`, plus its size).
 4. **Box check** (`eval_boxes.py`, the table it printed, also saved in `samples/video/117093-boxes.eval.json`): precision and
    recall at IoU 0.5 and 0.75, raw and on pitch, for pre-trained and fine-tuned. State which is better and by how much.

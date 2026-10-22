@@ -18,7 +18,8 @@ frames it never saw, and re-runs the video pipeline on the benchmark clip. Desig
 
 ## 1. Set up the machine (once)
 
-You need an NVIDIA GPU with 8 GB or more of video memory and a current driver. In PowerShell, `nvidia-smi` should list the card.
+You need a GPU with 8 GB or more of video memory (16 GB or more is comfortable) and Python 3.12. Austin's machine is **AMD (ROCm on
+Windows 11)**; an NVIDIA machine works too, so both routes are below.
 
 ```powershell
 git clone https://github.com/ILikePotatoesALot/pitch-insights.git     # private: sign in to GitHub when asked
@@ -29,20 +30,46 @@ py -3.12 -m venv video\.venv
 video\.venv\Scripts\python -m pip install --upgrade pip
 ```
 
-Install PyTorch with CUDA first, using the command from https://pytorch.org/get-started/locally/ (Stable, Windows,
-Pip, Python, and the newest CUDA your driver supports). Then:
+Install PyTorch **before** `requirements.txt`, from one of these two routes. Install every PyTorch package in one command
+(a later `pip install torch...` or `torchvision` on its own can swap in the CPU build from PyPI).
 
-**AMD Radeon instead (done 22 Oct on an RX 9070 XT):** use AMD's ROCm build for Windows from
-https://rocm.docs.amd.com/projects/radeon-ryzen/ (Install PyTorch, Windows). For ROCm 7.2.1 that was the SDK wheels
-`rocm_sdk_core`, `rocm_sdk_devel`, `rocm_sdk_libraries_custom` and `rocm-7.2.1.tar.gz`, then `torch-2.9.1+rocm7.2.1`,
-`torchvision-0.24.1+rocm7.2.1` and `torchaudio-2.9.1+rocm7.2.1`, all from `https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/`.
-It reports the card through `torch.cuda` like a CUDA build, so the check below and the scripts work unchanged. Installing the
-requirements afterwards keeps that torch (check with `pip install --dry-run -r video\requirements.txt` first).
+**AMD, ROCm on Windows (Austin's machine).** AMD's official wheels: PyTorch 2.9.1 with ROCm 7.2.1, Windows 11, Python 3.12 only.
+Supported cards on AMD's matrix at the time of writing: Radeon RX 9070 / 9070 XT / 9060 XT, AI PRO R9700, RX 7900 XTX,
+PRO W7900, RX 7700. Check [the compatibility matrix](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityrad/windows/windows_compatibility.html)
+for the card, and install the graphics driver AMD names for the release (26.2.2 for 7.2.1; use
+[AMD's install page](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/install/installrad/windows/install-pytorch.html)
+if it has moved on, and use the commands on it). Both steps run inside the venv:
+
+```powershell
+video\.venv\Scripts\pip install --no-cache-dir `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/rocm_sdk_core-7.2.1-py3-none-win_amd64.whl `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/rocm_sdk_devel-7.2.1-py3-none-win_amd64.whl `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/rocm_sdk_libraries_custom-7.2.1-py3-none-win_amd64.whl `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/rocm-7.2.1.tar.gz
+
+video\.venv\Scripts\pip install --no-cache-dir `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/torch-2.9.1%2Brocm7.2.1-cp312-cp312-win_amd64.whl `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/torchaudio-2.9.1%2Brocm7.2.1-cp312-cp312-win_amd64.whl `
+    https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/torchvision-0.24.1%2Brocm7.2.1-cp312-cp312-win_amd64.whl
+```
+
+The second command takes several minutes. (`torchaudio` isn't used by this project; AMD installs it with the others, and it keeps
+the three versions consistent.) ROCm builds of PyTorch answer through the same `torch.cuda` calls, so `torch.cuda.is_available()` is
+`True` on a working AMD setup. `nvidia-smi` doesn't exist here; use the Task Manager's GPU tab or `torch.cuda.get_device_name(0)`.
+
+**NVIDIA.** A current driver (`nvidia-smi` lists the card), then the command from https://pytorch.org/get-started/locally/
+(Stable, Windows, Pip, Python, and the newest CUDA your driver supports).
+
+The AMD route above was run on 22 Oct on a Radeon RX 9070 XT (ROCm 7.2.1). Installing the requirements afterwards kept that torch
+(check with `pip install --dry-run -r video\requirements.txt` first). Then, for either route:
 
 ```powershell
 video\.venv\Scripts\pip install -r video\requirements.txt
-video\.venv\Scripts\python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"   # True and your GPU
+video\.venv\Scripts\python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"   # for AMD: 2.9.1+rocm7.2.1 True and the Radeon's name
 ```
+
+If the version shown has no `+rocm` (AMD) or `+cu` (NVIDIA), `requirements.txt` replaced the GPU build with the CPU one:
+see "If something goes wrong".
 
 Create `.env` in the repo root (it is ignored by git; never commit it) with your Hugging Face read token. The dataset is gated,
 so the account must have accepted the SoccerTrack v2 terms:
@@ -59,6 +86,8 @@ video\.venv\Scripts\python video\extract_gsr.py          # about 30 s: ground tr
 ```
 
 ## 3. Baseline on the GPU (pre-trained model; refreshes the stored benchmark)
+
+The files record the device they ran on (`detections.meta.json`, copied into the benchmark), so a baseline made on the AMD card says so.
 
 ```powershell
 video\.venv\Scripts\python video\detect.py calib
@@ -130,8 +159,15 @@ browser sign-in.
 - **`cv2` fails to import after installing:** the training extras can pull in `opencv-python-headless` next to
   `opencv-python`. Run `video\.venv\Scripts\pip uninstall -y opencv-python opencv-python-headless`, then
   `video\.venv\Scripts\pip install opencv-python==5.0.0.93`.
-- **`torch.cuda.is_available()` is False:** a CPU build of PyTorch was installed. Uninstall `torch torchvision` and install the CUDA
-  build from pytorch.org, then re-run `pip install -r video\requirements.txt`.
+- **`torch.cuda.is_available()` is False:** a CPU build of PyTorch was installed (the version has no `+rocm` or `+cu`).
+  Uninstall `torch torchvision torchaudio`, then install the GPU wheels again, all in one command (AMD: the second `pip install`
+  in step 1; NVIDIA: the pytorch.org command), then re-run `pip install -r video\requirements.txt`.
+- **AMD: still False with the `+rocm` build:** the card or driver isn't on AMD's Windows list for this release (check the
+  compatibility matrix and the driver version), or the ROCm SDK wheels (first command) weren't installed in the same venv.
+  Report the card, driver and the output of `python -m torch.utils.collect_env`; don't try other ROCm releases or Linux without Austin's say.
+- **AMD: a HIP or "no kernel image" error during training, or training far slower than expected:** ROCm on Windows is a newer
+  route than CUDA and this model hasn't been run on it. Try `--batch-size 2 --grad-accum 8` once; if it still fails, stop and report the error
+  text. The fallback is a cloud or NVIDIA GPU (Austin's call), not CPU training.
 - **Hugging Face says 401 or 403:** the token is wrong or the account hasn't accepted the dataset's terms
   (open the dataset page on huggingface.co while signed in).
 - **AMD (ROCm on Windows): `detect.py` or `eval_boxes.py` doesn't return after finishing.** A process that has run the detector
