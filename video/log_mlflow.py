@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 
 import clip
 
@@ -34,6 +35,21 @@ def tracking_uri() -> str | None:
     return None
 
 
+def subscription_tenant(uri: str) -> str | None:
+    """The tenant that owns the URI's subscription, from Azure Resource Manager's
+    401 reply (no sign-in needed). azureml-mlflow's browser sign-in otherwise
+    gets a token for the account's home tenant, and the workspace answers every
+    call with 400 Bad Request when the subscription lives in another tenant."""
+    import requests
+
+    m = re.search(r"/subscriptions/([^/]+)/", uri)
+    if not m:
+        return None
+    r = requests.get(f"https://management.azure.com/subscriptions/{m.group(1)}?api-version=2022-12-01", timeout=30)
+    found = re.search(r"login\.windows\.net/([0-9a-fA-F-]{36})", r.headers.get("WWW-Authenticate", ""))
+    return found.group(1) if found else None
+
+
 def flat_metrics(bench: dict) -> dict[str, float]:
     tp = bench["tracked_players"]
     out = {
@@ -43,6 +59,7 @@ def flat_metrics(bench: dict) -> dict[str, float]:
         "position_error_p90_m": tp["position_error_p90_m"],
         "team_accuracy": tp["team_accuracy"],
         "tracks_per_player": tp["tracks_per_ground_truth_player_mean"],
+        "id_consistency": tp["id_consistency"],
         "raw_recall": bench["detections_on_pitch"]["recall"],
         "raw_precision": bench["detections_on_pitch"]["precision"],
         "ball_frame_share": bench["ball"]["frames_with_ball"] / bench["ball"]["frames"],
@@ -55,9 +72,14 @@ def flat_metrics(bench: dict) -> dict[str, float]:
 
 
 def main() -> None:
+    import sys
+
     import truststore
 
     truststore.inject_into_ssl()  # the network inspects HTTPS; use the Windows certificate store
+    # MLflow prints emoji ("View run at ...") before it marks a run finished; on a
+    # cp1252 Windows console that raised and left the run stuck at Running.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     try:
         import mlflow
     except ImportError:
@@ -65,6 +87,10 @@ def main() -> None:
     uri = tracking_uri()
     if not uri:
         raise SystemExit("MLFLOW_TRACKING_URI isn't set (the workspace's MLflow tracking URI, from the Azure portal)")
+    if not os.environ.get("AZURE_TENANT_ID"):
+        tenant = subscription_tenant(uri)
+        if tenant:
+            os.environ["AZURE_TENANT_ID"] = tenant  # read by azureml-mlflow's browser sign-in
     bench = json.loads(clip.BENCHMARK.read_text(encoding="utf-8"))
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment(EXPERIMENT)
