@@ -178,6 +178,24 @@ def test_merge_joins_duplicates_and_cut_off_boxes_but_keeps_neighbours():
     assert any(d.class_id == 37 for d in merged)
 
 
+def test_merge_keeps_the_whole_player_when_a_higher_scoring_crop_sits_inside_it():
+    # The crop is exactly the top half of the whole box: IoU is 0.5, the same as the duplicate
+    # threshold, but this is containment, so the whole player (feet included) must survive.
+    crop = Detection((100, 100, 120, 125), 0.9, 1)
+    whole = Detection((100, 100, 120, 150), 0.6, 1)
+    for order in ([crop, whole], [whole, crop]):
+        (kept,) = merge(order)
+        assert kept.box == (100, 100, 120, 150)
+        assert kept.score == 0.9
+
+
+def test_merge_still_drops_a_plain_duplicate():
+    a = Detection((100, 100, 120, 150), 0.9, 1)
+    b = Detection((101, 101, 121, 151), 0.5, 1)
+    (kept,) = merge([a, b])
+    assert kept.score == 0.9
+
+
 def test_shift_moves_boxes_into_frame_coordinates():
     (d,) = shift([Detection((1, 2, 3, 4), 0.5, 1)], 100, 90)
     assert d.box == (101, 92, 103, 94)

@@ -76,18 +76,20 @@ def merge(dets: list[Detection], iou_threshold: float = 0.5, contain_threshold: 
     Keeps the highest-scoring box of each group. When one box mostly lies
     inside the other (a player cut off at one tile's edge and whole in the
     next), the kept box takes the union, so the whole player survives even if
-    the cut-off box scored higher.
+    the cut-off box scored higher. Containment is checked before the plain
+    IoU duplicate test: a crop that is exactly half of the whole box has an IoU
+    of 0.5 and would otherwise be kept alone, with the feet cut off.
     """
     kept: list[Detection] = []
     for d in sorted(dets, key=lambda d: d.score, reverse=True):
         for i, k in enumerate(kept):
             if k.class_id != d.class_id:
                 continue
-            if iou(k.box, d.box) >= iou_threshold:
-                break
             if overlap_of_smaller(k.box, d.box) >= contain_threshold:
                 kb, db = k.box, d.box
                 kept[i] = replace(k, box=(min(kb[0], db[0]), min(kb[1], db[1]), max(kb[2], db[2]), max(kb[3], db[3])))
+                break
+            if iou(k.box, d.box) >= iou_threshold:
                 break
         else:
             kept.append(d)

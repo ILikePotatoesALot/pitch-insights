@@ -42,7 +42,7 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Video path (SoccerTrack v2 + RF-DETR) | Built on `video-path` (22 Oct) on a 100 s clip, reviewed; keep-or-cut decision 24 Oct. 91% of players found at 85% precision, 0.78 m mean position error, 88% teams, 19 events (74% match SoccerTrack's within 5 s) | `video/`, `backend/pitch_insights/video/`, [DESIGN.md, Video path](DESIGN.md#video-path) |
 | Azure deployment | Not started | |
 
-**Tests:** 178 passing (38 of them for the video path, on hand-made snippets: no video, model or network) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 180 passing (40 of them for the video path, on hand-made snippets: no video, model or network) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -157,7 +157,7 @@ The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples
 - The high press creates many pressures but not many extra high turnovers, so Carrot's PPDA isn't as low as a real pressing side's (the pressure index shows the pressing correctly).
 - Synthetic speed and distance don't exist yet; they come with the v2 tracking frames (estimates) and the video path (measured).
 - The app's JavaScript bundle is large (Three.js); fine for now.
-- Video path: 5 frames a second (not 10); no shots (the ball is often missed in flight); the ball is found in under half the frames; team from shirt colour is about 88% right and track IDs switch (a player keeps one ID for 72% of frames); the spectator and spare-ball filters need the whole clip, so they're offline only; team, tracker and event settings were chosen on the benchmark clip itself.
+- Video path: the stored detections and benchmark predate the tile-merge fix of 22 Oct (about 4% of person boxes differ); re-run `detect.py calib`, `calibrate.py`, `detect.py clip` and `process.py` (about 80 min) to refresh them, then `log_mlflow.py` (browser sign-in). 5 frames a second (not 10); no shots (the ball is often missed in flight); the ball is found in under half the frames; team from shirt colour is about 88% right and track IDs switch (a player keeps one ID for 72% of frames); the spectator and spare-ball filters need the whole clip, so they're offline only; team, tracker and event settings were chosen on the benchmark clip itself.
 - Machine translation can get idioms wrong while keeping every name and number ("turn up the pressure" came out as "turn up the news" in Chinese), and the check can't catch that. The app labels translations as machine-made.
 
 ## Data on this machine
