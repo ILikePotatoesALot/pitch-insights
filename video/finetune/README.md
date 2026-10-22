@@ -1,5 +1,8 @@
 # Fine-tuning the detector on a GPU machine (Windows, PowerShell)
 
+If a coding assistant (for example Claude Code) is doing this for you, point it at [LLM_BRIEF.md](LLM_BRIEF.md): it has the
+rules, the stop conditions and what to report. This file is the procedure.
+
 Fine-tunes RF-DETR small on SoccerTrack's own tight boxes, then scores it against the pre-trained model on
 frames it never saw, and re-runs the video pipeline on the benchmark clip. Design and reasons:
 [docs/DESIGN.md, Video path](../../docs/DESIGN.md#video-path). A GPU also makes the baseline detection fast
@@ -21,6 +24,7 @@ You need an NVIDIA GPU with 8 GB or more of video memory and a current driver. I
 git clone https://github.com/ILikePotatoesALot/pitch-insights.git     # private: sign in to GitHub when asked
 cd pitch-insights
 git checkout video-path       # the branch has to be pushed to GitHub first
+git checkout -b video-finetune-results   # all work and results go on this branch, not on video-path
 py -3.12 -m venv video\.venv
 video\.venv\Scripts\python -m pip install --upgrade pip
 ```
@@ -102,10 +106,9 @@ Remove-Item Env:VIDEO_TAG
 ## 6. Bring the results back
 
 The weights are about 370 MB: copy `checkpoint_best_total.pth` (and `train_summary.json`) by USB or a share. The small result files
-are in git, so on the GPU machine:
+are in git, so on the GPU machine (push only when Austin says so; an assistant works on that branch from the start, see the brief):
 
 ```powershell
-git checkout -b video-finetune-results
 git add samples/video
 git commit -m "Fine-tuning results and refreshed baseline benchmark"
 git push -u origin video-finetune-results
