@@ -143,6 +143,7 @@ The clip is set in `video/clip.py`. Outputs go to `samples/video/` (not `samples
 - **Models:** `gpt-4o` (version 2024-11-20, retires April 2027) and `text-embedding-3-small`, both tested 21 Oct on the Foundry resource's v1 API (no API version). Quota for `gpt-6-luna` was requested and refused (21 Oct), so the agents stay on `gpt-4o`; keep calls few (stored commentary, `max_tokens` 220) and watch the US$20 budget alert. `LLM_PROVIDER` picks `foundry` (default), `github` (fallback) or `foundry_local`. See [DESIGN.md, Agents](DESIGN.md#agents).
 - **Keys:** in `.env` only (ignored by git). `.env.example` holds placeholders; never put real values in it, because it's committed.
 - **HTTPS on this machine:** the network inspects HTTPS, so Python's built-in certificate list fails with "self-signed certificate in certificate chain". Use the Windows certificate store (`ssl.create_default_context()`); never turn verification off. curl needs `--ssl-no-revoke` for a related reason.
+- **No admin rights on this machine** (an organisation laptop): machine-wide installers such as Azure CLI can't be installed (tried 22 Oct; skipped). So Azure sign-ins from Python use a browser window each time, and the deployment (step 8) needs another route: the Azure portal, Azure Cloud Shell, or another machine.
 
 **Ways of working**
 - Commit locally as often as needed; **push only when Austin says so.**
