@@ -447,7 +447,7 @@ Designed 21 Oct 2026, built 22 Oct on branch `video-path`. Turns real, licensed 
 | 4. Track, teams, ball, messages, benchmark | `video/process.py` | Seconds; re-run freely |
 | 5. Preview | `video/preview.py` | Draws our tracks and the ground truth on the clip (`data/video/117093/preview.mp4`, git-ignored) |
 
-The pure-Python parts (loader, tile merging, tracker, events, scoring) live in `backend/pitch_insights/video/` and are covered by `backend/tests/test_video.py`; the backend gains no new dependencies. The detector runs in its own environment, `video\.venv` (torch CPU, rfdetr 1.11.2, opencv, supervision, truststore).
+The pure-Python parts (loader, tile merging, tracker, events, scoring) live in `backend/pitch_insights/video/` and are covered by `backend/tests/test_video.py`; the backend gains no new dependencies. The detector runs in its own environment, `video\.venv` (torch, rfdetr 1.11.2, opencv, supervision, truststore): torch CPU on the organisation laptop, AMD's ROCm build on Austin's GPU machine.
 
 **Tiles.** The whole frame at the model's 512 px input finds only 7 people. On the first clip frame: 4 × 2 tiles over the whole frame found 42 people in 6.4 s; 5 × 2 over the pitch band found 54 in 7.1 s; 6 × 2 found 57 in 8.2 s. 5 × 2 was chosen. A player cut off at a tile's edge is merged with the whole one by how much of the smaller box lies inside the other, not only by IoU; containment is checked first, because a crop that is exactly half of the whole box has an IoU of exactly the duplicate threshold and used to be kept alone, with the feet cut off (found in review, 22 Oct).
 
@@ -467,34 +467,35 @@ The pure-Python parts (loader, tile merging, tracker, events, scoring) live in `
 
 Match 117093, first half, **38:00.0 to 39:40.0** (100 s, frames 57,001–59,500, 500 frames at 5 fps). Chosen from the BAS events: Left's attack that ends in their second goal (39:35), with three crosses, a free kick, a shot, three outs and a throw-in on the way. Defined in `video/clip.py`.
 
-### Benchmark (22 Oct)
+### Benchmark (refreshed 22 Oct on a GPU, after the tile-merge fix)
 
-Pre-trained RF-DETR small, no fine-tuning, CPU, 500 frames (100 s at 5 fps). Ground truth: 22 people a frame (11,000 in all); the GSR file has no referees or ball.
+RF-DETR small on 500 frames (100 s at 5 fps), on Austin's GPU machine (AMD Radeon RX 9070 XT). **Pre-trained** is the COCO model as released; **fine-tuned** takes people from the model trained on SoccerTrack's MOT boxes (see [Fine-tuning](#fine-tuning-run-22-oct-on-austins-gpu-machine)) and the ball from the COCO one. Ground truth: 22 people a frame (11,000 in all); the GSR file has no referees or ball.
 
-| Measure | Result |
-|---|---|
-| Players found (recall, within 3 m) | **91%** (10,000 of 11,000) |
-| Precision (our people that are a real player) | **85%** (11,762 output); the rest are the referee and assistant referees (not in the ground truth), people behind the right goal, and spectators the filter missed by the far-left corner |
-| People we gave a team | 96% precision, 83% recall (keepers and officials get no team) |
-| Position error, matched players | **0.78 m mean, 0.59 m median**, 1.7 m at the 90th percentile |
-| Team from shirt colour | **88%** right |
-| Track IDs | 60 tracks for 22 players; a player keeps their most common ID for 72% of their frames |
-| Image-to-pitch mapping (held-out calibration frames) | 0.76 m mean, 0.57 m median |
-| Before filtering (detections on the pitch) | 91% recall, 51% precision: spectators on the far stand, removed by the static-spot filter (7,630 detections) |
-| Ball | Followed in 227 of 500 frames (45%), after removing 8 spots where spare balls lie; not scored (SoccerTrack's ball file is a reconstruction, not per-frame truth) |
-| Events: 19 derived (9 passes, 7 carries, 3 interceptions) | 37 BAS events in the clip (`Out` left out) |
-| Event recall within ±1 s / ±5 s | 24% / **38%** (passes 30% / 40%, carries 20% / 40%, shots 0 of 2) |
-| Event precision within ±1 s / ±5 s | 47% / **74%** |
-| Time | Detection 7.7 s a frame (64 min for the clip, about 65 min wall clock; plus 11 min for the 76 calibration frames); ground-truth extraction 25 s; everything after detection 1 s; the preview video 1 min |
+| Measure | Pre-trained | Fine-tuned |
+|---|---|---|
+| Players found (recall, within 3 m) | **90%** (9,941 of 11,000) | **93%** (10,245) |
+| Precision (our people that are a real player) | **85%** (11,734 output); the rest are the referee and assistant referees (not in the ground truth), people behind the right goal, and spectators the filter missed by the far-left corner | **97%** (10,588 output) |
+| People we gave a team | 97% precision, 69% recall (keepers and officials get no team) | 99% precision, 66% recall |
+| Position error, matched players | **0.77 m mean, 0.59 m median**, 1.7 m at the 90th percentile | **0.76 m mean, 0.58 m median**, 1.6 m |
+| Team from shirt colour | **93%** right | **95%** right |
+| Track IDs | 73 tracks for 22 players; a player keeps their most common ID for 69% of their frames | 52 tracks; 69% |
+| Image-to-pitch mapping (held-out calibration frames) | 0.77 m mean, 0.58 m median | 0.76 m mean, 0.57 m median |
+| Before filtering (detections on the pitch) | 91% recall, 51% precision: spectators on the far stand, removed by the static-spot filter (7,678 detections, 50 spots) | 93% recall, 96% precision: the filter finds no static spots, because the model no longer detects the spectators |
+| Ball | Followed in 227 of 500 frames (45%), after removing 8 spots where spare balls lie; not scored (SoccerTrack's ball file is a reconstruction, not per-frame truth) | 226 frames (6 spots) |
+| Events derived (37 BAS events in the clip, `Out` left out) | 15 (6 passes, 6 carries, 3 interceptions) | 14 (7 passes, 5 carries, 2 interceptions) |
+| Event recall within ±1 s / ±5 s | 19% / **30%** (passes 30%, carries 33%, shots 0 of 2 within 5 s) | 22% / **30%** (passes 35%, carries 27%) |
+| Event precision within ±1 s / ±5 s | 47% / **73%** | 57% / **79%** |
+| Detection time | 0.26 s a frame (2.2 min for the clip) | 0.47 s a frame (3.9 min; two models run) |
+
+Before the refresh (CPU, 7.7 s a frame, the old tile merge) the pre-trained figures were: found 91%, precision 85%, 0.78 m mean and 0.59 m median, team 88%, ID consistency 72% (60 tracks), team recall 83%, ball 45%, events 19 with precision 74% and recall 38% within 5 s. The raw detections hardly changed between CPU and GPU, so the differences come from the merge fix: teams improved (88% → 93%) while tracks split more (60 → 73), fewer people got a team (83% → 69%) and event recall fell (38% → 30%).
 
 How much of this to trust:
 
-- **Fitted apart from the test:** only the image-to-pitch mapping, which uses frames before the clip.
-- **Chosen while looking at the clip:** the static-spot filter's settings, 4 colour groups, the tracker's 6 m gate and 5 s patience, and the 2.5 m possession radius were each picked by comparing a few settings on the first half of the clip. Detection, positions and the mapping weren't tuned on it. Treat the team, ID and event figures as optimistic until they are checked on a second clip.
-- **Merge order:** the stored detections, the calibration and the benchmark above were made before that tile-merge fix. On 9 clip frames the fix changes about 4% of person boxes (19 of about 450). Detection has to be re-run (about 75 min) to refresh the figures; until then they describe the old merge.
-- Recall and position error are the solid numbers: the mapping is honest, and SoccerTrack's own positions carry up to about 0.6 m of rounding, so 0.59 m median is close to that floor.
+- **Fitted apart from the test:** the image-to-pitch mapping (frames before the clip) and the fine-tuned model (the first four minutes of the half, checkpoint chosen on `valid`).
+- **Chosen while looking at the clip:** the static-spot filter's settings, 4 colour groups, the tracker's 6 m gate and 5 s patience, and the 2.5 m possession radius were each picked by comparing a few settings on the first half of the clip, before the merge fix. Detection, positions and the mapping weren't tuned on it. Treat the team, ID and event figures as optimistic until they are checked on a second clip.
+- Recall and position error are the solid numbers: the mapping is honest, and SoccerTrack's own positions carry up to about 0.6 m of rounding, so 0.58 m median is close to that floor.
 
-Positions are matched to the ground truth in pitch metres (closest pairs first, within 3 m). We didn't run SoccerTrack's `gs_hota` or `bas_map` scripts (they need their repository and packages); our numbers are simpler but computed the same way for every run. Full figures in `samples/video/117093-38min.benchmark.json`.
+Positions are matched to the ground truth in pitch metres (closest pairs first, within 3 m). We didn't run SoccerTrack's `gs_hota` or `bas_map` scripts (they need their repository and packages); our numbers are simpler but computed the same way for every run. Full figures in `samples/video/117093-38min.benchmark.json` and `117093-38min_ft.benchmark.json`.
 
 ### Outputs (in `samples/video/`)
 
@@ -502,6 +503,8 @@ Positions are matched to the ground truth in pitch metres (closest pairs first, 
 - `117093-38min.events.jsonl`: the derived events (event format v1, `source: "video"`).
 - `117093-38min.benchmark.json`: the benchmark.
 - `117093-38min.calibration.json`: the fitted mapping.
+- `117093-38min_ft.*`: the same four files with the fine-tuned detector.
+- `117093-boxes.eval.json`: the box check of pre-trained against fine-tuned on the held-out test frames.
 
 No video, weights or ground truth are committed; intermediate files are in the git-ignored `data/video/117093/`.
 
@@ -524,22 +527,41 @@ No video, weights or ground truth are committed; intermediate files are in the g
 
 Scoring leaves out `Out` (it changes the previous pass, it isn't an action) and counts `Goal` as a `shot`. Throw-ins and free kicks are `pass`es here, as in the table.
 
-### Fine-tuning (built 22 Oct, run on a separate GPU machine)
+### Fine-tuning (run 22 Oct on Austin's GPU machine)
 
-Code in `video/finetune/` (steps for the machine in its README), with the pure logic in `backend/pitch_insights/video/mot.py` and tests. Nothing here has trained yet.
+Code in `video/finetune/` (steps for the machine in its README), with the pure logic in `backend/pitch_insights/video/mot.py` and tests. Run on 22 Oct on Austin's own machine; results below.
 
 - **Labels:** the MOT boxes (above), the only tight image boxes we have. (The GSR boxes are loose, and an earlier plan to use our own detections matched to the GSR positions would only have taught the model what it already does.)
-- **Data:** each chosen frame is cut into the detector's own 5 × 2 tiles (`tiles_for`), each tile saved with the boxes inside it (clipped; kept when at least half is visible). People the file doesn't box (spectators, referees, staff) are background, which is what should teach the model to ignore them. About 3,900 train tiles (on a few frames, 26 of 30 tiles were kept), 400 valid and 400 test, in RF-DETR's Roboflow layout.
+- **Data:** each chosen frame is cut into the detector's own 5 × 2 tiles (`tiles_for`), each tile saved with the boxes inside it (clipped; kept when at least half is visible). People the file doesn't box (spectators, referees, staff) are background, which is what should teach the model to ignore them. 3,328 train tiles (11,403 boxes), 400 valid (1,121) and 400 test (1,086), in RF-DETR's Roboflow layout.
 - **Splits:** stretches of the four minutes with 8-second gaps: train 0:00–2:24 (every 8th frame, 450 frames), valid 2:32–3:12 (40), test 3:20–3:59 (40). The benchmark clip (38:00–39:40) is a further test and is never trained on. The checkpoint is chosen on `valid`; `test` is used once, by `eval_boxes.py`.
 - **Model:** RF-DETR small from the COCO weights, the head replaced by one class (`player`), 512 px input, batch 8 × accumulation 2, learning rate 1e-4, early stopping. RF-DETR realigns its head to a checkpoint's class count on load, so the fine-tuned file loads like any other.
 - **Ball:** the labels have none, so a fine-tuned model would lose it. The detector therefore runs two models: people from the fine-tuned one, the ball from the COCO one (`TiledDetector(weights=...)`).
 - **Checking it:** `eval_boxes.py` scores pre-trained and fine-tuned side by side on the test frames (precision and recall at IoU 0.5 and 0.75, raw and after the pitch filter), independent of our calibration. On two test frames the pre-trained model gives recall 98% at IoU 0.5 (91% at 0.75) but precision only 43% (73% on the pitch), so precision is where a gain should show. Then `VIDEO_TAG=_ft` runs the whole pipeline on the benchmark clip into separate files (`117093-38min_ft.*`) so the two benchmarks compare directly.
 - **Caveats:** one match, one camera, four minutes of labels, so this adapts the model to this pitch and does not make it general. Referees and staff count as false positives for both models in the box check, because the file doesn't box them.
-- **Not tested here:** training needs the `rfdetr[train]` extras (PyTorch Lightning and COCO-evaluation packages), which aren't installed on this organisation laptop, so only the data builder, the evaluation and the option names were run here (the builder on a few frames, the evaluation on two, the options accepted by RF-DETR's `TrainConfig`). The guide starts with a one-epoch smoke run.
+- **Machine:** AMD Radeon RX 9070 XT (16 GB), not NVIDIA, so PyTorch is AMD's ROCm build for Windows (2.9.1+rocm7.2.1, Python 3.12.10); it reports the card through `torch.cuda` like a CUDA build, trains in bf16 and needed no script changes. Two quirks: Triton isn't available, so RF-DETR's box matching uses a slower fallback; and a process that has run the detector on frames **decoded from the video** hangs at exit after its work is done, and can't be killed for a while (`detect.py` and `eval_boxes.py`; training is unaffected). The output is written before the hang, so the steps were run through a wrapper that ends the process once it prints its last line. Decoding in a child process, `os._exit` and `TerminateProcess` didn't avoid it; detecting on frames loaded from `.npy` did, so it is the AMD driver with video decoding in the same process.
+- **Training runs** (at most two, chosen on `valid`):
+
+  | Run | Settings | Time | Stopped | Best epoch | `valid` EMA mAP 50–95 / 75 / 50 |
+  |---|---|---|---|---|---|
+  | `rfdetr-small-default` (**used**) | defaults: lr 1e-4, batch 8 × 2 | 22.8 min | after epoch 8 (early stopping) | 0 | **0.707** / 0.894 / 0.993 |
+  | `rfdetr-small-lr5e-5` | lr 5e-5, otherwise the same | 14.6 min | after epoch 8 | 0 | 0.697 / 0.848 / 0.991 |
+
+  Both peak after the first epoch and then lose score at the stricter IoUs (to about 0.66) while recall and mAP at IoU 0.5 stay above 99%: with 450 frames of four minutes' play, the model learns what it can at once, and more epochs mainly fit the boxes to those frames. The best checkpoint (`checkpoint_best_total.pth`) is 127 MB.
+- **Box check** (`eval_boxes.py`, the 40 test frames, 880 true boxes, score 0.3 or more):
+
+  | Detector | IoU | Precision, all | Precision, on pitch | Recall |
+  |---|---|---|---|---|
+  | Pre-trained | 0.5 | 45.0% | 71.5% | 97.4% |
+  | Pre-trained | 0.75 | 41.4% | 65.8% | 89.7% |
+  | **Fine-tuned** | 0.5 | **98.1%** | **98.4%** | **97.7%** |
+  | Fine-tuned | 0.75 | 81.8% | 82.0% | 81.5% |
+
+  Fine-tuning removes almost every false person (1,049 to 17 at IoU 0.5) without losing recall, as expected. At IoU 0.75 its recall is lower (89.7% → 81.5%): its boxes are a little less tight than the pre-trained ones on some players, which barely shows in position error on the clip (0.77 → 0.76 m mean).
+- **Decision:** use the fine-tuned model for people (tracked-player precision on the clip 85% → 97%, recall 90% → 93%). The weights stay out of git; they are on Austin's GPU machine and have to be copied to wherever detection runs.
 
 ### Later
 
-- **Fine-tuning** (built, not yet run; see the next section). Azure ML GPU quota can't be requested from this account (the request is refused: Austin lacks a support role on the subscription), so it runs on Austin's own GPU machine, with the run logged to Azure ML afterwards.
+- **Fine-tuning:** done on Austin's own GPU machine (above), because Azure ML GPU quota can't be requested from this account (Austin lacks a support role on the subscription). Still to do: log the run to Azure ML with `video\log_mlflow.py` (`VIDEO_TAG=_ft`), and check the fine-tuned model on a second clip or match, since it has only seen this pitch.
 - **Serving:** CPU detection in a container on Azure Container Apps; clips are processed ahead of time, so speed isn't critical.
 - A `match_meta` for video matches, so the Interpreter can run on video events; and the Interpreter on SoccerTrack's ground-truth events, as a check on real data.
 
