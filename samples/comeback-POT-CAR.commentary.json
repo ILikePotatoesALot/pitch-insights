@@ -302,11 +302,11 @@
   },
   "M-23": {
    "moment_id": "M-23",
-   "input_hash": "4afaf3f6803ac090",
+   "input_hash": "2ae33e64de1fc0f6",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Madekuta scores his second goal to put Potato ahead 2–1 against Carrot, turning the game around.",
-   "analyst": "Madekuta's second goal, assisted by Sakinelli, gives Potato a 2–1 lead despite Carrot's dominance. With an xG of 0.78, it shifts Potato's win probability from 42% to 75%.",
+   "casual": "Madekuta scores his second to make it 2–1 for Potato, turning the game around after Carrot had been on top.",
+   "analyst": "Madekuta's second goal, assisted by Sakinelli, puts Potato ahead 2–1 with a high xG of 0.78. This shifts their win probability from 42% to 75%, despite Carrot dominating momentum recently.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -422,15 +422,15 @@
   },
   "M-34": {
    "moment_id": "M-34",
-   "input_hash": "f8f0a7b050589468",
+   "input_hash": "46b505f57630e855",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Musialetti scores late to make it 2–2 for Carrot, assisted by Mbeulier.",
-   "analyst": "Musialetti's equaliser for Carrot at 88' shifts their win chance from 1% to 14%. Assisted by Mbeulier, it was a big chance (xG 0.43) against the run of play, with Potato dominating momentum.",
+   "casual": "Musialetti scores late to make it 2–2 for Carrot against the run of play.",
+   "analyst": "Musialetti's equaliser at 88' levels the match at 2–2, shifting Carrot's win probability from 1% to 14%. Assisted by Mbeulier, it was a big chance (xG 0.43) despite Potato's dominance.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 10,
+    "claims": 12,
     "unsupported": []
    },
    "corrected": [],
@@ -474,15 +474,15 @@
   },
   "M-38": {
    "moment_id": "M-38",
-   "input_hash": "7e18718445e9673a",
+   "input_hash": "8e45034ba0635303",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Szobalenko scores a dramatic winner for Carrot in the 96th minute, assisted by Musialetti. It's now 3–2 to Carrot.",
-   "analyst": "Szobalenko's late goal, assisted by Musialetti, shifts Carrot's win probability from 3% to 97%. Despite a low xG of 0.08, Carrot's dominance in the final third pays off with a decisive 3–2 lead.",
+   "casual": "Szobalenko scores in the 96th minute to make it 3–2 for Carrot. A dramatic late winner!",
+   "analyst": "Szobalenko's goal in the 96th minute, assisted by Musialetti, turns Carrot's win probability from 3% to 97%. Despite its low xG of 0.08, Carrot's dominance in the final minutes pays off.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 11,
+    "claims": 10,
     "unsupported": []
    },
    "corrected": [],

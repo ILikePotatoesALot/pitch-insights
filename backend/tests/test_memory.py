@@ -230,3 +230,70 @@ def test_live_embedder_in_a_match_without_a_service(match):
     for e in events:
         plain.update(e)
     assert brain.moments == plain.moments  # the match goes on, just without memory facts
+
+
+def status_error(cls, code):
+    return cls("refused", response=httpx.Response(code, request=httpx.Request("POST", "https://x")), body=None)
+
+
+def test_live_embedder_stops_for_the_match_on_a_config_error():
+    client = SimpleNamespace(embeddings=FakeEmbeddings(fail=status_error(openai.AuthenticationError, 401)))
+    emb = FoundryEmbedder(client, "my-deployment")
+    assert emb.vector("Potato FC goal") is None
+    emb._paused_until -= 10_000  # long after any transient pause would have ended
+    assert emb.vector("Carrot FC goal") is None and client.embeddings.calls == [1]
+
+
+def test_live_embedder_skips_only_the_text_a_400_refuses():
+    client = SimpleNamespace(embeddings=FakeEmbeddings(fail=status_error(openai.BadRequestError, 400)))
+    emb = FoundryEmbedder(client, "my-deployment")
+    assert emb.vector("Potato FC goal") is None
+    assert emb.vector("Carrot FC goal") is None and client.embeddings.calls == [1, 1]  # no pause
+
+
+def on_ball(seq, t, etype, player, x, y, team="POT", **extra):
+    return {"seq": seq, "t": t, "period": 1, "type": etype, "team_id": team, "player_id": player,
+            "possession_id": None, "x": x, "y": y} | extra
+
+
+def test_build_up_without_possession_ids():
+    """Video events have no possession ids: winning the ball must still start a new possession,
+    and the flank comes from the shooter's last run, not the first."""
+    meta = json.loads((SAMPLES / "comeback-POT-CAR.jsonl").open(encoding="utf-8").readline())
+    home = [p["id"] for p in meta["home"]["players"]]
+    agent = MemoryAgent(meta, StoredVectors())
+    events = [
+        on_ball(1, 0.0, "pass", home[5], 30, 34, kind="open_play", receiver_id=home[9], outcome="complete"),
+        {"seq": 2, "t": 5.0, "period": 1, "type": "interception", "team_id": "CAR", "player_id": "CAR-04",
+         "possession_id": None, "x": 70, "y": 30, "outcome": "won"},
+        {"seq": 3, "t": 40.0, "period": 1, "type": "recovery", "team_id": "POT", "player_id": home[9],
+         "possession_id": None, "x": 40, "y": 10, "outcome": "won"},
+        on_ball(4, 41.0, "carry", home[9], 40, 10, end_x=60, end_y=12),
+        on_ball(5, 44.0, "carry", home[9], 70, 34, end_x=90, end_y=34),
+        on_ball(6, 47.0, "shot", home[9], 95, 34, kind="open_play", outcome="goal", body_part="right_foot", xg=0.4),
+    ]
+    for ev in events[:-1]:
+        agent.update(ev, [])
+    goal = chance("M-1", home[9], 1) | {"seq": 6}
+    agent.update(events[-1], [goal])
+    text = agent.records[0]["text"]
+    assert "down the middle, on the break" in text, text
+
+
+def test_every_sample_has_vectors_for_every_moment_it_remembers():
+    """The replay hides stored commentary whose memory facts are missing, so the stored vectors
+    must cover every description the agent asks for."""
+    for path in sorted(SAMPLES.glob("*.jsonl")):
+        meta, events = read_match(path)
+        stored = load_vectors(path)
+        brain, _ = run(meta, events, stored)
+        assert stored.vectors and set(stored.asked) <= set(stored.vectors), path.name
+
+
+def test_memory_for_warns_when_vectors_are_missing(tmp_path, caplog):
+    meta = json.loads((SAMPLES / "comeback-POT-CAR.jsonl").open(encoding="utf-8").readline())
+    with caplog.at_level("WARNING", logger="pitch_insights.agents"):
+        agent = memory.memory_for(tmp_path / "missing.jsonl", meta)
+    assert agent.embedder.vectors == {} and "memory_vectors_missing" in caplog.text
+    path = SAMPLES / "comeback-POT-CAR.jsonl"
+    assert memory.memory_for(path, meta).embedder is memory.memory_for(path, meta).embedder  # loaded once

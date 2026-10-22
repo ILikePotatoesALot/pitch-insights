@@ -81,5 +81,5 @@ def test_replay_adds_memory_from_stored_vectors():
     with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=89") as ws:
         while (msg := ws.receive_json())["type"] != "catchup":
             pass
-    m = next(m for m in msg["moments"] if m["id"] == "M-34")  # Musialetti's 88th-minute equaliser
+    m = next(m for m in msg["moments"] if m["id"] == "M-23")  # Madekuta's second goal, at 61'
     assert any(f["kind"] == "memory" and f["value"].get("moment_id") for f in m["facts"])

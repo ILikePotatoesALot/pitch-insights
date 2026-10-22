@@ -12,8 +12,18 @@ import json
 from pathlib import Path
 
 
+def sibling_path(match_path: Path, suffix: str) -> Path:
+    """A file stored next to a match: samples/<name><suffix>."""
+    return match_path.with_name(match_path.stem + suffix)
+
+
+def write_json(path: Path, data: dict) -> Path:
+    path.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    return path
+
+
 def commentary_path(match_path: Path) -> Path:
-    return match_path.with_name(match_path.stem + ".commentary.json")
+    return sibling_path(match_path, ".commentary.json")
 
 
 def load_commentary(match_path: Path) -> dict:
@@ -38,8 +48,6 @@ def summarise(records: list[dict]) -> dict:
 
 
 def write_commentary(match_path: Path, header: dict, records: list[dict]) -> Path:
-    path = commentary_path(match_path)
     data = header | {"match": match_path.stem, "summary": summarise(records),
                      "moments": {r["moment_id"]: r for r in records}}
-    path.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
-    return path
+    return write_json(commentary_path(match_path), data)

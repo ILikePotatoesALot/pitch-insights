@@ -29,6 +29,7 @@ docs/DESIGN.md, Agents.
 from __future__ import annotations
 
 import base64
+import functools
 import json
 import logging
 import math
@@ -40,12 +41,13 @@ from typing import Protocol
 
 import openai
 
+from pitch_insights.agents.store import sibling_path, write_json
 from pitch_insights.explain.moments import ordinal
 
 log = logging.getLogger("pitch_insights.agents")
 
 DIMENSIONS = 256          # text-embedding-3-small shortened from 1,536; plenty for one-sentence moments
-THRESHOLD = 0.82          # cosine similarity; calibrated on the three samples (see docs/DESIGN.md)
+THRESHOLD = 0.83          # cosine similarity; calibrated on the three samples (see docs/DESIGN.md)
 BATCH = 512               # inputs per embeddings request (the service allows 2,048 and 300,000 tokens)
 COMMENTED_TIERS = {"headline", "notable"}
 
@@ -59,8 +61,10 @@ ON_BALL = {"pass", "carry", "dribble", "shot"}
 SET_PIECES = {"corner", "free_kick", "throw_in", "goal_kick", "kickoff"}
 BREAK_S = 15.0            # a chance within this long of winning the ball in your own half is "on the break"
 WING = 68 / 3             # each flank is a third of the pitch's width; y = 68 is the attacking team's left
-ROUTES = {"left": "down the left", "right": "down the right", "middle": "down the middle",
-          "corner": "from corners", "free_kick": "from free kicks", "penalty": "from the penalty spot"}
+ROUTE = {"left": "down the left", "right": "down the right", "middle": "down the middle",
+         "corner": "from a corner", "free_kick": "from a free kick", "penalty": "from the penalty spot"}
+ROUTES = ROUTE | {"corner": "from corners", "free_kick": "from free kicks"}  # for counts
+BALL_WON = {"interception", "recovery", "tackle"}
 MISSED = {"saved": "was saved", "off_target": "went wide", "blocked": "was blocked", "woodwork": "hit the woodwork"}
 
 
@@ -113,7 +117,7 @@ class StoredVectors:
 
 
 def memory_path(match_path: Path) -> Path:
-    return match_path.with_name(match_path.stem + ".memory.json")
+    return sibling_path(match_path, ".memory.json")
 
 
 def load_vectors(match_path: Path) -> StoredVectors:
@@ -132,11 +136,9 @@ def load_vectors(match_path: Path) -> StoredVectors:
 
 
 def write_vectors(match_path: Path, model: str, vectors: dict[str, list[float]]) -> Path:
-    path = memory_path(match_path)
     data = {"model": model, "dimensions": DIMENSIONS, "match": match_path.stem,
             "vectors": {text: pack(v) for text, v in vectors.items()}}
-    path.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
-    return path
+    return write_json(memory_path(match_path), data)
 
 
 def embed_batch(client: openai.OpenAI, deployment: str, texts: list[str]) -> tuple[str, list[list[float]]]:
@@ -176,6 +178,15 @@ class FoundryEmbedder:
             return None
         try:
             _, [v] = embed_batch(self.client, self.deployment, [text])
+        except (openai.AuthenticationError, openai.PermissionDeniedError, openai.NotFoundError) as e:
+            # Bad key, no access or wrong deployment: no retry can fix it, so stop for the match.
+            log.error(json.dumps({"event": "memory_embedding_disabled", "error": type(e).__name__,
+                                  "status": e.status_code}))
+            self._paused_until = math.inf
+            return None
+        except openai.BadRequestError as e:
+            log.warning(json.dumps({"event": "memory_embedding_refused", "status": e.status_code}))
+            return None  # this text only; the next one may be fine
         except (openai.OpenAIError, ValueError) as e:
             log.warning(json.dumps({"event": "memory_embedding_failed", "error": type(e).__name__}))
             self._paused_until = time.monotonic() + self.PAUSE_S
@@ -215,6 +226,9 @@ class MemoryAgent:
     # ------------------------------------------------------------ build-up
 
     def _observe(self, ev: dict) -> None:
+        if (ev.get("possession_id") is None and ev["type"] in BALL_WON and ev.get("outcome") == "won"
+                and self._possession is not None and ev.get("team_id") != self._possession[0][2]):
+            self._possession = None  # without possession ids (video), winning the ball ends a possession
         if ev["type"] not in ON_BALL or not ev.get("team_id"):
             return
         key = (ev["period"], ev.get("possession_id"), ev["team_id"])
@@ -229,18 +243,24 @@ class MemoryAgent:
     def _name(self, pid: str | None) -> str:
         return self.surname.get(pid, "") if pid else ""
 
-    def _chance(self, m: dict) -> tuple[str, str]:
-        """How a goal or big chance came about, as a phrase, and its route (a key of ROUTES)."""
+    def _chance(self, m: dict) -> tuple[str, str, str]:
+        """How a goal or big chance came about: as a phrase for the fact, with every name; as a
+        phrase to embed, which names only the scorer, after how the chance was made, so a shared
+        build-up counts for more than a shared name; and its route (a key of ROUTE)."""
         shot = self._phase[-1] if self._phase and self._phase[-1]["seq"] == m["seq"] else None
         who = self._name(m["player_id"])
         if shot is None or shot["type"] != "shot":
-            return (f"{who} scored" if m["type"] == "goal" else f"{who} missed a big chance"), "middle"
+            fact = f"{who} scored" if m["type"] == "goal" else f"{who} missed a big chance"
+            return fact, f"{ROUTE['middle']}: a shot, by {who}", "middle"
         goal = shot["outcome"] == "goal"
-        result = "" if goal else " " + MISSED.get(shot["outcome"], "missed")
-        if shot["kind"] == "penalty":
-            return (f"{who} scored from the penalty spot" if goal else f"{who}'s penalty{result}"), "penalty"
-        if shot["kind"] == "free_kick":
-            return (f"{who} scored with a direct free kick" if goal else f"{who}'s direct free kick{result}"), "free_kick"
+        missed = MISSED.get(shot["outcome"], "missed")
+        result, that = ("", "") if goal else (" " + missed, " that " + missed)
+        if shot["kind"] in ("penalty", "free_kick"):
+            route = shot["kind"]
+            label = "penalty" if route == "penalty" else "direct free kick"
+            fact = (f"{who} scored from the penalty spot" if route == "penalty" else f"{who} scored with a direct free kick") \
+                if goal else f"{who}'s {label}{result}"
+            return fact, f"{ROUTE[route]}: a {label}{that}, by {who}", route
 
         before = self._phase[:-1]
         key = next((e for e in reversed(before) if e["type"] == "pass" and e.get("receiver_id") == shot["player_id"]
@@ -251,27 +271,30 @@ class MemoryAgent:
         if set_piece:
             route = start["kind"]
             label = "corner" if route == "corner" else "free kick"
-            delivery = f"from {self._name(start['player_id'])}'s {label}" if key is start else f"after a {label}"
+            named, plain = ((f"from {self._name(start['player_id'])}'s {label}", f"from a {label}") if key is start
+                            else (f"after a {label}",) * 2)
         else:
             if key is not None:
                 y = key["y"]
                 kind = {"cross": "cross", "through_ball": "through ball", "long_ball": "long ball"}.get(key.get("kind"), "pass")
-                delivery = f"from {self._name(key['player_id'])}'s {kind}"
+                named, plain = f"from {self._name(key['player_id'])}'s {kind}", f"from a {kind}"
             else:
-                run = next((e for e in before if e["player_id"] == shot["player_id"] and e["type"] in ("carry", "dribble")), None)
+                run = next((e for e in reversed(before)
+                            if e["player_id"] == shot["player_id"] and e["type"] in ("carry", "dribble")), None)
                 y = (run or shot)["y"]
-                delivery = "after a run with the ball" if run else ""
+                named = plain = "after a run with the ball" if run else ""
             route = "left" if y > 68 - WING else "right" if y < WING else "middle"
         in_box = shot["x"] >= 105 - 16.5 and 34 - 20.16 <= shot["y"] <= 34 + 20.16
         technique = ("a " if in_box else "a long-range ") + ("header" if shot.get("body_part") == "head" else "shot")
-        how = " ".join(p for p in (delivery, "" if set_piece else ROUTES[route]) if p)
         _, poss_t, poss_x = self._possession
-        if poss_x < 52.5 and shot["t"] - poss_t <= BREAK_S:
-            how += ", on the break" + ("" if goal else ",")
+        on_break = ", on the break" if poss_x < 52.5 and shot["t"] - poss_t <= BREAK_S else ""
+        how = " ".join(p for p in (named, "" if set_piece else ROUTE[route]) if p) + on_break
+        embed = f"{ROUTE[route]}{on_break}: " + " ".join(p for p in (technique, plain) if p) + f"{that}, by {who}"
         if goal:
-            return f"{who} scored with {technique} {how}".rstrip(", "), route
-        noun = technique.removeprefix("a ")
-        return f"{who}'s {noun} {how}{result}", route
+            return f"{who} scored with {technique} {how}".rstrip(), embed, route
+        if on_break:
+            how += ","
+        return f"{who}'s {technique.removeprefix('a ')} {how}{result}", embed, route
 
     # ------------------------------------------------------------ records and facts
 
@@ -282,9 +305,9 @@ class MemoryAgent:
         short, club = self.short.get(team, ""), self.club.get(team, "")
         rec = {"id": m["id"], "seq": m["seq"], "clock": clock, "family": family, "team": team, "route": None}
         if family == "chance":
-            phrase, rec["route"] = self._chance(m)
+            phrase, embed, rec["route"] = self._chance(m)
             xg = next((f["value"] for f in m["facts"] if f["kind"] == "chance"), None)
-            rec["text"] = f"{club} {'goal' if m['type'] == 'goal' else 'big chance'}: {phrase}."
+            rec["text"] = f"{club} {'goal' if m['type'] == 'goal' else 'big chance'} {embed}."
             rec["fact"] = f"Earlier in this match, at {clock}: {phrase}" + (f" (xG {xg:.2f})." if xg is not None else ".")
         elif family == "penalty":
             fouler = next((self._name(f["value"]) for f in m["facts"] if f["kind"] == "foul"), "")
@@ -354,6 +377,24 @@ class MemoryAgent:
         return {"kind": "memory", "value": value, "text": text}
 
 
+@functools.lru_cache(maxsize=16)
+def _cached_vectors(match_path: Path, mtime_ns: int | None) -> StoredVectors:
+    """Loaded once per file version, not on every replay connection or seek."""
+    return load_vectors(match_path)
+
+
 def memory_for(match_path: Path, meta: dict) -> MemoryAgent:
-    """The Memory agent for a stored match, using its precomputed vectors (no network)."""
-    return MemoryAgent(meta, load_vectors(match_path))
+    """The Memory agent for a stored match, using its precomputed vectors (no network).
+
+    Without them, moments get no memory facts, so stored commentary written with those facts
+    no longer matches its moment and isn't shown: the .memory.json files ship with the samples.
+    """
+    try:
+        mtime = memory_path(match_path).stat().st_mtime_ns
+    except OSError:
+        mtime = None
+    vectors = _cached_vectors(match_path, mtime)
+    if not vectors.vectors:
+        log.warning(json.dumps({"event": "memory_vectors_missing", "match": match_path.stem,
+                                "file": memory_path(match_path).name}))
+    return MemoryAgent(meta, vectors)

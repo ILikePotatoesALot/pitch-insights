@@ -37,7 +37,7 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 113 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, and the memory tests use fake embedders. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 118 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, and the memory tests use fake embedders. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -136,7 +136,7 @@ cd backend
 
 ## Waiting on Austin
 
-1. **Free-tier resources** in `rg-pitch-insights`, East US 2: Content Safety (F0), Translator (F0, region Global), Speech (F0, optional), and Application Insights connected from the Foundry project's Tracing page. The names are already in `.env` (empty) and `.env.example`; fill in the endpoints and keys. Needed for next step 2.
+1. **Move Speech to East US 2** (22 Oct). The free-tier services are set up and all four connect: Content Safety, Translator and Application Insights in East US 2, but Speech was created in East US by mistake (`AZURE_SPEECH_REGION=eastus` in `.env`). Recreate it in East US 2, then set `AZURE_SPEECH_REGION` back to `eastus2`.
 2. **Optional, later:** fine-tuning the detector, if T4 GPU quota arrives in Azure ML (workspace `ML-pitch-insights`, family **NCASv3_T4**, East US 2, 4 cores; request it from Compute > Compute clusters > New, or Azure portal > Quotas > Machine Learning) or on Austin's GPU machine.
 
 Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is fine for the video path, so no clarification question is needed; teammates are GitHub collaborators only; GPT-6 Luna quota was refused; the video path uses the pre-trained detector.
