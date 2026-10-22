@@ -75,3 +75,11 @@ def test_stale_commentary_is_not_shown():
     stale = {"moments": {"M-1": {"input_hash": "written-for-other-facts", "casual": "c"}}}
     assert with_commentary(moment, good, meta)["commentary"]["casual"] == "c"
     assert "commentary" not in with_commentary(moment, stale, meta)
+
+
+def test_replay_adds_memory_from_stored_vectors():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=89") as ws:
+        while (msg := ws.receive_json())["type"] != "catchup":
+            pass
+    m = next(m for m in msg["moments"] if m["id"] == "M-23")  # Madekuta's second goal, at 61'
+    assert any(f["kind"] == "memory" and f["value"].get("moment_id") for f in m["facts"])

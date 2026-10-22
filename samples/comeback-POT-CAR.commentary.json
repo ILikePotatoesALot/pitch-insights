@@ -30,19 +30,21 @@
   },
   "M-2": {
    "moment_id": "M-2",
-   "input_hash": "2c6523a9edaf585e",
+   "input_hash": "6ad086a64f5e3f88",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Madekuta's early shot is saved by Alissandro, keeping Potato's lead at 1–0.",
-   "analyst": "Madekuta's chance, with an xG of 0.44, is denied by Alissandro. Potato are dominant, with all final-third passes and 4 shots (xG 1.13) in the last five minutes.",
+   "casual": "Madekuta misses a golden chance to double Potato's lead early on. Alissandro pulls off a key save.",
+   "analyst": "Madekuta's saved shot, with an xG of 0.44, keeps Potato from extending their lead to 2–0. Potato dominate the opening minutes, with 4 shots and 100% final-third passing in the last five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 8,
+    "claims": 9,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-3": {
    "moment_id": "M-3",
@@ -146,15 +148,15 @@
   },
   "M-12": {
    "moment_id": "M-12",
-   "input_hash": "e17bff83044ca8a8",
+   "input_hash": "3e143d19fd935243",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are starting to take control after a strong five minutes.",
-   "analyst": "Carrot shift the momentum, taking control with 33% of final-third passes in the last five minutes.",
+   "casual": "Carrot are starting to take charge as the game shifts their way.",
+   "analyst": "Carrot regain control for the second time, dominating the last five minutes with 33% of final-third passes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 3,
     "unsupported": []
    },
    "corrected": [],
@@ -196,19 +198,21 @@
   },
   "M-16": {
    "moment_id": "M-16",
-   "input_hash": "a6729e9378716724",
+   "input_hash": "14f7551bb3a20561",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC are dominating just before the break, keeping all the final-third play to themselves.",
-   "analyst": "Potato FC's momentum peaks at 0.71, controlling the game with 100% of final-third passes in the last 5 minutes.",
+   "casual": "Potato FC are firmly in control as the first half ends level at 1–1.",
+   "analyst": "Potato FC dominate again, with 100% of final-third passes in the last five minutes, as it's 1–1 at the break.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 7,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-17": {
    "moment_id": "M-17",
@@ -228,19 +232,21 @@
   },
   "M-18": {
    "moment_id": "M-18",
-   "input_hash": "a1bad9821355c729",
+   "input_hash": "7b41f6fa99e4ef6e",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot FC are stepping up their pressing game, putting Potato FC under real pressure.",
-   "analyst": "Carrot FC's pressing rate surges to 3.0 per minute, well above their match average of 1.33.",
+   "casual": "Carrot are pressing hard and taking control after a tough few minutes.",
+   "analyst": "Carrot ramp up to 3.0 high pressures per minute, their 3rd pressing spell, turning momentum after a difficult phase.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 3,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-20": {
    "moment_id": "M-20",
@@ -260,11 +266,11 @@
   },
   "M-21": {
    "moment_id": "M-21",
-   "input_hash": "7931eb3c08948570",
+   "input_hash": "1f5a5c3c19a5ec12",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot FC are starting to dominate, pushing forward and controlling the play.",
-   "analyst": "Carrot FC have taken control with 78% of final-third passes in the last five minutes.",
+   "casual": "Carrot are now in charge, showing more presence in the final third.",
+   "analyst": "Carrot regain control for the third time, dominating with 78% of final-third passes in the last five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -278,27 +284,29 @@
   },
   "M-22": {
    "moment_id": "M-22",
-   "input_hash": "f0f3823890ba1586",
+   "input_hash": "0abed50d7382bfac",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are piling on the pressure as they push for a breakthrough.",
-   "analyst": "Carrot's pressing intensifies with 2.6 high pressures per minute, leading to 3 shots and 65% of final-third passes.",
+   "casual": "Carrot FC are pressing hard and dominating the game right now.",
+   "analyst": "Carrot FC ramp up their pressing game again, making 2.6 high pressures per minute and controlling 65% of final-third passes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 3,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-23": {
    "moment_id": "M-23",
-   "input_hash": "14190a97643de696",
+   "input_hash": "2ae33e64de1fc0f6",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Madekuta scores his second goal to put Potato ahead 2–1, turning the game around against Carrot.",
-   "analyst": "Madekuta's second goal, assisted by Sakinelli, shifts Potato FC ahead 2–1 despite Carrot FC's dominance. The big chance (xG 0.78) boosts their win probability from 42% to 75%, altering the match's momentum.",
+   "casual": "Madekuta scores his second to make it 2–1 for Potato, turning the game around after Carrot had been on top.",
+   "analyst": "Madekuta's second goal, assisted by Sakinelli, puts Potato ahead 2–1 with a high xG of 0.78. This shifts their win probability from 42% to 75%, despite Carrot dominating momentum recently.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -306,15 +314,17 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-24": {
    "moment_id": "M-24",
-   "input_hash": "6eb87d2606f41fcc",
+   "input_hash": "1ce400449b413263",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC are on top now, turning the tide in their favour.",
-   "analyst": "Potato FC regain control with 71% of final-third passes in the last five minutes, leading 2–1.",
+   "casual": "Potato are back in charge, pushing forward and controlling the game.",
+   "analyst": "Potato regain control with 71% of final-third passes in the last 5 minutes, leading 2–1.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -344,15 +354,15 @@
   },
   "M-29": {
    "moment_id": "M-29",
-   "input_hash": "e2f0582ea1a6d55a",
+   "input_hash": "332dcdf5ecb3c103",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot are pushing hard and taking control as the game heads into the final stages.",
-   "analyst": "Carrot dominate the last five minutes, completing 84% of final-third passes and swinging momentum to 0.54 from their side.",
+   "casual": "Carrot are pushing hard now, dominating the last five minutes as they chase an equaliser.",
+   "analyst": "Carrot have taken control for the 4th time, completing 84% of final-third passes in the past five minutes.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 5,
     "unsupported": []
    },
    "corrected": [],
@@ -394,11 +404,11 @@
   },
   "M-33": {
    "moment_id": "M-33",
-   "input_hash": "f12ee3ea2c12eb15",
+   "input_hash": "616abc88020c5d21",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Potato FC are finishing strongly, turning the game in their favour late on.",
-   "analyst": "Potato FC have seized control in the final stages, completing all final-third passes in the last five minutes.",
+   "casual": "Potato are back on top as they dominate the final minutes.",
+   "analyst": "Potato regain control for the third time, owning the last five minutes with all final-third passes completed.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -415,16 +425,18 @@
    "input_hash": "46b505f57630e855",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Musialetti levels the match late on for Carrot, making it 2–2. It's a big goal against the run of play, assisted by Mbeulier.",
-   "analyst": "Musialetti's equaliser for Carrot, assisted by Mbeulier, shifts their win probability from 1% to 14%. Scored against the run of play with a high xG of 0.43, it changes the game's dynamic.",
+   "casual": "Musialetti scores late to make it 2–2 for Carrot against the run of play.",
+   "analyst": "Musialetti's equaliser at 88' levels the match at 2–2, shifting Carrot's win probability from 1% to 14%. Assisted by Mbeulier, it was a big chance (xG 0.43) despite Potato's dominance.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 8,
+    "claims": 12,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-36": {
    "moment_id": "M-36",
@@ -444,27 +456,29 @@
   },
   "M-37": {
    "moment_id": "M-37",
-   "input_hash": "04d6add592905ea3",
+   "input_hash": "70cb5c0d7016c9db",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot FC are piling on the pressure as the match enters the 96th minute.",
-   "analyst": "Carrot FC's pressing intensity rises to 2.2 per minute, controlling 94% of final-third passes in the last 5 minutes.",
+   "casual": "Carrot are pushing hard in stoppage time, keeping the pressure on Potato.",
+   "analyst": "Carrot are pressing intensely with 2.2 high pressures per minute, dominating the final third late on.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 5,
+    "claims": 3,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-38": {
    "moment_id": "M-38",
    "input_hash": "8e45034ba0635303",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Szobalenko scores a dramatic late goal to put Carrot FC ahead 3–2 in the 96th minute.",
-   "analyst": "Szobalenko's goal, assisted by Musialetti, shifts Carrot FC's win probability from 3% to 97%. With an xG of 0.08, it caps Carrot's dominance in the final minutes, where they controlled 94% of final-third passes.",
+   "casual": "Szobalenko scores in the 96th minute to make it 3–2 for Carrot. A dramatic late winner!",
+   "analyst": "Szobalenko's goal in the 96th minute, assisted by Musialetti, turns Carrot's win probability from 3% to 97%. Despite its low xG of 0.08, Carrot's dominance in the final minutes pays off.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
@@ -472,7 +486,9 @@
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-39": {
    "moment_id": "M-39",

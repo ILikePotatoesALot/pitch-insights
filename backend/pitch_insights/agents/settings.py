@@ -21,7 +21,9 @@ class AgentSettings:
     endpoint: str = ""
     api_key: str = field(default="", repr=False)
     model: str = ""
-    embedding_model: str = ""
+    embedding_model: str = ""   # the Memory agent's embeddings deployment, always on Foundry
+    embedding_endpoint: str = ""
+    embedding_api_key: str = field(default="", repr=False)
     timeout_s: float = 20.0      # per model call, before the SDK's own retries
     max_retries: int = 2         # the OpenAI SDK's retry layer (backoff, honours Retry-After); the only one
     max_tokens: int = 220        # rate limits count max_tokens, so keep it near the real output size
@@ -31,6 +33,10 @@ class AgentSettings:
     @property
     def configured(self) -> bool:
         return bool(self.endpoint and self.api_key and self.model)
+
+    @property
+    def embeddings_configured(self) -> bool:
+        return bool(self.embedding_endpoint and self.embedding_api_key and self.embedding_model)
 
 
 def _num(env: dict, key: str, default, cast, lo, hi):
@@ -61,6 +67,8 @@ def load_settings(env_file: Path | None = ENV_FILE) -> AgentSettings:
     return AgentSettings(
         provider=provider, endpoint=endpoint, api_key=key, model=model,
         embedding_model=env.get("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", ""),
+        embedding_endpoint=env.get("AZURE_OPENAI_ENDPOINT", ""),
+        embedding_api_key=env.get("AZURE_OPENAI_API_KEY", ""),
         timeout_s=_num(env, "AGENT_TIMEOUT_S", 20.0, float, 1, 300),
         max_retries=_num(env, "AGENT_MAX_RETRIES", 2, int, 0, 10),
         max_tokens=_num(env, "AGENT_MAX_TOKENS", 220, int, 16, 4096),

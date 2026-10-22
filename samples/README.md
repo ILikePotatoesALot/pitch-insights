@@ -1,6 +1,6 @@
 # Demo matches
 
-Three generated matches chosen with `scripts/seed_search.py`. Each `.jsonl` file has `match_meta` on the first line, then one event per line. The `.debug.json` files hold hidden generator values (match form, script) and are not for the agents.
+Three generated matches chosen with `scripts/seed_search.py`. Each `.jsonl` file has `match_meta` on the first line, then one event per line. The `.debug.json` files hold hidden generator values (match form, script) and are not for the agents. The `.commentary.json` files hold the stored commentary, and the `.memory.json` files the Memory agent's precomputed embeddings (`backend/scripts/embed_moments.py`).
 
 | File | Seed | Result | Story |
 |---|---|---|---|

@@ -62,19 +62,21 @@
   },
   "M-5": {
    "moment_id": "M-5",
-   "input_hash": "6d5dfeecd0eaf402",
+   "input_hash": "42bf08e42c1b7fdb",
    "agent": "narrator",
    "status": "ok",
-   "casual": "Carrot FC are firmly in control as they push forward.",
-   "analyst": "Carrot FC dominate with 90% of final-third passes in the last five minutes, showcasing their control at 1–1.",
+   "casual": "Carrot FC are dominating again, keeping Broccoli FC pinned back.",
+   "analyst": "Carrot FC are in control, completing 90% of final-third passes in this second dominant spell of the match.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 4,
+    "claims": 3,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-6": {
    "moment_id": "M-6",
@@ -94,35 +96,39 @@
   },
   "M-7": {
    "moment_id": "M-7",
-   "input_hash": "24aa9fd936221cbd",
+   "input_hash": "83f5df5426b8d93f",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Gyokerland scores his second to level it for Carrot at 2–2. Carrot are pushing hard and now look like favourites.",
-   "analyst": "Gyokerland's second goal, assisted by Szobalenko, levels the match at 2–2 with an xG of 0.18. Carrot's win chance jumps from 28% to 56%, reflecting their dominance in momentum and final-third activity.",
+   "casual": "Gyokerland scores his second of the match to make it 2–2 for Carrot just before half-time.",
+   "analyst": "Gyokerland's second goal of the match, assisted by Szobalenko, ties the game at 2–2. Carrot's attacking dominance in the last five minutes (90% final-third passes, 3 shots, xG 0.42) pays off.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 10,
+    "claims": 11,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-8": {
    "moment_id": "M-8",
-   "input_hash": "c41b60b771bec437",
+   "input_hash": "66a025ea9e0d6676",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Gyokerland's shot could have put Carrot ahead, but Pickvardt made the save. It's still 2–2 at the break.",
-   "analyst": "Gyokerland's missed chance, with an xG of 0.34, could have shifted the balance before half-time. Carrot's momentum and 65% of final-third passes show they were pressing hard.",
+   "casual": "Gyokerland's shot is saved just before half-time, keeping the score at 2–2. Carrot FC have been pressing hard.",
+   "analyst": "Gyokerland's missed chance (xG 0.34) just before half-time keeps the match level at 2–2. Carrot FC dominate the closing minutes, controlling 65% of final-third passes and maintaining momentum (+0.51).",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 7,
+    "claims": 9,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-9": {
    "moment_id": "M-9",
@@ -145,16 +151,18 @@
    "input_hash": "233026b15101caa6",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Bowerman scores a brilliant goal to make it 3–2 for Broccoli, turning the game around.",
-   "analyst": "Jordy Bowerman's low-probability strike (xG 0.03) gives Broccoli a 3–2 lead, doubling their win chance to 50%. His rating jumps to 7.9, reflecting his decisive impact in a tight match.",
+   "casual": "Bowerman scores his 5th of the season to give Broccoli the lead at 3–2.",
+   "analyst": "Jordy Bowerman's improbable strike (xG 0.03) edges Broccoli ahead 3–2, boosting their win probability from 18% to 50%. His live rating jumps to 7.9, reflecting his decisive impact.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 9,
+    "claims": 11,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-12": {
    "moment_id": "M-12",
@@ -206,19 +214,21 @@
   },
   "M-18": {
    "moment_id": "M-18",
-   "input_hash": "ca4223e043a3092f",
+   "input_hash": "13da900fb19263f0",
    "agent": "explainer",
    "status": "ok",
-   "casual": "Gyokerland scores his third goal to make it 3–4. Carrot are still behind but this gives them hope.",
-   "analyst": "Gyokerland completes his hat-trick with a low xG chance (0.16), assisted by Szobalenko, to reduce the deficit to 3–4. Despite Broccoli's dominance, Carrot's top scorer keeps them in the match.",
+   "casual": "Gyokerland scores his third of the match, making it 3–4. Carrot are still behind but fighting hard.",
+   "analyst": "Gyokerland completes his hat-trick with a low xG chance, assisted by Szobalenko. Despite Broccoli's dominance, Carrot's top scorer keeps them in contention, though their win probability remains low at 2%.",
    "attempts": 1,
    "grounding": {
     "score": 1.0,
-    "claims": 9,
+    "claims": 7,
     "unsupported": []
    },
    "corrected": [],
-   "reason": null
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
   },
   "M-20": {
    "moment_id": "M-20",
