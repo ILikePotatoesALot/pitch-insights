@@ -32,6 +32,13 @@ video\.venv\Scripts\python -m pip install --upgrade pip
 Install PyTorch with CUDA first, using the command from https://pytorch.org/get-started/locally/ (Stable, Windows,
 Pip, Python, and the newest CUDA your driver supports). Then:
 
+**AMD Radeon instead (done 22 Oct on an RX 9070 XT):** use AMD's ROCm build for Windows from
+https://rocm.docs.amd.com/projects/radeon-ryzen/ (Install PyTorch, Windows). For ROCm 7.2.1 that was the SDK wheels
+`rocm_sdk_core`, `rocm_sdk_devel`, `rocm_sdk_libraries_custom` and `rocm-7.2.1.tar.gz`, then `torch-2.9.1+rocm7.2.1`,
+`torchvision-0.24.1+rocm7.2.1` and `torchaudio-2.9.1+rocm7.2.1`, all from `https://repo.radeon.com/rocm/windows/rocm-rel-7.2.1/`.
+It reports the card through `torch.cuda` like a CUDA build, so the check below and the scripts work unchanged. Installing the
+requirements afterwards keeps that torch (check with `pip install --dry-run -r video\requirements.txt` first).
+
 ```powershell
 video\.venv\Scripts\pip install -r video\requirements.txt
 video\.venv\Scripts\python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"   # True and your GPU
@@ -69,7 +76,7 @@ video\.venv\Scripts\python video\finetune\build_dataset.py --limit 3 --out data\
 video\.venv\Scripts\python video\finetune\train.py --smoke --dataset data\finetune\smoke
 ```
 
-Then the real run (about 3,900 training tiles and 800 for validation and test; the build takes a few minutes):
+Then the real run (3,328 training tiles and 800 for validation and test; the build takes under a minute, training about 23 minutes on an RX 9070 XT):
 
 ```powershell
 video\.venv\Scripts\python video\finetune\build_dataset.py
@@ -105,7 +112,7 @@ Remove-Item Env:VIDEO_TAG
 
 ## 6. Bring the results back
 
-The weights are about 370 MB: copy `checkpoint_best_total.pth` (and `train_summary.json`) by USB or a share. The small result files
+The weights are about 127 MB: copy `checkpoint_best_total.pth` (and `train_summary.json`) by USB or a share. The small result files
 are in git, so on the GPU machine (push only when Austin says so; an assistant works on that branch from the start, see the brief):
 
 ```powershell
@@ -127,4 +134,8 @@ browser sign-in.
   build from pytorch.org, then re-run `pip install -r video\requirements.txt`.
 - **Hugging Face says 401 or 403:** the token is wrong or the account hasn't accepted the dataset's terms
   (open the dataset page on huggingface.co while signed in).
+- **AMD (ROCm on Windows): `detect.py` or `eval_boxes.py` doesn't return after finishing.** A process that has run the detector
+  on frames decoded from the video hangs at exit, after its output is written, and can't be killed for a while (training isn't
+  affected). Wait for its last line (`500/500 frames ...`, or `wrote ...`), then stop it and go on; the output is complete.
+  The stuck process holds no GPU memory and goes away by itself, or at a reboot.
 - **Weights fail to download:** RF-DETR fetches its COCO weights (368 MB) on first use, so the machine needs internet access.
