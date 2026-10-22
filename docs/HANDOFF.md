@@ -13,13 +13,12 @@ Written 21 Oct 2026, updated 22 Oct (video path). The single place to pick this 
 
 | Branch | State | Contents |
 |---|---|---|
-| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4), Memory agent (ILikePotatoesALot/pitch-insights#6) |
-| `ai-services` | Local only, not pushed | Content Safety, Translator (five languages), tracing to Application Insights, Foundry groundedness evaluator |
-| `video-path` | Local only, not pushed; cut from `ai-services` | The video path on SoccerTrack v2: loader, tiled RF-DETR, pitch calibration, tracker, teams, events, benchmark (22 Oct) |
+| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4), Memory agent (ILikePotatoesALot/pitch-insights#6), Content Safety, Translator, tracing and the groundedness evaluator (ILikePotatoesALot/pitch-insights#8, 22 Oct) |
+| `video-path` | Local only, not pushed; cut from `ai-services`, which is now merged into `main` | The video path on SoccerTrack v2: loader, tiled RF-DETR, pitch calibration, tracker, teams, events, benchmark (22 Oct) |
 
 The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
-**Next git step:** `ai-services` and `video-path` are committed locally and reviewed, not pushed. Push them and open pull requests when Austin says (`video-path` builds on `ai-services`, so it goes second).
+**Next git step:** `video-path` is committed locally and reviewed, not pushed. It already contains everything in `ai-services` (merged as #8). When Austin says: merge `main` into it, push it and open its pull request into `main` (merged with a merge commit), so the PR shows only the video path and the Apache-2.0 relicense.
 
 ## What's built
 
@@ -34,9 +33,9 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
 | Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built, reviewed twice, fixed, merged (ILikePotatoesALot/pitch-insights#4) | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
 | Memory agent (similar earlier moments as `memory` facts; Foundry embeddings stored next to each sample, so replays need no network) | Built, reviewed, merged (ILikePotatoesALot/pitch-insights#6) | `backend/pitch_insights/agents/memory.py`, [DESIGN.md, Memory agent](DESIGN.md#memory-agent) |
-| Safety check (Azure AI Content Safety: every line screened, blocked at severity 2, fails closed) | Built on `ai-services` (22 Oct); 52 stored moments screened, none blocked | `backend/pitch_insights/agents/safety.py`, [DESIGN.md, Safety check](DESIGN.md#safety-check) |
-| Translations (Azure AI Translator: Spanish, French, German, Dutch, Simplified Chinese; names and clocks protected; checked; stored) | Built on `ai-services` (22 Oct); 9 of 3,180 kept English | `backend/pitch_insights/agents/translate.py`, [DESIGN.md, Translations](DESIGN.md#translations) |
-| Tracing (Agent Framework to Application Insights, no prompts or replies) and Foundry's groundedness evaluator (all 52 lines pass, lowest 4 of 5) | Built on `ai-services` (22 Oct) | `agents/tracing.py`, `scripts/evaluate_groundedness.py` |
+| Safety check (Azure AI Content Safety: every line screened, blocked at severity 2, fails closed) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8; 52 stored moments screened, none blocked | `backend/pitch_insights/agents/safety.py`, [DESIGN.md, Safety check](DESIGN.md#safety-check) |
+| Translations (Azure AI Translator: Spanish, French, German, Dutch, Simplified Chinese; names and clocks protected; checked; stored) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8; 9 of 3,180 kept English | `backend/pitch_insights/agents/translate.py`, [DESIGN.md, Translations](DESIGN.md#translations) |
+| Tracing (Agent Framework to Application Insights, no prompts or replies) and Foundry's groundedness evaluator (all 52 lines pass, lowest 4 of 5) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8 | `agents/tracing.py`, `scripts/evaluate_groundedness.py` |
 | Other agents (Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Built on `video-path` (22 Oct) on a 100 s clip, reviewed; keep-or-cut decision 24 Oct. 91% of players found at 85% precision, 0.78 m mean position error, 88% teams, 19 events (74% match SoccerTrack's within 5 s) | `video/`, `backend/pitch_insights/video/`, [DESIGN.md, Video path](DESIGN.md#video-path) |
@@ -183,7 +182,7 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 | # | Step | Needs | Size |
 |---|---|---|---|
 | 1 | Done: **agents core**, merged in ILikePotatoesALot/pitch-insights#4 (21 Oct) | | |
-| 2 | Done 22 Oct: **Foundry and AI services** (Memory agent merged; Content Safety, Translator, tracing and the groundedness evaluator on `ai-services`) | | |
+| 2 | Done 22 Oct: **Foundry and AI services** (Memory agent and Content Safety, Translator, tracing and the groundedness evaluator, all merged; the latter in ILikePotatoesALot/pitch-insights#8) | | |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
 | 5 | Decided 21 Oct: the video path uses **pre-trained detection on a short clip** (no GPU quota needed); fine-tuning maybe later. Cut it if it isn't working by 24 Oct | | |
