@@ -1,4 +1,4 @@
-"""Fine-tune RF-DETR small on the tiled MOT dataset (run on a machine with an NVIDIA GPU).
+"""Fine-tune RF-DETR small on the tiled MOT dataset (run on a machine with a GPU: CUDA or ROCm).
 
 Starts from the COCO weights, replaces the head with one class (`player`) and trains on the tiles
 from build_dataset.py. The checkpoint that scores best on the `valid` split is kept (`valid` is
@@ -62,7 +62,8 @@ def main() -> None:
     import torch
 
     if not torch.cuda.is_available():
-        print("warning: no CUDA GPU found; this will be very slow (check the PyTorch CUDA install)", file=sys.stderr)
+        print("warning: no GPU found (CUDA or ROCm); this will be very slow (check the GPU build of PyTorch: "
+              f"{torch.__version__} should end in +rocm... or +cu...)", file=sys.stderr)
     output_dir = RUNS / args.name
     options = train_options(args, output_dir)
 
@@ -75,6 +76,7 @@ def main() -> None:
         "model": "RF-DETR small", "from": "COCO pre-trained", "dataset": str(args.dataset),
         "options": {k: v for k, v in options.items() if k not in ("dataset_dir", "output_dir")},
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+        "torch": torch.__version__,
         "minutes": round((time.perf_counter() - started) / 60, 1),
         "checkpoints": sorted(p.name for p in output_dir.glob("*.pth")),
         "dataset_counts": json.loads((args.dataset / "summary.json").read_text(encoding="utf-8"))

@@ -528,6 +528,8 @@ Scoring leaves out `Out` (it changes the previous pass, it isn't an action) and 
 
 Code in `video/finetune/` (steps for the machine in its README), with the pure logic in `backend/pitch_insights/video/mot.py` and tests. Nothing here has trained yet.
 
+- **Hardware:** Austin's GPU machine is AMD, so the README installs AMD's ROCm 7.2.1 wheels for Windows (PyTorch 2.9.1, Python 3.12, Windows 11; supported Radeon cards listed on AMD's compatibility matrix) instead of the CUDA build. ROCm builds of PyTorch answer through `torch.cuda`, so the code needs no change; the training summary and detector metadata record the device and the PyTorch build. The route is newer than CUDA and RF-DETR training hasn't been run on it, which is why the brief has a stop condition for HIP errors instead of a CPU fallback.
+
 - **Labels:** the MOT boxes (above), the only tight image boxes we have. (The GSR boxes are loose, and an earlier plan to use our own detections matched to the GSR positions would only have taught the model what it already does.)
 - **Data:** each chosen frame is cut into the detector's own 5 × 2 tiles (`tiles_for`), each tile saved with the boxes inside it (clipped; kept when at least half is visible). People the file doesn't box (spectators, referees, staff) are background, which is what should teach the model to ignore them. About 3,900 train tiles (on a few frames, 26 of 30 tiles were kept), 400 valid and 400 test, in RF-DETR's Roboflow layout.
 - **Splits:** stretches of the four minutes with 8-second gaps: train 0:00–2:24 (every 8th frame, 450 frames), valid 2:32–3:12 (40), test 3:20–3:59 (40). The benchmark clip (38:00–39:40) is a further test and is never trained on. The checkpoint is chosen on `valid`; `test` is used once, by `eval_boxes.py`.

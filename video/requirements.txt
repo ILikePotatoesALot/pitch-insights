@@ -3,6 +3,8 @@
 # Install PyTorch FIRST. On a machine with an NVIDIA GPU use the CUDA build, with the command from
 # https://pytorch.org/get-started/locally/ (it names the index for your driver), for example:
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/<cuda tag>
+# On an AMD GPU (Windows 11, Python 3.12) use AMD's ROCm wheels, all in one command: the exact commands are in
+# video\finetune\README.md, step 1.
 # On a CPU-only machine: pip install torch torchvision
 #
 # Then:  pip install -r video\requirements.txt
