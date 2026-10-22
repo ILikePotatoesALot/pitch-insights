@@ -64,6 +64,8 @@ function CheckNote({ m }: { m: Moment }) {
     <p className="check">
       {c.agent === "explainer" ? "Explainer" : "Narrator"} agent · {g ? `${g.claims} names and numbers checked against these facts` : "checked"}
       {c.corrected.length > 0 && `; first draft corrected (${c.corrected.join(", ")} weren't in the facts)`}
+      {c.safety?.passed && " · screened by Azure AI Content Safety"}
+      {m.lang && " · machine-translated by Azure AI Translator"}
     </p>
   );
 }
@@ -101,7 +103,8 @@ export function MomentFeed({ moments, meta, aiInfo, mode, colours }: {
       </h3>
       {shown.length === 0 ? <p className="empty">Nothing yet. Moments appear here as the match unfolds.</p> :
         <ul>{[...shown].reverse().map((m) => <MomentCard key={m.id} m={m} meta={meta} mode={mode} colours={colours} />)}</ul>}
-      {aiInfo && <p className="ai-note">Commentary is AI-generated ({aiInfo.model}) from the facts under "Why?", and every name and number in it is checked against them.</p>}
+      {aiInfo && <p className="ai-note">Commentary is AI-generated ({aiInfo.model}) from the facts under "Why?", and every name and number in it is checked against them.
+        {moments.some((m) => m.lang) && " Moments are machine-translated from English."}</p>}
     </div>
   );
 }

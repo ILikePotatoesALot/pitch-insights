@@ -1,0 +1,1221 @@
+{
+ "service": "azure-translator",
+ "api_version": "3.0",
+ "version": "2026-10-22.2",
+ "source": "en",
+ "languages": [
+  "es",
+  "fr",
+  "de",
+  "nl",
+  "zh-Hans"
+ ],
+ "machine_translated": true,
+ "kept_english": {
+  "es": 0,
+  "fr": 0,
+  "de": 0,
+  "nl": 0,
+  "zh-Hans": 2
+ },
+ "moments": {
+  "M-1": {
+   "source_hash": "269dd1e6596c7acf",
+   "es": {
+    "headline": "Shacroft abre el marcador",
+    "fact.0": "Ahora está Carrot 0–1 Broccoli.",
+    "fact.1": "La probabilidad de ganar de Broccoli pasó del 26% al 61%.",
+    "fact.2": "Asistido por Bowerman.",
+    "fact.3": "Una gran posibilidad, xG 0,31.",
+    "fact.4": "Su segundo gol de la temporada.",
+    "fact.5": "Broccoli jugó el 35% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.6": "Shacroft en directo es 6,4.",
+    "fact.7": "Disparos hasta ahora: Carrot 1 (xG 0,04), Broccoli 1 (xG 0,31).",
+    "casual": "Shacroft anotó temprano para Broccoli, poniendo el 1–0 tras la asistencia de Bowerman.",
+    "analyst": "El gol de Shacroft, con una probabilidad de 0,31 xG, pone a Broccoli 1–0 y aumenta su probabilidad de victoria del 26% al 61%. El reciente control de Broccoli en el último tercio da sus frutos con un gol decisivo temprano."
+   },
+   "fr": {
+    "headline": "Shacroft ouvre le score",
+    "fact.0": "C’est maintenant Carrot 0–1 Broccoli.",
+    "fact.1": "Les chances de victoire de Broccoli sont passées de 26 % à 61 %.",
+    "fact.2": "Assisté par Bowerman.",
+    "fact.3": "Une grande chance, xG 0,31.",
+    "fact.4": "Son deuxième but de la saison.",
+    "fact.5": "Broccoli joué 35 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.6": "Shacroft en direct est de 6,4.",
+    "fact.7": "Tirs jusqu’à présent : Carrot 1 (xG 0,04), Broccoli 1 (xG 0,31).",
+    "casual": "Shacroft marque tôt pour Broccoli, portant le score à 1–0 grâce à la passe décisive de Bowerman.",
+    "analyst": "Le but de Shacroft, avec une chance xG de 0,31, donne l’avantage 1–0 à Broccoli et augmente leur probabilité de victoire de 26 % à 61 %. Le contrôle récent du dernier tiers de Broccoli porte ses fruits par un but décisif en début de match."
+   },
+   "de": {
+    "headline": "Shacroft eröffnet die Punktewertung",
+    "fact.0": "Jetzt steht es Carrot 0–1 Broccoli.",
+    "fact.1": "Die Gewinnchance von Broccoli stieg von 26 % auf 61 %.",
+    "fact.2": "Unterstützt von Bowerman.",
+    "fact.3": "Eine große Chance, xG 0,31.",
+    "fact.4": "Sein zweites Saisontor.",
+    "fact.5": "Broccoli spielte in den letzten fünf Minuten 35 % der Pässe im letzten Drittel.",
+    "fact.6": "Shacroft hat eine Live-Bewertung von 6,4.",
+    "fact.7": "Bisherige Aufnahmen: Carrot 1 (xG 0,04), Broccoli 1 (xG 0,31).",
+    "casual": "Shacroft trifft früh für Broccoli und stellt nach einer Vorlage von Bowerman auf 1:0.",
+    "analyst": "Shacroft's Tor mit einer 0,31 xG-Chance bringt Broccoli mit 1:0 in Führung und erhöht ihre Gewinnwahrscheinlichkeit von 26 % auf 61 %. Broccoli kürzliche Kontrolle im letzten Drittel zahlt sich mit einem entscheidenden frühen Treffer aus."
+   },
+   "nl": {
+    "headline": "Shacroft opent de score",
+    "fact.0": "Het staat nu Carrot 0–1 Broccoli.",
+    "fact.1": "De kans van Broccoli om te winnen steeg van 26% naar 61%.",
+    "fact.2": "Geassisteerd door Bowerman.",
+    "fact.3": "Een grote kans, xG 0,31.",
+    "fact.4": "Zijn tweede doelpunt van het seizoen.",
+    "fact.5": "Broccoli speelde 35% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.6": "De live rating van Shacroft is 6,4.",
+    "fact.7": "Tot nu toe foto's: Carrot 1 (xG 0,04), Broccoli 1 (xG 0,31).",
+    "casual": "Shacroft scoort vroeg voor Broccoli, waarmee het 1–0 wordt na een assist van Bowerman's.",
+    "analyst": "Het doelpunt van Shacroft, met een kans van 0,31 xG, brengt Broccoli op een 1–0 voorsprong en verhoogt hun winstkans van 26% naar 61%. De recente controle van Broccoli in het laatste derde deel betaalt zich uit met een beslissende vroege treffer."
+   },
+   "zh-Hans": {
+    "headline": "Shacroft 开局得分",
+    "fact.0": "现在比分 Carrot 0比1 Broccoli。",
+    "fact.1": "Broccoli的获胜概率从26%降至61%。",
+    "fact.2": "协助者为 Bowerman。",
+    "fact.3": "概率很大，xG 0.31。",
+    "fact.4": "这是他本赛季的第二个进球。",
+    "fact.5": "Broccoli 在最后五分钟完成了35%的最后三分之一传球。",
+    "fact.6": "Shacroft的现场评分为6.4。",
+    "fact.7": "目前射击数： Carrot 1 张（xG 0.04）， Broccoli 1 张（xG 0.31）。",
+    "casual": "Shacroft 为 Broccoli早早破门， Bowerman助攻将比分改写为1比0。",
+    "analyst": "Shacroft的进球以0.31的xG机会将 Broccoli 以1比0领先，胜率从26%提升至61%。 Broccoli近期在最后三分之一的控制权带来了决定性的早早进球。"
+   }
+  },
+  "M-2": {
+   "source_hash": "723763844e2773ff",
+   "es": {
+    "headline": "Gyokerland iguala para Carrot",
+    "fact.0": "Ahora es Carrot 1–1 Broccoli.",
+    "fact.1": "Las probabilidades de ganar de Carrot pasaron del 30% al 57%.",
+    "fact.2": "Asistido por Mbeulier.",
+    "fact.3": "Calidad Chance xG 0,18.",
+    "fact.4": "Su decimocuarto gol de la temporada.",
+    "fact.5": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,63 de su equipo).",
+    "fact.6": "Carrot jugó el 72% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.7": "Carrot tuvo 4 tiros (xG 0,51) y 2 córners en los últimos cinco minutos.",
+    "fact.8": "La valoración en directo de Gyokerland es de 6,8.",
+    "fact.9": "Disparos hasta ahora: Carrot 6 (xG 0,73), Broccoli 2 (xG 0,36).",
+    "casual": "Gyokerland empata para Carrot con su decimocuarto gol esta temporada, asistido por Mbeulier. Ahora el marcador es 1–1.",
+    "analyst": "El empate de Gyokerland, asistido por Mbeulier, eleva la oportunidad de victoria de Carrot del 30% al 57%. Culmina una racha dominante en la que Carrot controló el 72% de los pases del último tercio y generó 4 tiros (xG 0,51)."
+   },
+   "fr": {
+    "headline": "Gyokerland égalise pour Carrot",
+    "fact.0": "C’est maintenant Carrot 1–1 Broccoli.",
+    "fact.1": "Les chances de victoire de Carrot sont passées de 30 % à 57 %.",
+    "fact.2": "Assisté par Mbeulier.",
+    "fact.3": "Chance quality xG 0,18.",
+    "fact.4": "Son 14e but de la saison.",
+    "fact.5": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,63 de leur côté).",
+    "fact.6": "Carrot joué 72 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.7": "Carrot a réalisé 4 tirs (xG 0,51) et 2 corners dans les cinq dernières minutes.",
+    "fact.8": "Gyokerland en direct est de 6,8.",
+    "fact.9": "Tirs jusqu’à présent : Carrot 6 (xG 0,73), Broccoli 2 (xG 0,36).",
+    "casual": "Gyokerland égalise pour Carrot avec son 14e but de la saison, assisté par Mbeulier. Le score est maintenant 1–1.",
+    "analyst": "L’égalisation de Gyokerland, assistée par Mbeulier, porte la chance de victoire de Carrot de 30 % à 57 %. Cela conclut une période dominante où Carrot contrôlé 72 % des dernières passes du dernier tiers et généré 4 tirs (xG 0,51)."
+   },
+   "de": {
+    "headline": "Gyokerland gleicht für Carrot",
+    "fact.0": "Jetzt steht es Carrot 1:1 Broccoli.",
+    "fact.1": "Die Gewinnchance von Carrot stieg von 30 % auf 57 %.",
+    "fact.2": "Unterstützt von Mbeulier.",
+    "fact.3": "Chance-Qualität xG 0,18.",
+    "fact.4": "Sein 14. Saisontor.",
+    "fact.5": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,63 von ihrer Seite).",
+    "fact.6": "Carrot spielte in den letzten fünf Minuten 72 % der Pässe im letzten Drittel.",
+    "fact.7": "Carrot hatte in den letzten fünf Minuten 4 Schüsse (xG 0,51) und 2 Eckstöße.",
+    "fact.8": "Die Live-Bewertung von Gyokerland liegt bei 6,8.",
+    "fact.9": "Bisherige Aufnahmen: 6 Carrot (xG 0,73), Broccoli 2 (xG 0,36).",
+    "casual": "Gyokerland gleicht für Carrot mit seinem 14. Saisontor aus, vorbereitet von Mbeulier. Es steht jetzt 1:1.",
+    "analyst": "Der Ausgleich von Gyokerland, unterstützt von Mbeulier, erhöht Carrot's Siegchance von 30 % auf 57 %. Er krönt eine dominante Phase, in der Carrot 72 % der letzten Pässe kontrollierte und 4 Schüsse generierte (xG 0,51)."
+   },
+   "nl": {
+    "headline": "Gyokerland gelijk voor Carrot",
+    "fact.0": "Het staat nu Carrot 1–1 Broccoli.",
+    "fact.1": "De kans van Carrot om te winnen ging van 30% naar 57%.",
+    "fact.2": "Geassisteerd door Mbeulier.",
+    "fact.3": "Kanskwaliteit xG 0,18.",
+    "fact.4": "Zijn 14e doelpunt van het seizoen.",
+    "fact.5": "Carrot had in de laatste vijf minuten de overhand (momentum +0,63 van hun kant).",
+    "fact.6": "Carrot speelde 72% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.7": "Carrot had 4 schoten (xG 0,51) en 2 corners in de laatste vijf minuten.",
+    "fact.8": "De live rating van Gyokerland is 6,8.",
+    "fact.9": "Schoten tot nu toe: Carrot 6 (xG 0,73), Broccoli 2 (xG 0,36).",
+    "casual": "Gyokerland maakt gelijk voor Carrot met zijn 14e doelpunt dit seizoen, geassisteerd door Mbeulier. Het staat nu 1–1.",
+    "analyst": "De gelijkmaker van Gyokerland, geassisteerd door Mbeulier, verhoogt Carrot's kans op winst van 30% naar 57%. Het sluit een dominante periode af waarin Carrot 72% van de passes in het laatste derde deel controleerde en 4 schoten genereerde (xG 0,51)."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 使 Carrot",
+    "fact.0": "现在 Carrot 1比1 Broccoli。",
+    "fact.1": "Carrot的获胜概率从30%提升到57%。",
+    "fact.2": "协助者为 Mbeulier。",
+    "fact.3": "概率质量xG 0.18。",
+    "fact.4": "这是他本赛季的第14个进球。",
+    "fact.5": "Carrot 在最后五分钟占据上风（势头+0.63）。",
+    "fact.6": "Carrot 在最后五分钟完成了72%的最后三分之一传球。",
+    "fact.7": "Carrot 在最后五分钟门4次（x进球0.51）和2个角球。",
+    "fact.8": "Gyokerland的现场评分为6.8。",
+    "fact.9": "目前射击数： Carrot 6（xG 0.73）， Broccoli 2 （xG 0.36）。",
+    "casual": "Gyokerland本赛季第14球，助攻者Mbeulier，将比分扳平给Carrot。比分现在是1比1。",
+    "analyst": "Gyokerland的扳平进球， Mbeulier助攻，将 Carrot的胜率从30%提升到57%。这也为 Carrot 在最后三分之一区域控制72%的传球并制造4次射门（xG 0.51）的统治性表现画下句号。"
+   }
+  },
+  "M-3": {
+   "source_hash": "e70b4ce940fff8fc",
+   "es": {
+    "headline": "Gyokerland creciendo en el juego",
+    "fact.0": "La audiencia en directo de Gyokerland es de 6,9.",
+    "fact.1": "Subió desde 6,0 en los últimos diez minutos.",
+    "fact.2": "15' gol (+0,68).",
+    "fact.3": "11' pase de llave (+0,04).",
+    "fact.4": "8' pase de llave (+0,04)."
+   },
+   "fr": {
+    "headline": "Gyokerland évoluant dans le jeu",
+    "fact.0": "Gyokerland en direct est de 6,9.",
+    "fact.1": "En hausse par rapport à 6,0 en dix minutes.",
+    "fact.2": "15' but (+0,68).",
+    "fact.3": "11' passe clé (+0,04).",
+    "fact.4": "8' passe clé (+0,04)."
+   },
+   "de": {
+    "headline": "Gyokerland in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Gyokerland beträgt 6,9.",
+    "fact.1": "Anstieg von 6,0 in den letzten zehn Minuten.",
+    "fact.2": "15' Ziel (+0,68).",
+    "fact.3": "11' Tastenpass (+0,04).",
+    "fact.4": "8' Tastenpass (+0,04)."
+   },
+   "nl": {
+    "headline": "Gyokerland groeien in het spel",
+    "fact.0": "De live rating van Gyokerland is 6,9.",
+    "fact.1": "Omhoog van 6,0 in de laatste tien minuten.",
+    "fact.2": "15' doel (+0,68).",
+    "fact.3": "11' sleutelpass (+0,04).",
+    "fact.4": "8' sleutelpass (+0,04)."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 逐渐融入游戏",
+    "fact.0": "Gyokerland的现场评分为6.9。",
+    "fact.1": "从最后十分钟的6.0提升。",
+    "fact.2": "15' 进球（+0.68）。",
+    "fact.3": "11' 键传递（+0.04）。",
+    "fact.4": "8' 键传递（+0.04）。"
+   }
+  },
+  "M-4": {
+   "source_hash": "5f3ef070dadc4afd",
+   "es": {
+    "headline": "Carrot encima",
+    "fact.0": "Carrot tienen un impulso de 0,70 de su lado, tan unilateral como se puede ser.",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,70 de su lado).",
+    "fact.2": "Carrot jugó el 89% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Carrot 1–1 Broccoli.",
+    "casual": "Carrot FC están dominando el partido ahora mismo, manteniendo a Broccoli FC bajo presión constante.",
+    "analyst": "Carrot FC controlan, con un 89% de pases en el último tercio en los últimos cinco minutos y un buen impulso."
+   },
+   "fr": {
+    "headline": "Carrot au sommet",
+    "fact.0": "Carrot ont une impulsion de 0,70 de leur côté, à peu près aussi unilatérale que possible.",
+    "fact.1": "Carrot avait l’avantage dans les cinq dernières minutes (élan +0,70 de leur côté).",
+    "fact.2": "Carrot joué 89 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Carrot 1–1 Broccoli.",
+    "casual": "Carrot FC dominent le jeu en ce moment, Broccoli FC soumettant une pression constante.",
+    "analyst": "Carrot FC contrôlent le jeu, avec 89 % des passes du dernier tiers dans les cinq dernières minutes et un élan solide."
+   },
+   "de": {
+    "headline": "Carrot oben",
+    "fact.0": "Carrot haben von ihrer Seite einen Momentum von 0,70, so einseitig, wie es nur geht.",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,70 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 89 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Carrot 1:1 Broccoli.",
+    "casual": "Carrot FC dominieren gerade das Spiel und halten Broccoli FC ständig unter Druck.",
+    "analyst": "Carrot FC haben die Kontrolle, mit 89 % der Pässe im letzten Drittel in den letzten fünf Minuten und starkem Schwung."
+   },
+   "nl": {
+    "headline": "Carrot bovenop",
+    "fact.0": "Carrot hebben momentum 0,70 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,70 van hun kant).",
+    "fact.2": "Carrot speelde 89% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Carrot 1–1 Broccoli.",
+    "casual": "Carrot FC domineren momenteel het spel en houden Broccoli FC constant onder druk.",
+    "analyst": "Carrot FC hebben de controle, met 89% van de passes in het laatste derde deel in de laatste vijf minuten en sterk momentum."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 在上面",
+    "fact.0": "Carrot 队的动量只有0.70，几乎是一边倒的。",
+    "fact.1": "Carrot 在最后五分钟占据上风（势头+0.70）。",
+    "fact.2": "Carrot 在最后五分钟完成了89%的最后三分之一传球。",
+    "fact.3": "比分 Carrot 1比1 Broccoli。",
+    "casual": "Carrot FC 现在主宰了比赛，持续给 Broccoli FC 施加压力。",
+    "analyst": "Carrot FC 掌控了比赛，最后五分钟内完成了89%的最后三分之一传球，势头强劲。"
+   }
+  },
+  "M-5": {
+   "source_hash": "7a3d52cf9781f25a",
+   "es": {
+    "headline": "Carrot encima",
+    "fact.0": "Carrot tienen un impulso de 0,79 desde su lado, tan unilateral como se puede ser.",
+    "fact.1": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,79 de su equipo).",
+    "fact.2": "Carrot jugó el 90% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Carrot 1–1 Broccoli.",
+    "fact.4": "Carrot también dominaban en 19'.",
+    "fact.5": "Ese es el segundo periodo de dominio de Carrot en este partido.",
+    "casual": "Carrot FC dominan de nuevo, manteniendo a Broccoli FC inmovilizados.",
+    "analyst": "Carrot FC tienen el control, completando el 90% de los pases finales en el tercer tercio en esta segunda etapa dominante del partido."
+   },
+   "fr": {
+    "headline": "Carrot au sommet",
+    "fact.0": "Carrot ont un élan de 0,79 de leur côté, à peu près aussi unilatéral que possible.",
+    "fact.1": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,79 de leur côté).",
+    "fact.2": "Carrot joué 90 % des dernières passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Carrot 1–1 Broccoli.",
+    "fact.4": "Carrot dominaient aussi à 19'.",
+    "fact.5": "C’est la deuxième période de domination de Carrot dans ce match.",
+    "casual": "Carrot FC dominent à nouveau, Broccoli FC maintenant au recul.",
+    "analyst": "Carrot FC contrôlent, complétant 90 % des passes du dernier tiers lors de cette deuxième période dominante du match."
+   },
+   "de": {
+    "headline": "Carrot oben",
+    "fact.0": "Carrot haben von ihrer Seite ein Schwung von 0,79, so einseitig, wie es nur geht.",
+    "fact.1": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,79 von ihrer Seite).",
+    "fact.2": "Carrot spielte in den letzten fünf Minuten 90 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Carrot 1:1 Broccoli.",
+    "fact.4": "Carrot dominierten auch bei 19'.",
+    "fact.5": "Das ist Carrot zweite Dominanzphase in diesem Match.",
+    "casual": "Carrot FC dominieren wieder und halten Broccoli FC zurück.",
+    "analyst": "Carrot FC haben die Kontrolle und vervollständigen 90 % der letzten Drittel-Pässe in diesem zweiten dominanten Spell des Spiels."
+   },
+   "nl": {
+    "headline": "Carrot bovenop",
+    "fact.0": "Carrot hebben momentum 0,79 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Carrot had in de laatste vijf minuten de overhand (momentum +0,79 van hun kant).",
+    "fact.2": "Carrot speelde 90% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Carrot 1–1 Broccoli.",
+    "fact.4": "Carrot domineerden ook op 19'.",
+    "fact.5": "Dat is Carrot tweede dominantieperiode in deze wedstrijd.",
+    "casual": "Carrot FC domineren weer, houden Broccoli FC tegen.",
+    "analyst": "Carrot FC hebben de controle en voltooien 90% van de passes in het laatste derde deel van deze tweede dominante periode van de wedstrijd."
+   },
+   "zh-Hans": {
+    "headline": "Carrot 在上面",
+    "fact.0": "Carrot 队的势头只有0.79，几乎是一边倒的。",
+    "fact.1": "Carrot 在最后五分钟占据上风（势头+0.79）。",
+    "fact.2": "Carrot 在最后五分钟完成了90%的最后三分之一传球。",
+    "fact.3": "比分 Carrot 1比1 Broccoli。",
+    "fact.4": "Carrot 在 19'时也占据了主导地位。",
+    "fact.5": "这是 Carrot在这场比赛中的第二次统治。",
+    "casual": "Carrot FC 再次占据主导，将 Broccoli FC 压制在后面。",
+    "analyst": "Carrot FC 掌控比赛，完成了比赛中90%的最后三分之一传球，这是比赛的第二次主导表现。"
+   }
+  },
+  "M-6": {
+   "source_hash": "6d038e4a1882a26e",
+   "es": {
+    "headline": "Phillwood Broccoli adelanta",
+    "fact.0": "Ahora es Carrot 1–2 Broccoli.",
+    "fact.1": "La probabilidad de ganar de Broccoli pasó del 19% al 46%.",
+    "fact.2": "Asistido por Gallasher.",
+    "fact.3": "Calidad Chance xG 0,15.",
+    "fact.4": "Su primer gol de la temporada.",
+    "fact.5": "Contra el curso del juego: Carrot había dominado.",
+    "fact.6": "Broccoli estuvieron bajo presión en los últimos cinco minutos (impulso -0,73 de su equipo).",
+    "fact.7": "Broccoli jugó el 18% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.8": "La calificación en directo de Phillwood es de 7,0.",
+    "fact.9": "Disparos hasta ahora: Carrot 13 (xG 1,59), Broccoli 6 (xG 0,74).",
+    "fact.10": "Subió desde 6,1 en los últimos diez minutos.",
+    "casual": "Phillwood marca su primer gol de la temporada para dar a Broccoli una ventaja de 2-1, a pesar de Carrot dominar el partido.",
+    "analyst": "El primer gol de la temporada de Declan Phillwood, asistido por Gallasher, pone a Broccoli 2-1 contra el curso del juego. Carrot había dominado con 13 disparos y un xG de 1,59, pero las posibilidades de victoria de Broccoli suben al 46%."
+   },
+   "fr": {
+    "headline": "Phillwood Broccoli donne de l’avance",
+    "fact.0": "C’est maintenant Carrot 1 à 2 Broccoli.",
+    "fact.1": "Les chances de victoire de Broccoli sont passées de 19 % à 46 %.",
+    "fact.2": "Assisté par Gallasher.",
+    "fact.3": "Chance quality xG 0,15.",
+    "fact.4": "Son premier but de la saison.",
+    "fact.5": "Contre le cours du jeu : Carrot avait dominé.",
+    "fact.6": "Broccoli étaient sous pression dans les cinq dernières minutes (élan de -0,73 de leur côté).",
+    "fact.7": "Broccoli joué 18 % des dernières passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.8": "Phillwood en direct est de 7,0.",
+    "fact.9": "Tirs jusqu’à présent : Carrot 13 (xG 1,59), Broccoli 6 (xG 0,74).",
+    "fact.10": "En hausse par rapport à 6,1 en dix minutes.",
+    "casual": "Phillwood marque son premier but de la saison pour donner à Broccoli une avance de 2-1, malgré Carrot domination du match.",
+    "analyst": "Le premier but de la saison de Declan Phillwood, assisté par Gallasher, Broccoli donne l’avantage 2-1 contre le cours du jeu. Carrot avait dominé avec 13 tirs et un xG de 1,59, mais les chances de victoire de Broccoli grimpent à 46 %."
+   },
+   "de": {
+    "headline": "Phillwood setzt Broccoli voran",
+    "fact.0": "Jetzt steht es Carrot 1–2 Broccoli.",
+    "fact.1": "Die Gewinnchance von Broccoli stieg von 19 % auf 46 %.",
+    "fact.2": "Unterstützt von Gallasher.",
+    "fact.3": "Chance-Qualität xG 0,15.",
+    "fact.4": "Sein erstes Tor der Saison.",
+    "fact.5": "Entgegen dem Spielverlauf: Carrot war oberste gewesen.",
+    "fact.6": "Broccoli standen in den letzten fünf Minuten unter Druck (Momentum -0,73 von ihrer Seite).",
+    "fact.7": "Broccoli spielte in den letzten fünf Minuten 18 % der Pässe im letzten Drittel.",
+    "fact.8": "Die Live-Bewertung von Phillwood liegt bei 7,0.",
+    "fact.9": "Bisherige Aufnahmen: 13 Carrot (xG 1,59), Broccoli 6 (xG 0,74).",
+    "fact.10": "Erhöht von 6,1 in den letzten zehn Minuten.",
+    "casual": "Phillwood erzielt sein erstes Saisontor und bringt Broccoli trotz Carrot Dominanz auf 2:1 in Führung.",
+    "analyst": "Das erste Saisontor von Declan Phillwood, vorbereitet von Gallasher, bringt Broccoli gegen den Spielverlauf mit 2:1 in Führung. Carrot dominierte mit 13 Schüssen und einem xG von 1,59, doch Broccoli's Gewinnchance steigt auf 46 %."
+   },
+   "nl": {
+    "headline": "Phillwood zet Broccoli voorop",
+    "fact.0": "Het staat nu Carrot 1–2 Broccoli.",
+    "fact.1": "De kans van Broccoli om te winnen steeg van 19% naar 46%.",
+    "fact.2": "Geassisteerd door Gallasher.",
+    "fact.3": "Kanskwaliteit xG 0,15.",
+    "fact.4": "Zijn eerste doelpunt van het seizoen.",
+    "fact.5": "Tegen de spelverloop in: Carrot stond bovenaan.",
+    "fact.6": "Broccoli stonden in de laatste vijf minuten onder druk (momentum -0,73 van hun kant).",
+    "fact.7": "Broccoli speelde 18% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.8": "De live rating van Phillwood is 7,0.",
+    "fact.9": "Schoten tot nu toe: 13 Carrot (xG 1,59), Broccoli 6 (xG 0,74).",
+    "fact.10": "Gestegen van 6,1 in de laatste tien minuten.",
+    "casual": "Phillwood scoort zijn eerste doelpunt van het seizoen en brengt Broccoli een 2-1 voorsprong, ondanks dat Carrot de wedstrijd domineerd.",
+    "analyst": "Het eerste doelpunt van Declan Phillwood van het seizoen, geassisteerd door Gallasher, brengt Broccoli tegen de spelverloop in op een 2-1 voorsprong. Carrot domineerde met 13 schoten en xG 1,59, maar de winstkans van Broccoli steeg naar 46%."
+   },
+   "zh-Hans": {
+    "headline": "Phillwood 让 Broccoli 领先",
+    "fact.0": "现在 Carrot 1–2 Broccoli。",
+    "fact.1": "Broccoli的获胜概率从19%降至46%。",
+    "fact.2": "协助者为 Gallasher。",
+    "fact.3": "概率质量xG 0.15。",
+    "fact.4": "这是他本赛季的首粒进球。",
+    "fact.5": "逆势而上： Carrot 一直占据上风。",
+    "fact.6": "Broccoli 在最后五分钟承受了压力（球队势头-0.73）。",
+    "fact.7": "Broccoli 在最后五分钟完成了18%的最后三分之一传球。",
+    "fact.8": "Phillwood的现场评分为7.0。",
+    "fact.9": "目前射击数： Carrot 13（xG 1.59）， Broccoli 6（xG 0.74）。",
+    "fact.10": "从最后十分钟的6.1有所上升。",
+    "casual": "尽管比赛中Carrot占据主导，Phillwood打进了本赛季的首粒进球，帮助Broccoli以2-1领先。",
+    "analyst": "Declan Phillwood本赛季首粒进球由 Gallasher助攻，逆转比赛节奏，将 Broccoli 以2-1领先。 Carrot 以13次射门和xG1.59占据主导，但 Broccoli的胜率跃升至46%。"
+   }
+  },
+  "M-7": {
+   "source_hash": "d7a1f71338d9ba1c",
+   "es": {
+    "headline": "Gyokerland iguala para Carrot",
+    "fact.0": "Ahora está Carrot 2–2 Broccoli.",
+    "fact.1": "La probabilidad de ganar de Carrot pasó del 28% al 56%.",
+    "fact.2": "Asistido por Szobalenko.",
+    "fact.3": "Calidad Chance xG 0,18.",
+    "fact.4": "Su segundo gol del partido.",
+    "fact.5": "Su decimoquinto gol de la temporada.",
+    "fact.6": "Carrot tuvieron la ventaja en los últimos cinco minutos (impulso +0,35 de su equipo).",
+    "fact.7": "Carrot jugó el 90% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.8": "Carrot tuvo 3 disparos (xG 0,42) y 1 córner en los últimos cinco minutos.",
+    "fact.9": "La valoración en directo de Gyokerland es de 8,1.",
+    "fact.10": "Disparos hasta ahora: Carrot 14 (xG 1,77), Broccoli 6 (xG 0,74).",
+    "fact.11": "Subió desde 7,3 en los últimos diez minutos.",
+    "fact.12": "La audiencia en directo de Szobalenko es de 6,9.",
+    "fact.13": "Subió desde 6,2 en los últimos diez minutos.",
+    "fact.14": "Antes en este partido, a las 15': Gyokerland marcó con un disparo de Mbeulier por la derecha (xG 0.18).",
+    "fact.15": "Eso hace 2 goles Carrot o grandes ocasiones en este partido.",
+    "casual": "Gyokerland anota su segundo gol del partido para poner el 2–2 para Carrot justo antes del descanso.",
+    "analyst": "El segundo gol de Gyokerland en el partido, asistido por Szobalenko, empata el partido 2–2. El dominio ofensivo de Carrot en los últimos cinco minutos (90% de pases en el último tercio, 3 disparos, xG 0,42) da resultado."
+   },
+   "fr": {
+    "headline": "Gyokerland égalise pour Carrot",
+    "fact.0": "C’est maintenant Carrot 2–2 Broccoli.",
+    "fact.1": "La chance de victoire de Carrot est passée de 28 % à 56 %.",
+    "fact.2": "Assisté par Szobalenko.",
+    "fact.3": "Chance quality xG 0,18.",
+    "fact.4": "Son deuxième but du match.",
+    "fact.5": "Son 15e but de la saison.",
+    "fact.6": "Carrot avait l’avantage dans les cinq dernières minutes (élan +0,35 de leur côté).",
+    "fact.7": "Carrot joué 90 % des dernières passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.8": "Carrot a réalisé 3 tirs (xG 0,42) et 1 corner dans les cinq dernières minutes.",
+    "fact.9": "Gyokerland en direct est de 8,1.",
+    "fact.10": "Tirs jusqu’à présent : Carrot 14 (xG 1,77), Broccoli 6 (xG 0,74).",
+    "fact.11": "En hausse par rapport à 7,3 en dix minutes.",
+    "fact.12": "Szobalenko en direct est de 6,9.",
+    "fact.13": "En hausse par rapport à 6,2 en dix minutes.",
+    "fact.14": "Plus tôt dans ce match, à 15': Gyokerland marqué sur une passe de Mbeulier sur la droite (xG 0,18).",
+    "fact.15": "Cela fait 2 buts Carrot ou de grandes occasions dans ce match.",
+    "casual": "Gyokerland inscrit son deuxième but du match pour porter le score à 2–2 pour Carrot juste avant la mi-temps.",
+    "analyst": "Le deuxième but de Gyokerland du match, assisté par Szobalenko, égalise à 2–2. La domination offensive de Carrot dans les cinq dernières minutes (90 % de passes dans le dernier tiers de balles, 3 tirs, xG 0,42) porte ses fruits."
+   },
+   "de": {
+    "headline": "Gyokerland gleicht für Carrot",
+    "fact.0": "Jetzt steht es Carrot 2–2 Broccoli.",
+    "fact.1": "Die Gewinnchance von Carrot stieg von 28 % auf 56 %.",
+    "fact.2": "Unterstützt von Szobalenko.",
+    "fact.3": "Chance-Qualität xG 0,18.",
+    "fact.4": "Sein zweites Tor des Spiels.",
+    "fact.5": "Sein 15. Saisontor.",
+    "fact.6": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,35 von ihrer Seite).",
+    "fact.7": "Carrot spielte in den letzten fünf Minuten 90 % der Pässe im letzten Drittel.",
+    "fact.8": "Carrot hatte in den letzten fünf Minuten 3 Schüsse (xG 0,42) und 1 Ecke.",
+    "fact.9": "Die Live-Bewertung von Gyokerland liegt bei 8,1.",
+    "fact.10": "Bisherige Aufnahmen: 14 Carrot (xG 1,77), Broccoli 6 (xG 0,74).",
+    "fact.11": "Anstieg von 7,3 in den letzten zehn Minuten.",
+    "fact.12": "Die Live-Bewertung von Szobalenko beträgt 6,9.",
+    "fact.13": "Erhöht von 6,2 in den letzten zehn Minuten.",
+    "fact.14": "Früher in diesem Spiel, um 15': Gyokerland erzielte mit einem Schuss von Mbeulier nach rechts (xG 0,18) ein Tor.",
+    "fact.15": "Das macht 2 Carrot Tore oder große Chancen in diesem Spiel.",
+    "casual": "Gyokerland erzielte kurz vor der Halbzeit sein zweites Tor des Spiels zum 2:2 für Carrot .",
+    "analyst": "Gyokerland zweites Tor des Spiels, vorbereitet von Szobalenko, glich zum 2:2 aus. Die offensive Dominanz von Carrot in den letzten fünf Minuten (90 % Pässe im letzten Drittel, 3 Schüsse, xG 0,42) zahlt sich aus."
+   },
+   "nl": {
+    "headline": "Gyokerland gelijk voor Carrot",
+    "fact.0": "Het is nu Carrot 2–2 Broccoli.",
+    "fact.1": "De kans van Carrot om te winnen steeg van 28% naar 56%.",
+    "fact.2": "Geassisteerd door Szobalenko.",
+    "fact.3": "Kanskwaliteit xG 0,18.",
+    "fact.4": "Zijn tweede doelpunt van de wedstrijd.",
+    "fact.5": "Zijn 15e doelpunt van het seizoen.",
+    "fact.6": "Carrot had in de laatste vijf minuten de overhand (momentum +0,35 van hun kant).",
+    "fact.7": "Carrot speelde 90% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.8": "Carrot had 3 schoten (xG 0,42) en 1 corner in de laatste vijf minuten.",
+    "fact.9": "De live-rating van Gyokerland is 8,1.",
+    "fact.10": "Tot nu toe foto's: Carrot 14 (xG 1,77), Broccoli 6 (xG 0,74).",
+    "fact.11": "Gestegen van 7,3 in de laatste tien minuten.",
+    "fact.12": "De live rating van Szobalenko is 6,9.",
+    "fact.13": "Gestegen van 6,2 in de laatste tien minuten.",
+    "fact.14": "Eerder in deze wedstrijd, op 15': Gyokerland scoorde met een schot uit een pass van Mbeulier aan de rechterkant (xG 0.18).",
+    "fact.15": "Dat maakt 2 Carrot doelpunten of grote kansen in deze wedstrijd.",
+    "casual": "Gyokerland scoort zijn tweede van de wedstrijd en maakt het 2–2 voor Carrot vlak voor rust.",
+    "analyst": "Het tweede doelpunt van Gyokerland van de wedstrijd, geassisteerd door Szobalenko, brengt de stand gelijk op 2–2. Carrot's aanvallende dominantie in de laatste vijf minuten (90% passes in het laatste derde deel, 3 schoten, xG 0,42) betaalt zich uit."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 使 Carrot",
+    "fact.0": "现在比分 Carrot 2比2 Broccoli。",
+    "fact.1": "Carrot的获胜概率从28%降至56%。",
+    "fact.2": "协助者为 Szobalenko。",
+    "fact.3": "概率质量xG 0.18。",
+    "fact.4": "这是他本场比赛的第二个进球。",
+    "fact.5": "这是他本赛季的第15个进球。",
+    "fact.6": "Carrot 在最后五分钟占据上风（他们势头+0.35）。",
+    "fact.7": "Carrot 在最后五分钟完成了90%的最后三分之一传球。",
+    "fact.8": "Carrot 在最后五分钟射门3次（xG0.42）和1个角球。",
+    "fact.9": "Gyokerland的现场评分为8.1。",
+    "fact.10": "目前射击数： Carrot 14发（xG 1.77）， Broccoli 6发（xG 0.74）。",
+    "fact.11": "从过去十分钟的7.3提升。",
+    "fact.12": "Szobalenko的现场评分为6.9。",
+    "fact.13": "从最后十分钟的6.2有所上升。",
+    "fact.14": "比赛早些时候， 15'： Gyokerland 接 Mbeulier右路传球射门得分（xG 0.18）。",
+    "fact.15": "这场比赛中已有2个 Carrot 进球或重大机会。",
+    "casual": "Gyokerland 在半场结束前打进本场第二球，将比分改写为2比2 Carrot 。",
+    "analyst": "Gyokerland在 Szobalenko助攻下打进本场比赛的第二个进球，将比分扳成2比2。 Carrot在最后五分钟的进攻优势（90%的最后三分之一传球成功率，3次射门，xG0.42）得到了回报。"
+   }
+  },
+  "M-8": {
+   "source_hash": "9310bed582bb41d5",
+   "failed": {
+    "zh-Hans": [
+     "fact.7"
+    ]
+   },
+   "es": {
+    "headline": "Gyokerland se le niega una gran oportunidad",
+    "fact.0": "El disparo de Gyokerland fue salvado: xG 0,34, así que entra unas 34 veces en 100.",
+    "fact.1": "Salvado por Pickvardt.",
+    "fact.2": "El marcador es Carrot 2–2 Broccoli.",
+    "fact.3": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,51 de su equipo).",
+    "fact.4": "Carrot jugó el 65% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.5": "Antes en este partido, a 42': Gyokerland anotó con un disparo de Szobalenko por el centro (xG 0,18).",
+    "fact.6": "Antes en este partido, a las 15': Gyokerland marcó con un disparo de Mbeulier por la derecha (xG 0.18).",
+    "fact.7": "Eso hace 3 goles Carrot o grandes ocasiones en este partido, 2 de ellas por el centro.",
+    "casual": "El disparo de Gyokerland es detenido justo antes del descanso, manteniendo el marcador en 2–2. Carrot FC han estado presionando con fuerza.",
+    "analyst": "La ocasión fallida de Gyokerland(xG 0,34) justo antes del descanso mantiene el partido empatado a 2–2. Carrot FC dominan los minutos finales, controlando el 65% de los pases del último tercio y manteniendo el impulso (+0,51)."
+   },
+   "fr": {
+    "headline": "Gyokerland se voit refuser une grande chance",
+    "fact.0": "Le tir de Gyokerland a été sauvé : xG 0,34, donc il rentre environ 34 fois sur 100.",
+    "fact.1": "Sauvé par Pickvardt.",
+    "fact.2": "Le score est Carrot 2–2 Broccoli.",
+    "fact.3": "Carrot ont eu l’avantage dans les cinq dernières minutes (élan +0,51 de leur côté).",
+    "fact.4": "Carrot joué 65 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.5": "Plus tôt dans ce match, à 42': Gyokerland marqué d’une passe de Szobalenko au centre (xG 0,18).",
+    "fact.6": "Plus tôt dans ce match, à 15': Gyokerland marqué sur une passe de Mbeulier sur la droite (xG 0,18).",
+    "fact.7": "Cela fait 3 buts Carrot ou de grandes occasions dans ce match, dont 2 au centre.",
+    "casual": "Le tir de Gyokerland est arrêté juste avant la mi-temps, maintenant le score à 2–2. Carrot FC ont beaucoup pressé.",
+    "analyst": "La chance manquée de Gyokerland(xG 0,34) juste avant la mi-temps maintient l’égalité 2–2. Carrot FC dominent les dernières minutes, contrôlant 65 % des passes du dernier tiers et maintenant leur élan (+0,51)."
+   },
+   "de": {
+    "headline": "Gyokerland wird eine große Chance verwehrt",
+    "fact.0": "Gyokerland Schuss wurde gerettet: xG 0,34, also geht er etwa 34 Mal in 100.",
+    "fact.1": "Gerettet von Pickvardt.",
+    "fact.2": "Der Spielstand lautet Carrot 2:2 Broccoli.",
+    "fact.3": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,51 von ihrer Seite).",
+    "fact.4": "Carrot spielte in den letzten fünf Minuten 65 % der Pässe im letzten Drittel.",
+    "fact.5": "Früher in diesem Spiel, um 42': Gyokerland erzielte mit einem Schuss aus Szobalenko seines Pass in die Mitte ein Tor (xG 0,18).",
+    "fact.6": "Früher in diesem Spiel, um 15': Gyokerland erzielte mit einem Schuss von Mbeulier nach rechts (xG 0,18) ein Tor.",
+    "fact.7": "Das ergibt 3 Carrot Tore oder große Chancen in diesem Spiel, davon 2 in der Mitte.",
+    "casual": "Der Schuss von Gyokerland wird kurz vor der Halbzeit pariert, sodass es 2:2 bleibt. Carrot FC haben stark Druck gemacht.",
+    "analyst": "Gyokerland vergebene Chance (xG 0,34) kurz vor der Halbzeit hält das Spiel bei 2:2. Carrot FC dominieren die Schlussminuten, kontrollieren 65 % der letzten Drittel-Pässe und halten den Schwung (+0,51)."
+   },
+   "nl": {
+    "headline": "Gyokerland wordt een grote kans ontzegd",
+    "fact.0": "Gyokerland schot werd gered: xG 0,34, dus het gaat ongeveer 34 keer in 100.",
+    "fact.1": "Gered door Pickvardt.",
+    "fact.2": "De stand is Carrot 2–2 Broccoli.",
+    "fact.3": "Carrot had in de laatste vijf minuten de overhand (momentum +0,51 van hun kant).",
+    "fact.4": "Carrot speelde 65% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.5": "Eerder in deze wedstrijd, op 42': scoorde Gyokerland met een schot uit een pass van Szobalenko door het midden (xG 0,18).",
+    "fact.6": "Eerder in deze wedstrijd, op 15': Gyokerland scoorde met een schot uit een pass van Mbeulier aan de rechterkant (xG 0.18).",
+    "fact.7": "Dat maakt 3 Carrot doelpunten of grote kansen in deze wedstrijd, waarvan 2 in het midden.",
+    "casual": "Het schot van Gyokerland wordt net voor rust gered, waardoor de stand 2–2 blijft. Carrot FC hebben hard aangedrongen.",
+    "analyst": "Gyokerland's gemiste kans (xG 0,34) vlak voor rust houdt de wedstrijd gelijk op 2–2. Carrot FC domineren de slotminuten, controleren 65% van de passes in het laatste derde deel en behouden het momentum (+0,51)."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 被剥夺了很大的机会",
+    "fact.0": "Gyokerland的射门被保存了：xG值0.34，所以大约100次进34次。",
+    "fact.1": "Pickvardt救了。",
+    "fact.2": "比分 Carrot 2比2 Broccoli。",
+    "fact.3": "Carrot 在最后五分钟占据上风（他们势头+0.51）。",
+    "fact.4": "Carrot 在最后五分钟完成了65%的最后三分之一传球。",
+    "fact.5": "比赛早些时候， 42'： Gyokerland 接 Szobalenko中路传球射门得分（xG 0.18）。",
+    "fact.6": "比赛早些时候， 15'： Gyokerland 接 Mbeulier右路传球射门得分（xG 0.18）。",
+    "casual": "Gyokerland的射门在半场前被扑出，比分保持在2比2。 Carrot FC 一直积极施压。",
+    "analyst": "Gyokerland半场前错失良机（x进球0.34），使比分保持2比2平。 Carrot FC 在最后几分钟占据主导，控制了65%的最后三分之一传球，保持了势头（+0.51）。"
+   }
+  },
+  "M-9": {
+   "source_hash": "c64ef1a3ca8982c6",
+   "es": {
+    "headline": "Descanso: Carrot 2–2 Broccoli",
+    "fact.0": "Descanso: Carrot 2–2 Broccoli.",
+    "fact.1": "Disparos hasta ahora: Carrot 15 (xG 2,11), Broccoli 6 (xG 0,74).",
+    "fact.2": "Posesión: Carrot 68,8%, Broccoli 31,2%.",
+    "fact.3": "42' Gyokerland iguala para Carrot.",
+    "fact.4": "40' Phillwood Broccoli adelanta.",
+    "fact.5": "6' Shacroft abre el marcador.",
+    "casual": "El partido está empatado al descanso, 2–2. Carrot FC tenido más balón y ocasiones, pero Broccoli FC siguen el ritmo.",
+    "analyst": "Al descanso, Carrot FC y Broccoli FC empatan a 2–2. Carrot dominan con un 68,8% de posesión y 15 disparos (xG 2,11), pero la eficiencia de Broccoli en 6 tiros (xG 0,74) les mantiene en el partido."
+   },
+   "fr": {
+    "headline": "Mi-temps : Carrot 2–2 Broccoli",
+    "fact.0": "Mi-temps : Carrot 2–2 Broccoli.",
+    "fact.1": "Tirs jusqu’à présent : Carrot 15 (xG 2,11), Broccoli 6 (xG 0,74).",
+    "fact.2": "Possession : Carrot 68,8 %, Broccoli 31,2 %.",
+    "fact.3": "42' Gyokerland égalise pour Carrot.",
+    "fact.4": "40' Phillwood met Broccoli en avant.",
+    "fact.5": "6' Shacroft ouvre le score.",
+    "casual": "Le score est à égalité à la mi-temps, 2–2. Carrot FC eu plus de ballons et d’occasions, mais Broccoli FC suivent le rythme.",
+    "analyst": "À la mi-temps, Carrot FC et Broccoli FC égalisent à 2–2. Carrot dominent avec 68,8 % de possession et 15 tirs (xG 2,11), mais l’efficacité de Broccoli sur 6 tirs (xG 0,74) les maintient dans le match."
+   },
+   "de": {
+    "headline": "Halbzeit: Carrot 2:2 Broccoli",
+    "fact.0": "Halbzeit: Carrot 2:2 Broccoli.",
+    "fact.1": "Bisherige Aufnahmen: Carrot 15 (xG 2,11), Broccoli 6 (xG 0,74).",
+    "fact.2": "Ballbesitz: Carrot 68,8 % Broccoli 31,2 %.",
+    "fact.3": "42' Gyokerland gleicht für Carrot aus.",
+    "fact.4": "40' Phillwood setzt Broccoli voran.",
+    "fact.5": "6' Shacroft eröffnet die Punkteausgleich.",
+    "casual": "Zur Halbzeit stand es 2:2. Carrot FC hatten mehr Ballbesitz und Chancen, aber Broccoli FC halten mit.",
+    "analyst": "In der Halbzeit gleichen Carrot FC und Broccoli FC bei 2:2 aus. Carrot dominieren mit 68,8 % Ballbesitz und 15 Schüssen (xG 2,11), doch Broccoli Effizienz aus 6 Schüssen (xG 0,74) hält sie im Spiel."
+   },
+   "nl": {
+    "headline": "Rust: Carrot 2–2 Broccoli",
+    "fact.0": "Rust: Carrot 2–2 Broccoli.",
+    "fact.1": "Opnames tot nu toe: 15 Carrot (xG 2,11), Broccoli 6 (xG 0,74).",
+    "fact.2": "Posbezit: Carrot 68,8%, Broccoli 31,2%.",
+    "fact.3": "42' Gyokerland gelijkmaakt voor Carrot.",
+    "fact.4": "40' Phillwood zet Broccoli voorop.",
+    "fact.5": "6' Shacroft opent de score.",
+    "casual": "Het stond gelijk bij rust, 2–2. Carrot FC hadden meer balbezit en kansen, maar Broccoli FC houden het tempo bij.",
+    "analyst": "In de rust staan Carrot FC en Broccoli FC gelijk op 2–2. Carrot domineren met 68,8% balbezit en 15 schoten (xG 2,11), maar de efficiëntie van Broccoli uit 6 schoten (xG 0,74) houdt hen in de wedstrijd."
+   },
+   "zh-Hans": {
+    "headline": "半场比分： Carrot 2–2 Broccoli",
+    "fact.0": "半场比分： Carrot 2–2 Broccoli。",
+    "fact.1": "目前射击数： Carrot 15发（xG 2.11）， Broccoli 6发（xG 0.74）。",
+    "fact.2": "控球率： Carrot 68.8%， Broccoli 31.2%。",
+    "fact.3": "42' Gyokerland 可以等于 Carrot。",
+    "fact.4": "40' Phillwood 让 Broccoli 领先。",
+    "fact.5": "6' Shacroft 开局得分。",
+    "casual": "半场结束时比分是2比2。 Carrot FC 控球和机会更多，但 Broccoli FC 正在跟上节奏。",
+    "analyst": "半场结束时， Carrot FC 和 Broccoli FC 战成2比2平。 Carrot 以68.8%的控球率和15次射门（x进球2.11）占据主导地位，但 Broccoli6次射门的效率（xG0.74）让他们保持竞争力。"
+   }
+  },
+  "M-10": {
+   "source_hash": "3f41f8061a7f5a65",
+   "es": {
+    "headline": "Bowerman Broccoli adelanta",
+    "fact.0": "Ahora es Carrot 2–3 Broccoli.",
+    "fact.1": "La probabilidad de ganar de Broccoli pasó del 18% al 50%.",
+    "fact.2": "Un final poco probable: xG 0,03, así que unos 3 de cada 100 disparos como va a la pantalla.",
+    "fact.3": "Su quinto gol de la temporada.",
+    "fact.4": "Broccoli jugó el 31% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.5": "La audiencia en directo de Bowerman es de 7,9.",
+    "fact.6": "Disparos hasta ahora: Carrot 17 (xG 2,40), Broccoli 10 (xG 0,98).",
+    "fact.7": "Subió desde 6,8 en los últimos diez minutos.",
+    "casual": "Bowerman anotó su quinto gol de la temporada para poner a Broccoli por delante 3–2.",
+    "analyst": "El golpe improbable de Jordy Bowerman(xG 0,03) Broccoli lleva por delante 3–2, aumentando su probabilidad de victoria del 18% al 50%. Su rating en vivo sube a 7,9, reflejando su impacto decisivo."
+   },
+   "fr": {
+    "headline": "Bowerman Broccoli donne de l’avance",
+    "fact.0": "C’est maintenant Carrot 2–3 Broccoli.",
+    "fact.1": "La chance de victoire de Broccoli est passée de 18 % à 50 %.",
+    "fact.2": "Une fin improbable : xG 0,03, donc environ 3 tirs sur 100 comme celui-ci.",
+    "fact.3": "Son 5e but de la saison.",
+    "fact.4": "Broccoli joué 31 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.5": "Bowerman en direct est de 7,9.",
+    "fact.6": "Tirs jusqu’à présent : Carrot 17 (xG 2,40), Broccoli 10 (xG 0,98).",
+    "fact.7": "En hausse par rapport à 6,8 en dix minutes.",
+    "casual": "Bowerman inscrit son 5e but de la saison pour donner l’avantage à Broccoli 3–2.",
+    "analyst": "Le strike improbable de Jordy Bowerman(xG 0,03) Broccoli mène 3–2, augmentant leur probabilité de victoire de 18 % à 50 %. Son score en direct grimpe à 7,9, reflétant son impact décisif."
+   },
+   "de": {
+    "headline": "Bowerman setzt Broccoli voran",
+    "fact.0": "Jetzt steht es Carrot 2–3 Broccoli.",
+    "fact.1": "Die Gewinnchance von Broccoli stieg von 18 % auf 50 %.",
+    "fact.2": "Ein unwahrscheinliches Finish: xG 0,03, also etwa 3 von 100 Schüssen, wie er reingeht.",
+    "fact.3": "Sein fünftes Saisontor.",
+    "fact.4": "Broccoli spielte in den letzten fünf Minuten 31 % der Pässe im letzten Drittel.",
+    "fact.5": "Die Live-Bewertung von Bowerman liegt bei 7,9.",
+    "fact.6": "Bisherige Aufnahmen: 17 Carrot (xG 2,40), Broccoli 10 (xG 0,98).",
+    "fact.7": "Erhöht von 6,8 in den letzten zehn Minuten.",
+    "casual": "Bowerman erzielte sein fünftes Saisontor und brachte Broccoli mit 3:2 in Führung.",
+    "analyst": "Jordy Bowerman's unwahrscheinlicher Schlag (xG 0,03) führt Broccoli mit 3:2 und erhöht ihre Gewinnwahrscheinlichkeit von 18 % auf 50 %. Sein Live-Rating springt auf 7,9 und spiegelt damit seinen entscheidenden Einfluss wider."
+   },
+   "nl": {
+    "headline": "Bowerman zet Broccoli voorop",
+    "fact.0": "Het staat nu Carrot 2–3 Broccoli.",
+    "fact.1": "De kans van Broccoli om te winnen steeg van 18% naar 50%.",
+    "fact.2": "Een onwaarschijnlijke finish: xG 0,03, dus ongeveer 3 op 100 shots zoals hij erin gaat.",
+    "fact.3": "Zijn vijfde doelpunt van het seizoen.",
+    "fact.4": "Broccoli speelde 31% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.5": "De live kijkcijfers van Bowerman zijn 7,9.",
+    "fact.6": "Tot nu toe schoten Carrot 17 (xG 2,40), Broccoli 10 (xG 0,98).",
+    "fact.7": "Gestegen van 6,8 in de laatste tien minuten.",
+    "casual": "Bowerman scoort zijn vijfde van het seizoen en brengt Broccoli op 3–2.",
+    "analyst": "Jordy Bowerman's onwaarschijnlijke strike (xG 0,03) neemt Broccoli een 3–2 voorsprong, waardoor hun winkans van 18% naar 50% stijgt. Zijn live rating stijgt naar 7,9, wat zijn beslissende impact weerspiegelt."
+   },
+   "zh-Hans": {
+    "headline": "Bowerman 让 Broccoli 领先",
+    "fact.0": "现在 Carrot 2–3 Broccoli。",
+    "fact.1": "Broccoli的中奖概率从18%提升到了50%。",
+    "fact.2": "一个不太可能的结局：xG0.03，大约每100发子弹中有3分之3。",
+    "fact.3": "这是他本赛季的第5个进球。",
+    "fact.4": "Broccoli 在最后五分钟完成了31%的最后三分之一传球。",
+    "fact.5": "Bowerman的现场评分为7.9。",
+    "fact.6": "目前射门数： Carrot 17次（xG 2.40）， Broccoli 10次（xG 0.98）。",
+    "fact.7": "从最后十分钟的6.8有所上升。",
+    "casual": "Bowerman 打进本赛季的第5球，帮助 Broccoli 以3比2领先。",
+    "analyst": "Jordy Bowerman的不可思议一击（xG 0.03） Broccoli 以3比2领先，胜率从18%提升至50%。他的实时评分升至7.9，体现了他决定性的影响力。"
+   }
+  },
+  "M-11": {
+   "source_hash": "739818307e88b1e8",
+   "es": {
+    "headline": "Maguvolt creciendo en el juego",
+    "fact.0": "La valoración en directo de Maguvolt es de 6,7.",
+    "fact.1": "Subió desde 5,9 en los últimos diez minutos.",
+    "fact.2": "5' intercepción (+0,45).",
+    "fact.3": "59' intercepción (+0,45).",
+    "fact.4": "18' fue regateado más allá de (-0,27)."
+   },
+   "fr": {
+    "headline": "Maguvolt évoluant dans le jeu",
+    "fact.0": "Maguvolt en direct est de 6,7.",
+    "fact.1": "En hausse par rapport à 5,9 en dix minutes.",
+    "fact.2": "5' interception (+0,45).",
+    "fact.3": "59' interception (+0,45).",
+    "fact.4": "18' a été dribblé au-delà (-0,27)."
+   },
+   "de": {
+    "headline": "Maguvolt in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Maguvolt liegt bei 6,7.",
+    "fact.1": "Anstieg von 5,9 in den letzten zehn Minuten.",
+    "fact.2": "5' Interception (+0,45).",
+    "fact.3": "59' Interception (+0,45).",
+    "fact.4": "18' wurde (-0,27) überholt."
+   },
+   "nl": {
+    "headline": "Maguvolt groeien in het spel",
+    "fact.0": "De live rating van Maguvolt is 6,7.",
+    "fact.1": "Gestegen van 5,9 in de laatste tien minuten.",
+    "fact.2": "5' interceptie (+0,45).",
+    "fact.3": "59' interceptie (+0,45).",
+    "fact.4": "18' werd voorbij gedribbeld (-0,27)."
+   },
+   "zh-Hans": {
+    "headline": "Maguvolt 逐渐融入游戏",
+    "fact.0": "Maguvolt的现场评分为6.7。",
+    "fact.1": "从过去十分钟的5.9上升。",
+    "fact.2": "5' 拦截（+0.45）。",
+    "fact.3": "59' 拦截（+0.45）。",
+    "fact.4": "18' 被运球越过网球（-0.27）。"
+   }
+  },
+  "M-12": {
+   "source_hash": "268426a013cf926a",
+   "es": {
+    "headline": "Bowerman alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Bowerman es de 8,0.",
+    "casual": "Jordy Bowerman brilla por Broccoli FC, alcanzando una impresionante valoración de 8.0.",
+    "analyst": "Jordy Bowerman alcanza una puntuación de 8.0 en Broccoli FC, reflejando su fuerte influencia en este combate."
+   },
+   "fr": {
+    "headline": "Bowerman atteint une note de 8,0",
+    "fact.0": "La note en direct de Bowerman est de 8,0.",
+    "casual": "Jordy Bowerman brille pour Broccoli FC, atteignant une impressionnante note de 8,0.",
+    "analyst": "Jordy Bowerman atteint une note de 8,0 pour Broccoli FC, reflétant sa forte influence dans ce match."
+   },
+   "de": {
+    "headline": "Bowerman erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Bowerman liegt bei 8,0.",
+    "casual": "Jordy Bowerman glänzt für Broccoli FC und erreicht eine beeindruckende Bewertung von 8,0.",
+    "analyst": "Jordy Bowerman erreicht eine Bewertung von 8,0 für Broccoli FC, was seinen starken Einfluss in diesem Match widerspiegelt."
+   },
+   "nl": {
+    "headline": "Bowerman haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Bowerman is 8,0.",
+    "casual": "Jordy Bowerman straalt voor Broccoli FC en haalt een indrukwekkende 8,0 rating.",
+    "analyst": "Jordy Bowerman bereikt een rating van 8,0 voor Broccoli FC, wat zijn sterke invloed in deze wedstrijd weerspiegelt."
+   },
+   "zh-Hans": {
+    "headline": "Bowerman 评分为8.0",
+    "fact.0": "Bowerman的现场评分为8.0。",
+    "casual": "Jordy BowermanBroccoli FC表现出色，获得了令人印象深刻的8.0评分。",
+    "analyst": "Jordy BowermanBroccoli FC评分为8.0，反映出他在比赛中的强大影响力。"
+   }
+  },
+  "M-13": {
+   "source_hash": "56cc986c909c3a39",
+   "es": {
+    "headline": "Gvardosz creciendo en el juego",
+    "fact.0": "La audiencia en directo de Gvardosz es de 6,9.",
+    "fact.1": "Subió desde 6,2 en los últimos diez minutos.",
+    "fact.2": "4' intercepción (+0,46).",
+    "fact.3": "71' intercepción (+0,46).",
+    "fact.4": "71' de luz (+0,23)."
+   },
+   "fr": {
+    "headline": "Gvardosz évoluant dans le jeu",
+    "fact.0": "Gvardosz en direct est de 6,9.",
+    "fact.1": "En hausse par rapport à 6,2 en dix minutes.",
+    "fact.2": "4' interception (+0,46).",
+    "fact.3": "71' interception (+0,46).",
+    "fact.4": "71' au sol (+0,23)."
+   },
+   "de": {
+    "headline": "Gvardosz in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Gvardosz beträgt 6,9.",
+    "fact.1": "Erhöht von 6,2 in den letzten zehn Minuten.",
+    "fact.2": "4' Interception (+0,46).",
+    "fact.3": "71' Interception (+0,46).",
+    "fact.4": "71' Freistand (+0,23)."
+   },
+   "nl": {
+    "headline": "Gvardosz groeien in het spel",
+    "fact.0": "De live rating van Gvardosz is 6,9.",
+    "fact.1": "Gestegen van 6,2 in de laatste tien minuten.",
+    "fact.2": "4' onderschepping (+0,46).",
+    "fact.3": "71' onderschepping (+0,46).",
+    "fact.4": "71' ruimte (+0,23)."
+   },
+   "zh-Hans": {
+    "headline": "Gvardosz 逐渐融入游戏",
+    "fact.0": "Gvardosz的现场评分为6.9。",
+    "fact.1": "从最后十分钟的6.2有所上升。",
+    "fact.2": "4' 拦截（+0.46）。",
+    "fact.3": "71' 拦截（+0.46）。",
+    "fact.4": "净空71'（+0.23）。"
+   }
+  },
+  "M-14": {
+   "source_hash": "64f3dc1b7ecc028a",
+   "es": {
+    "headline": "Calvertson pone el marcador 4–2 a Broccoli",
+    "fact.0": "Ahora es Carrot 2–4 Broccoli.",
+    "fact.1": "Las probabilidades de ganar de Broccoli pasaron del 62% al 90%.",
+    "fact.2": "Asistido por Zahara.",
+    "fact.3": "Calidad Chance xG 0,17.",
+    "fact.4": "Su duodécimo gol de la temporada.",
+    "fact.5": "Broccoli tuvo 3 tiros (xG 0,28) y 1 córner en los últimos cinco minutos.",
+    "fact.6": "La valoración en directo de Calvertson es de 7,5.",
+    "fact.7": "Disparos hasta ahora: Carrot 20 (xG 2,84), Broccoli 13 (xG 1,26).",
+    "fact.8": "Subió desde 6,2 en los últimos diez minutos.",
+    "casual": "Calvertson anota su duodécimo de la temporada, poniendo el marcador 4–2 a Broccoli. Zahara le prepara la jugada.",
+    "analyst": "El duodécimo gol de la temporada de Calvertson aumenta la probabilidad de victoria de Broccoli del 62% al 90%. Asistido por Zahara, corona un sólido tramo de cinco minutos con 3 disparos y 1 córner."
+   },
+   "fr": {
+    "headline": "Calvertson porte le score à 4–2 à Broccoli",
+    "fact.0": "Il est maintenant Carrot 2 à 4 Broccoli.",
+    "fact.1": "La chance de victoire de Broccoli est passée de 62 % à 90 %.",
+    "fact.2": "Assisté par Zahara.",
+    "fact.3": "Chance quality xG 0,17.",
+    "fact.4": "Son 12e but de la saison.",
+    "fact.5": "Broccoli a réalisé 3 tirs (xG 0,28) et 1 corner dans les cinq dernières minutes.",
+    "fact.6": "Calvertson en direct est de 7,5.",
+    "fact.7": "Tirs jusqu’à présent : Carrot 20 (xG 2,84), Broccoli 13 (xG 1,26).",
+    "fact.8": "En hausse par rapport à 6,2 en dix minutes.",
+    "casual": "Calvertson marque son 12e but de la saison, portant le score à 4–2 à Broccoli. Zahara lui donne une position.",
+    "analyst": "Le 12e but de la saison de Calvertson fait passer la probabilité de victoire de Broccoli de 62 % à 90 %. Assisté par Zahara, il conclut une solide période de cinq minutes avec 3 tirs et 1 corner."
+   },
+   "de": {
+    "headline": "Calvertson steht 4:2 zu Broccoli",
+    "fact.0": "Jetzt steht es Carrot 2–4 Broccoli.",
+    "fact.1": "Die Gewinnchance von Broccoli stieg von 62 % auf 90 %.",
+    "fact.2": "Unterstützt von Zahara.",
+    "fact.3": "Chance-Qualität xG 0,17.",
+    "fact.4": "Sein zwölftes Saisontor.",
+    "fact.5": "Broccoli hatte in den letzten fünf Minuten 3 Schüsse (xG 0,28) und 1 Ecke.",
+    "fact.6": "Calvertson Live-Bewertung beträgt 7,5.",
+    "fact.7": "Bisherige Aufnahmen: Carrot 20 (xG 2,84), Broccoli 13 (xG 1,26).",
+    "fact.8": "Erhöht von 6,2 in den letzten zehn Minuten.",
+    "casual": "Calvertson erzielt sein zwölftes Saisontor, womit es 4–2 zu Broccoli steht. Zahara bereitet ihn auf.",
+    "analyst": "Das zwölfte Saisontor von Calvertson erhöht die Gewinnwahrscheinlichkeit von Broccoli von 62 % auf 90 %. Unterstützt von Zahara krönt es eine starke fünfminütige Phase mit 3 Schüssen und 1 Ecke."
+   },
+   "nl": {
+    "headline": "Calvertson maakt het 4–2 voor Broccoli",
+    "fact.0": "Het is nu Carrot 2–4 Broccoli.",
+    "fact.1": "De kans van Broccoli om te winnen steeg van 62% naar 90%.",
+    "fact.2": "Geassisteerd door Zahara.",
+    "fact.3": "Kanskwaliteit xG 0,17.",
+    "fact.4": "Zijn twaalfde doelpunt van het seizoen.",
+    "fact.5": "Broccoli had 3 schoten (xG 0,28) en 1 corner in de laatste vijf minuten.",
+    "fact.6": "De live rating van Calvertson is 7,5.",
+    "fact.7": "Tot nu toe aantal schoten: Carrot 20 (xG 2,84), Broccoli 13 (xG 1,26).",
+    "fact.8": "Gestegen van 6,2 in de laatste tien minuten.",
+    "casual": "Calvertson scoort zijn twaalfde van het seizoen, waarmee het 4–2 tegen Broccoli staat. Zahara zet hem in de verdediging.",
+    "analyst": "Calvertson's twaalfde doelpunt van het seizoen verhoogt Broccoli's winkans van 62% naar 90%. Met hulp van Zahara sluit het een sterke periode van vijf minuten af met 3 schoten en 1 corner."
+   },
+   "zh-Hans": {
+    "headline": "Calvertson 比分变为4比2 Broccoli",
+    "fact.0": "现在 Carrot 2–4 Broccoli。",
+    "fact.1": "Broccoli的获胜概率从62%提升到了90%。",
+    "fact.2": "协助者为 Zahara。",
+    "fact.3": "机会质量xG 0.17。",
+    "fact.4": "这是他本赛季的第12个进球。",
+    "fact.5": "Broccoli 在最后五分钟门3次（xG0.28）和1个角球。",
+    "fact.6": "Calvertson的现场评分为7.5。",
+    "fact.7": "目前射击数： Carrot 20发（xG 2.84）， Broccoli 13发（xG 1.26）。",
+    "fact.8": "从最后十分钟的6.2有所上升。",
+    "casual": "Calvertson 打进本赛季第12球，比分变为4比2 Broccoli。 Zahara 助攻。",
+    "analyst": "Calvertson本赛季第12个进球将 Broccoli的胜率从62%提升至90%。在 Zahara助攻下，这球以3次射门和1次角球结束了五分钟的强势表现。"
+   }
+  },
+  "M-15": {
+   "source_hash": "79a789ee9a3f2e6c",
+   "es": {
+    "headline": "Hechizo de extremo a extremo",
+    "fact.0": "La posesión cambia de manos 3,8 veces por minuto."
+   },
+   "fr": {
+    "headline": "Sort de bout en bout",
+    "fact.0": "La possession change de mains 3,8 fois par minute."
+   },
+   "de": {
+    "headline": "End-to-End-Zauber",
+    "fact.0": "Der Ballbesitz ist 3,8 Mal pro Minute den Besitzer."
+   },
+   "nl": {
+    "headline": "End-to-end spreuk",
+    "fact.0": "Balbezit wisselt 3,8 keer per minuut."
+   },
+   "zh-Hans": {
+    "headline": "端到端咒语",
+    "fact.0": "控球权每分钟易手3.8次。"
+   }
+  },
+  "M-16": {
+   "source_hash": "c763d1d9727a977e",
+   "es": {
+    "headline": "Zahara pierde una gran oportunidad",
+    "fact.0": "El disparo de Zahara salió desviado: xG 0,37, así que entra unas 37 veces en 100.",
+    "fact.1": "El marcador es Carrot 2–4 Broccoli.",
+    "fact.2": "Broccoli jugó el 88% de los pases del último tercio en los últimos cinco minutos.",
+    "casual": "Zahara falla una gran oportunidad para ampliar la ventaja de Broccoli en los minutos finales.",
+    "analyst": "Ezio Zahara falla una ocasión de alta calidad con un xG de 0,37, que podría haber adelantado aún más a Broccoli . Broccoli dominan la jugada del último tercio, controlando el 88% de los pases en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Zahara rate une grande occasion",
+    "fact.0": "Le tir de Zahara était hors cible : xG 0,37, donc il rentre environ 37 fois sur 100.",
+    "fact.1": "Le score est Carrot 2–4 Broccoli.",
+    "fact.2": "Broccoli joué 88 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "casual": "Zahara rate une belle occasion d’augmenter l’avance de Broccoli en fin de match.",
+    "analyst": "Ezio Zahara rate une occasion de grande qualité avec un xG de 0,37, ce qui aurait pu Broccoli reprendre l’avantage. Broccoli dominent le dernier tiers, contrôlant 88 % des passes dans les cinq dernières minutes."
+   },
+   "de": {
+    "headline": "Zahara verpasst eine große Chance",
+    "fact.0": "Der Schuss Zahara verfehlte das Ziel: xG 0,37, also geht er etwa 37 Mal in 100 Fälle.",
+    "fact.1": "Der Spielstand lautet Carrot 2–4 Broccoli.",
+    "fact.2": "Broccoli spielte in den letzten fünf Minuten 88 % der Pässe im letzten Drittel.",
+    "casual": "Zahara verpasst eine große Chance, Broccoli Führung spät auszubauen.",
+    "analyst": "Ezio Zahara vergibt eine hochwertige Chance mit einem xG von 0,37, was Broccoli weiter hätte bringen können. Broccoli dominieren den Spielzug im letzten Drittel und kontrollieren 88 % der Pässe in den letzten fünf Minuten."
+   },
+   "nl": {
+    "headline": "Zahara mist een grote kans",
+    "fact.0": "Zahara's schot ging naast het doel: xG 0,37, dus het gaat ongeveer 37 keer in 100.",
+    "fact.1": "De stand is Carrot 2–4 Broccoli.",
+    "fact.2": "Broccoli speelde 88% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "casual": "Zahara mist een geweldige kans om de voorsprong van Broccoli laat in de wedstrijd uit te breiden.",
+    "analyst": "Ezio Zahara mist een hoogstaande kans met een xG van 0,37, wat Broccoli verder had kunnen brengen. Broccoli domineren de laatste derde play en controleren 88% van de passes in de laatste vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Zahara 错失了一个大好机会",
+    "fact.0": "Zahara的射门偏离目标：xG值0.37，所以大约100次进37次。",
+    "fact.1": "比分 Carrot 2比4 Broccoli。",
+    "fact.2": "Broccoli 在最后五分钟完成了88%的最后三分之一传球。",
+    "casual": "Zahara 错失了扩大 Broccoli领先的绝佳机会。",
+    "analyst": "Ezio Zahara 错失了一个高质量的机会，xG为0.37，本可以让 Broccoli 取得更大优势。 Broccoli 在最后三分之一回合占据主导，过去五分钟控球率达88%。"
+   }
+  },
+  "M-17": {
+   "source_hash": "b35194df0feeebdd",
+   "es": {
+    "headline": "Broccoli encima",
+    "fact.0": "Broccoli tienen un impulso de 0,71 desde su lado, tan unilateral como se puede ser.",
+    "fact.1": "Broccoli tuvo la ventaja en los últimos cinco minutos (impulso +0,71 de su equipo).",
+    "fact.2": "Broccoli jugó el 100% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Carrot 2–4 Broccoli."
+   },
+   "fr": {
+    "headline": "Broccoli au sommet",
+    "fact.0": "Broccoli ont une impulsion de 0,71 de leur côté, à peu près aussi unilatérale que possible.",
+    "fact.1": "Broccoli a eu l’avantage dans les cinq dernières minutes (élan +0,71 de leur côté).",
+    "fact.2": "Broccoli joué 100 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Carrot 2–4 Broccoli."
+   },
+   "de": {
+    "headline": "Broccoli oben",
+    "fact.0": "Broccoli haben von ihrer Seite ein Schwung von 0,71, so einseitig, wie es nur geht.",
+    "fact.1": "Broccoli hatte in den letzten fünf Minuten die Oberhand (Momentum +0,71 von ihrer Seite).",
+    "fact.2": "Broccoli spielte in den letzten fünf Minuten 100 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Carrot 2–4 Broccoli."
+   },
+   "nl": {
+    "headline": "Broccoli bovenop",
+    "fact.0": "Broccoli hebben momentum 0,71 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Broccoli had de overhand in de laatste vijf minuten (momentum +0,71 van hun kant).",
+    "fact.2": "Broccoli speelde 100% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Carrot 2–4 Broccoli."
+   },
+   "zh-Hans": {
+    "headline": "Broccoli 在上面",
+    "fact.0": "Broccoli 队的势头是0.71，几乎是一边倒。",
+    "fact.1": "Broccoli 在最后五分钟占据上风（他们方面势头+0.71）。",
+    "fact.2": "Broccoli 在最后五分钟完成了100%的最后三分之一传球。",
+    "fact.3": "比分 Carrot 2比4 Broccoli。"
+   }
+  },
+  "M-18": {
+   "source_hash": "d7fb9743f90826aa",
+   "es": {
+    "headline": "Gyokerland le quita uno para Carrot",
+    "fact.0": "Ahora es Carrot 3–4 Broccoli.",
+    "fact.1": "La probabilidad de ganar de Carrot pasó del 0% al 2%.",
+    "fact.2": "Asistido por Szobalenko.",
+    "fact.3": "Calidad Chance xG 0,16.",
+    "fact.4": "Su tercer gol del partido.",
+    "fact.5": "Su decimosexto gol de la temporada.",
+    "fact.6": "Contra el curso del juego: Broccoli había dominado.",
+    "fact.7": "Carrot estuvieron bajo presión en los últimos cinco minutos (impulso de -0,76 por parte de su equipo).",
+    "fact.8": "Carrot jugó el 24% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.9": "La audiencia en directo de Gyokerland es de 8,9.",
+    "fact.10": "Disparos hasta ahora: Carrot 22 (xG 3,14), Broccoli 15 (xG 1,69).",
+    "fact.11": "Antes en este partido, a 42': Gyokerland anotó con un disparo de Szobalenko por el centro (xG 0,18).",
+    "fact.12": "Antes en este partido, a las 15': Gyokerland marcó con un disparo de Mbeulier por la derecha (xG 0.18).",
+    "fact.13": "Eso hace 4 goles Carrot o grandes ocasiones en este partido, 3 de ellas por el centro.",
+    "casual": "Gyokerland anota su tercer gol del partido, poniendo el 3–4. Carrot siguen por detrás pero luchan con fuerza.",
+    "analyst": "Gyokerland completa su hat-trick con una baja oportunidad de xG, asistido por Szobalenko. A pesar del dominio de Broccoli, el máximo goleador de Carrot los mantiene en la lucha, aunque su probabilidad de victoria sigue siendo baja, del 2%."
+   },
+   "fr": {
+    "headline": "Gyokerland en retire un pour Carrot",
+    "fact.0": "Il est maintenant Carrot 3–4 Broccoli.",
+    "fact.1": "La chance de Carrot de gagner est passée de 0 % à 2 %.",
+    "fact.2": "Assisté par Szobalenko.",
+    "fact.3": "Chance quality xG 0,16.",
+    "fact.4": "Son 3e but du match.",
+    "fact.5": "Son 16e but de la saison.",
+    "fact.6": "Contre le cours du jeu : Broccoli avait dominé.",
+    "fact.7": "Carrot étaient sous pression dans les cinq dernières minutes (élan de -0,76 de leur côté).",
+    "fact.8": "Carrot joué 24 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.9": "Gyokerland en direct est de 8,9.",
+    "fact.10": "Tirs jusqu’à présent : Carrot 22 (xG 3,14), Broccoli 15 (xG 1,69).",
+    "fact.11": "Plus tôt dans ce match, à 42': Gyokerland marqué d’une passe de Szobalenko au centre (xG 0,18).",
+    "fact.12": "Plus tôt dans ce match, à 15': Gyokerland marqué sur une passe de Mbeulier sur la droite (xG 0,18).",
+    "fact.13": "Cela fait 4 buts Carrot ou de grandes occasions dans ce match, dont 3 au centre.",
+    "casual": "Gyokerland inscrit son troisième but du match, portant le score à 3–4. Carrot sont toujours menés mais se battent avec acharnement.",
+    "analyst": "Gyokerland complète son triplé avec une faible chance xG, assisté par Szobalenko. Malgré la domination de Broccoli, le meilleur buteur de Carrot les maintient en lice, même si leur probabilité de victoire reste faible à 2 %."
+   },
+   "de": {
+    "headline": "Gyokerland zieht einen zurück für Carrot",
+    "fact.0": "Jetzt steht es Carrot 3–4 Broccoli.",
+    "fact.1": "Die Gewinnchance von Carrot stieg von 0 % auf 2 %.",
+    "fact.2": "Unterstützt von Szobalenko.",
+    "fact.3": "Chance-Qualität xG 0,16.",
+    "fact.4": "Sein drittes Tor des Spiels.",
+    "fact.5": "Sein 16. Saisontor.",
+    "fact.6": "Entgegen dem Spielverlauf: Broccoli war oberste gewesen.",
+    "fact.7": "Carrot standen in den letzten fünf Minuten unter Druck (Momentum -0,76 von ihrer Seite).",
+    "fact.8": "Carrot spielte in den letzten fünf Minuten 24 % der Pässe im letzten Drittel.",
+    "fact.9": "Die Live-Bewertung von Gyokerland liegt bei 8,9.",
+    "fact.10": "Bisherige Aufnahmen: Carrot 22 (xG 3,14), Broccoli 15 (xG 1,69).",
+    "fact.11": "Früher in diesem Spiel, um 42': Gyokerland erzielte mit einem Schuss aus Szobalenko seines Pass in die Mitte ein Tor (xG 0,18).",
+    "fact.12": "Früher in diesem Spiel, um 15': Gyokerland erzielte mit einem Schuss von Mbeulier nach rechts (xG 0,18) ein Tor.",
+    "fact.13": "Das macht 4 Carrot Tore oder große Chancen in diesem Spiel, davon 3 in der Mitte.",
+    "casual": "Gyokerland erzielt sein drittes Tor des Spiels und erhöht auf 3:4. Carrot liegen immer noch zurück, kämpfen aber hart.",
+    "analyst": "Gyokerland komplettiert seinen Hattrick mit einer niedrigen xG-Chance, unterstützt von Szobalenko. Trotz Broccoli Dominanz hält Carrot's Topscorer sie im Rennen, obwohl ihre Gewinnwahrscheinlichkeit mit 2 % niedrig bleibt."
+   },
+   "nl": {
+    "headline": "Gyokerland trekt er een naar Carrot",
+    "fact.0": "Het staat nu Carrot 3–4 Broccoli.",
+    "fact.1": "De kans van Carrot om te winnen ging van 0% naar 2%.",
+    "fact.2": "Geassisteerd door Szobalenko.",
+    "fact.3": "Kanskwaliteit xG 0,16.",
+    "fact.4": "Zijn derde doelpunt van de wedstrijd.",
+    "fact.5": "Zijn 16e doelpunt van het seizoen.",
+    "fact.6": "Tegen de spelverloop in: Broccoli stond bovenaan.",
+    "fact.7": "Carrot stonden in de laatste vijf minuten onder druk (momentum -0,76 van hun kant).",
+    "fact.8": "Carrot speelde 24% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.9": "De live rating van Gyokerland is 8,9.",
+    "fact.10": "Tot nu toe schoten Carrot 22 (xG 3,14), Broccoli 15 (xG 1,69).",
+    "fact.11": "Eerder in deze wedstrijd, op 42': scoorde Gyokerland met een schot uit een pass van Szobalenko door het midden (xG 0,18).",
+    "fact.12": "Eerder in deze wedstrijd, op 15': Gyokerland scoorde met een schot uit een pass van Mbeulier aan de rechterkant (xG 0.18).",
+    "fact.13": "Dat maakt 4 Carrot doelpunten of grote kansen in deze wedstrijd, waarvan 3 in het midden.",
+    "casual": "Gyokerland scoort zijn derde van de wedstrijd, waardoor het 3–4 wordt. Carrot staan nog steeds achter, maar vechten hard.",
+    "analyst": "Gyokerland maakt zijn hattrick compleet met een lage xG-kans, geassisteerd door Szobalenko. Ondanks de dominantie van Broccoli houdt Carrot's topscorer hen in de strijd, hoewel hun winstkans laag blijft op 2%."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 为他拉开了一 Carrot",
+    "fact.0": "现在是 Carrot 3–4 Broccoli。",
+    "fact.1": "Carrot的中奖概率从0%降到了2%。",
+    "fact.2": "协助者为 Szobalenko。",
+    "fact.3": "机会质量 xG 0.16。",
+    "fact.4": "这是他本场比赛的第三个进球。",
+    "fact.5": "这是他本赛季的第16个进球。",
+    "fact.6": "逆势而上： Broccoli 一直占据上风。",
+    "fact.7": "Carrot 在最后五分钟承受了压力（球队势头为-0.76）。",
+    "fact.8": "Carrot 在最后五分钟完成了24%的最后三分之一传球。",
+    "fact.9": "Gyokerland的现场评分为8.9。",
+    "fact.10": "目前射击数： Carrot 22发（xG 3.14）， Broccoli 15发（xG 1.69）。",
+    "fact.11": "比赛早些时候， 42'： Gyokerland 接 Szobalenko中路传球射门得分（xG 0.18）。",
+    "fact.12": "比赛早些时候， 15'： Gyokerland 接 Mbeulier右路传球射门得分（xG 0.18）。",
+    "fact.13": "这场比赛共有4个 Carrot 进球或重大机会，其中3个在中路。",
+    "casual": "Gyokerland 打进本场比赛的第三球，比分变为3比4。 Carrot 队仍落后，但拼尽全力。",
+    "analyst": "Gyokerland 以较低的xG机会完成帽子戏法， Szobalenko助攻。尽管 Broccoli占据主导地位， Carrot的头号射手依然保持竞争力，尽管胜率仍低，仅为2%。"
+   }
+  },
+  "M-19": {
+   "source_hash": "e1e8bff81e7ad816",
+   "es": {
+    "headline": "Alissandro creciendo en el juego",
+    "fact.0": "La valoración en directo de Alissandro es de 5,7.",
+    "fact.1": "Subió desde 4,9 en los últimos diez minutos.",
+    "fact.2": "58' gol encajado (-0,39).",
+    "fact.3": "89' salvación (+0,37).",
+    "fact.4": "40' gol encajado (-0,36)."
+   },
+   "fr": {
+    "headline": "Alissandro évoluant dans le jeu",
+    "fact.0": "Alissandro en direct est de 5,7.",
+    "fact.1": "En hausse par rapport à 4,9 en dix minutes.",
+    "fact.2": "58' but encaissé (-0,39).",
+    "fact.3": "89' sauvegarde (+0,37).",
+    "fact.4": "40' but encaissé (-0,36)."
+   },
+   "de": {
+    "headline": "Alissandro in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Alissandro beträgt 5,7.",
+    "fact.1": "Anstieg von 4,9 in den letzten zehn Minuten.",
+    "fact.2": "58' Gegentor (-0,39).",
+    "fact.3": "89' Rettung (+0,37).",
+    "fact.4": "40' Gegentor (-0,36)."
+   },
+   "nl": {
+    "headline": "Alissandro groeien in het spel",
+    "fact.0": "De live kijkcijfers van Alissandro zijn 5,7.",
+    "fact.1": "Gestegen van 4,9 in de laatste tien minuten.",
+    "fact.2": "58' doelpunt tegengekregen (-0,39).",
+    "fact.3": "89' redding (+0,37).",
+    "fact.4": "40' doelpunt tegengekregen (-0,36)."
+   },
+   "zh-Hans": {
+    "headline": "Alissandro 逐渐融入游戏",
+    "fact.0": "Alissandro的现场评分为5.7。",
+    "fact.1": "从最后十分钟的4.9提升。",
+    "fact.2": "失58'球（-0.39）。",
+    "fact.3": "89' 存档（+0.37）。",
+    "fact.4": "失40'球（-0.36）。"
+   }
+  },
+  "M-20": {
+   "source_hash": "623c13fe683b4e57",
+   "failed": {
+    "zh-Hans": [
+     "fact.7"
+    ]
+   },
+   "es": {
+    "headline": "Tiempo completo: Carrot 3–4 Broccoli",
+    "fact.0": "Tiempo completo: Carrot 3–4 Broccoli.",
+    "fact.1": "Disparos hasta ahora: Carrot 22 (xG 3,14), Broccoli 17 (xG 1,96).",
+    "fact.2": "Posesión: Carrot 65,0%, Broccoli 35,0%.",
+    "fact.3": "Jugador del partido: Anders Gyokerland (8,9).",
+    "fact.4": "42' Gyokerland iguala para Carrot.",
+    "fact.5": "58' Bowerman Broccoli adelanta.",
+    "fact.6": "40' Phillwood Broccoli adelanta.",
+    "fact.7": "Carrot había estado invicto en 5 jornadas.",
+    "fact.8": "Broccoli están invictos en 4 partidos de liga.",
+    "casual": "Broccoli se imponieron a Carrot 4–3 en un partido emocionante, poniendo fin a la racha invicta de Carrot.",
+    "analyst": "Broccoli asegurar una victoria por 4–3 sobre Carrot, a pesar de Carrot posesión dominante con un 65% y de crear un xG más alto (3,14 frente a 1,96). Anders Gyokerland destaca como Jugador del Partido con una valoración de 8,9."
+   },
+   "fr": {
+    "headline": "Temps plein : Carrot 3–4 Broccoli",
+    "fact.0": "Temps plein : Carrot 3–4 Broccoli.",
+    "fact.1": "Tirs jusqu’à présent : Carrot 22 (xG 3,14), Broccoli 17 (xG 1,96).",
+    "fact.2": "Possession : Carrot 65,0 %, Broccoli 35,0 %.",
+    "fact.3": "Joueur du match : Anders Gyokerland (8,9).",
+    "fact.4": "42' Gyokerland égalise pour Carrot.",
+    "fact.5": "58' Bowerman met Broccoli en avant.",
+    "fact.6": "40' Phillwood met Broccoli en avant.",
+    "fact.7": "Carrot était invaincu en 5 matchs.",
+    "fact.8": "Broccoli sont invaincus en 4 matchs de championnat.",
+    "casual": "Broccoli l’emportent 4–3 Carrot dans un match palpitant, mettant fin à la série d’invincibilité de Carrot.",
+    "analyst": "Broccoli s’impose 4–3 contre Carrot, malgré Carrot possession dominante avec 65 % et un xG plus élevé (3,14 contre 1,96). Anders Gyokerland brille en tant que joueur du match avec une note de 8,9."
+   },
+   "de": {
+    "headline": "Vollzeit: Carrot 3–4 Broccoli",
+    "fact.0": "Vollzeit: Carrot 3–4 Broccoli.",
+    "fact.1": "Bisherige Aufnahmen: 22 Carrot (xG 3,14), Broccoli 17 (xG 1,96).",
+    "fact.2": "Ballbesitz: Carrot 65,0 %, Broccoli 35,0 %.",
+    "fact.3": "Spieler des Spiels: Anders Gyokerland (8,9).",
+    "fact.4": "42' Gyokerland gleicht für Carrot aus.",
+    "fact.5": "58' Bowerman setzt Broccoli voran.",
+    "fact.6": "40' Phillwood setzt Broccoli voran.",
+    "fact.7": "Carrot war in 5 Jahren ungeschlagen.",
+    "fact.8": "Broccoli sind in 4 Ligaspielen ungeschlagen.",
+    "casual": "Broccoli setzten sich Carrot in einem packenden Spiel knapp mit 4:3 durch und beendeten damit Carrot ungeschlagene Serie.",
+    "analyst": "Broccoli sicherten sich einen 4:3-Sieg über Carrot, obwohl Carrot den Ballbesitz mit 65 % dominierte und höhere xG erzeugte (3,14 zu 1,96). Anders Gyokerland glänzt als Spieler des Spiels mit einer Bewertung von 8,9."
+   },
+   "nl": {
+    "headline": "Voltijd: Carrot 3–4 Broccoli",
+    "fact.0": "Voltijd: Carrot 3–4 Broccoli.",
+    "fact.1": "Schoten tot nu toe: Carrot 22 (xG 3,14), Broccoli 17 (xG 1,96).",
+    "fact.2": "Posbezit: Carrot 65,0%, Broccoli 35,0%.",
+    "fact.3": "Speler van de wedstrijd: Anders Gyokerland (8,9).",
+    "fact.4": "42' Gyokerland gelijkmaakt voor Carrot.",
+    "fact.5": "58' Bowerman zet Broccoli voorop.",
+    "fact.6": "40' Phillwood zet Broccoli voorop.",
+    "fact.7": "Carrot was ongeslagen in 5 jaar.",
+    "fact.8": "Broccoli zijn ongeslagen in 4 competitiewedstrijden.",
+    "casual": "Broccoli versloegen Carrot met 4–3 in een spannende wedstrijd, waarmee Carrot ongeslagen reeks beëindigde.",
+    "analyst": "Broccoli behaalde een 4–3 overwinning op Carrot, ondanks Carrot dominante balbezit met 65% en hogere xG (3,14 tegen 1,96). Anders Gyokerland schittert als Speler van de Wedstrijd met een rating van 8,9."
+   },
+   "zh-Hans": {
+    "headline": "全场： Carrot 3–4 Broccoli",
+    "fact.0": "全场： Carrot 3–4 Broccoli。",
+    "fact.1": "目前射门数： Carrot 22次（xG 3.14）， Broccoli 17次（xG 1.96）。",
+    "fact.2": "控球率： Carrot 65.0%， Broccoli 35.0%。",
+    "fact.3": "本场最佳球员： Anders Gyokerland （8.9）。",
+    "fact.4": "42' Gyokerland 可以等于 Carrot。",
+    "fact.5": "58' Bowerman 让 Broccoli 领先。",
+    "fact.6": "40' Phillwood 让 Broccoli 领先。",
+    "fact.8": "Broccoli 在4场联赛中保持不败。",
+    "casual": "Broccoli 在一场激烈的比赛中以4比3惜败 Carrot ，终结了 Carrot的不败纪录。",
+    "analyst": "尽管控球率Carrot占优，控球率达到65%，并且xG（3.14比1.96），Broccoli还是以4比3战胜Carrot。Anders Gyokerland以8.9的评分成为全场最佳球员。"
+   }
+  }
+ }
+}

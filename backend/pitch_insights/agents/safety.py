@@ -13,20 +13,18 @@ https://learn.microsoft.com/en-us/rest/api/contentsafety/text-operations/analyze
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from dataclasses import dataclass, field
 
 import httpx
 
-from pitch_insights.agents.clients import ssl_context
+from pitch_insights.agents.clients import post_with_retry, ssl_context
 
 log = logging.getLogger("pitch_insights.agents")
 
 API_VERSION = "2024-09-01"
 CATEGORIES = ("Hate", "SelfHarm", "Sexual", "Violence")
 MAX_CHARS = 10_000  # the service's limit per request
-MAX_RETRIES = 4
 
 
 @dataclass
@@ -58,25 +56,11 @@ class ContentSafety:
     async def aclose(self) -> None:
         await self.client.aclose()
 
-    async def _post(self, text: str) -> httpx.Response:
-        """One request, retried on 429 and 5xx with backoff that honours Retry-After (the free
-        tier allows only a few requests a second)."""
-        for attempt in range(MAX_RETRIES + 1):
-            r = await self.client.post(self.url, headers={"Ocp-Apim-Subscription-Key": self._key},
-                                       json={"text": text[:MAX_CHARS], "categories": list(CATEGORIES),
-                                             "outputType": "FourSeverityLevels"})
-            if (r.status_code != 429 and r.status_code < 500) or attempt == MAX_RETRIES:
-                return r
-            try:
-                wait = float(r.headers.get("Retry-After", ""))
-            except ValueError:
-                wait = 2 ** attempt
-            await asyncio.sleep(min(wait, 30.0))
-        return r
-
     async def check(self, text: str) -> SafetyResult:
         try:
-            r = await self._post(text)
+            r = await post_with_retry(self.client, self.url, headers={"Ocp-Apim-Subscription-Key": self._key},
+                                      json={"text": text[:MAX_CHARS], "categories": list(CATEGORIES),
+                                            "outputType": "FourSeverityLevels"})
             r.raise_for_status()
             severities = {c["category"]: int(c.get("severity") or 0) for c in r.json()["categoriesAnalysis"]}
         except httpx.HTTPStatusError as e:

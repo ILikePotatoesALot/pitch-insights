@@ -25,6 +25,7 @@ from pitch_insights.agents.prompts import input_hash
 from pitch_insights.agents.safety import safety_from_settings
 from pitch_insights.agents.settings import load_settings
 from pitch_insights.agents.store import load_commentary, summarise, write_commentary
+from pitch_insights.agents.tracing import flush_tracing, setup_tracing
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 
@@ -75,6 +76,7 @@ async def main() -> int:
     logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING, format="%(message)s")
 
     settings = load_settings()
+    tracing = setup_tracing(settings, "pitch-insights-commentary")
     writer = writer_from_settings(settings)
     safety = safety_from_settings(settings)
     if safety is None:
@@ -95,6 +97,8 @@ async def main() -> int:
         await writer.aclose()
         if safety is not None:
             await safety.aclose()
+        if tracing:
+            flush_tracing()
     return 0
 
 

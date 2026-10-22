@@ -7,6 +7,7 @@ deployment time this can move to keyless auth (managed identity); see docs/DESIG
 
 from __future__ import annotations
 
+import asyncio
 import ssl
 from urllib.parse import urlsplit
 
@@ -25,6 +26,23 @@ def ssl_context() -> ssl.SSLContext:
     bundled list rejects them. Verification is never turned off.
     """
     return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+
+async def post_with_retry(client: httpx.AsyncClient, url: str, *, headers: dict, json, retries: int = 4,
+                          params=None) -> httpx.Response:
+    """POST, retried on 429 and 5xx with backoff that honours Retry-After, as Microsoft's transient
+    fault guidance says. For the Azure AI services called over REST (Content Safety, Translator),
+    whose free tiers allow only a few requests a second. Other errors return at once."""
+    for attempt in range(retries + 1):
+        r = await client.post(url, headers=headers, json=json, params=params)
+        if (r.status_code != 429 and r.status_code < 500) or attempt == retries:
+            return r
+        try:
+            wait = float(r.headers.get("Retry-After", ""))
+        except ValueError:
+            wait = 2.0 ** attempt
+        await asyncio.sleep(min(wait, 30.0))
+    return r
 
 
 def foundry_v1(endpoint: str) -> str:

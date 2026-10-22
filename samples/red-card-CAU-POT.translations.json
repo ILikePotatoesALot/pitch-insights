@@ -1,0 +1,896 @@
+{
+ "service": "azure-translator",
+ "api_version": "3.0",
+ "version": "2026-10-22.2",
+ "source": "en",
+ "languages": [
+  "es",
+  "fr",
+  "de",
+  "nl",
+  "zh-Hans"
+ ],
+ "machine_translated": true,
+ "kept_english": {
+  "es": 0,
+  "fr": 0,
+  "de": 4,
+  "nl": 1,
+  "zh-Hans": 1
+ },
+ "moments": {
+  "M-1": {
+   "source_hash": "d83c002d8f596512",
+   "es": {
+    "headline": "Potato encima",
+    "fact.0": "Potato tienen un impulso de 0,75 de su lado, tan unilateral como puede ser.",
+    "fact.1": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,75 de su equipo).",
+    "fact.2": "Potato jugó el 88% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Cauliflower 0–0 Potato.",
+    "casual": "Potato FC controlan, manteniendo a Cauliflower FC sujetos.",
+    "analyst": "Potato FC dominan con el 88% de los pases del último tercio en los últimos cinco minutos, afirmando un control claro."
+   },
+   "fr": {
+    "headline": "Potato au sommet",
+    "fact.0": "Potato ont un élan de 0,75 de leur côté, à peu près aussi unilatéral que possible.",
+    "fact.1": "Potato a eu l’avantage dans les cinq dernières minutes (élan +0,75 de leur côté).",
+    "fact.2": "Potato joué 88 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Cauliflower 0–0 Potato.",
+    "casual": "Potato FC contrôle, Cauliflower FC maintient au sol.",
+    "analyst": "Potato FC domine avec 88 % des passes du dernier tiers dans les cinq dernières minutes, affirmant un contrôle clair."
+   },
+   "de": {
+    "headline": "Potato oben",
+    "fact.0": "Potato haben von ihrer Seite 0,75 Momentum, so einseitig, wie es nur geht.",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,75 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 88 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Cauliflower 0:0 Potato.",
+    "casual": "Potato FC haben die Kontrolle und halten Cauliflower FC zurück.",
+    "analyst": "Potato FC dominieren mit 88 % der letzten Dreisel-Pässe in den letzten fünf Minuten und behalten die klare Kontrolle."
+   },
+   "nl": {
+    "headline": "Potato bovenop",
+    "fact.0": "Potato hebben momentum 0,75 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Potato had de overhand in de laatste vijf minuten (momentum +0,75 van hun kant).",
+    "fact.2": "Potato speelde 88% van de passes in het laatste derde deel van de laatste vijf minuten.",
+    "fact.3": "De stand is Cauliflower 0–0 Potato.",
+    "casual": "Potato FC hebben de controle en houden Cauliflower FC op afstand.",
+    "analyst": "Potato FC domineren met 88% van de passes in het laatste derde deel van de laatste vijf minuten en hebben duidelijke controle."
+   },
+   "zh-Hans": {
+    "headline": "Potato 在上面",
+    "fact.0": "Potato 队的势头只有0.75，几乎是一边倒。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.75）。",
+    "fact.2": "Potato 在最后五分钟完成了88%的最后三分之一传球。",
+    "fact.3": "比分 Cauliflower 0比0 Potato。",
+    "casual": "Potato FC 掌控着局面，把 Cauliflower FC 压制住。",
+    "analyst": "Potato FC 在最后五分钟以88%的最后三分之一传球占据主导，完全掌控了比赛。"
+   }
+  },
+  "M-2": {
+   "source_hash": "e7d4d31c9f5442b7",
+   "es": {
+    "headline": "Raisman expulsados; Potato reducidos a 10",
+    "fact.0": "Raisman es expulsado por segunda tarjeta amarilla.",
+    "fact.1": "Potato están en 10.",
+    "fact.2": "La probabilidad de ganar de Potato cayó del 43% al 28%.",
+    "fact.3": "El marcador es Cauliflower 0–0 Potato.",
+    "fact.4": "La valoración en directo de Raisman es de 5,5.",
+    "casual": "Raisman es expulsado por una segunda amarilla, dejando a Potato con 10 jugadores. El marcador sigue 0–0.",
+    "analyst": "La segunda tarjeta amarilla de Raisman reduce Potato a 10 jugadores, reduciendo significativamente su probabilidad de victoria del 43% al 28%. Con el marcador aún 0–0, este cambio podría ser decisivo en el partido."
+   },
+   "fr": {
+    "headline": "Raisman expulsé ; Potato réduit à 10",
+    "fact.0": "Raisman est expulsé pour un second carton jaune.",
+    "fact.1": "Potato sont descendus à 10.",
+    "fact.2": "La chance de victoire de Potato est passée de 43 % à 28 %.",
+    "fact.3": "Le score est Cauliflower 0–0 Potato.",
+    "fact.4": "Raisman en direct est de 5,5.",
+    "casual": "Raisman est expulsé pour un second drapeau jaune, laissant Potato avec 10 joueurs. Le score reste 0–0.",
+    "analyst": "Le deuxième carton jaune de Raisman réduit Potato à 10 joueurs, ce qui fait baisser considérablement leur probabilité de victoire de 43 % à 28 %. Avec le score toujours à 0–0, ce changement pourrait être décisif dans le match."
+   },
+   "de": {
+    "headline": "Raisman vom Platz gestellt; Potato auf 10 reduziert",
+    "fact.0": "Raisman wird wegen einer zweiten gelben Karte vom Platz gestellt.",
+    "fact.1": "Potato sind auf 10 runter.",
+    "fact.2": "Die Gewinnchance von Potato sank von 43 % auf 28 %.",
+    "fact.3": "Der Spielstand lautet Cauliflower 0:0 Potato.",
+    "fact.4": "Die Live-Bewertung von Raisman beträgt 5,5.",
+    "casual": "Raisman wird mit einer zweiten gelben Karte vom Platz gestellt, sodass Potato mit 10 Spielern übrig bleibt. Es steht immer noch 0:0.",
+    "analyst": "Die zweite gelbe Karte von Raisman reduziert Potato auf 10 Spieler, wodurch ihre Gewinnwahrscheinlichkeit von 43 % auf 28 % deutlich sinkt. Mit einem Stand von 0–0 könnte diese Verschiebung im Spiel entscheidend sein."
+   },
+   "nl": {
+    "headline": "Raisman weggestuurd; Potato teruggebracht tot 10",
+    "fact.0": "Raisman wordt weggestuurd voor een tweede gele kaart.",
+    "fact.1": "Potato zijn teruggebracht tot 10.",
+    "fact.2": "De kans van Potato om te winnen daalde van 43% naar 28%.",
+    "fact.3": "De stand is Cauliflower 0–0 Potato.",
+    "fact.4": "De live-kijkcijfers van Raisman zijn 5,5.",
+    "casual": "Raisman wordt weggestuurd voor een tweede gele kaart, waardoor Potato met 10 spelers overblijft. Het staat nog steeds 0–0.",
+    "analyst": "De tweede gele kaart van Raisman vermindert Potato tot 10 spelers, waardoor hun winkans aanzienlijk daalt van 43% naar 28%. Met de stand nog steeds 0–0 kan deze verandering cruciaal zijn in de wedstrijd."
+   },
+   "zh-Hans": {
+    "headline": "Raisman 被罚下; Potato 剩下10人",
+    "fact.0": "Raisman 因第二张黄牌被罚下。",
+    "fact.1": "Potato 已经降到10个了。",
+    "fact.2": "Potato的获胜概率从43%降至28%。",
+    "fact.3": "比分 Cauliflower 0比0 Potato。",
+    "fact.4": "Raisman的现场评分为5.5。",
+    "casual": "Raisman 因第二张黄牌被罚下， Potato 队剩下10人。比分依然是0比0。",
+    "analyst": "Raisman的第二张黄牌将 Potato 人数减少到10人，胜率从43%大幅降低到28%。比分仍为0比0，这一转变可能成为比赛的关键。"
+   }
+  },
+  "M-3": {
+   "source_hash": "4d3a3145cb4f32b7",
+   "es": {
+    "headline": "Potato encima",
+    "fact.0": "Potato tienen un impulso de 0,73 de su lado, tan unilateral como puede ser.",
+    "fact.1": "Potato tuvieron la ventaja en los últimos cinco minutos (impulso +0,73 de su equipo).",
+    "fact.2": "Potato jugó el 95% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "Potato tuvo 3 tiros (xG 0,28) y 1 córner en los últimos cinco minutos.",
+    "fact.4": "El marcador es Cauliflower 0–0 Potato.",
+    "fact.5": "Potato también dominaban en 15'.",
+    "fact.6": "Ese es el segundo periodo de dominio de Potato en este partido.",
+    "casual": "Potato FC tienen el control firme, manteniendo a Cauliflower FC sujeto.",
+    "analyst": "Potato FC dominan con el 95% de los pases en el último tercio y 3 disparos en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Potato au sommet",
+    "fact.0": "Potato ont un élan de 0,73 de leur côté, à peu près aussi déséquilibré que possible.",
+    "fact.1": "Potato ont eu l’avantage dans les cinq dernières minutes (élan +0,73 de leur côté).",
+    "fact.2": "Potato joué 95 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Potato a réalisé 3 tirs (xG 0,28) et 1 corner dans les cinq dernières minutes.",
+    "fact.4": "Le score est Cauliflower 0–0 Potato.",
+    "fact.5": "Potato dominaient aussi à 15'.",
+    "fact.6": "C’est la deuxième période de domination de Potato dans ce match.",
+    "casual": "Potato FC sont fermement aux commandes, Cauliflower FC maintenant au sol.",
+    "analyst": "Potato FC dominent avec 95 % des passes du dernier tiers et 3 tirs dans les cinq dernières minutes."
+   },
+   "de": {
+    "headline": "Potato oben",
+    "fact.0": "Potato haben von ihrer Seite ein Momentum von 0,73, so einseitig, wie es nur geht.",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,73 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 95 % der Pässe im letzten Drittel.",
+    "fact.3": "Potato hatte in den letzten fünf Minuten 3 Schüsse (xG 0,28) und 1 Ecke.",
+    "fact.4": "Der Spielstand lautet Cauliflower 0:0 Potato.",
+    "fact.5": "Potato dominierten auch bei 15'.",
+    "fact.6": "Das ist Potato zweite Dominanzphase in diesem Match.",
+    "casual": "Potato FC haben fest die Kontrolle und halten Cauliflower FC zurück.",
+    "analyst": "Potato FC dominieren mit 95 % der Pässe im letzten Drittel und 3 Schüssen in den letzten fünf Minuten."
+   },
+   "nl": {
+    "headline": "Potato bovenop",
+    "fact.0": "Potato hebben momentum 0,73 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.1": "Potato had in de laatste vijf minuten de overhand (momentum +0,73 van hun kant).",
+    "fact.2": "Potato speelde 95% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "Potato had 3 schoten (xG 0,28) en 1 corner in de laatste vijf minuten.",
+    "fact.4": "De stand is Cauliflower 0–0 Potato.",
+    "fact.5": "Potato domineerden ook op 15'.",
+    "fact.6": "Dat is Potato tweede dominantieperiode in deze wedstrijd.",
+    "casual": "Potato FC hebben de controle stevig en houden Cauliflower FC op afstand.",
+    "analyst": "Potato FC domineren met 95% van de passes in het laatste derde deel en 3 schoten in de laatste vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Potato 在上面",
+    "fact.0": "Potato 队的势头只有0.73，几乎是一边倒的。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.73）。",
+    "fact.2": "Potato 在最后五分钟完成了95%的最后三分之一传球。",
+    "fact.3": "Potato 在最后五分钟门3次（xG0.28）和1个角球。",
+    "fact.4": "比分 Cauliflower 0比0 Potato。",
+    "fact.5": "Potato 在 15'时也占据了主导地位。",
+    "fact.6": "这是 Potato在这场比赛中的第二次统治。",
+    "casual": "Potato FC 牢牢掌控着局面，将 Cauliflower FC 压制在后方。",
+    "analyst": "Potato FC 在最后三分之一区域的传球成功率达95%，最后五分钟射门3次。"
+   }
+  },
+  "M-4": {
+   "source_hash": "95d9652e6ebf6e6c",
+   "es": {
+    "headline": "Konsatou creciendo en el juego",
+    "fact.0": "La valoración en directo de Konsatou es de 6,7.",
+    "fact.1": "Subió desde 6,0 en los últimos diez minutos.",
+    "fact.2": "33' intercepción (+0,38).",
+    "fact.3": "27' ganó la bola suelta (+0,15).",
+    "fact.4": "8' pase mal colocado (-0,07)."
+   },
+   "fr": {
+    "headline": "Konsatou évoluant dans le jeu",
+    "fact.0": "Konsatou en direct est de 6,7.",
+    "fact.1": "En hausse par rapport à 6,0 en dix minutes.",
+    "fact.2": "33' interception (+0,38).",
+    "fact.3": "27' a gagné la balle libre (+0,15).",
+    "fact.4": "8' passage mal placé (-0,07)."
+   },
+   "de": {
+    "headline": "Konsatou in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Konsatou liegt bei 6,7.",
+    "fact.1": "Anstieg von 6,0 in den letzten zehn Minuten.",
+    "fact.2": "33' Interception (+0,38).",
+    "fact.3": "27' gewann den losen Ball (+0,15).",
+    "fact.4": "8' fehlplatzierter Pass (-0,07)."
+   },
+   "nl": {
+    "headline": "Konsatou groeien in het spel",
+    "fact.0": "De live rating van Konsatou is 6,7.",
+    "fact.1": "Omhoog van 6,0 in de laatste tien minuten.",
+    "fact.2": "33' onderschepping (+0,38).",
+    "fact.3": "27' won de losse bal (+0,15).",
+    "fact.4": "8' misplaatste pass (-0,07)."
+   },
+   "zh-Hans": {
+    "headline": "Konsatou 逐渐融入游戏",
+    "fact.0": "Konsatou的现场评分为6.7。",
+    "fact.1": "从最后十分钟的6.0提升。",
+    "fact.2": "33' 拦截（+0.38）。",
+    "fact.3": "27' 赢得了松散球（+0.15）。",
+    "fact.4": "8' 传球失误（-0.07）。"
+   }
+  },
+  "M-5": {
+   "source_hash": "b547710b2d905962",
+   "es": {
+    "headline": "Bissolatte abre el marcador",
+    "fact.0": "Ahora está Cauliflower 1–0 Potato.",
+    "fact.1": "La probabilidad de Cauliflower de ganar pasó del 40% al 73%.",
+    "fact.2": "Asistido por Kudalah.",
+    "fact.3": "Un final poco probable: xG 0,06, así que unos 6 de cada 100 disparos como ese van dentro.",
+    "fact.4": "Marcó de cabeza.",
+    "fact.5": "Su primer gol de la temporada.",
+    "fact.6": "Cauliflower jugó el 67% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.7": "La valoración en directo de Bissolatte es de 7,1.",
+    "fact.8": "Disparos hasta ahora: Cauliflower 6 (xG 0,50), Potato 10 (xG 0,88).",
+    "fact.9": "La valoración en directo de Kudalah es de 6,8.",
+    "fact.10": "Subió desde 6,1 en los últimos diez minutos.",
+    "fact.11": "Subió desde 6,1 en los últimos diez minutos.",
+    "casual": "Bissolatte cabecea su primer gol de la temporada para adelantar al Cauliflower justo antes del descanso.",
+    "analyst": "El remate de cabeza de Bissolatte, desde una baja probabilidad de xG de 0,06, da a Cauliflower una ventaja de 1–0 y aumenta su probabilidad de victoria al 73%. La asistencia de Kudalah S culmina una sólida racha de dominio en el último tercio para Cauliflower."
+   },
+   "fr": {
+    "headline": "Bissolatte ouvre le score",
+    "fact.0": "C’est maintenant Cauliflower 1–0 Potato.",
+    "fact.1": "La chance de victoire de Cauliflower est passée de 40 % à 73 %.",
+    "fact.2": "Assisté par Kudalah.",
+    "fact.3": "Une fin improbable : xG 0,06, donc environ 6 tirs sur 100 comme celui-ci.",
+    "fact.4": "A marqué de la tête.",
+    "fact.5": "Son premier but de la saison.",
+    "fact.6": "Cauliflower joué 67 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.7": "Bissolatte la note en direct est de 7,1.",
+    "fact.8": "Tirs jusqu’à présent : Cauliflower 6 (xG 0,50), Potato 10 (xG 0,88).",
+    "fact.9": "Kudalah en direct est de 6,8.",
+    "fact.10": "En hausse par rapport à 6,1 en dix minutes.",
+    "fact.11": "En hausse par rapport à 6,1 en dix minutes.",
+    "casual": "Bissolatte marque de la tête son premier but de la saison pour donner l’avantage à Cauliflower juste avant la mi-temps.",
+    "analyst": "Bissolatte de la tête, sur une faible chance xG de 0,06, donne à Cauliflower une avance de 1–0 et augmente leur probabilité de victoire à 73 %. La passe décisive de Kudalah couronne une forte période de domination du dernier tiers pour Cauliflower."
+   },
+   "de": {
+    "headline": "Bissolatte eröffnet die Punktewertung",
+    "fact.0": "Jetzt steht es Cauliflower 1:0 Potato.",
+    "fact.1": "Die Gewinnchance von Cauliflower stieg von 40 % auf 73 %.",
+    "fact.2": "Unterstützt von Kudalah.",
+    "fact.3": "Ein unwahrscheinliches Finish: xG 0,06, also etwa 6 von 100 Schüssen, wie er reingeht.",
+    "fact.4": "Tor mit einem Kopfball.",
+    "fact.5": "Sein erstes Tor der Saison.",
+    "fact.6": "Cauliflower spielte in den letzten fünf Minuten 67 % der Pässe im letzten Drittel.",
+    "fact.7": "Die Live-Bewertung von Bissolatte liegt bei 7,1.",
+    "fact.8": "Bisherige Aufnahmen: Cauliflower 6 (xG 0,50), Potato 10 (xG 0,88).",
+    "fact.9": "Die Live-Bewertung von Kudalah liegt bei 6,8.",
+    "fact.10": "Erhöht von 6,1 in den letzten zehn Minuten.",
+    "fact.11": "Erhöht von 6,1 in den letzten zehn Minuten.",
+    "casual": "Bissolatte köpfte sein erstes Saisontor herein und brachte Cauliflower kurz vor der Halbzeit in Führung.",
+    "analyst": "Der Kopfball von Bissolatte aus einer niedrigen xG-Chance von 0,06 bringt Cauliflower eine 1:0-Führung und erhöht ihre Gewinnwahrscheinlichkeit auf 73%. Die Vorlage von Kudalah krönt eine starke Dominanz im letzten Drittel für Cauliflower."
+   },
+   "nl": {
+    "headline": "Bissolatte opent de score",
+    "fact.0": "Het staat nu Cauliflower 1–0 Potato.",
+    "fact.1": "De kans van Cauliflower om te winnen steeg van 40% naar 73%.",
+    "fact.2": "Geassisteerd door Kudalah.",
+    "fact.3": "Een onwaarschijnlijke finish: xG 0,06, dus ongeveer 6 in 100 schoten zoals hij erin gaat.",
+    "fact.4": "Scoorde met een kopbal.",
+    "fact.5": "Zijn eerste doelpunt van het seizoen.",
+    "fact.6": "Cauliflower speelde 67% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.7": "De live rating van Bissolatte is 7,1.",
+    "fact.8": "Tot nu toe aantal foto's: Cauliflower 6 (xG 0,50), Potato 10 (xG 0,88).",
+    "fact.9": "De live rating van Kudalah is 6,8.",
+    "fact.10": "Gestegen van 6,1 in de laatste tien minuten.",
+    "fact.11": "Gestegen van 6,1 in de laatste tien minuten.",
+    "casual": "Bissolatte kopt zijn eerste doelpunt van het seizoen binnen en brengt Cauliflower vlak voor rust op voorsprong.",
+    "analyst": "De kopbal van Bissolatte, vanuit een lage xG-kans van 0,06, geeft Cauliflower een 1–0 voorsprong en verhoogt hun winstkans tot 73%. De assist van Kudalah sluit een sterke periode van dominantie in het laatste derde deel af voor Cauliflower."
+   },
+   "zh-Hans": {
+    "headline": "Bissolatte 开局得分",
+    "fact.0": "现在比分 Cauliflower 1比0 Potato。",
+    "fact.1": "Cauliflower的获胜概率从40%提升到了73%。",
+    "fact.2": "协助者为 Kudalah。",
+    "fact.3": "一个不太可能的结局：xG是0.06，所以大约100发中有6发类似的射击。",
+    "fact.4": "头球破门。",
+    "fact.5": "这是他本赛季的首粒进球。",
+    "fact.6": "Cauliflower 在最后五分钟完成了67%的最后三分之一传球。",
+    "fact.7": "Bissolatte的现场评分为7.1。",
+    "fact.8": "目前射击数： Cauliflower 6发（xG 0.50）， Potato 10发（xG 0.88）。",
+    "fact.9": "Kudalah的现场评分为6.8。",
+    "fact.10": "从最后十分钟的6.1有所上升。",
+    "fact.11": "从最后十分钟的6.1有所上升。",
+    "casual": "Bissolatte 头球攻入本赛季首球，帮助 Cauliflower 半场前领先。",
+    "analyst": "Bissolatte的头球攻门，从低到0.06的xG概率中，帮助 Cauliflower 取得1比0领先，胜率提升至73%。 Kudalah的助攻为 Cauliflower队在最后三分之一区域的强势统治画上句号。"
+   }
+  },
+  "M-6": {
+   "source_hash": "fa853a1f5cf6bd6a",
+   "es": {
+    "headline": "Cauliflower tomar el control",
+    "fact.0": "En los últimos diez minutos Potato dominaban (impulso 0,73 de su lado); ahora Cauliflower están (0,46 de su lado).",
+    "fact.1": "Cauliflower tuvo la ventaja en los últimos cinco minutos (impulso +0,46 de su equipo).",
+    "fact.2": "Cauliflower jugó el 73% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Cauliflower 1–0 Potato.",
+    "casual": "Cauliflower están presionando fuerte y manteniendo a Potato defensiva.",
+    "analyst": "Cauliflower dominan los últimos cinco minutos con el 73% de los pases en el último tercio, revirtiendo la ventaja de Potato de impulso anterior."
+   },
+   "fr": {
+    "headline": "Cauliflower prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Potato dominaient (momentum 0,73 de leur côté) ; maintenant Cauliflower sont (0,46 de leur côté).",
+    "fact.1": "Cauliflower ont eu l’avantage dans les cinq dernières minutes (élan +0,46 de leur côté).",
+    "fact.2": "Cauliflower joué 73 % des dernières passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Cauliflower 1–0 Potato.",
+    "casual": "Cauliflower poussent fort et Potato maintiennent sur la défensive.",
+    "analyst": "Cauliflower dominent les cinq dernières minutes avec 73 % des passes du dernier tiers, renversant l’avantage de Potato plus tôt sur l’élan."
+   },
+   "de": {
+    "headline": "Cauliflower übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Potato vorne (Momentum 0,73 von ihrer Seite); jetzt sind Cauliflower es (0,46 von ihrer Seite).",
+    "fact.1": "Cauliflower hatten in den letzten fünf Minuten die Oberhand (Schwung +0,46 von ihrer Seite).",
+    "fact.2": "Cauliflower spielte in den letzten fünf Minuten 73 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Cauliflower 1:0 Potato.",
+    "casual": "Cauliflower treiben hart und halten Potato auf dem defensiven Fuß.",
+    "analyst": "Cauliflower dominieren die letzten fünf Minuten mit 73 % der Pässe im letzten Drittel und kehren damit Potato den früheren Momentumvorteil um."
+   },
+   "nl": {
+    "headline": "Cauliflower neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Potato bovenaan (momentum 0,73 van hun kant); nu zijn Cauliflower dat (0,46 van hun kant).",
+    "fact.1": "Cauliflower had in de laatste vijf minuten de overhand (momentum +0,46 van hun kant).",
+    "fact.2": "Cauliflower speelde 73% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Cauliflower 1–0 Potato.",
+    "casual": "Cauliflower duwen hard en houden Potato op achtervoet.",
+    "analyst": "Cauliflower domineren de laatste vijf minuten met 73% van de passes in het laatste derde deel, waarmee Potato het eerdere momentumvoordeel van  omkeert."
+   },
+   "zh-Hans": {
+    "headline": "Cauliflower 掌控局面",
+    "fact.0": "最后十分钟内， Potato 占据上风（势头领先自己方0.73）;现在 Cauliflower 领先（领先0.46）。",
+    "fact.1": "Cauliflower 在最后五分钟占据上风（他们势头+0.46）。",
+    "fact.2": "Cauliflower 在最后五分钟完成了73%的最后三分之一传球。",
+    "fact.3": "比分 Cauliflower 1比0 Potato。",
+    "casual": "Cauliflower 全力以赴，让 Potato 处于被动。",
+    "analyst": "Cauliflower 在最后五分钟占据主导，完成了73%的最后三分之一传球，扭转了 Potato之前的势头优势。"
+   }
+  },
+  "M-7": {
+   "source_hash": "5c9727b81be1f38e",
+   "failed": {
+    "de": [
+     "fact.4",
+     "casual"
+    ]
+   },
+   "es": {
+    "headline": "Descanso: Cauliflower 1–0 Potato",
+    "fact.0": "Descanso: Cauliflower 1–0 Potato.",
+    "fact.1": "Disparos hasta ahora: Cauliflower 8 (xG 0,72), Potato 10 (xG 0,88).",
+    "fact.2": "Posesión: Cauliflower 41,2% Potato 58,8%.",
+    "fact.3": "41' Bissolatte abre el marcador.",
+    "fact.4": "20' Raisman expulsados; Potato reducidos a 10.",
+    "casual": "Es el descanso y Cauliflower ventaja 1–0 gracias al gol de Bissolatte. Potato se queda con 10 hombres tras la tarjeta roja de Raisman.",
+    "analyst": "Al descanso, Cauliflower ganaban 1–0 a pesar de tener menos posesión y menos xG que Potato. El gol de Bissolatte y la tarjeta roja de Raisman han cambiado la balanza a favor de Cauliflower."
+   },
+   "fr": {
+    "headline": "Mi-temps : Cauliflower 1–0 Potato",
+    "fact.0": "Mi-temps : Cauliflower 1–0 Potato.",
+    "fact.1": "Tirs jusqu’à présent : Cauliflower 8 (xG 0,72), Potato 10 (xG 0,88).",
+    "fact.2": "Possession : Cauliflower 41,2 %, Potato 58,8 %.",
+    "fact.3": "41' Bissolatte ouvre le score.",
+    "fact.4": "20' Raisman expulsé ; Potato réduit à 10.",
+    "casual": "C’est la mi-temps, et Cauliflower mène 1–0 grâce au but de Bissolatte. Potato sont réduits à 10 après le carton rouge de Raisman.",
+    "analyst": "À la mi-temps, Cauliflower menait 1–0 malgré moins de possession et un xG inférieur à Potato. Le but de Bissolatte et le carton rouge de Raisman ont fait pencher la balance en faveur de Cauliflower."
+   },
+   "de": {
+    "headline": "Halbzeit: Cauliflower 1:0 Potato",
+    "fact.0": "Halbzeit: Cauliflower 1:0 Potato.",
+    "fact.1": "Bisherige Aufnahmen: Cauliflower 8 (xG 0,72), Potato 10 (xG 0,88).",
+    "fact.2": "Ballbesitz: Cauliflower 41,2 %, Potato 58,8 %.",
+    "fact.3": "41' Bissolatte eröffnet die Punkteausgleich.",
+    "analyst": "Zur Halbzeit führten Cauliflower trotz weniger Ballbesitz und weniger xG als Potato mit 1:0. Das Tor von Bissolatte und die rote Karte von Raisman haben das Gleichgewicht zugunsten von Cauliflower verschoben."
+   },
+   "nl": {
+    "headline": "Rust: Cauliflower 1–0 Potato",
+    "fact.0": "Rust: Cauliflower 1–0 Potato.",
+    "fact.1": "Tot nu toe schoten: Cauliflower 8 (xG 0,72), Potato 10 (xG 0,88).",
+    "fact.2": "Posbezit: Cauliflower 41,2%, Potato 58,8%.",
+    "fact.3": "41' Bissolatte opent de score.",
+    "fact.4": "20' Raisman weggestuurd; Potato teruggebracht tot 10.",
+    "casual": "Het is rust, en Cauliflower staan dankzij het doelpunt van Bissolatte met 1–0 voor. Potato zijn teruggebracht tot 10 man na de rode kaart van Raisman.",
+    "analyst": "Bij rust stond Cauliflower met 1–0 voor ondanks minder balbezit en minder xG dan Potato. Het doelpunt van Bissolatte en de rode kaart van Raisman hebben het evenwicht in het voordeel van Cauliflower verschoven."
+   },
+   "zh-Hans": {
+    "headline": "半场结束： Cauliflower 1–0 Potato",
+    "fact.0": "半场： Cauliflower 1–0 Potato。",
+    "fact.1": "目前射击数： Cauliflower 8（xG 0.72）， Potato 10 （xG 0.88）。",
+    "fact.2": "控球率： Cauliflower 41.2%， Potato 58.8%。",
+    "fact.3": "41' Bissolatte 开局得分。",
+    "fact.4": "20' Raisman 被罚下; Potato 剩10分。",
+    "casual": "半场结束，Cauliflower凭借Bissolatte的进球以1比0领先。Raisman被红牌罚下后，Potato队只剩10人应战。",
+    "analyst": "半场结束时，尽管控球次数和xG低于Potato，Cauliflower仍以1比0领先。Bissolatte的进球和Raisman的红牌改变了Cauliflower队的领先优势。"
+   }
+  },
+  "M-8": {
+   "source_hash": "8f343f6eb28576b5",
+   "es": {
+    "headline": "Potato tomar el control",
+    "fact.0": "En los últimos diez minutos Cauliflower dominaban (impulso de 0,65 por parte de su equipo); ahora Potato están (0,43 por parte de su equipo).",
+    "fact.1": "Potato tuvo la ventaja en los últimos cinco minutos (impulso +0,43 de su lado).",
+    "fact.2": "Potato jugó el 85% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.3": "El marcador es Cauliflower 1–0 Potato.",
+    "casual": "Potato FC empiezan a dominar tras cinco minutos muy sólidos.",
+    "analyst": "Potato FC tomar el control, completando el 85% de los pases del último tercio en los últimos cinco minutos a pesar de ir perdiendo 1–0."
+   },
+   "fr": {
+    "headline": "Potato prendre le contrôle",
+    "fact.0": "Dans les dix dernières minutes, Cauliflower étaient en tête (momentum 0,65 de leur côté) ; maintenant Potato sont (0,43 de leur côté).",
+    "fact.1": "Potato ont eu l’avantage dans les cinq dernières minutes (élan +0,43 de leur côté).",
+    "fact.2": "Potato joué 85 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.3": "Le score est Cauliflower 1–0 Potato.",
+    "casual": "Potato FC commencent à dominer après cinq minutes solides.",
+    "analyst": "Potato FC prend le contrôle, complétant 85 % des passes du dernier tiers dans les cinq dernières minutes malgré un retard de 1–0."
+   },
+   "de": {
+    "headline": "Potato übernehmen die Kontrolle",
+    "fact.0": "In den letzten zehn Minuten lagen Cauliflower vorne (Schwung 0,65 von ihrer Seite); jetzt sind Potato es (0,43 von ihrer Seite).",
+    "fact.1": "Potato hatten in den letzten fünf Minuten die Oberhand (Momentum +0,43 von ihrer Seite).",
+    "fact.2": "Potato spielte in den letzten fünf Minuten 85 % der Pässe im letzten Drittel.",
+    "fact.3": "Der Spielstand lautet Cauliflower 1:0 Potato.",
+    "casual": "Potato FC beginnen nach starken fünf Minuten zu dominieren.",
+    "analyst": "Potato FC übernehmen die Kontrolle und vervollständigen in den letzten fünf Minuten 85 % der letzten Drittelpässe, obwohl sie mit 0:1 zurücklagen."
+   },
+   "nl": {
+    "headline": "Potato neem de controle",
+    "fact.0": "In de laatste tien minuten stonden Cauliflower bovenaan (momentum 0,65 van hun kant); nu zijn Potato dat (0,43 van hun kant).",
+    "fact.1": "Potato had de overhand in de laatste vijf minuten (momentum +0,43 van hun kant).",
+    "fact.2": "Potato speelde 85% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.3": "De stand is Cauliflower 1–0 Potato.",
+    "casual": "Potato FC beginnen te domineren na een sterke vijf minuten.",
+    "analyst": "Potato FC nemen de controle en voltooien 85% van de passes in het laatste derde deel in de laatste vijf minuten, ondanks een achterstand van 1–0."
+   },
+   "zh-Hans": {
+    "headline": "Potato 掌控局面",
+    "fact.0": "最后十分钟内 Cauliflower 占据上风（势头领先0.65）;现在 Potato 领先（领先0.43）。",
+    "fact.1": "Potato 在最后五分钟占据上风（势头+0.43）。",
+    "fact.2": "Potato 在最后五分钟完成了85%的最后三分之一传球。",
+    "fact.3": "比分 Cauliflower 1比0 Potato。",
+    "casual": "Potato FC 在强势的五分钟后开始占据主导。",
+    "analyst": "尽管落后1比0，Potato FC在最后五分钟内完成了85%的最后三分之一传球。"
+   }
+  },
+  "M-9": {
+   "source_hash": "347edf58c84d35bb",
+   "es": {
+    "headline": "Woodelson pone el marcador 2–0 a Cauliflower",
+    "fact.0": "Ahora está Cauliflower 2–0 Potato.",
+    "fact.1": "La probabilidad de ganar de Cauliflower pasó del 77% al 96%.",
+    "fact.2": "Asistido por Mbeumonte.",
+    "fact.3": "Calidad Chance xG 0,20.",
+    "fact.4": "Su séptimo gol de la temporada.",
+    "fact.5": "Contra el curso del juego: Potato había dominado.",
+    "fact.6": "Cauliflower estuvieron bajo presión en los últimos cinco minutos (impulso de -0,42 por parte de su equipo).",
+    "fact.7": "Cauliflower jugó el 22% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.8": "La valoración en directo de Woodelson es de 7,5.",
+    "fact.9": "Disparos hasta ahora: Cauliflower 9 (xG 0,92), Potato 15 (xG 1,27).",
+    "fact.10": "Subió desde 6,4 en los últimos diez minutos.",
+    "casual": "Woodelson anotó en contra del curso del juego para poner el 2–0 a favor de Cauliflower, aliviando la presión.",
+    "analyst": "El gol de Woodelson, asistido por Mbeumonte, duplica la ventaja de Cauliflower a 2–0 a pesar del dominio de Potato. Con un xG de 0,20, aumenta su probabilidad de victoria del 77% al 96%, aliviando la presión reciente."
+   },
+   "fr": {
+    "headline": "Woodelson porte le score à 2–0 à Cauliflower",
+    "fact.0": "C’est maintenant Cauliflower 2–0 Potato.",
+    "fact.1": "La chance de victoire de Cauliflower est passée de 77 % à 96 %.",
+    "fact.2": "Assisté par Mbeumonte.",
+    "fact.3": "Chance qualité xG 0,20.",
+    "fact.4": "Son 7e but de la saison.",
+    "fact.5": "Contre le cours du jeu : Potato avait dominé.",
+    "fact.6": "Cauliflower étaient sous pression dans les cinq dernières minutes (élan de -0,42 de leur côté).",
+    "fact.7": "Cauliflower joué 22 % des passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.8": "Woodelson en direct est de 7,5.",
+    "fact.9": "Tirs jusqu’à présent : Cauliflower 9 (xG 0,92), Potato 15 (xG 1,27).",
+    "fact.10": "En hausse par rapport à 6,4 en dix minutes.",
+    "casual": "Woodelson a marqué contre le cours du jeu pour porter le score à 2–0 pour Cauliflower, allégeant ainsi la pression.",
+    "analyst": "Le but de Woodelson, assisté par Mbeumonte, double l’avance de Cauliflower à 2–0 malgré la domination de Potato. Avec un xG de 0,20, cela augmente leurs chances de victoire de 77 % à 96 %, soulageant ainsi la pression récente."
+   },
+   "de": {
+    "headline": "Woodelson steht 2:0 für Cauliflower",
+    "fact.0": "Jetzt steht es Cauliflower 2:0 Potato.",
+    "fact.1": "Die Gewinnchance von Cauliflower stieg von 77 % auf 96 %.",
+    "fact.2": "Unterstützt von Mbeumonte.",
+    "fact.3": "Chance-Qualität xG 0,20.",
+    "fact.4": "Sein siebtes Saisontor.",
+    "fact.5": "Entgegen dem Spielverlauf: Potato war oberste gewesen.",
+    "fact.6": "Cauliflower standen in den letzten fünf Minuten unter Druck (Momentum -0,42 von ihrer Seite).",
+    "fact.7": "Cauliflower spielte in den letzten fünf Minuten 22 % der Pässe im letzten Drittel.",
+    "fact.8": "Woodelson Live-Bewertung beträgt 7,5.",
+    "fact.9": "Bisherige Aufnahmen: 9 Cauliflower (xG 0,92), Potato 15 (xG 1,27).",
+    "fact.10": "Anstieg von 6,4 in den letzten zehn Minuten.",
+    "casual": "Woodelson trifft gegen den Spielverlauf zum 2:0 für Cauliflower und mildert den Druck.",
+    "analyst": "Woodelson's Tor, vorbereitet von Mbeumonte, verdoppelt Cauliflower Führung trotz Potato's Dominanz auf 2:0. Mit einem xG von 0,20 erhöht das ihre Siegchance von 77 % auf 96 %, was den aktuellen Druck entlastet."
+   },
+   "nl": {
+    "headline": "Woodelson maakt het 2–0 voor Cauliflower",
+    "fact.0": "Het staat nu Cauliflower 2–0 Potato.",
+    "fact.1": "De kans van Cauliflower om te winnen steeg van 77% naar 96%.",
+    "fact.2": "Geassisteerd door Mbeumonte.",
+    "fact.3": "Kanskwaliteit xG 0,20.",
+    "fact.4": "Zijn 7e doelpunt van het seizoen.",
+    "fact.5": "Tegen de spelverloop in: Potato stond bovenaan.",
+    "fact.6": "Cauliflower stonden in de laatste vijf minuten onder druk (momentum -0,42 van hun kant).",
+    "fact.7": "Cauliflower speelde 22% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.8": "De live rating van Woodelson is 7,5.",
+    "fact.9": "Tot nu toe foto's: Cauliflower 9 (xG 0,92), Potato 15 (xG 1,27).",
+    "fact.10": "Gestegen van 6,4 in de laatste tien minuten.",
+    "casual": "Woodelson scoort tegen het spelverloop in en maakt het 2–0 voor Cauliflower, waarmee hij de druk verlicht.",
+    "analyst": "Het doelpunt van Woodelson, geassisteerd door Mbeumonte, verdubbelt Cauliflower voorsprong tot 2–0 ondanks de dominantie van Potato. Met een xG van 0,20 verhoogt het hun winstkans van 77% naar 96%, wat de recente druk verlicht."
+   },
+   "zh-Hans": {
+    "headline": "Woodelson 比分变为2比0 Cauliflower",
+    "fact.0": "现在比分 Cauliflower 2比0 Potato。",
+    "fact.1": "Cauliflower的获胜概率从77%提升到了96%。",
+    "fact.2": "协助者为 Mbeumonte。",
+    "fact.3": "概率质量xG 0.20。",
+    "fact.4": "这是他本赛季的第七粒进球。",
+    "fact.5": "逆势而上： Potato 一直占据上风。",
+    "fact.6": "Cauliflower 在最后五分钟承受了压力（球队势头为-0.42）。",
+    "fact.7": "Cauliflower 在最后五分钟完成了22%的最后三分之一传球。",
+    "fact.8": "Woodelson的现场评分为7.5。",
+    "fact.9": "目前射击数： Cauliflower 9次（xG 0.92）， Potato 15次（xG 1.27）。",
+    "fact.10": "从最后十分钟的6.4提升。",
+    "casual": "Woodelson 在比赛节奏中得分，将比分改写为2比0， Cauliflower队轻松缓解了压力。",
+    "analyst": "Woodelson的进球由Mbeumonte助攻，尽管Potato占据优势，Cauliflower的领先优势扩大到2比0。xG为0.20，将他们的胜率从77%提升到96%，缓解了近期的压力。"
+   }
+  },
+  "M-10": {
+   "source_hash": "dc7881a131284322",
+   "es": {
+    "headline": "Konsatou creciendo en el juego",
+    "fact.0": "La valoración en directo de Konsatou es de 7,8.",
+    "fact.1": "Subió desde 7,1 en los últimos diez minutos.",
+    "fact.2": "63' placaje ganado (+0,55).",
+    "fact.3": "33' intercepción (+0,46).",
+    "fact.4": "27' ganó la bola suelta (+0,18)."
+   },
+   "fr": {
+    "headline": "Konsatou évoluant dans le jeu",
+    "fact.0": "Konsatou en direct est de 7,8.",
+    "fact.1": "En hausse par rapport à 7,1 en dix minutes.",
+    "fact.2": "63' plaquage gagné (+0,55).",
+    "fact.3": "33' interception (+0,46).",
+    "fact.4": "27' a gagné la balle libre (+0,18)."
+   },
+   "de": {
+    "headline": "Konsatou in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Konsatou liegt bei 7,8.",
+    "fact.1": "Erhöht von 7,1 in den letzten zehn Minuten.",
+    "fact.2": "63' Tackling gewonnen (+0,55).",
+    "fact.3": "33' Interception (+0,46).",
+    "fact.4": "27' gewann den losen Ball (+0,18)."
+   },
+   "nl": {
+    "headline": "Konsatou groeien in het spel",
+    "fact.0": "De live rating van Konsatou is 7,8.",
+    "fact.1": "Gestegen van 7,1 in de laatste tien minuten.",
+    "fact.2": "63' tackle won (+0,55).",
+    "fact.3": "33' onderschepping (+0,46).",
+    "fact.4": "27' won de losse bal (+0,18)."
+   },
+   "zh-Hans": {
+    "headline": "Konsatou 逐渐融入游戏",
+    "fact.0": "Konsatou的现场评分为7.8。",
+    "fact.1": "从过去十分钟的7.1提升。",
+    "fact.2": "63' 擒抱获胜（+0.55）。",
+    "fact.3": "33' 拦截（+0.46）。",
+    "fact.4": "27' 赢得了松散球（+0.18）。"
+   }
+  },
+  "M-11": {
+   "source_hash": "e5c330ef6e10708e",
+   "es": {
+    "headline": "Konsatou alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Konsatou es de 8,0."
+   },
+   "fr": {
+    "headline": "Konsatou atteint une note de 8,0",
+    "fact.0": "La note en direct de Konsatou est de 8,0."
+   },
+   "de": {
+    "headline": "Konsatou erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Konsatou liegt bei 8,0."
+   },
+   "nl": {
+    "headline": "Konsatou haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Konsatou is 8,0."
+   },
+   "zh-Hans": {
+    "headline": "Konsatou 评分为8.0",
+    "fact.0": "Konsatou的现场评分为8.0。"
+   }
+  },
+  "M-12": {
+   "source_hash": "1cd3d443213b8add",
+   "es": {
+    "headline": "Aïnsley creciendo en el juego",
+    "fact.0": "La valoración en directo de Aïnsley es de 7,2.",
+    "fact.1": "Subió desde 6,1 en los últimos diez minutos.",
+    "fact.2": "90+4' placaje ganado (+0,43).",
+    "fact.3": "90+4' placaje ganado (+0,43).",
+    "fact.4": "74' pase que añade amenaza (+0,24)."
+   },
+   "fr": {
+    "headline": "Aïnsley évoluant dans le jeu",
+    "fact.0": "La note en direct de Aïnsley est de 7,2.",
+    "fact.1": "En hausse par rapport à 6,1 en dix minutes.",
+    "fact.2": "90+4' plaquage gagné (+0,43).",
+    "fact.3": "90+4' plaquage gagné (+0,43).",
+    "fact.4": "74' passe cette menace supplémentaire (+0,24)."
+   },
+   "de": {
+    "headline": "Aïnsley in das Spiel hineinwachsen",
+    "fact.0": "Aïnsley hat eine Live-Einschaltquote von 7,2.",
+    "fact.1": "Erhöht von 6,1 in den letzten zehn Minuten.",
+    "fact.2": "90+4' Tackle gewann (+0,43).",
+    "fact.3": "90+4' Tackle gewann (+0,43).",
+    "fact.4": "74' Pass, der die Gefahr erhöhte (+0,24)."
+   },
+   "nl": {
+    "headline": "Aïnsley groeien in het spel",
+    "fact.0": "De live kijkcijfers van Aïnsley zijn 7,2.",
+    "fact.1": "Gestegen van 6,1 in de laatste tien minuten.",
+    "fact.2": "90+4' tackle won (+0,43).",
+    "fact.3": "90+4' tackle won (+0,43).",
+    "fact.4": "74' pass die extra dreiging toevoegde (+0,24)."
+   },
+   "zh-Hans": {
+    "headline": "Aïnsley 逐渐融入游戏",
+    "fact.0": "Aïnsley的现场评分为7.2。",
+    "fact.1": "从最后十分钟的6.1有所上升。",
+    "fact.2": "90+4' 擒抱获胜（+0.43）。",
+    "fact.3": "90+4' 擒抱获胜（+0.43）。",
+    "fact.4": "这74'传球，增加了威胁（+0.24）。"
+   }
+  },
+  "M-13": {
+   "source_hash": "cc9e4a00c70fd1f0",
+   "failed": {
+    "de": [
+     "fact.6",
+     "fact.7"
+    ],
+    "nl": [
+     "fact.7"
+    ],
+    "zh-Hans": [
+     "fact.8"
+    ]
+   },
+   "es": {
+    "headline": "Tiempo final: Cauliflower 2–0 Potato",
+    "fact.0": "Partido final: Cauliflower 2–0 Potato.",
+    "fact.1": "Disparos hasta ahora: Cauliflower 11 (xG 1,03), Potato 23 (xG 1,92).",
+    "fact.2": "Posesión: Cauliflower 44,1%, Potato 55,9%.",
+    "fact.3": "Jugador del partido: Ezri Konsatou (8,4).",
+    "fact.4": "41' Bissolatte abre el marcador.",
+    "fact.5": "64' Woodelson pone el marcador 2–0 a Cauliflower.",
+    "fact.6": "20' Raisman expulsados; Potato reducidos a 10.",
+    "fact.7": "Flekhagen tiene 5 porterías a cero esta temporada.",
+    "fact.8": "Potato había estado invicto en 5 jornadas.",
+    "casual": "Cauliflower FC gana 2–0 contra Potato FC, poniendo fin a su racha invicta. Konsatou destaca como jugador del partido.",
+    "analyst": "Cauliflower FC asegurar una victoria por 2–0 sobre Potato FC, a pesar de ser superados en tiros 23 a 11 y ir perdiendo en posesión. La destacada actuación de Konsatou(valoración de 8,4) y la tarjeta roja temprana de Raisman influyen en el resultado."
+   },
+   "fr": {
+    "headline": "Temps plein : Cauliflower 2–0 Potato",
+    "fact.0": "Temps plein : Cauliflower 2–0 Potato.",
+    "fact.1": "Tirs jusqu’à présent : Cauliflower 11 (xG 1,03), Potato 23 (xG 1,92).",
+    "fact.2": "Possession : Cauliflower 44,1 %, Potato 55,9 %.",
+    "fact.3": "Joueur du match : Ezri Konsatou (8,4).",
+    "fact.4": "41' Bissolatte ouvre le score.",
+    "fact.5": "64' Woodelson porte le score à 2–0 à Cauliflower.",
+    "fact.6": "20' Raisman expulsé ; Potato réduit à 10.",
+    "fact.7": "Flekhagen a 5 clean sheets cette saison.",
+    "fact.8": "Potato était invaincu en 5 matchs.",
+    "casual": "Cauliflower FC s’impose 2–0 contre Potato FC, mettant fin à leur série d’invaincues. Konsatou brille en tant que joueur du match.",
+    "analyst": "Cauliflower FC s’imposent 2–0 contre Potato FC, malgré une domination de 23 contre 11 et un retard en possession du ballon. La performance remarquable de Konsatou(note 8,4) et le carton rouge précoce de Raisman influencent le résultat."
+   },
+   "de": {
+    "headline": "Endspielzeit: Cauliflower 2:0 Potato",
+    "fact.0": "Endspielzeit: Cauliflower 2:0 Potato.",
+    "fact.1": "Bisherige Aufnahmen: 11 Cauliflower (xG 1,03), Potato 23 (xG 1,92).",
+    "fact.2": "Ballbesitz: Cauliflower 44,1 %, Potato 55,9 %.",
+    "fact.3": "Spieler des Spiels: Ezri Konsatou (8,4).",
+    "fact.4": "41' Bissolatte eröffnet die Punkteausgleich.",
+    "fact.5": "64' Woodelson steht 2:0 zu Cauliflower.",
+    "fact.8": "Potato war in 5 Jahren ungeschlagen.",
+    "casual": "Cauliflower FC gewinnen mit 2:0 gegen Potato FC und beenden damit ihre ungeschlagene Serie. Konsatou glänzt als Spieler des Spiels.",
+    "analyst": "Cauliflower FC sicherten sich einen 2:0-Sieg gegen Potato FC, obwohl sie mit 23 zu 11 Torschüssen untertroffen wurden und im Ballbesitz zurücklagen. Die herausragende Leistung von Konsatou(8,4 Rating) und Raisman's frühe Rote Karte prägten das Ergebnis."
+   },
+   "nl": {
+    "headline": "Eindtijd: Cauliflower 2–0 Potato",
+    "fact.0": "Eindstand: Cauliflower 2–0 Potato.",
+    "fact.1": "Tot nu toe aantal foto's: 11 Cauliflower (xG 1,03), Potato 23 (xG 1,92).",
+    "fact.2": "Posbezit: Cauliflower 44,1%, Potato 55,9%.",
+    "fact.3": "Speler van de wedstrijd: Ezri Konsatou (8,4).",
+    "fact.4": "41' Bissolatte opent de score.",
+    "fact.5": "64' Woodelson maakt het 2–0 voor Cauliflower.",
+    "fact.6": "20' Raisman weggestuurd; Potato teruggebracht tot 10.",
+    "fact.8": "Potato was ongeslagen in 5 jaar.",
+    "casual": "Cauliflower FC winnen met 2–0 van Potato FC en beëindigen daarmee hun ongeslagen reeks. Konsatou schittert als speler van de wedstrijd.",
+    "analyst": "Cauliflower FC behaalden een 2–0 overwinning op Potato FC, ondanks dat ze met 23 tegen 11 werden overklast in schoten en achter stonden in balbezit. Konsatou's opvallende prestatie (8,4 rating) en Raisman's vroege rode kaart bepalen de uitslag."
+   },
+   "zh-Hans": {
+    "headline": "全场结束： Cauliflower 2–0 Potato",
+    "fact.0": "全场： Cauliflower 2–0 Potato。",
+    "fact.1": "目前射击数： Cauliflower 11发（xG 1.03）， Potato 23发（xG 1.92）。",
+    "fact.2": "控球率： Cauliflower 44.1%， Potato 55.9%。",
+    "fact.3": "本场最佳球员： Ezri Konsatou （8.4分）。",
+    "fact.4": "41' Bissolatte 开局得分。",
+    "fact.5": "64' Woodelson 比分变为2比0 Cauliflower。",
+    "fact.6": "20' Raisman 被罚下; Potato 剩10分。",
+    "fact.7": "Flekhagen 本赛季有5场零封。",
+    "casual": "Cauliflower FC 以2比0战胜 Potato FC，终结了他们的不败纪录。 Konsatou 成为本场最佳球员。",
+    "analyst": "尽管被射门23比11落后且控球落后，Cauliflower FC仍以2比0战胜Potato FC。Konsatou的出色表现（评分8.4）和Raisman队早期的红牌决定了比赛结果。"
+   }
+  },
+  "M-14": {
+   "source_hash": "4d9ccfcb9d3aad61",
+   "es": {
+    "headline": "Flekhagen alcanza una puntuación de 8,0",
+    "fact.0": "La valoración en directo de Flekhagen es de 8,0."
+   },
+   "fr": {
+    "headline": "Flekhagen atteint une note de 8,0",
+    "fact.0": "La note en direct de Flekhagen est de 8,0."
+   },
+   "de": {
+    "headline": "Flekhagen erreicht eine Bewertung von 8,0",
+    "fact.0": "Die Live-Bewertung von Flekhagen liegt bei 8,0."
+   },
+   "nl": {
+    "headline": "Flekhagen haalt een beoordeling van 8,0",
+    "fact.0": "De live rating van Flekhagen is 8,0."
+   },
+   "zh-Hans": {
+    "headline": "Flekhagen 评分为8.0",
+    "fact.0": "Flekhagen的现场评分为8.0。"
+   }
+  },
+  "M-15": {
+   "source_hash": "628aa499f993de32",
+   "es": {
+    "headline": "Porrance creciendo en el juego",
+    "fact.0": "La valoración en directo de Porrance es de 7,3.",
+    "fact.1": "Subió desde 6,3 en los últimos diez minutos.",
+    "fact.2": "90+5' portería a cero (+0,96).",
+    "fact.3": "68' pase mal colocado (-0,10).",
+    "fact.4": "30' pase mal colocado (-0,10)."
+   },
+   "fr": {
+    "headline": "Porrance évoluant dans le jeu",
+    "fact.0": "Porrance en direct est de 7,3.",
+    "fact.1": "En hausse par rapport à 6,3 en dix minutes.",
+    "fact.2": "90+5' clean sheet (+0,96).",
+    "fact.3": "68' passe mal placée (-0,10).",
+    "fact.4": "30' passe mal placée (-0,10)."
+   },
+   "de": {
+    "headline": "Porrance in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Porrance liegt bei 7,3.",
+    "fact.1": "Erhöht von 6,3 in den letzten zehn Minuten.",
+    "fact.2": "90+5' ohne Gegentor (+0,96).",
+    "fact.3": "68' fehlplatzierter Pass (-0,10).",
+    "fact.4": "30' fehlplatzierter Pass (-0,10)."
+   },
+   "nl": {
+    "headline": "Porrance groeien in het spel",
+    "fact.0": "De live rating van Porrance is 7,3.",
+    "fact.1": "Gestegen van 6,3 in de laatste tien minuten.",
+    "fact.2": "90+5' schone score (+0,96).",
+    "fact.3": "68' misplaatste pass (-0,10).",
+    "fact.4": "30' misplaatste pass (-0,10)."
+   },
+   "zh-Hans": {
+    "headline": "Porrance 逐渐融入游戏",
+    "fact.0": "Porrance的现场评分为7.3。",
+    "fact.1": "从最后十分钟的6.3提升。",
+    "fact.2": "90+5' 场零封（+0.96）。",
+    "fact.3": "68' 传球失误（-0.10）。",
+    "fact.4": "30' 传球失误（-0.10）。"
+   }
+  },
+  "M-16": {
+   "source_hash": "c06d56f0da3e0854",
+   "es": {
+    "headline": "Udoroma creciendo en el juego",
+    "fact.0": "La valoración en directo de Udoroma es de 7,2.",
+    "fact.1": "Subió desde 6,2 en los últimos diez minutos.",
+    "fact.2": "90+5' portería a cero (+0,96).",
+    "fact.3": "43' pase de teclas (+0,10).",
+    "fact.4": "55' pase mal colocado (-0,10)."
+   },
+   "fr": {
+    "headline": "Udoroma évoluant dans le jeu",
+    "fact.0": "La note en direct de Udoroma est de 7,2.",
+    "fact.1": "En hausse par rapport à 6,2 en dix minutes.",
+    "fact.2": "90+5' clean sheet (+0,96).",
+    "fact.3": "43' passe clé (+0,10).",
+    "fact.4": "55' passe mal placée (-0,10)."
+   },
+   "de": {
+    "headline": "Udoroma in das Spiel hineinwachsen",
+    "fact.0": "Udoroma hat eine Live-Einschaltquote von 7,2.",
+    "fact.1": "Erhöht von 6,2 in den letzten zehn Minuten.",
+    "fact.2": "90+5' ohne Gegentor (+0,96).",
+    "fact.3": "43' Tastenpass (+0,10).",
+    "fact.4": "55' fehlplatzierter Pass (-0,10)."
+   },
+   "nl": {
+    "headline": "Udoroma groeien in het spel",
+    "fact.0": "De live kijkcijfers van Udoroma zijn 7,2.",
+    "fact.1": "Gestegen van 6,2 in de laatste tien minuten.",
+    "fact.2": "90+5' schone score (+0,96).",
+    "fact.3": "43' sleutelpass (+0,10).",
+    "fact.4": "55' misplaatste pass (-0,10)."
+   },
+   "zh-Hans": {
+    "headline": "Udoroma 逐渐融入游戏",
+    "fact.0": "Udoroma的现场评分为7.2。",
+    "fact.1": "从最后十分钟的6.2有所上升。",
+    "fact.2": "90+5' 场零封（+0.96）。",
+    "fact.3": "43' 键传递（+0.10）。",
+    "fact.4": "55' 传球失误（-0.10）。"
+   }
+  },
+  "M-17": {
+   "source_hash": "995b0bcb48cace79",
+   "es": {
+    "headline": "Andervik creciendo en el juego",
+    "fact.0": "La audiencia en directo de Andervik es de 7,9.",
+    "fact.1": "Subió desde 7,0 en los últimos diez minutos.",
+    "fact.2": "90+5' portería a cero (+0,93).",
+    "fact.3": "45+1' intercepción (+0,46).",
+    "fact.4": "69' intercepción (+0,46)."
+   },
+   "fr": {
+    "headline": "Andervik évoluant dans le jeu",
+    "fact.0": "Andervik en direct est de 7,9.",
+    "fact.1": "En hausse par rapport à 7,0 dans les dix dernières minutes.",
+    "fact.2": "90+5' clean sheet (+0,93).",
+    "fact.3": "45+1' interception (+0,46).",
+    "fact.4": "69' interception (+0,46)."
+   },
+   "de": {
+    "headline": "Andervik in das Spiel hineinwachsen",
+    "fact.0": "Die Live-Bewertung von Andervik liegt bei 7,9.",
+    "fact.1": "Anstieg von 7,0 in den letzten zehn Minuten.",
+    "fact.2": "90+5' sauberes Blatt (+0,93).",
+    "fact.3": "45+1' Interception (+0,46).",
+    "fact.4": "69' Interception (+0,46)."
+   },
+   "nl": {
+    "headline": "Andervik groeien in het spel",
+    "fact.0": "De live kijkcijfers van Andervik zijn 7,9.",
+    "fact.1": "Gestegen van 7,0 in de laatste tien minuten.",
+    "fact.2": "90+5' clean sheet (+0,93).",
+    "fact.3": "45+1' onderschepping (+0,46).",
+    "fact.4": "69' onderschepping (+0,46)."
+   },
+   "zh-Hans": {
+    "headline": "Andervik 逐渐融入游戏",
+    "fact.0": "Andervik的现场评分为7.9。",
+    "fact.1": "从最后十分钟的7.0提升。",
+    "fact.2": "90+5' 场零封（+0.93）。",
+    "fact.3": "45+1' 拦截（+0.46）。",
+    "fact.4": "69' 拦截（+0.46）。"
+   }
+  }
+ }
+}

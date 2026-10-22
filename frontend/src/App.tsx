@@ -11,6 +11,7 @@ export default function App() {
   const [name, setName] = useState<string | null>(null);
   const [mode, setMode] = useState<ViewMode>("analyst");
   const [favourite, setFavourite] = useState<string | null>(null);
+  const [lang, setLang] = useState("en");
   const [seekTo, setSeekTo] = useState(0);
   const sceneRef = useRef<PitchScene | null>(null);
   const pitchEl = useRef<HTMLDivElement>(null);
@@ -40,7 +41,14 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
-  const { meta, aiInfo, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } = useReplay(name, onEvent, onReset);
+  const { meta, aiInfo, languages, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek } =
+    useReplay(name, lang, onEvent, onReset);
+  // A new language reconnects from the current minute, so the match carries on where it was.
+  const changeLang = (l: string) => {
+    const m = state?.match_minute ?? 0;
+    seek(Math.floor(state?.period === 1 ? Math.min(m, 45) : m)); // first-half stoppage stays in the first half
+    setLang(l);
+  };
 
   useEffect(() => {
     if (meta) sceneRef.current?.setMatch(meta);
@@ -61,6 +69,9 @@ export default function App() {
         <h1>Pitch Insights <small>live football intelligence</small></h1>
         <select value={name ?? ""} onChange={(e) => setName(e.target.value)} aria-label="Match">
           {matches.map((m) => <option key={m.name} value={m.name}>{m.home.name} v {m.away.name} ({m.name.split("-")[0]})</option>)}
+        </select>
+        <select value={lang} onChange={(e) => changeLang(e.target.value)} aria-label="Language">
+          {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
         </select>
         <div className="segmented" role="group" aria-label="Viewer mode">
           {(["casual", "analyst"] as ViewMode[]).map((v) => (

@@ -65,6 +65,7 @@ export interface Moment {
   signals: string[];
   score: Record<string, number>;
   commentary?: Commentary; // written by the agents, when there is some for this moment
+  lang?: string; // set when the server sent this moment machine-translated
 }
 
 /** One moment's commentary from the agents, checked against its evidence pack. */
@@ -78,6 +79,7 @@ export interface Commentary {
   grounding: { score: number; claims: number; unsupported: string[] } | null;
   corrected: string[]; // what the groundedness check caught in an earlier draft
   reason: string | null;
+  safety?: { passed: boolean; severities: Record<string, number>; flagged: string[]; error: string | null } | null;
 }
 
 /** Who wrote a match's stored commentary, for the AI-generated label. */

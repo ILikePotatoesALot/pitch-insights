@@ -13,11 +13,12 @@ Written 21 Oct 2026. The single place to pick this project up: where things stan
 
 | Branch | State | Contents |
 |---|---|---|
-| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4) |
+| `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4), Memory agent (ILikePotatoesALot/pitch-insights#6) |
+| `ai-services` | Local only, not pushed | Content Safety, Translator (five languages), tracing to Application Insights, Foundry groundedness evaluator |
 
 The merged branches are deleted. Every branch so far has had a `/code-review`, and the original code was reviewed by path on `generator-review`.
 
-**Next git step:** the Memory agent is on local branch `memory-agent` (cut from `tidy-ups`, ILikePotatoesALot/pitch-insights#5), committed, not pushed. Push it and open a pull request when Austin says.
+**Next git step:** `ai-services` is committed locally and reviewed, not pushed. Push it and open a pull request when Austin says.
 
 ## What's built
 
@@ -31,13 +32,16 @@ The merged branches are deleted. Every branch so far has had a `/code-review`, a
 | Replay server (FastAPI WebSocket) | Built, reviewed, fixed | `backend/pitch_insights/server.py` |
 | App (Vite + React + Three.js: 3D pitch, moments feed, ratings, stats, casual/analyst modes) | Built, reviewed, fixed, checked in the browser | `frontend/` |
 | Agents core (Explainer, Narrator, groundedness check with retry and fallback, stored commentary, commentary in the app) | Built, reviewed twice, fixed, merged (ILikePotatoesALot/pitch-insights#4) | `backend/pitch_insights/agents/`, [DESIGN.md, Agents](DESIGN.md#agents) |
-| Memory agent (similar earlier moments as `memory` facts; Foundry embeddings stored next to each sample, so replays need no network) | Built and reviewed on local branch `memory-agent` (21 Oct), not pushed | `backend/pitch_insights/agents/memory.py`, [DESIGN.md, Memory agent](DESIGN.md#memory-agent) |
-| Other agents (Content Safety, Translator, Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
+| Memory agent (similar earlier moments as `memory` facts; Foundry embeddings stored next to each sample, so replays need no network) | Built, reviewed, merged (ILikePotatoesALot/pitch-insights#6) | `backend/pitch_insights/agents/memory.py`, [DESIGN.md, Memory agent](DESIGN.md#memory-agent) |
+| Safety check (Azure AI Content Safety: every line screened, blocked at severity 2, fails closed) | Built on `ai-services` (22 Oct); 52 stored moments screened, none blocked | `backend/pitch_insights/agents/safety.py`, [DESIGN.md, Safety check](DESIGN.md#safety-check) |
+| Translations (Azure AI Translator: Spanish, French, German, Dutch, Simplified Chinese; names and clocks protected; checked; stored) | Built on `ai-services` (22 Oct); 9 of 3,180 kept English | `backend/pitch_insights/agents/translate.py`, [DESIGN.md, Translations](DESIGN.md#translations) |
+| Tracing (Agent Framework to Application Insights, no prompts or replies) and Foundry's groundedness evaluator (all 52 lines pass, lowest 4 of 5) | Built on `ai-services` (22 Oct) | `agents/tracing.py`, `scripts/evaluate_groundedness.py` |
+| Other agents (Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Designed only | [DESIGN.md, Video path](DESIGN.md#video-path-planned) |
 | Azure deployment | Not started | |
 
-**Tests:** 118 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, and the memory tests use fake embedders. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 133 passing (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -83,12 +87,22 @@ cd backend
 .venv\Scripts\python scripts/embed_moments.py
 ```
 
-**Stored commentary** (needs the Foundry values in `.env`; redoes only moments whose facts, model or prompt changed):
+**Stored commentary** (needs the Foundry values in `.env`; redoes only moments whose facts, model or prompt changed, and screens older lines with Content Safety without calling the model; traces to Application Insights when its connection string is set):
 
 ```
 cd backend
 .venv\Scripts\python scripts/generate_commentary.py
 ```
+
+**Translations and the groundedness evaluator** (run after the stored commentary; each sends only what changed). The Translator's free tier is paced to 30,000 characters a minute, so a full run takes about 10 minutes:
+
+```
+cd backend
+.venv\Scripts\python scripts/translate_moments.py
+.venv\Scripts\python scripts/evaluate_groundedness.py
+```
+
+Order after changing moments: `embed_moments.py`, then `generate_commentary.py`, then `translate_moments.py` and `evaluate_groundedness.py`.
 
 **Demo matches** (in `samples/`): `comeback-POT-CAR` (seed 52: Potato lead 2–1, Carrot win 3–2 with an 88' equaliser and a 96th-minute winner; the hero match), `thriller-CAR-BRO` (seed 4: Broccoli win 4–3 away), `red-card-CAU-POT` (seed 24: Potato down to ten at 20', Cauliflower win 2–0).
 
@@ -147,7 +161,7 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 | # | Step | Needs | Size |
 |---|---|---|---|
 | 1 | Done: **agents core**, merged in ILikePotatoesALot/pitch-insights#4 (21 Oct) | | |
-| 2 | **Foundry and AI services:** Memory agent (built, on `memory-agent`), Foundry groundedness evaluation, Content Safety, Translator, tracing to Application Insights | Free-tier resources | ~half a day |
+| 2 | Done 22 Oct: **Foundry and AI services** (Memory agent merged; Content Safety, Translator, tracing and the groundedness evaluator on `ai-services`) | | |
 | 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
 | 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
 | 5 | Decided 21 Oct: the video path uses **pre-trained detection on a short clip** (no GPU quota needed); fine-tuning maybe later. Cut it if it isn't working by 24 Oct | | |

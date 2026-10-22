@@ -99,6 +99,14 @@ cd backend
 .venv\Scripts\python scripts/generate_commentary.py
 ```
 
+Every line is then screened by **Azure AI Content Safety** (blocked at the lowest harm level, and not shown if the service can't be reached), and **Foundry's groundedness evaluator** gives a second opinion: all 52 stored lines pass, the lowest scoring 4 out of 5. **Azure AI Translator** puts every moment into Spanish, French, German, Dutch and Simplified Chinese, with player and club names and match clocks protected, and a translation that loses a name or number keeps its English (9 of 3,180 did). Agent runs are traced to **Application Insights** through Agent Framework's OpenTelemetry instrumentation, without prompts or replies.
+
+```
+cd backend
+.venv\Scripts\python scripts/translate_moments.py
+.venv\Scripts\python scripts/evaluate_groundedness.py
+```
+
 First full run: 52 moments across the three demo matches, all grounded, none fell back. Commentary is labelled as AI-generated in the app, and "Why?" shows the facts it came from. Details and the engineering practices we follow: [docs/DESIGN.md](docs/DESIGN.md#agents).
 
 ## Credits
