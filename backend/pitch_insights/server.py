@@ -4,13 +4,15 @@
 
 GET  /api/matches                list of demo matches in samples/
 GET  /api/matches/{name}         that match's match_meta
-WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0
+GET  /api/clubs                  the clubs and their squads (for the app's profile picker)
+WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0&mode=casual&team=POT&player=POT-09&focus=xg
 
 The WebSocket sends, in order:
-  {"type": "meta", "meta": ..., "commentary": {...}, "languages": {...}, "lang": "de"}
+  {"type": "meta", "meta": ..., "commentary": {...}, "languages": {...}, "lang": "de", "profile": {...}}
                                                         commentary: who wrote the stored commentary
                                                         (model, prompt version, groundedness summary);
-                                                        languages: those with stored translations
+                                                        languages: those with stored translations;
+                                                        profile: the viewer's choices as the server applied them
   {"type": "catchup", "moments": [...], "state": ..., "recent_events": [...]}
                                                         only when starting after kick-off; recent_events
                                                         (the last 3 minutes) let the pitch redraw at once
@@ -29,13 +31,17 @@ The WebSocket sends, in order:
 The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"}, {"cmd": "resume"} or
 {"cmd": "detail", "value": "casual"} (the viewer's mode, "casual" or "analyst", the default: casual fans
 get only the cues made for everyone, so cues they would never see can't hold a slot on their screen).
-To seek, it reconnects with a different `from` minute, or `at` (match seconds, which wins when both are
+The viewer's profile comes with the connection (`mode`, `team`, `player`, `focus`; see
+pitch_insights/director/personalise.py): the Director boosts cues about the favourite, adds alerts for the
+favourite player and keeps cues about the other side from holding slots. A value that is missing, malformed or
+not in this match is ignored. To seek, it reconnects with a different `from` minute, or `at` (match seconds, which wins when both are
 given): a minute on the broadcast clock can say 47:00 of the second half but not 45+2 of the first.
 """
 
 from __future__ import annotations
 
 import asyncio
+import functools
 import json
 import math
 import os
@@ -47,7 +53,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.store import load_commentary, with_commentary
 from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
-from pitch_insights.director import CueBuilder, Director, ShowClock, visible_to
+from pitch_insights.director import CueBuilder, Director, Personaliser, ShowClock, parse_profile, visible_to
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
@@ -82,6 +88,26 @@ def list_matches() -> list[dict]:
                     "home": {k: meta["home"][k] for k in ("id", "name", "short_name", "colours")},
                     "away": {k: meta["away"][k] for k in ("id", "name", "short_name", "colours")}})
     return out
+
+
+@functools.lru_cache(maxsize=4)
+def _clubs(files: tuple[tuple[str, int], ...]) -> list[dict]:
+    """The clubs in these sample files (path and modification time, so a changed file is read again)."""
+    clubs: dict[str, dict] = {}
+    for path in (Path(p) for p, _ in files):
+        with path.open(encoding="utf-8") as f:
+            meta = json.loads(f.readline())
+        for side in ("home", "away"):
+            t = meta[side]
+            clubs.setdefault(t["id"], {k: t[k] for k in ("id", "name", "short_name", "colours")} | {
+                "players": [{k: p[k] for k in ("id", "name", "number", "position")} for p in t["players"]]})
+    return sorted(clubs.values(), key=lambda c: c["name"])
+
+
+@app.get("/api/clubs")
+def list_clubs() -> list[dict]:
+    """Each club in the samples with its squad: what the profile picker offers as a favourite club and player."""
+    return _clubs(tuple((str(p), p.stat().st_mtime_ns) for p in sorted(SAMPLES.glob("*.jsonl"))))
 
 
 @app.get("/api/matches/{name}")
@@ -137,8 +163,9 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         m = with_commentary(m, stored, meta)
         return translated_moment(m, translations.get(m["id"]), lang)
 
+    profile = parse_profile(ws.query_params, meta)  # checked against this match: a bad value is ignored
     await ws.send_json({"type": "meta", "meta": meta, "commentary": commentary_info(stored),
-                        "languages": languages, "lang": lang})
+                        "languages": languages, "lang": lang, "profile": profile.public()})
 
     try:  # exact match seconds: a reconnect that must land on the same second, which a minute can't
         at = float(ws.query_params["at"]) if "at" in ws.query_params else None  # (no `from` for 45+2')
@@ -162,9 +189,10 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     # The Overlay Director: one per connection, working in screen seconds (a cue lasts as long on the
     # screen at 60x as at 1x). A seek or a language change reconnects, so cues start afresh.
     director, builder, clock = Director(), CueBuilder(meta), ShowClock()
+    personaliser = Personaliser(profile, meta)  # the favourites and focus metric: boosts, alerts, relevance
     # Whose screen the Director is keeping clean: what the browser last asked for, and what the Director has
     # been reconciled to (listen() only asks; play() does the sending, so two tasks never write at once).
-    viewer = {"detail": "analyst", "applied": "analyst"}
+    viewer = {"detail": profile.mode, "applied": profile.mode}
 
     def show_now() -> float:
         return clock.at(rep.now, rep.speed)
@@ -227,7 +255,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 state = state_message(brain)
                 await ws.send_json({"type": "state", "state": state})
                 last_state = loop.time()
-            cues = [c for m in shown_moments for c in builder.for_moment(m, state) if visible_to(c, viewer["detail"])]
+            cues = [c for c in personaliser.cues(builder, ev, shown_moments, state, lambda: state_message(brain), rep.now)
+                    if visible_to(c, viewer["detail"])]
             if cues:
                 await tick()  # mode changes and expiries first, so the new cues meet the screen as it is
                 await send_all(director.offer(cues, show_now()))

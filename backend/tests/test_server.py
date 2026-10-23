@@ -192,3 +192,46 @@ def test_switching_to_casual_takes_down_the_analyst_cues_on_screen():
                 assert msg["reason"] == "withdrawn"
                 return
     raise AssertionError("the analyst cue stayed up")
+
+
+def test_lists_clubs_with_their_squads():
+    clubs = client.get("/api/clubs").json()
+    assert [c["id"] for c in clubs] == ["BRO", "CAR", "CAU", "POT"]  # by name
+    pot = next(c for c in clubs if c["id"] == "POT")
+    assert pot["name"] == "Potato FC" and len(pot["players"]) == 20
+    assert set(pot["players"][0]) == {"id", "name", "number", "position"}
+
+
+def test_the_profile_comes_with_the_connection_and_is_sent_back_as_applied():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0&mode=casual&team=pot&player=POT-11&focus=xg") as ws:
+        meta = ws.receive_json()
+    assert meta["profile"] == {"mode": "casual", "team_id": "POT", "player_id": "POT-11", "focus": "xg"}
+
+
+def test_a_bad_profile_is_ignored_not_fatal():
+    url = "/ws/replay/comeback-POT-CAR?speed=0&mode=%00&team=BRO&player=../x&focus=" + "z" * 4000
+    with client.websocket_connect(url) as ws:
+        meta = ws.receive_json()
+        assert meta["profile"] == {"mode": "analyst", "team_id": None, "player_id": None, "focus": None}
+        assert ws.receive_json()["type"] == "event"
+
+
+def test_the_favourite_players_goal_alert_reaches_a_casual_fan():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=59&mode=casual&player=POT-11") as ws:
+        alerts = []
+        while (msg := ws.receive_json())["type"] != "end":
+            if msg["type"] == "cue" and msg["cue"]["template"] == "fan_alert":
+                alerts.append(msg["cue"])
+    assert [(a["data"]["event"], a["data"]["clock"], a["why"]) for a in alerts] == [("goal", "61'", "favourite_player")]
+
+
+def test_two_viewers_of_one_match_are_offered_different_cues():
+    def cue_kinds(query):
+        out = []
+        with client.websocket_connect(f"/ws/replay/comeback-POT-CAR?speed=600&from=59&{query}") as ws:
+            while (msg := ws.receive_json())["type"] != "end":
+                if msg["type"] == "cue":
+                    out.append((msg["cue"]["template"], msg["cue"]["about"]["team_id"]))
+        return out
+
+    assert cue_kinds("mode=casual&team=POT&player=POT-11&lang=de") != cue_kinds("mode=analyst&team=CAR&lang=en")

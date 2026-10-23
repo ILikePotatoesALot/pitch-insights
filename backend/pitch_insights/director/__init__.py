@@ -9,6 +9,8 @@ Deterministic code, not a model call: see docs/DESIGN.md, Overlay Director.
 """
 
 from pitch_insights.director.cues import CARD_TEMPLATES, TEMPLATES, CueBuilder, visible_to
+from pitch_insights.director.personalise import FOCUS_METRICS, MODES, Personaliser, Profile, parse_profile
 from pitch_insights.director.scheduler import DEFAULT_RULES, Director, Rules, ShowClock
 
-__all__ = ["CARD_TEMPLATES", "TEMPLATES", "CueBuilder", "DEFAULT_RULES", "Director", "Rules", "ShowClock", "visible_to"]
+__all__ = ["CARD_TEMPLATES", "FOCUS_METRICS", "MODES", "TEMPLATES", "CueBuilder", "DEFAULT_RULES", "Director", "Personaliser",
+           "Profile", "Rules", "ShowClock", "parse_profile", "visible_to"]

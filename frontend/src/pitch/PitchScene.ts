@@ -39,6 +39,9 @@ export function teamColours(meta: MatchMeta): [THREE.Color, THREE.Color] {
 
 interface Spike { x: number; y: number; amp: number; born: number; goal: boolean }
 
+/** A ring and a beam that follow one player, and the page's label for them. See PitchScene.setSpotlight. */
+interface Spotlight { id: string; colour: string; group: THREE.Group; pulse: THREE.Mesh; label: HTMLElement | null; target: THREE.Vector3; placed: boolean; on: boolean; labelSize: [number, number] }
+
 const BASE_COLOUR = new THREE.Color("#10202c");
 const GLOW_COLOUR = new THREE.Color("#fff6c2");
 
@@ -60,6 +63,8 @@ export class PitchScene {
   private observer: ResizeObserver;
   private dirty = true;
   private tmpColour = new THREE.Color();
+  private spot: Spotlight | null = null;
+  private tmpVector = new THREE.Vector3();
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -109,7 +114,64 @@ export class PitchScene {
     this.dirty = true;
   }
 
+  /**
+   * Follow a player with a ring and a beam, and keep `label` (an element over the pitch) beside them, or stop
+   * (`null`). The label is a page element, not part of the 3D scene, so it stays sharp and can be held inside the
+   * pitch when the player is at its edge. The events carry positions but there is no
+   * tracking in the synthetic matches, so the spotlight sits where the player last took part (a pass, a carry,
+   * a pass received, a tackle) and glides there; it stays hidden until the first such event, and while they are off.
+   */
+  setSpotlight(player: { id: string; colour: string } | null, label: HTMLElement | null = null) {
+    if (this.spot && player && this.spot.id === player.id && this.spot.colour === player.colour) return;
+    this.clearSpotlight(); // (another match can give the same player the other club's colour)
+    if (!player) return;
+    const colour = new THREE.Color(player.colour);
+    const group = new THREE.Group();
+    const flat = (inner: number, outer: number, opacity: number) => {
+      const m = new THREE.Mesh(new THREE.RingGeometry(inner, outer, 56), new THREE.MeshBasicMaterial({
+        color: colour, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false }));
+      m.rotation.x = -Math.PI / 2;
+      return m;
+    };
+    const ring = flat(2.1, 2.9, 0.95), pulse = flat(2.9, 3.4, 0.5);
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 2.6, 15, 28, 1, true), new THREE.MeshBasicMaterial({
+      color: colour, transparent: true, opacity: 0.2, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+    beam.position.y = 7.5;
+    group.add(ring, pulse, beam);
+    group.visible = false;
+    this.scene.add(group);
+    this.spot = { id: player.id, colour: player.colour, group, pulse, label, target: new THREE.Vector3(), placed: false, on: true,
+                  labelSize: [0, 0] };
+  }
+
+  /** Show or hide the spotlight to match whether the player is on the pitch (from the live state). */
+  setSpotlightOn(on: boolean) {
+    if (this.spot) this.spot.on = on;
+  }
+
+  private clearSpotlight() {
+    const spot = this.spot;
+    if (!spot) return;
+    this.scene.remove(spot.group);
+    spot.group.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) { obj.geometry.dispose(); (obj.material as THREE.Material).dispose(); }
+    });
+    if (spot.label) spot.label.style.display = "none";
+    this.spot = null;
+  }
+
+  /** Where this event puts the spotlit player, in pitch metres, or null if it says nothing about them. */
+  private spotPosition(ev: MatchEvent, meta: MatchMeta): [number, number] | null {
+    const id = this.spot?.id;
+    if (ev.player_id === id) {
+      return (ev.type === "carry" ? toAbsolute(ev, meta, true) : null) ?? toAbsolute(ev, meta);
+    }
+    if (ev.type === "pass" && ev.receiver_id === id && ev.outcome === "complete") return toAbsolute(ev, meta, true);
+    return null;
+  }
+
   reset() {
+    if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
     this.heat[0].fill(0);
     this.heat[1].fill(0);
     this.spikes = [];
@@ -124,6 +186,16 @@ export class PitchScene {
     if (meta.home.id !== this.homeId) this.setMatch(meta);
     this.matchTime = matchTime;
     this.decay();
+    if (this.spot) {
+      if (ev.type === "substitution" && ev.player_off_id === this.spot.id) this.spot.on = false;
+      else if (ev.type === "foul" && ev.card === "red" && ev.player_id === this.spot.id) this.spot.on = false;
+      else if (ev.type === "substitution" && ev.player_on_id === this.spot.id) this.spot.on = true;
+      const at = this.spotPosition(ev, meta);
+      if (at) {
+        this.spot.target.set(at[0] - L / 2, 0, W / 2 - at[1]);
+        if (!this.spot.placed) { this.spot.group.position.copy(this.spot.target); this.spot.placed = true; }
+      }
+    }
     const pos = toAbsolute(ev, meta);
     if (!pos || !ev.team_id) return;
     const side = ev.team_id === this.homeId ? 0 : 1;
@@ -145,6 +217,7 @@ export class PitchScene {
 
   dispose() {
     cancelAnimationFrame(this.frame);
+    this.clearSpotlight();
     this.observer.disconnect();
     this.controls.dispose();
     this.scene.traverse((obj) => {
@@ -307,6 +380,34 @@ export class PitchScene {
     this.camera.updateProjectionMatrix();
   }
 
+  private moveSpotlight() {
+    const spot = this.spot;
+    if (!spot) return;
+    spot.group.visible = spot.placed && spot.on;
+    if (spot.label) spot.label.style.display = spot.group.visible ? "block" : "none";
+    if (!spot.group.visible) return;
+    const g = spot.group.position;
+    const x = spot.target.x, z = spot.target.z;
+    g.set(g.x + (x - g.x) * 0.1, 0, g.z + (z - g.z) * 0.1);
+    g.y = this.heightAt(g.x + L / 2, W / 2 - g.z) + 0.5;
+    const beat = (performance.now() % 1600) / 1600; // a ring that swells and fades, once every 1.6 s
+    spot.pulse.scale.setScalar(1 + beat * 0.9);
+    (spot.pulse.material as THREE.MeshBasicMaterial).opacity = 0.55 * (1 - beat);
+    if (spot.label) this.placeLabel(spot.label, g);
+  }
+
+  /** Put the label above the player's beam, inside the pitch's box. */
+  private placeLabel(label: HTMLElement, at: THREE.Vector3) {
+    const { clientWidth: cw, clientHeight: ch } = this.container;
+    const v = this.tmpVector.set(at.x, at.y + 10, at.z).project(this.camera);
+    const spot = this.spot!;
+    if (!spot.labelSize[0]) spot.labelSize = [label.offsetWidth, label.offsetHeight]; // measured once: reading it every frame forces a layout
+    const [w, h] = spot.labelSize;
+    const x = Math.min(cw - w - 6, Math.max(6, (v.x * 0.5 + 0.5) * cw - w / 2));
+    const y = Math.min(ch - h - 6, Math.max(6, (-v.y * 0.5 + 0.5) * ch - h));
+    label.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+  }
+
   private loop = () => {
     this.frame = requestAnimationFrame(this.loop);
     if (this.dirty) {
@@ -316,6 +417,7 @@ export class PitchScene {
     const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
     const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
     this.ball.position.lerp(target, 0.18);
+    this.moveSpotlight();
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   };

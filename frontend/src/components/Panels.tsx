@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { CommentaryInfo, LiveState, MatchMeta, Moment, PlayerState, ViewMode } from "../types";
+import { focusLabel } from "../profile";
+import type { CommentaryInfo, FocusMetric, LiveState, MatchMeta, Moment, PlayerState, ViewMode } from "../types";
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
@@ -20,6 +21,98 @@ export function Scoreboard({ meta, state, colours }: { meta: MatchMeta; state: L
         <div className="draw" style={{ width: pct(wp.draw) }}>{wp.draw >= 0.12 && `Draw ${pct(wp.draw)}`}</div>
         <div style={{ width: pct(wp.away), background: colours[1] }}>{wp.away >= 0.12 && pct(wp.away)}</div>
       </div>
+    </div>
+  );
+}
+
+type TeamNumbers = Record<string, number | null | undefined>;
+
+/** A team's value for a focus metric, as text ("1.23", "55%"). */
+function teamFocusValue(state: LiveState, side: "home" | "away", teamId: string, focus: FocusMetric): string {
+  if (focus === "win_probability") return pct(state.win_probability[side]);
+  const v = (state.teams[teamId] as unknown as TeamNumbers)[focus];
+  if (v === null || v === undefined) return "–";
+  return focus === "xg" || focus === "xt_added" ? v.toFixed(2) : focus.endsWith("_pct") ? `${v}%` : String(v);
+}
+
+/** The viewer's focus metric, for both teams: shown whatever the layout or mode. */
+export function FocusStrip({ meta, state, colours, focus }: {
+  meta: MatchMeta; state: LiveState | null; colours: [string, string]; focus: FocusMetric | null;
+}) {
+  if (!focus) return null;
+  const sides: ["home" | "away", string, string][] = [["home", meta.home.id, colours[0]], ["away", meta.away.id, colours[1]]];
+  return (
+    <div className="focus-strip" title="Your focus metric (change it under Profile)">
+      <span className="fs-label">★ {focusLabel(focus)}</span>
+      {sides.map(([side, id, colour]) => (
+        <span className="fs-val" key={side}><i style={{ background: colour }} />{meta[side].short_name} <b>{state ? teamFocusValue(state, side, id, focus) : "–"}</b></span>
+      ))}
+    </div>
+  );
+}
+
+/** The favourite's value for the focus metric, when the metric makes sense for one player. */
+function playerFocus(p: PlayerState, focus: FocusMetric | null): [string, string] | null {
+  switch (focus) {
+    case "xt_added": return ["xT added", p.xt_added.toFixed(2)];
+    case "xg": return ["xG", p.xg.toFixed(2)];
+    case "shots": return ["Shots", String(p.shots)];
+    case "pass_accuracy_pct": return ["Pass accuracy", p.passes ? `${Math.round((100 * p.passes_complete) / p.passes)}%` : "–"];
+    default: return null;
+  }
+}
+
+function Sparkline({ values, colour }: { values: number[]; colour: string }) {
+  if (values.length < 2) return <svg className="spark" viewBox="0 0 100 24" aria-hidden />;
+  const lo = Math.min(...values, 6) - 0.2, hi = Math.max(...values, 7) + 0.2;
+  const pts = values.map((v, i) => `${(i / (values.length - 1)) * 100},${24 - ((v - lo) / (hi - lo)) * 24}`).join(" ");
+  return (
+    <svg className="spark" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Rating through the match">
+      <polyline points={pts} fill="none" stroke={colour} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+/** The viewer's favourite player, pinned: live rating with its trend, and the stats that suit their mode. */
+export function PinnedPlayer({ state, meta, colours, playerId, mode, focus, history, onChange }: {
+  state: LiveState | null; meta: MatchMeta; colours: [string, string]; playerId: string; mode: ViewMode;
+  focus: FocusMetric | null; history: number[]; onChange: () => void;
+}) {
+  const home = meta.home.players.find((p) => p.id === playerId);
+  const person = home ?? meta.away.players.find((p) => p.id === playerId);
+  if (!person) return null;
+  const colour = home ? colours[0] : colours[1];
+  const p = state?.players.find((x) => x.player_id === playerId);
+  const here = p ? playerFocus(p, focus) : null;
+  const stats: [string, string][] = p ? [
+    ["Goals", String(p.goals)], ["Assists", String(p.assists)], ["Shots", String(p.shots)],
+    ["Passes", `${p.passes_complete}/${p.passes}`],
+    ...(mode === "analyst" ? [["xG", p.xg.toFixed(2)], ["xT added", p.xt_added.toFixed(2)], ["Key passes", String(p.key_passes)],
+      ["Tackles won", String(p.tackles_won)]] as [string, string][] : []),
+  ] : [];
+  const before = history.length > 1 ? history[Math.max(0, history.length - 11)] : null;
+  const delta = p && before !== null ? p.rating - before : null;
+  return (
+    <div className="pinned" style={{ borderLeftColor: colour }}>
+      <div className="pin-top">
+        <span className="pin-number" style={{ background: colour }}>{person.number}</span>
+        <div className="pin-name">
+          <b>{person.name}</b>
+          <small>★ Your player · {person.position}{p && !p.on_pitch ? " · off" : ""}</small>
+        </div>
+        {p && <div className="pin-rating">
+          <b className="bigrating">{p.rating.toFixed(1)}</b>
+          {delta !== null && Math.abs(delta) >= 0.05 && <small className={delta > 0 ? "up" : "down"}>{delta > 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}</small>}
+        </div>}
+        <button className="close" onClick={onChange} aria-label="Change your player" title="Change your player">⋯</button>
+      </div>
+      {p ? <>
+        <Sparkline values={history} colour={colour} />
+        <div className="pin-stats">
+          {here && <span className="focus"><em>{here[0]}</em> <b>{here[1]}</b></span>}
+          {stats.filter(([k]) => k !== here?.[0]).map(([k, v]) => <span key={k}><em>{k}</em> <b>{v}</b></span>)}
+        </div>
+      </> : <p className="empty">Waiting for the match to start…</p>}
     </div>
   );
 }
@@ -165,22 +258,23 @@ export function Ratings({ state, meta, colours, favourite, setFavourite }: {
   );
 }
 
-const ROWS: [string, (t: LiveState["teams"][string]) => string | number][] = [
-  ["Possession", (t) => `${t.possession_pct}%`],
-  ["Shots (on target)", (t) => `${t.shots} (${t.shots_on_target})`],
-  ["xG", (t) => t.xg.toFixed(2)],
-  ["Big chances", (t) => t.big_chances],
-  ["Pass accuracy", (t) => `${t.pass_accuracy_pct}%`],
-  ["Progressive passes", (t) => t.progressive_passes],
-  ["Threat added (xT)", (t) => t.xt_added.toFixed(2)],
-  ["High pressures", (t) => t.pressures_high],
-  ["PPDA", (t) => t.ppda ?? "–"],
-  ["Corners", (t) => t.corners],
-  ["Fouls", (t) => t.fouls],
-  ["Cards", (t) => `${t.yellows}Y ${t.reds}R`],
+// The key of a row is the focus metric it answers to (a row without one can't be a focus).
+const ROWS: [string, string, (t: LiveState["teams"][string]) => string | number][] = [
+  ["possession_pct", "Possession", (t) => `${t.possession_pct}%`],
+  ["shots", "Shots (on target)", (t) => `${t.shots} (${t.shots_on_target})`],
+  ["xg", "xG", (t) => t.xg.toFixed(2)],
+  ["", "Big chances", (t) => t.big_chances],
+  ["pass_accuracy_pct", "Pass accuracy", (t) => `${t.pass_accuracy_pct}%`],
+  ["", "Progressive passes", (t) => t.progressive_passes],
+  ["xt_added", "Threat added (xT)", (t) => t.xt_added.toFixed(2)],
+  ["", "High pressures", (t) => t.pressures_high],
+  ["", "PPDA", (t) => t.ppda ?? "–"],
+  ["", "Corners", (t) => t.corners],
+  ["", "Fouls", (t) => t.fouls],
+  ["", "Cards", (t) => `${t.yellows}Y ${t.reds}R`],
 ];
 
-export function StatsPanel({ state, meta }: { state: LiveState | null; meta: MatchMeta }) {
+export function StatsPanel({ state, meta, focus }: { state: LiveState | null; meta: MatchMeta; focus: FocusMetric | null }) {
   if (!state) return null;
   const h = state.teams[meta.home.id], a = state.teams[meta.away.id];
   const p = state.patterns;
@@ -189,7 +283,10 @@ export function StatsPanel({ state, meta }: { state: LiveState | null; meta: Mat
       <h3>Match stats</h3>
       <table>
         <thead><tr><th>{meta.home.short_name}</th><th /><th>{meta.away.short_name}</th></tr></thead>
-        <tbody>{ROWS.map(([label, f]) => <tr key={label}><td>{f(h)}</td><th>{label}</th><td>{f(a)}</td></tr>)}</tbody>
+        <tbody>
+          {focus === "win_probability" && <tr className="focus"><td>{pct(state.win_probability.home)}</td><th>★ Win probability</th><td>{pct(state.win_probability.away)}</td></tr>}
+          {ROWS.map(([key, label, f]) => <tr key={label} className={key && key === focus ? "focus" : ""}><td>{f(h)}</td><th>{key && key === focus ? "★ " : ""}{label}</th><td>{f(a)}</td></tr>)}
+        </tbody>
       </table>
       <p className="patterns">
         Last 5 min: tempo <b>{p.tempo}</b> passes/min · chaos <b>{p.chaos.toFixed(2)}</b> · high pressures/min{" "}

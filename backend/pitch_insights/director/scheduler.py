@@ -39,14 +39,14 @@ class Rules:
     max_cards: int = 2
     max_total: int = 3
     cooldown: dict[str, float] = field(default_factory=lambda: {
-        "stat_card": 20.0, "player_tag": 8.0, "rating_alert": 15.0, "speed_popup": 12.0})
+        "stat_card": 20.0, "player_tag": 8.0, "rating_alert": 15.0, "speed_popup": 12.0, "fan_alert": 4.0})
     topic_cooldown: float = 45.0
     preempt_margin: int = 10
     min_hold: dict[str, float] = field(default_factory=lambda: {"lower_third": 4.0, "stat_card": 2.0, "player_tag": 2.0,
-                                                                 "rating_alert": 2.0, "speed_popup": 2.0})
+                                                                 "rating_alert": 2.0, "speed_popup": 2.0, "fan_alert": 2.0})
     urgent: int = 90
     max_delay: dict[str, float] = field(default_factory=lambda: {
-        "lower_third": 8.0, "stat_card": 12.0, "player_tag": 3.0, "rating_alert": 10.0, "speed_popup": 2.0})
+        "lower_third": 8.0, "stat_card": 12.0, "player_tag": 3.0, "rating_alert": 10.0, "speed_popup": 2.0, "fan_alert": 10.0})
     max_pending: int = 4
 
 
