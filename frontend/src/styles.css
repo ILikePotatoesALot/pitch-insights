@@ -34,7 +34,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; al
 @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
 
 .stage { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.pitch { position: relative; height: min(62vh, 620px); min-height: 320px; border-radius: 12px; overflow: hidden;
+.pitch { position: relative; height: min(62vh, 620px); min-height: 440px; border-radius: 12px; overflow: hidden;
   background: radial-gradient(ellipse at 50% 40%, #16324a 0%, #0b1218 70%); border: 1px solid var(--line); }
 .pitch canvas { display: block; width: 100%; height: 100%; }
 .overlay-msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
@@ -56,13 +56,57 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; al
 .controls .seek b { color: var(--text); min-width: 28px; }
 .controls .status { color: var(--accent); }
 
-.lowerthird { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 2; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
-  background: linear-gradient(90deg, rgba(11,18,24,0.95), rgba(18,28,37,0.8)); border-left: 5px solid var(--accent);
-  padding: 12px 16px; border-radius: 8px; animation: slidein 0.4s ease-out; }
+/* Overlays: one region per template, so none can draw over another. The Director decides what is up. */
+.cue-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; padding: 16px 20px 20px; display: flex;
+  flex-direction: column; justify-content: space-between; gap: 8px; overflow: hidden; }
+.cue-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.cue-col { display: flex; flex-direction: column; gap: 8px; }
+.cue-col.left { align-items: flex-start; }
+.cue-col.right { align-items: flex-end; margin-left: auto; }
+.cue-bottom { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; flex-shrink: 0; }
+.cue { animation: slidein 0.4s ease-out; --team: var(--accent);
+  background: linear-gradient(90deg, rgba(11,18,24,0.95), rgba(18,28,37,0.82)); border-radius: 8px; }
+.lowerthird { align-self: stretch; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  border-left: 5px solid var(--team); padding: 12px 16px; }
+.lowerthird.kind-goal { border-left-width: 8px; }
+.lowerthird.kind-red_card { --team: var(--bad); }
 .lt-clock { color: var(--accent); font-weight: 700; }
 .lt-head { font-size: 20px; font-weight: 700; }
-.lt-fact { color: var(--muted); font-size: 14px; flex-basis: 100%; }
-@keyframes slidein { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.lt-fact { color: var(--muted); font-size: 14px; flex-basis: 100%; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.playertag { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-left: 4px solid var(--team); }
+.pt-number { min-width: 28px; text-align: center; font-weight: 700; font-size: 18px; color: #111; background: var(--team); border-radius: 4px; padding: 2px 4px; }
+.pt-main { display: flex; flex-direction: column; line-height: 1.25; }
+.pt-main small { font-size: 12px; }
+.pt-rating { font-weight: 700; color: var(--accent); font-size: 18px; margin-left: 6px; }
+.statcard { width: 230px; padding: 10px 12px; background: rgba(11,18,24,0.9); border: 1px solid var(--line); }
+.statcard h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.sc-teams { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.sc-teams i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin: 0 5px; }
+.sc-row { display: grid; grid-template-columns: 52px 1fr 52px; align-items: baseline; font-size: 13px; padding: 2px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.sc-row b:last-child { text-align: right; }
+.sc-row span { text-align: center; color: var(--muted); font-size: 12px; }
+.ratingalert { display: flex; align-items: baseline; gap: 8px; padding: 6px 12px; border-left: 4px solid var(--good); }
+.ratingalert.down { border-left-color: var(--bad); }
+.ratingalert.milestone { border-left-color: var(--accent); }
+.ra-arrow { font-size: 12px; }
+.ratingalert.up .ra-arrow { color: var(--good); }
+.ratingalert.down .ra-arrow { color: var(--bad); }
+.ratingalert.milestone .ra-arrow { color: var(--accent); }
+.ra-rating { font-weight: 700; color: var(--accent); }
+.speedpopup { display: flex; align-items: baseline; gap: 6px; padding: 8px 14px; border-right: 4px solid var(--team); }
+.speedpopup b { font-size: 24px; }
+/* Sideways, never up or down, so a cue sliding in can't dip over the one below it. */
+@keyframes slidein { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes slidein-right { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cue-col.right .cue { animation-name: slidein-right; }
+@media (prefers-reduced-motion: reduce) { .cue { animation: none; } }
+
+/* A narrow screen wraps the stat card under the alerts and the lower-third onto more lines: give the pitch room. */
+@media (max-width: 700px) { .pitch { min-height: 540px; } .lt-head { font-size: 17px; } }
+
+/* Broadcast: the pitch and its overlays only, bigger, in one column. */
+.app.broadcast main { grid-template-columns: minmax(0, 1fr); }
+.app.broadcast .pitch { height: clamp(440px, calc(100vh - 320px), 820px); }
 
 .legend { color: var(--muted); font-size: 13px; margin: 0; }
 

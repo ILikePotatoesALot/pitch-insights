@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from pitch_insights.server import app
@@ -108,3 +109,86 @@ def test_a_bad_at_value_falls_back_to_from():
     with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0&from=abc&at=soon") as ws:
         assert ws.receive_json()["type"] == "meta"
         assert ws.receive_json()["event"]["seq"] == 1
+
+
+def test_replay_streams_overlay_cues_that_keep_the_screen_clean():
+    from fastapi import WebSocketDisconnect
+
+    from pitch_insights.director import CARD_TEMPLATES, DEFAULT_RULES
+
+    on_screen: dict[str, dict] = {}
+    cues, goal_moments, ended = [], set(), False
+
+    def watch(msg):
+        c = msg["cue"] if msg["type"] == "cue" else None
+        if c:
+            cues.append(c)
+            on_screen[c["id"]] = c
+        elif msg["type"] == "cue_end":
+            assert on_screen.pop(msg["id"])  # only ends a cue that is up
+            assert msg["reason"] in ("expired", "preempted")
+        by_template = [c["template"] for c in on_screen.values()]
+        assert len(by_template) == len(set(by_template)) <= DEFAULT_RULES.max_total
+        assert sum(t in CARD_TEMPLATES for t in by_template) <= DEFAULT_RULES.max_cards
+
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=87") as ws:
+        while not ended:
+            msg = ws.receive_json()
+            ended = msg["type"] == "end"
+            if msg["type"] == "catchup":
+                assert not any(k.startswith("cue") for k in msg)  # a seek starts with a clear screen
+            if msg["type"] == "moment" and msg["moment"]["type"] == "goal":
+                goal_moments.add(msg["moment"]["id"])
+            watch(msg)
+        # After the final whistle the connection stays open until the last cues are down.
+        with pytest.raises(WebSocketDisconnect):
+            while True:
+                watch(ws.receive_json())
+    assert {c["moment_id"] for c in cues if c["template"] == "lower_third"} >= goal_moments and len(goal_moments) >= 2
+    assert all(isinstance(c["data"], dict) and c["duration"] > 0 for c in cues)
+    assert on_screen == {}
+
+
+def test_cue_text_follows_the_chosen_language():
+    def goal_cue(lang):
+        with client.websocket_connect(f"/ws/replay/comeback-POT-CAR?speed=600&from=87&lang={lang}") as ws:
+            while (msg := ws.receive_json())["type"] != "end":
+                if msg["type"] == "cue" and msg["cue"]["template"] == "lower_third" and msg["cue"]["data"]["kind"] == "goal":
+                    return msg["cue"]["data"]
+
+    english, german = goal_cue("en"), goal_cue("de")
+    assert english["headline"] and german["headline"] and english["headline"] != german["headline"]
+
+
+def test_a_casual_viewer_is_sent_only_the_cues_made_for_everyone():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=60&from=87") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        ws.send_json({"cmd": "detail", "value": "casual"})
+        ws.send_json({"cmd": "detail", "value": "nonsense"})  # ignored, not fatal
+        cues = []
+        while len(cues) < 2:
+            msg = ws.receive_json()
+            assert msg["type"] != "end"
+            if msg["type"] == "cue":
+                cues.append(msg["cue"])
+    assert all(c["detail"] == "casual" for c in cues)
+
+
+def test_switching_to_casual_takes_down_the_analyst_cues_on_screen():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=60&from=80") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        analyst_up = None
+        for _ in range(2000):
+            msg = ws.receive_json()
+            assert msg["type"] != "end"
+            if msg["type"] == "cue" and msg["cue"]["detail"] == "analyst":
+                analyst_up = msg["cue"]["id"]
+                break
+        assert analyst_up, "no analyst cue turned up"
+        ws.send_json({"cmd": "detail", "value": "casual"})
+        for _ in range(2000):
+            msg = ws.receive_json()
+            if msg["type"] == "cue_end" and msg["id"] == analyst_up:
+                assert msg["reason"] == "withdrawn"
+                return
+    raise AssertionError("the analyst cue stayed up")

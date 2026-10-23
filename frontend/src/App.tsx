@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { commentaryText, MomentFeed, MomentumChart, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
+import { Overlays } from "./components/Overlays";
+import { MomentFeed, MomentumChart, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { PitchScene, teamColours } from "./pitch/PitchScene";
-import type { MatchEvent, MatchMeta, MatchSummary, Moment, ViewMode } from "./types";
+import type { LayoutMode, MatchEvent, MatchMeta, MatchSummary, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
 
 const SPEEDS = [1, 5, 20, 60];
@@ -10,6 +11,7 @@ export default function App() {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [name, setName] = useState<string | null>(null);
   const [mode, setMode] = useState<ViewMode>("analyst");
+  const [layout, setLayout] = useState<LayoutMode>("fan");
   const [favourite, setFavourite] = useState<string | null>(null);
   const [lang, setLang] = useState("en");
   const [seekTo, setSeekTo] = useState(0);
@@ -41,8 +43,8 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
-  const { meta, aiInfo, languages, state, moments, liveMoment, status, speed, setSpeed, pause, resume, seek, seekAt } =
-    useReplay(name, lang, onEvent, onReset);
+  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, seek, seekAt } =
+    useReplay(name, lang, mode, onEvent, onReset);
   // A new language reconnects from the current moment (not the start of the minute, so nothing replays).
   // It goes by match seconds, because a minute can't say first-half stoppage time (45+2'). Before the first
   // state arrives there is no current moment, so the reconnect keeps the jump already made.
@@ -63,10 +65,8 @@ export default function App() {
     return [`#${h.getHexString()}`, `#${a.getHexString()}`];
   }, [meta]);
 
-  const banner = useLowerThird(liveMoment);
-
   return (
-    <div className="app">
+    <div className={`app ${layout}`}>
       <header>
         <h1>Pitch Insights <small>live football intelligence</small></h1>
         <select value={name ?? ""} onChange={(e) => setName(e.target.value)} aria-label="Match">
@@ -75,6 +75,12 @@ export default function App() {
         <select value={lang} onChange={(e) => changeLang(e.target.value)} aria-label="Language">
           {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
         </select>
+        <div className="segmented" role="group" aria-label="Layout">
+          {(["broadcast", "fan"] as LayoutMode[]).map((v) => (
+            <button key={v} className={layout === v ? "on" : ""} onClick={() => setLayout(v)}
+                    title={v === "broadcast" ? "The pitch and its overlays only" : "Adds the side panel"}>{v === "broadcast" ? "Broadcast" : "Fan"}</button>
+          ))}
+        </div>
         <div className="segmented" role="group" aria-label="Viewer mode">
           {(["casual", "analyst"] as ViewMode[]).map((v) => (
             <button key={v} className={mode === v ? "on" : ""} onClick={() => setMode(v)}>{v === "casual" ? "Casual fan" : "Analyst"}</button>
@@ -86,15 +92,7 @@ export default function App() {
         <section className="stage">
           {meta && <Scoreboard meta={meta} state={state} colours={colours} />}
           <div className="pitch" ref={pitchEl}>
-            {banner && (
-              <div className={`lowerthird ${banner.tier}`} key={banner.id}>
-                <span className="lt-clock">{banner.clock}</span>
-                <span className="lt-head">{banner.headline}</span>
-                {commentaryText(banner, mode)
-                  ? <span className="lt-fact">{commentaryText(banner, mode)}</span>
-                  : mode === "analyst" && banner.facts[1] && <span className="lt-fact">{banner.facts[1].text}</span>}
-              </div>
-            )}
+            {meta && <Overlays cues={cues} meta={meta} mode={mode} colours={colours} />}
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
             {status === "error" && <div className="overlay-msg">Can't reach the replay server. Is it running on port 8000?</div>}
             {status === "disconnected" && <div className="overlay-msg">Lost the connection to the replay server. Pick a minute and press Go to reconnect.</div>}
@@ -118,28 +116,12 @@ export default function App() {
           </p>
         </section>
 
-        <aside>
+        {layout === "fan" && <aside>
           {meta && <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={mode} colours={colours} />}
           {meta && <Ratings state={state} meta={meta} colours={colours} favourite={favourite} setFavourite={setFavourite} />}
           {meta && mode === "analyst" && <StatsPanel state={state} meta={meta} />}
-        </aside>
+        </aside>}
       </main>
     </div>
   );
-}
-
-/** The latest headline moment that arrived live, shown over the pitch for a few seconds. */
-function useLowerThird(live: Moment | null) {
-  const [banner, setBanner] = useState<Moment | null>(null);
-  useEffect(() => {
-    if (!live) setBanner(null);
-    else if (live.tier === "headline") setBanner(live);
-  }, [live]);
-  // The timer belongs to the banner, so a smaller moment arriving meanwhile can't cancel it.
-  useEffect(() => {
-    if (!banner) return;
-    const t = setTimeout(() => setBanner(null), 6000);
-    return () => clearTimeout(t);
-  }, [banner]);
-  return banner;
 }

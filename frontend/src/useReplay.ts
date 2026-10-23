@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CommentaryInfo, LiveState, MatchEvent, MatchMeta, Moment } from "./types";
+import type { CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, ViewMode } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 
@@ -8,7 +8,7 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  * Events go to `onEvent` (for the 3D pitch) instead of React state, so a busy
  * match doesn't re-render the page on every pass.
  */
-export function useReplay(name: string | null, lang: string, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
+export function useReplay(name: string | null, lang: string, mode: ViewMode, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
                           onReset: () => void) {
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
@@ -16,8 +16,9 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   const [languages, setLanguages] = useState<Record<string, string>>({ en: "English" });
   const [state, setState] = useState<LiveState | null>(null);
   const [moments, setMoments] = useState<Moment[]>([]);
-  // The latest moment that arrived live, not from a catch-up, for the banner over the pitch.
-  const [liveMoment, setLiveMoment] = useState<Moment | null>(null);
+  // The overlays on screen right now. The server starts and ends each one (the Overlay Director), so a
+  // pause freezes them and a seek or reconnect starts with a clear screen.
+  const [cues, setCues] = useState<Cue[]>([]);
   const [status, setStatus] = useState<Status>("connecting");
   const [speed, setSpeedState] = useState(20);
   // A jump belongs to the match it was made in; `n` makes a repeat jump to the same minute reconnect.
@@ -39,12 +40,16 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   // and a paused replay should stay paused through it.
   const pausedRef = useRef(false);
   const langRef = useRef<string | null>(null);
+  // The viewer's mode goes to the server, so its Overlay Director keeps clean the screen this viewer sees:
+  // cues made for analysts only don't take slots on a casual fan's screen.
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
 
   useEffect(() => {
     if (!name) return;
     setStatus("connecting");
     setMoments([]);
-    setLiveMoment(null);
+    setCues([]);
     setState(null);
     setAiInfo(null);
     onResetRef.current();
@@ -63,6 +68,7 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
           setMeta(data.meta);
           setAiInfo(data.commentary ?? null);
           setLanguages(data.languages ?? { en: "English" });
+          socket.send(JSON.stringify({ cmd: "detail", value: modeRef.current }));
           if (keepPaused) socket.send(JSON.stringify({ cmd: "pause" }));
           setStatus(keepPaused ? "paused" : "live");
           break;
@@ -76,7 +82,12 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
           break;
         case "moment":
           setMoments((m) => [...m, data.moment]);
-          setLiveMoment(data.moment);
+          break;
+        case "cue":
+          setCues((c) => [...c.filter((x) => x.id !== data.cue.id), data.cue]);
+          break;
+        case "cue_end":
+          setCues((c) => c.filter((x) => x.id !== data.id));
           break;
         case "state":
           setState(data.state);
@@ -91,8 +102,8 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
           break;
       }
     };
-    socket.onerror = () => { ended = true; setStatus("error"); };
-    socket.onclose = () => { if (!ended) setStatus("disconnected"); };
+    socket.onerror = () => { ended = true; setStatus("error"); setCues([]); };
+    socket.onclose = () => { if (!ended) { setStatus("disconnected"); setCues([]); } };
     return () => {
       ended = true; // closing on purpose (new match or jump), not a lost connection
       socket.close();
@@ -100,6 +111,8 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   }, [name, from, jump.n, lang]);
 
   const send = (cmd: object) => ws.current?.readyState === WebSocket.OPEN && ws.current.send(JSON.stringify(cmd));
+
+  useEffect(() => { send({ cmd: "detail", value: mode }); }, [mode]);
 
   const setSpeed = useCallback((value: number) => {
     setSpeedState(value);
@@ -110,5 +123,5 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, at: null, n: j.n + 1 })), [name]);
   const seekAt = useCallback((seconds: number) => setJump((j) => ({ match: name, minute: 0, at: seconds, n: j.n + 1 })), [name]);
 
-  return { meta, aiInfo, languages, state, moments, liveMoment, status, speed, from, setSpeed, pause, resume, seek, seekAt };
+  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, seek, seekAt };
 }

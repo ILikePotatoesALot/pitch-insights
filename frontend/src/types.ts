@@ -164,3 +164,27 @@ export interface MatchSummary {
 }
 
 export type ViewMode = "casual" | "analyst";
+/** Broadcast shows the pitch and its overlays only; fan adds the side panel. */
+export type LayoutMode = "broadcast" | "fan";
+
+export type CueTemplate = "lower_third" | "stat_card" | "player_tag" | "rating_alert" | "speed_popup";
+
+/**
+ * An overlay the Overlay Director chose to show (see backend/pitch_insights/director/cues.py). The server
+ * decides when it starts and ends (`cue` and `cue_end` messages), so the app only draws what it is told.
+ * Text from commentary arrives already in the viewer's language; labels such as "Possession" are the app's.
+ */
+export interface Cue {
+  id: string;
+  time: number; // match seconds of what it is about
+  duration: number; // seconds on screen
+  priority: number; // 0-100
+  template: CueTemplate;
+  tier: Moment["tier"];
+  detail: ViewMode; // "analyst" cues are for analysts only
+  about: { team_id: string | null; player_id: string | null };
+  topic: string | null;
+  moment_id: string | null;
+  delay?: number; // seconds it waited for a free slot
+  data: Record<string, any>;
+}
