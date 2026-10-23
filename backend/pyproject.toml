@@ -21,6 +21,7 @@ dependencies = [
     # Viewer profiles in Cosmos DB, signed in with the Container App's managed identity (no key)
     "azure-cosmos>=4.9,<5",
     "azure-identity>=1.19,<2",
+    "aiohttp>=3.9",  # the async Azure clients' HTTP transport; without it every Cosmos DB call fails
     # Telemetry to Application Insights
     "azure-monitor-opentelemetry>=1.8,<2",
 ]

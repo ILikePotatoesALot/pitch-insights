@@ -45,6 +45,7 @@ import asyncio
 import contextlib
 import functools
 import json
+import logging
 import math
 import os
 from pathlib import Path
@@ -63,6 +64,7 @@ from pitch_insights.origins import LOCALHOST, configured_origins, origin_allowed
 from pitch_insights.profiles import close_store, router as profiles_router
 from pitch_insights.telemetry import setup_telemetry
 
+log = logging.getLogger("pitch_insights.server")
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
 CUE_TICK_S = 0.25  # how often the Director looks for cues that are over or can now start
@@ -154,6 +156,7 @@ def state_message(brain: MatchBrain) -> dict:
 @app.websocket("/ws/replay/{name}")
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if not origin_allowed(ws.headers.get("origin")):  # CORS doesn't cover WebSockets, so check the page's origin here
+        log.warning("refused a replay from origin %r: add it to PITCH_ALLOWED_ORIGINS if it should be allowed", ws.headers.get("origin"))
         await ws.close(code=1008)
         return
     await ws.accept()

@@ -144,6 +144,20 @@ def test_cosmos_store_keeps_the_choices_and_a_time_to_live_and_nothing_else():
     asyncio.run(go())
 
 
+def test_the_async_azure_clients_can_be_built():
+    """The Cosmos DB and Entra clients need aiohttp as their transport; building them (no network) fails without it."""
+    async def go():
+        from azure.cosmos.aio import CosmosClient
+        from azure.identity.aio import DefaultAzureCredential
+
+        credential = DefaultAzureCredential()
+        client = CosmosClient("https://example.documents.azure.com:443/", credential=credential)
+        await client.close()
+        await credential.close()
+
+    asyncio.run(go())
+
+
 def test_the_environment_picks_the_store(monkeypatch):
     def fresh(**env):
         for k in ("COSMOS_ENDPOINT", "PITCH_PROFILE_STORE"):
