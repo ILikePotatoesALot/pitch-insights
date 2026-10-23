@@ -280,7 +280,7 @@ Code in `backend/pitch_insights/agents/translate.py` and `scripts/translate_mome
 
 ### Overlay Director
 
-Code in `backend/pitch_insights/director/` (`cues.py`: what to show; `scheduler.py`: what is on screen now; `sheet.py`: a whole match's cues worked out offline), built 23 Oct on branch `claude/overlay-director-1242b7`. It is **deterministic code, not a model call**: Microsoft's guidance is to use the lowest level of complexity that reliably meets the requirements, and a fixed set of rules decides overlays predictably, auditably and with no GPT-4o call to ration. (It sits in the agents' hand-off list because it is the stage that turns their output into what the viewer sees.)
+Code in `backend/pitch_insights/director/` (`cues.py`: what to show; `scheduler.py`: what is on screen now; `sheet.py`: a whole match's cues worked out offline), built 23 Oct and merged in ILikePotatoesALot/pitch-insights#12. It is **deterministic code, not a model call**: Microsoft's guidance is to use the lowest level of complexity that reliably meets the requirements, and a fixed set of rules decides overlays predictably, auditably and with no GPT-4o call to ration. (It sits in the agents' hand-off list because it is the stage that turns their output into what the viewer sees.)
 
 **Cues.** Each cue is plain JSON, the contract with the app (`frontend/src/types.ts`, `Cue`):
 
