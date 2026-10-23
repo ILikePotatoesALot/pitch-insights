@@ -67,6 +67,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - Backend outputs timed overlay cues as JSON (time, duration, priority, template, data).
 - Three.js pitch surface shaped by live momentum, with spikes for shots. Own design.
 - React overlays: lower-thirds, stat cards, player tags, speed popups, rating alerts.
+- Optional: a mobile pass (compact header menu on phones, every view checked at phone sizes, a check on a real phone); see [HANDOFF.md, Next steps](HANDOFF.md#next-steps-in-order), step 10.
 - The Overlay Director prevents clutter: built 23 Oct as deterministic code (rules, not a model call), see [DESIGN.md, Overlay Director](DESIGN.md#overlay-director).
 
 ## 5. Personalise (same renderer; the viewer profile decides)
