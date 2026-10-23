@@ -1,0 +1,7 @@
+# The image needs backend/pyproject.toml, backend/pitch_insights and samples/ only.
+**
+!backend/pyproject.toml
+!backend/pitch_insights/**
+!samples/**
+**/__pycache__
+**/*.pyc

@@ -9,14 +9,17 @@ from __future__ import annotations
 
 import asyncio
 import ssl
+from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
 import httpx
 import truststore
-from agent_framework_openai import OpenAIChatCompletionClient
-from openai import AsyncOpenAI, OpenAI
 
 from pitch_insights.agents.settings import AgentSettings
+
+if TYPE_CHECKING:  # the model clients are only imported where they're made, so the replay server's image can leave them out
+    from agent_framework_openai import OpenAIChatCompletionClient
+    from openai import OpenAI
 
 
 def ssl_context() -> ssl.SSLContext:
@@ -69,6 +72,8 @@ def base_url(settings: AgentSettings) -> str:
 def make_chat_client(settings: AgentSettings) -> OpenAIChatCompletionClient:
     if not settings.configured:
         raise RuntimeError(f"the {settings.provider} provider isn't configured; fill in .env (see .env.example)")
+    from agent_framework_openai import OpenAIChatCompletionClient
+    from openai import AsyncOpenAI
     oai = AsyncOpenAI(
         base_url=base_url(settings), api_key=settings.api_key,
         timeout=settings.timeout_s, max_retries=settings.max_retries,
@@ -82,6 +87,7 @@ def make_embeddings_client(settings: AgentSettings) -> OpenAI:
     if not settings.embeddings_configured:
         raise RuntimeError("embeddings aren't configured; fill in AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY "
                            "and AZURE_OPENAI_EMBEDDING_DEPLOYMENT in .env (see .env.example)")
+    from openai import OpenAI
     return OpenAI(
         base_url=foundry_v1(settings.embedding_endpoint), api_key=settings.embedding_api_key,
         timeout=settings.timeout_s, max_retries=settings.max_retries,

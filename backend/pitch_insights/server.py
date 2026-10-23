@@ -5,6 +5,7 @@
 GET  /api/matches                list of demo matches in samples/
 GET  /api/matches/{name}         that match's match_meta
 GET  /api/clubs                  the clubs and their squads (for the app's profile picker)
+GET/PUT/DELETE /api/profile/{id} a viewer's saved choices (Cosmos DB when deployed; see pitch_insights/profiles.py)
 WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0&mode=casual&team=POT&player=POT-09&focus=xg
 
 The WebSocket sends, in order:
@@ -41,6 +42,7 @@ given): a minute on the broadcast clock can say 47:00 of the second half but not
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import functools
 import json
 import math
@@ -57,6 +59,9 @@ from pitch_insights.director import CueBuilder, Director, Personaliser, ShowCloc
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
+from pitch_insights.origins import LOCALHOST, configured_origins, origin_allowed
+from pitch_insights.profiles import close_store, router as profiles_router
+from pitch_insights.telemetry import setup_telemetry
 
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
@@ -67,8 +72,18 @@ MIN_SPEED, MAX_SPEED = 0.1, 600.0
 def clamp_speed(speed: float) -> float:
     return max(MIN_SPEED, min(MAX_SPEED, speed))
 
-app = FastAPI(title="Pitch Insights replay server")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"], allow_headers=["*"])
+@contextlib.asynccontextmanager
+async def lifespan(_: FastAPI):
+    yield
+    await close_store()
+
+
+app = FastAPI(title="Pitch Insights replay server", lifespan=lifespan)
+# Only the static site (PITCH_ALLOWED_ORIGINS) and localhost may call this from a page; see pitch_insights/origins.py.
+app.add_middleware(CORSMiddleware, allow_origins=configured_origins(), allow_origin_regex=LOCALHOST,
+                   allow_methods=["GET", "PUT", "DELETE"], allow_headers=["Content-Type"])
+app.include_router(profiles_router)
+setup_telemetry(app)
 
 
 def _match_path(name: str) -> Path:
@@ -138,6 +153,9 @@ def state_message(brain: MatchBrain) -> dict:
 
 @app.websocket("/ws/replay/{name}")
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
+    if not origin_allowed(ws.headers.get("origin")):  # CORS doesn't cover WebSockets, so check the page's origin here
+        await ws.close(code=1008)
+        return
     await ws.accept()
     try:
         path = _match_path(name)

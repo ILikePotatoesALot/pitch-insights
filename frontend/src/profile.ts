@@ -1,9 +1,10 @@
+import { apiUrl, remoteServer } from "./api";
 import type { FocusMetric, Profile, ViewMode } from "./types";
 
 // A viewer's profile is only their choices: club, player, mode, language, focus metric. No name, id or history is
 // kept (Microsoft's Personalizer guidance: send aggregated features, never a user identifier). Reading and writing
-// goes through `ProfileStore`, so the Azure deployment can swap the browser's localStorage for Cosmos DB (a
-// `RemoteProfileStore` with the same three methods) without touching the app.
+// goes through `ProfileStore`: the browser's localStorage, and on the deployed site also Cosmos DB through the
+// replay server (`RemoteProfileStore`), which falls back to the browser's copy whenever the server can't be reached.
 
 export const FOCUS_OPTIONS: { key: FocusMetric; label: string; short: string }[] = [
   { key: "win_probability", label: "Win probability", short: "Win chance" },
@@ -56,7 +57,72 @@ export class LocalProfileStore implements ProfileStore {
   }
 }
 
-export const profileStore: ProfileStore = new LocalProfileStore();
+const VIEWER_KEY = "pitch-insights.viewer.v1";
+const REMOTE_TIMEOUT_MS = 3000; // the first screen waits for this, so a sleeping or broken server mustn't hold it long
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+let sessionViewer: string | null = null; // the id, if the browser won't keep one
+
+/** The random id this browser files its profile under (the Cosmos DB document id and partition key). It is made on
+ *  the first save and links to nothing else: no name, email or account. Null if none exists and `create` is false. */
+function viewerId(create: boolean): string | null {
+  try {
+    const saved = localStorage.getItem(VIEWER_KEY);
+    if (saved && UUID.test(saved)) return saved;
+    if (!create) return null;
+    const id = crypto.randomUUID();
+    localStorage.setItem(VIEWER_KEY, id);
+    return id;
+  } catch {
+    return sessionViewer ?? (create && typeof crypto?.randomUUID === "function" ? (sessionViewer = crypto.randomUUID()) : null);
+  }
+}
+
+/** The deployed site's store: the browser's copy (always kept, always the fallback) plus the same five choices in
+ *  Cosmos DB, one document per viewer id, through the replay server's /api/profile. Anything that goes wrong with
+ *  the server (asleep, throttled, not set up: 503) just means the browser's copy is used. */
+export class RemoteProfileStore implements ProfileStore {
+  constructor(private local: ProfileStore, private url: (path: string) => string) {}
+
+  private call(id: string, init: RequestInit = {}) {
+    return fetch(this.url(`/api/profile/${id}`), {
+      ...init, signal: AbortSignal.timeout(REMOTE_TIMEOUT_MS), headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  async load() {
+    const local = await this.local.load();
+    const id = viewerId(false);
+    if (!id) return local;
+    try {
+      const r = await this.call(id);
+      if (r.ok) {
+        const remote = sanitize(await r.json());
+        await this.local.save(remote);
+        return remote;
+      }
+      if (r.status === 404 && local) await this.call(id, { method: "PUT", body: JSON.stringify(local) }); // not there yet (or expired)
+    } catch { /* offline or asleep: the browser's copy */ }
+    return local;
+  }
+
+  async save(profile: Profile) {
+    await this.local.save(profile);
+    const id = viewerId(true);
+    if (!id) return;
+    try { await this.call(id, { method: "PUT", body: JSON.stringify(profile) }); } catch { /* kept in the browser only */ }
+  }
+
+  async clear() {
+    await this.local.clear();
+    const id = viewerId(false);
+    sessionViewer = null;
+    try { localStorage.removeItem(VIEWER_KEY); } catch { /* nothing to remove */ }
+    if (!id) return;
+    try { await this.call(id, { method: "DELETE" }); } catch { /* it expires by itself after 90 days */ }
+  }
+}
+
+export const profileStore: ProfileStore = remoteServer ? new RemoteProfileStore(new LocalProfileStore(), apiUrl) : new LocalProfileStore();
 
 const PARAMS = ["mode", "lang", "team", "player", "focus"] as const;
 

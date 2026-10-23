@@ -8,25 +8,34 @@ version = "0.1.0"
 description = "Live football intelligence, explained and personalised."
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
+# What the replay server needs at run time (it makes no model calls: the commentary and translations are stored).
+# The container image installs just these.
 dependencies = [
     "pydantic>=2.7",
     "pyyaml>=6.0",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
-    # Agents: Microsoft Agent Framework with the OpenAI-compatible client (Foundry v1 API, GitHub Models)
-    "agent-framework-core>=1.22,<2",
-    "agent-framework-openai>=1.17,<2",
-    "openai>=3.30,<4",
     "httpx>=0.27",
     "python-dotenv>=1.0",
     "truststore>=0.10",
-    # Tracing to Application Insights, and Foundry's groundedness evaluator (scripts only)
+    # Viewer profiles in Cosmos DB, signed in with the Container App's managed identity (no key)
+    "azure-cosmos>=4.9,<5",
+    "azure-identity>=1.19,<2",
+    # Telemetry to Application Insights
     "azure-monitor-opentelemetry>=1.8,<2",
-    "azure-ai-evaluation>=1.18,<2",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27"]
+# The agents that write the stored commentary and translations: Microsoft Agent Framework with the
+# OpenAI-compatible client (Foundry v1 API, GitHub Models)
+agents = [
+    "agent-framework-core>=1.22,<2",
+    "agent-framework-openai>=1.17,<2",
+    "openai>=3.30,<4",
+]
+# Foundry's groundedness evaluator (scripts only)
+evaluation = ["azure-ai-evaluation>=1.18,<2"]
+dev = ["pitch-insights[agents,evaluation]", "pytest>=8"]
 
 [tool.setuptools.packages.find]
 include = ["pitch_insights*"]

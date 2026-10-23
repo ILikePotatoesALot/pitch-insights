@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { Overlays } from "./components/Overlays";
 import { FocusStrip, MomentFeed, MomentumChart, PinnedPlayer, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { ProfilePicker } from "./components/ProfilePicker";
+import { apiUrl } from "./api";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { PitchScene, teamColours } from "./pitch/PitchScene";
 import type { ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
@@ -35,12 +36,12 @@ export default function App() {
   const p = profile ?? DEFAULT_PROFILE;
 
   useEffect(() => {
-    fetch("/api/matches").then((r) => r.json()).then((list: MatchSummary[]) => {
+    fetch(apiUrl("/api/matches")).then((r) => r.json()).then((list: MatchSummary[]) => {
       setMatches(list);
       const wanted = query.get("match");
       if (list.length) setName(list.find((m) => m.name === wanted)?.name ?? list[0].name);
     }).catch(() => setMatches([]));
-    fetch("/api/clubs").then((r) => r.json()).then(setClubs).catch(() => setClubs([]));
+    fetch(apiUrl("/api/clubs")).then((r) => r.json()).then(setClubs).catch(() => setClubs([]));
     const link = profileFromUrl(location.search);
     if (link) {
       setProfile(link);
@@ -190,7 +191,7 @@ export default function App() {
             {pinned && <div className="spot-label" ref={spotLabel} style={{ borderColor: pinned.colour }}>#{pinned.number} {pinned.name.split(" ").slice(-1)[0]}</div>}
             {meta && <Overlays cues={cues} meta={meta} mode={p.mode} colours={colours} />}
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
-            {status === "error" && <div className="overlay-msg">Can't reach the replay server. Is it running on port 8000?</div>}
+            {status === "error" && <div className="overlay-msg">Can't reach the replay server. {import.meta.env.DEV ? "Is it running on port 8000?" : "It may be waking up: try again in a moment."}</div>}
             {status === "disconnected" && <div className="overlay-msg">Lost the connection to the replay server. Pick a minute and press Go to reconnect.</div>}
           </div>
           <div className="controls">

@@ -28,3 +28,6 @@ Thumbs.db
 *.egg-info/
 *.tsbuildinfo
 .vite/
+
+# Python wheel build output
+build/
