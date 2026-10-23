@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import type { MatchEvent, MatchMeta } from "../types";
+import type { ClipEvent, ClipFrame, MatchEvent, MatchMeta } from "../types";
+import { ClipLayer } from "./ClipLayer";
 
 const L = 105;
 const W = 68;
@@ -9,6 +10,8 @@ const NZ = 68;
 const TERRITORY_TAU = 120; // seconds of match time for activity to fade to ~37%
 const SPIKE_TAU = 75;
 const SIGMA = 7; // metres: how far one action's influence spreads
+const CLIP_HEAT_PER_S = 0.015; // territory a tracked player adds each second, at their spot (an event adds 0.2 to 0.9)
+const PICK_DRAG_PX = 5; // a press that moves further than this is a camera drag, not a tap on a player
 
 /** Event position in absolute pitch metres, with the home team attacking left to right in the first half. */
 export function toAbsolute(ev: MatchEvent, meta: MatchMeta, end = false): [number, number] | null {
@@ -30,6 +33,9 @@ function displayColour(hex: string): THREE.Color {
 
 /** Pick display colours for the two teams that are easy to tell apart. */
 export function teamColours(meta: MatchMeta): [THREE.Color, THREE.Color] {
+  // The real clip's sides are blue and white: shown as they are, since lifting a white shirt's colour would make
+  // it a second blue.
+  if (meta.source === "video") return [new THREE.Color(meta.home.colours.primary), new THREE.Color(meta.away.colours.primary)];
   const home = displayColour(meta.home.colours.primary);
   let away = displayColour(meta.away.colours.primary);
   const diff = Math.abs(home.r - away.r) + Math.abs(home.g - away.g) + Math.abs(home.b - away.b);
@@ -65,6 +71,13 @@ export class PitchScene {
   private tmpColour = new THREE.Color();
   private spot: Spotlight | null = null;
   private tmpVector = new THREE.Vector3();
+  private clip: ClipLayer;
+  private clipSpeed = 1;
+  private clipLabel: HTMLElement | null = null;
+  private clipLabelText = "";
+  private clipLabelSize: [number, number] = [0, 0];
+  private lastFrameT: number | null = null;
+  private pressAt: [number, number] | null = null;
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -101,6 +114,11 @@ export class PitchScene {
       new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.6 }));
     this.scene.add(this.ball);
 
+    this.clip = new ClipLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
+    this.scene.add(this.clip.group);
+    this.renderer.domElement.addEventListener("pointerdown", this.onPress);
+    this.renderer.domElement.addEventListener("pointerup", this.onRelease);
+
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(container);
     this.resize();
@@ -111,7 +129,63 @@ export class PitchScene {
   setMatch(meta: MatchMeta) {
     this.colours = teamColours(meta);
     this.homeId = meta.home.id;
+    this.clip.setColours(this.colours[0], this.colours[1]);
     this.dirty = true;
+  }
+
+  // ------------------------------------------------------------ the video clip
+
+  /** Feed one `frame` of the tracked clip: everyone moves, and the territory surface follows where they were. */
+  showFrame(frame: ClipFrame, meta: MatchMeta) {
+    if (meta.home.id !== this.homeId) this.setMatch(meta);
+    this.clip.push(frame, meta);
+    const dt = this.lastFrameT === null ? 0 : Math.min(1, Math.max(0, frame.t - this.lastFrameT));
+    this.lastFrameT = frame.t;
+    this.matchTime = frame.t;
+    this.decay();
+    for (const p of this.clip.lastPlayers()) this.splat(p.side, p.x, p.y, CLIP_HEAT_PER_S * dt);
+    this.dirty = true;
+  }
+
+  /** A detected event of the clip: a line (pass, carry) or ring (interception) that fades. */
+  addClipEvent(ev: ClipEvent, meta: MatchMeta) {
+    if (meta.home.id !== this.homeId) this.setMatch(meta);
+    this.clip.addEvent(ev, meta);
+  }
+
+  /** The replay speed, which the drawing needs to move smoothly between frames. */
+  setClipSpeed(speed: number) { this.clipSpeed = speed; }
+
+  /** The page element for the label of the player the viewer tapped (kept beside them, like the spotlight's). */
+  setClipLabel(el: HTMLElement | null) { this.clipLabel = el; }
+
+  private onPress = (e: PointerEvent) => { this.pressAt = [e.clientX, e.clientY]; };
+
+  /** A tap (not a camera drag) on or near a tracked player selects them; a tap elsewhere clears it. */
+  private onRelease = (e: PointerEvent) => {
+    const down = this.pressAt;
+    this.pressAt = null;
+    if (!down || !this.clip.group.visible || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > PICK_DRAG_PX) return;
+    const box = this.renderer.domElement.getBoundingClientRect();
+    this.clip.select(this.clip.pick(e.clientX - box.left, e.clientY - box.top, this.camera, box.width, box.height));
+  };
+
+  private placeClipLabel() {
+    const label = this.clipLabel;
+    if (!label) return;
+    const { clientWidth: cw, clientHeight: ch } = this.container;
+    const info = this.clip.group.visible ? this.clip.selectedInfo(this.camera, cw, ch) : null;
+    label.style.display = info ? "block" : "none";
+    if (!info) return;
+    if (info.text !== this.clipLabelText) {
+      label.textContent = info.text;
+      this.clipLabelText = info.text;
+      this.clipLabelSize = [label.offsetWidth, label.offsetHeight]; // measured when the text changes, not every frame
+    }
+    const [w, h] = this.clipLabelSize;
+    const x = Math.min(cw - w - 6, Math.max(6, info.x - w / 2));
+    const y = Math.min(ch - h - 6, Math.max(6, info.y - h));
+    label.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
   }
 
   /**
@@ -172,6 +246,9 @@ export class PitchScene {
 
   reset() {
     if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
+    this.clip.clear();
+    this.lastFrameT = null;
+    if (this.clipLabel) this.clipLabel.style.display = "none";
     this.heat[0].fill(0);
     this.heat[1].fill(0);
     this.spikes = [];
@@ -218,6 +295,9 @@ export class PitchScene {
   dispose() {
     cancelAnimationFrame(this.frame);
     this.clearSpotlight();
+    this.renderer.domElement.removeEventListener("pointerdown", this.onPress);
+    this.renderer.domElement.removeEventListener("pointerup", this.onRelease);
+    this.clip.dispose();
     this.observer.disconnect();
     this.controls.dispose();
     this.scene.traverse((obj) => {
@@ -417,6 +497,9 @@ export class PitchScene {
     const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
     const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
     this.ball.position.lerp(target, 0.18);
+    this.ball.visible = !this.clip.group.visible; // a clip draws its own ball, only where the video found it
+    this.clip.update(this.clipSpeed);
+    this.placeClipLabel();
     this.moveSpotlight();
     this.controls.update();
     this.renderer.render(this.scene, this.camera);

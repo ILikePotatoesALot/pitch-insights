@@ -2,8 +2,9 @@
 
     uvicorn pitch_insights.server:app --port 8000
 
-GET  /api/matches                list of demo matches in samples/
-GET  /api/matches/{name}         that match's match_meta
+GET  /api/matches                list of demo matches in samples/, then the video clip(s) in samples/video/
+                                 (`kind` is "synthetic" or "video")
+GET  /api/matches/{name}         that match's match_meta (a clip's is made up of its teams, Left and Right)
 GET  /api/clubs                  the clubs and their squads (for the app's profile picker)
 WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0&mode=casual&team=POT&player=POT-09&focus=xg
 
@@ -57,6 +58,8 @@ from pitch_insights.director import CueBuilder, Director, Personaliser, ShowCloc
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
+from pitch_insights.video.replay import ClipError, clip_meta, find_clip, list_clips
+from pitch_insights.video.serve import replay_clip
 
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
@@ -85,9 +88,10 @@ def list_matches() -> list[dict]:
         with path.open(encoding="utf-8") as f:
             meta = json.loads(f.readline())
         out.append({"name": path.stem, "match_id": meta["match"]["id"],
+                    "kind": "synthetic",
                     "home": {k: meta["home"][k] for k in ("id", "name", "short_name", "colours")},
                     "away": {k: meta["away"][k] for k in ("id", "name", "short_name", "colours")}})
-    return out
+    return out + list_clips(SAMPLES)  # the real-footage clip(s) in samples/video/, listed after the synthetic matches
 
 
 @functools.lru_cache(maxsize=4)
@@ -112,6 +116,9 @@ def list_clubs() -> list[dict]:
 
 @app.get("/api/matches/{name}")
 def get_match(name: str) -> dict:
+    clip = find_clip(SAMPLES, name)
+    if clip:
+        return clip_meta(clip)
     meta, _ = read_match(_match_path(name))
     return meta
 
@@ -139,6 +146,15 @@ def state_message(brain: MatchBrain) -> dict:
 @app.websocket("/ws/replay/{name}")
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     await ws.accept()
+    try:
+        clip = find_clip(SAMPLES, name)  # a tracked video clip (samples/video/), not a synthetic match
+    except ClipError as e:
+        await ws.send_json({"type": "error", "message": str(e)})
+        await ws.close()
+        return
+    if clip:
+        await replay_clip(ws, clip, speed, clamp_speed)
+        return
     try:
         path = _match_path(name)
         meta, events = read_match(path)
