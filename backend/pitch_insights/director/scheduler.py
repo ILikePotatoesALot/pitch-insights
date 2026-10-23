@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 from pitch_insights.director.cues import CARD_TEMPLATES, TEMPLATES
 
 EPS = 1e-9
+DEFAULT_MAX_DELAY = 8.0  # for a template a custom `Rules.max_delay` leaves out
 
 
 @dataclass(frozen=True)
@@ -76,6 +77,7 @@ class ShowClock:
 class _Live:
     cue: dict
     start: float
+    seq: int  # the order cues were offered in, for tie-breaks (ids are strings: "C-10" sorts before "C-9")
 
     @property
     def end(self) -> float:
@@ -99,7 +101,6 @@ class Director:
         self._last_end: dict[str, float] = {}   # template -> when its last cue ended
         self._topic_end: dict[str, float] = {}  # topic -> when its last cue ended
         self.dropped: deque[dict] = deque(maxlen=500)  # what never reached the screen, and why
-        self.shown = 0
 
     # ------------------------------------------------------------ public
 
@@ -111,10 +112,6 @@ class Director:
     def waiting(self) -> int:
         """How many cues are queued. Each starts or is dropped within its template's `max_delay`."""
         return len(self._pending)
-
-    def remaining(self, now: float) -> dict[str, float]:
-        """Screen seconds each cue on screen has left."""
-        return {s.cue["id"]: round(max(0.0, s.end - now), 2) for s in self._live}
 
     def offer(self, cues: list[dict], now: float) -> list[dict]:
         """New cues arrive. Returns the messages for what changed on screen."""
@@ -143,10 +140,10 @@ class Director:
 
     def _settle(self, now: float) -> list[dict]:
         out: list[dict] = []
-        for s in sorted(self._live, key=lambda s: (s.end, s.cue["id"])):
+        for s in sorted(self._live, key=lambda s: (s.end, s.seq)):
             if now >= s.end - EPS:
                 self._end(s, s.end, "expired", out)
-        for p in [p for p in self._pending if now - p.arrived > self.rules.max_delay[p.cue["template"]] + EPS]:
+        for p in [p for p in self._pending if now - p.arrived > self.rules.max_delay.get(p.cue["template"], DEFAULT_MAX_DELAY) + EPS]:
             self._pending.remove(p)
             self._drop(p.cue, "stale", now)
         # Highest priority first; after each cue starts, look again from the top, because
@@ -160,8 +157,7 @@ class Director:
                     self._end(v, now, "preempted", out)
                 self._pending.remove(p)
                 cue = p.cue | {"delay": round(now - p.arrived, 2)}
-                self._live.append(_Live(cue, now))
-                self.shown += 1
+                self._live.append(_Live(cue, now, p.seq))
                 out.append({"type": "cue", "cue": cue})
                 break
             else:
@@ -183,7 +179,7 @@ class Director:
                 contested = live
             else:
                 break
-            v = min(contested, key=lambda s: (s.cue["priority"], s.start, s.cue["id"]))
+            v = min(contested, key=lambda s: (s.cue["priority"], s.start, s.seq))
             outranks = cue["priority"] >= v.cue["priority"] + r.preempt_margin
             newest_urgent = cue["priority"] >= r.urgent and v.cue["priority"] >= r.urgent
             if not (outranks or newest_urgent) or now - v.start < r.min_hold.get(v.cue["template"], 2.0) - EPS:

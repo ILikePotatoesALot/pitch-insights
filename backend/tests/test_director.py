@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from pitch_insights.director import CARD_TEMPLATES, CueBuilder, Director, Rules, ShowClock
-from pitch_insights.director.cues import cue
+from pitch_insights.director import CARD_TEMPLATES, CueBuilder, Director, Rules, ShowClock, visible_to
+from pitch_insights.director.cues import cue, lower_third_seconds
 from pitch_insights.director.sheet import cue_sheet
 from pitch_insights.generator.io import read_match
 
@@ -244,12 +244,6 @@ def test_time_never_runs_backwards():
     assert ended(d.advance(16.0)) == [("C-1", "expired")]
 
 
-def test_remaining_seconds_for_cues_still_up():
-    d = Director()
-    d.offer([make(duration=6.0)], now=10.0)
-    assert d.remaining(13.5) == {"C-1": 2.5}
-
-
 # ---------------------------------------------------------------- the screen clock
 
 def test_show_clock_divides_match_time_by_the_speed():
@@ -401,3 +395,38 @@ def test_speed_popup_cue():
 def test_cues_carry_what_a_per_viewer_filter_needs():
     c = CueBuilder(META).for_moment(moment(), None)
     assert all(x["about"] == {"team_id": "POT", "player_id": "POT-9"} and x["tier"] == "headline" for x in c)
+
+
+def test_chinese_text_is_timed_by_its_characters_not_its_spaces():
+    zh = "这是一个很长的句子，" * 8  # 72 characters, no spaces
+    assert lower_third_seconds(zh, zh, None) > lower_third_seconds("Goal.", "Goal.", None) == 6.0
+    assert lower_third_seconds(zh, None, None) >= 8.0
+
+
+def test_ties_go_by_the_order_cues_were_offered_not_by_id_text():
+    d = Director(Rules(max_cards=2, cooldown={}))
+    for _ in range(8):  # use up C-1 to C-8, so the next two are C-9 and C-10
+        d.offer([make("speed_popup", 10, duration=1.0)], now=d._now)
+        d.advance(d._now + 1.0)
+    d.offer([make("stat_card", 50), make("player_tag", 50)], now=d._now)
+    ids = {c["template"]: c["id"] for c in d.on_screen}
+    assert ids == {"stat_card": "C-9", "player_tag": "C-10"}
+    msgs = d.offer([make("rating_alert", 90)], now=d._now + 3.0)
+    assert ended(msgs) == [("C-9", "preempted")]  # the older of two equals, though "C-10" < "C-9" as text
+
+
+def test_rules_that_leave_a_template_out_still_work():
+    d = Director(Rules(max_delay={}, max_pending=2))
+    d.offer([make(priority=90, duration=30.0)], now=0.0)
+    d.offer([make(priority=50)], now=1.0)
+    d.advance(20.0)
+    assert d.waiting == 0 and d.dropped[-1]["reason"] == "stale"
+
+
+def test_casual_viewers_do_not_get_analyst_cues_and_so_lose_no_slots():
+    meta, events = read_match(SAMPLES / "comeback-POT-CAR.jsonl")
+    casual = [e["message"]["cue"] for e in cue_sheet(meta, events, 60, detail="casual") if e["message"]["type"] == "cue"]
+    analyst = [e["message"]["cue"] for e in cue_sheet(meta, events, 60) if e["message"]["type"] == "cue"]
+    assert casual and all(c["detail"] == "casual" for c in casual) and any(c["detail"] == "analyst" for c in analyst)
+    assert all(visible_to(c, "analyst") for c in analyst) and not all(visible_to(c, "casual") for c in analyst)
+    assert any(c["template"] == "stat_card" and c["data"]["kind"] == "summary" for c in casual)

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment } from "./types";
+import type { CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, ViewMode } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 
@@ -8,7 +8,7 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  * Events go to `onEvent` (for the 3D pitch) instead of React state, so a busy
  * match doesn't re-render the page on every pass.
  */
-export function useReplay(name: string | null, lang: string, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
+export function useReplay(name: string | null, lang: string, mode: ViewMode, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
                           onReset: () => void) {
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
@@ -40,6 +40,10 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   // and a paused replay should stay paused through it.
   const pausedRef = useRef(false);
   const langRef = useRef<string | null>(null);
+  // The viewer's mode goes to the server, so its Overlay Director keeps clean the screen this viewer sees:
+  // cues made for analysts only don't take slots on a casual fan's screen.
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
 
   useEffect(() => {
     if (!name) return;
@@ -64,6 +68,7 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
           setMeta(data.meta);
           setAiInfo(data.commentary ?? null);
           setLanguages(data.languages ?? { en: "English" });
+          socket.send(JSON.stringify({ cmd: "detail", value: modeRef.current }));
           if (keepPaused) socket.send(JSON.stringify({ cmd: "pause" }));
           setStatus(keepPaused ? "paused" : "live");
           break;
@@ -106,6 +111,8 @@ export function useReplay(name: string | null, lang: string, onEvent: (ev: Match
   }, [name, from, jump.n, lang]);
 
   const send = (cmd: object) => ws.current?.readyState === WebSocket.OPEN && ws.current.send(JSON.stringify(cmd));
+
+  useEffect(() => { send({ cmd: "detail", value: mode }); }, [mode]);
 
   const setSpeed = useCallback((value: number) => {
     setSpeedState(value);

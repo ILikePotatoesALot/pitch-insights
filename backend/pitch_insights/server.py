@@ -25,7 +25,9 @@ The WebSocket sends, in order:
                                                         the server watches, so a pause freezes them too
   {"type": "end"}                                       the final whistle; the connection stays open until the
                                                         cues still queued or on screen have run their course
-The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"} or {"cmd": "resume"}.
+The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"}, {"cmd": "resume"} or
+{"cmd": "detail", "value": "casual"} (the viewer's mode, "casual" or "analyst", the default: casual fans
+get only the cues made for everyone, so cues they would never see can't hold a slot on their screen).
 To seek, it reconnects with a different `from` minute, or `at` (match seconds, which wins when both are
 given): a minute on the broadcast clock can say 47:00 of the second half but not 45+2 of the first.
 """
@@ -44,7 +46,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.store import load_commentary, with_commentary
 from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
-from pitch_insights.director import CueBuilder, Director, ShowClock
+from pitch_insights.director import CueBuilder, Director, ShowClock, visible_to
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
@@ -159,6 +161,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     # The Overlay Director: one per connection, working in screen seconds (a cue lasts as long on the
     # screen at 60x as at 1x). A seek or a language change reconnects, so cues start afresh.
     director, builder, clock = Director(), CueBuilder(meta), ShowClock()
+    viewer = {"detail": "analyst"}  # whose screen the Director is keeping clean; the browser says
 
     def show_now() -> float:
         return clock.at(rep.now, rep.speed)
@@ -185,6 +188,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 rep.pause()
             elif cmd == "resume":
                 rep.resume()
+            elif cmd == "detail" and msg.get("value") in ("casual", "analyst"):
+                viewer["detail"] = msg["value"]
 
     async def send_all(messages: list[dict]):
         for msg in messages:
@@ -211,7 +216,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 state = state_message(brain)
                 await ws.send_json({"type": "state", "state": state})
                 last_state = loop.time()
-            cues = [c for m in shown_moments for c in builder.for_moment(m, state)]
+            cues = [c for m in shown_moments for c in builder.for_moment(m, state) if visible_to(c, viewer["detail"])]
             await send_all(director.offer(cues, show_now()) if cues else director.advance(show_now()))
         await ws.send_json({"type": "state", "state": state_message(brain)})
         await ws.send_json({"type": "end"})

@@ -158,3 +158,17 @@ def test_cue_text_follows_the_chosen_language():
 
     english, german = goal_cue("en"), goal_cue("de")
     assert english["headline"] and german["headline"] and english["headline"] != german["headline"]
+
+
+def test_a_casual_viewer_is_sent_only_the_cues_made_for_everyone():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=60&from=87") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        ws.send_json({"cmd": "detail", "value": "casual"})
+        ws.send_json({"cmd": "detail", "value": "nonsense"})  # ignored, not fatal
+        cues = []
+        while len(cues) < 2:
+            msg = ws.receive_json()
+            assert msg["type"] != "end"
+            if msg["type"] == "cue":
+                cues.append(msg["cue"])
+    assert all(c["detail"] == "casual" for c in cues)

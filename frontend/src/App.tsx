@@ -44,7 +44,7 @@ export default function App() {
   }, []);
 
   const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, seek, seekAt } =
-    useReplay(name, lang, onEvent, onReset);
+    useReplay(name, lang, mode, onEvent, onReset);
   // A new language reconnects from the current moment (not the start of the minute, so nothing replays).
   // It goes by match seconds, because a minute can't say first-half stoppage time (45+2'). Before the first
   // state arrives there is no current moment, so the reconnect keeps the jump already made.

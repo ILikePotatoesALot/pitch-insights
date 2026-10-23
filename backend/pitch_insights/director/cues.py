@@ -34,14 +34,23 @@ STORY_CAP = 70  # story cues never outrank an event's lower-third
 URGENT_EVENTS = ("goal", "red_card")  # always urgent (priority 90 and up), whatever their importance
 
 
-def _words(text: str | None) -> int:
-    return len(text.split()) if text else 0
+def _words(text: str | None) -> float:
+    """Words to read. Chinese and Japanese have no spaces, so each such character counts as 0.6 of a word."""
+    if not text:
+        return 0
+    cjk = sum("぀" <= ch <= "ヿ" or "㐀" <= ch <= "鿿" for ch in text)
+    return len(text.split()) + 0.6 * cjk
 
 
 def lower_third_seconds(casual: str | None, analyst: str | None, fact: str | None) -> float:
     """Six seconds, and a quarter of a second for each word past fifteen, up to ten."""
     words = max(_words(casual), _words(analyst), _words(fact))
     return round(min(10.0, 6.0 + 0.25 * max(0, words - 15)), 2)
+
+
+def visible_to(c: dict, detail: str) -> bool:
+    """Whether a viewer at this detail level ("casual" or "analyst") gets the cue; analysts get all of them."""
+    return detail == "analyst" or c["detail"] == "casual"
 
 
 def cue(template: str, time: float, duration: float, priority: float, *, tier: str, detail: str,

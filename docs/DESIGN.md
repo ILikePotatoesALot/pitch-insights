@@ -302,13 +302,13 @@ Code in `backend/pitch_insights/director/` (`cues.py`: what to show; `scheduler.
 |---|---|
 | goal, red card | lower-third (priority 90 or more, so always urgent) and a player tag (name, number, position, live rating) |
 | penalty, big chance, milestone, momentum swing, dominance, pressing spell (notable or headline) | lower-third; story moments (milestones, patterns) are capped at 70 so they never outrank an event |
-| half-time, full-time | lower-third and a summary stat card (possession, shots, on target, xG, pass accuracy); the summary cards are urgent, so another card's cooldown can't hold them back (found in the browser: a casual fan's full-time card was dropped because of an analyst-only card they never saw) |
+| half-time, full-time | lower-third and a summary stat card (possession, shots, on target, xG, pass accuracy); the summary cards are urgent, so another card's cooldown can't hold them back |
 | momentum swing, dominance | "who is in control" stat card (field tilt, possession, shots, xG), analysts only |
 | pressing spell | pressing stat card (high pressures, PPDA, tackles, interceptions), analysts only |
 | rating jump, drop or milestone | rating alert, analysts only, priority 20-60 |
 | (no source yet) | speed popup: built and tested, waiting for the speeds the video path's `frame` messages will give |
 
-Priority is `50 + 50 * importance` for lower-thirds and `30 + 30 * importance` for stat cards; a lower-third stays up 6 seconds, plus a quarter second for each word past fifteen, up to 10.
+Priority is `50 + 50 * importance` for lower-thirds and `30 + 30 * importance` for stat cards; a lower-third stays up 6 seconds, plus a quarter second for each word past fifteen, up to 10 (each Chinese or Japanese character counts as 0.6 of a word, since those have no spaces).
 
 **Clutter rules** (`Rules`, all config):
 
@@ -324,7 +324,8 @@ Priority is `50 + 50 * importance` for lower-thirds and `30 + 30 * importance` f
 **App.** `components/Overlays.tsx` draws three columns of cues over the pitch (bottom: player tag above the lower-third; top left: rating alert, speed popup; top right: stat card), so cues can't overlap whatever their height, and slide in sideways. Casual fans see the cues made for everyone (`detail: "casual"`: headline lower-thirds, goal tags, summary cards); analysts see all of them. **Broadcast** layout shows the pitch with its overlays only; **Fan** adds the side panel (moment feed, ratings, stats). The old banner and its timer are gone: the Director replaces them.
 
 - **Results (23 Oct, `calibrate_director.py`):** the screen never broke a rule over the three samples at 1x, 20x and 60x. At 1x the comeback match shows 57 cues (25 lower-thirds, 16 stat cards, 11 rating alerts, 5 player tags), the other two 23 and 29; at 60x, 32, 19 and 25, with 7, 2 and 2 cues pre-empted and 16, 5 and 7 delayed. Every goal, red card and final whistle, and the full-time summary card, reaches the screen in every sample at 1x, 20x and 60x (checked in a test).
-- **Known limits:** the Director runs per connection but doesn't know the viewer's mode, so a casual fan's screen can have gaps where an analyst-only cue held a slot the app then hid; Personalise moves the filter in front of the Director (cues already carry `about`, `tier` and `detail`). A speed change leaves a cue on screen for its remaining screen seconds at the new speed. The app's overlay labels ("Possession", "Match summary") are English only, like the rest of its chrome.
+- **Viewer mode:** the app tells the server the viewer's mode (`{"cmd": "detail", "value": "casual" | "analyst"}`, sent when it connects and whenever the switch changes), and the server offers the Director only the cues that viewer gets, so analyst-only cues can't hold a slot, a cooldown or the card limit on a casual fan's screen (found in the browser: a casual fan's full-time card was dropped for a pressing card they never saw). Personalise extends the same hook with the favourite club and player (cues already carry `about`, `tier` and `detail`).
+- **Known limits:** a viewer who switches from analyst to casual keeps seeing already-started cues hidden by the app, not taken down by the server, until they end. A speed change leaves a cue on screen for its remaining screen seconds at the new speed. The app's overlay labels ("Possession", "Match summary") are English only, like the rest of its chrome.
 
 ### Stored commentary for the demo
 
