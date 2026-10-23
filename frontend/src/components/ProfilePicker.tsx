@@ -16,13 +16,17 @@ export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSa
   const set = (patch: Partial<Profile>) => setDraft((d) => ({ ...d, ...patch }));
   const langs = { ...LANGUAGE_NAMES, ...languages };
 
+  // The parent re-renders on every replay update and passes a new `onClose` each time: keep it in a ref, so
+  // neither effect re-runs and the focus stays on the field the viewer is using.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => { firstField.current?.focus(); }, []);
   useEffect(() => {
-    firstField.current?.focus();
     if (first) return;
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
     window.addEventListener("keydown", esc);
     return () => window.removeEventListener("keydown", esc);
-  }, [first, onClose]);
+  }, [first]);
 
   const pickClub = (team: string | null) => {
     // Choosing a club drops a player that came from the club chosen before (so the list isn't left on a stale pick);

@@ -144,6 +144,11 @@ export class PitchScene {
                   labelSize: [0, 0] };
   }
 
+  /** Show or hide the spotlight to match whether the player is on the pitch (from the live state). */
+  setSpotlightOn(on: boolean) {
+    if (this.spot) this.spot.on = on;
+  }
+
   private clearSpotlight() {
     const spot = this.spot;
     if (!spot) return;
@@ -183,6 +188,7 @@ export class PitchScene {
     this.decay();
     if (this.spot) {
       if (ev.type === "substitution" && ev.player_off_id === this.spot.id) this.spot.on = false;
+      else if (ev.type === "foul" && ev.card === "red" && ev.player_id === this.spot.id) this.spot.on = false;
       else if (ev.type === "substitution" && ev.player_on_id === this.spot.id) this.spot.on = true;
       const at = this.spotPosition(ev, meta);
       if (at) {

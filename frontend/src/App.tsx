@@ -126,17 +126,23 @@ export default function App() {
   }, [pinned, meta]);
 
   // The favourite's rating, one sample a match minute, for the card's sparkline. It survives a reconnect at the
-  // same moment (a language change) and starts again if the match goes back (a jump) or the player changes.
-  const lastSample = useRef<number>(-1);
-  useEffect(() => { lastSample.current = -1; setRatingHistory([]); }, [name, p.player]);
+  // same moment (a language change) and starts again when the viewer jumps to another minute or changes player.
+  // A sample is keyed by period and minute, not compared as a number: the second half starts again near 45.
+  const lastSample = useRef("");
+  const clearHistory = useCallback(() => { lastSample.current = ""; setRatingHistory([]); }, []);
+  useEffect(clearHistory, [name, p.player, clearHistory]);
   useEffect(() => {
     const me = state?.players.find((x) => x.player_id === p.player);
     if (!state || !me) return;
-    const minute = state.match_minute; // absolute: 46 and up in the second half
-    if (minute === lastSample.current) return;
-    const back = minute < lastSample.current;
-    lastSample.current = minute;
-    setRatingHistory((h) => [...(back ? [] : h), me.rating]);
+    const key = `${state.period}:${state.match_minute}`;
+    if (key === lastSample.current) return;
+    lastSample.current = key;
+    setRatingHistory((h) => [...h, me.rating]);
+  }, [state, p.player]);
+  // Reconcile the spotlight with who is on the pitch (a sending-off or substitution may come from a state, not an event).
+  useEffect(() => {
+    const me = state?.players.find((x) => x.player_id === p.player);
+    if (me) sceneRef.current?.setSpotlightOn(me.on_pitch);
   }, [state, p.player]);
 
   const clubName = meta && p.team ? [meta.home, meta.away].find((t) => t.id === p.team)?.short_name : undefined;
@@ -195,7 +201,7 @@ export default function App() {
             <label className="seek">
               Jump to <input type="range" min={0} max={90} step={1} value={seekTo} onChange={(e) => setSeekTo(Number(e.target.value))} />
               <b>{seekTo}'</b>
-              <button onClick={() => seek(seekTo)}>Go</button>
+              <button onClick={() => { clearHistory(); seek(seekTo); }}>Go</button>
             </label>
             {status === "ended" && <span className="status">Match over</span>}
           </div>
