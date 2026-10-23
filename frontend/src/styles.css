@@ -172,3 +172,91 @@ aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .stats thead th:last-child { text-align: right; }
 .patterns { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
 .patterns b { color: var(--text); }
+
+/* ---------------------------------------------------------------- Personalise */
+:root { --fav: var(--accent); }
+header a.compare { color: var(--muted); font-size: 13px; text-decoration: underline dotted; text-underline-offset: 3px; }
+header a.compare:hover { color: var(--text); }
+.profile-chip { border-color: var(--line); white-space: nowrap; }
+.profile-chip.fav { border-color: var(--fav); box-shadow: inset 3px 0 0 var(--fav); }
+.app .scoreboard { border-top: 3px solid transparent; }
+.app[style*="--fav"] .scoreboard { border-top-color: var(--fav); }
+
+.focus-strip { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 18px; background: var(--panel); border: 1px solid var(--line);
+  border-left: 4px solid var(--accent); border-radius: 10px; padding: 6px 12px; font-variant-numeric: tabular-nums; }
+.fs-label { color: var(--accent); font-weight: 600; font-size: 13px; margin-right: auto; }
+.fs-val { font-size: 14px; display: inline-flex; align-items: baseline; gap: 6px; }
+.fs-val i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.fs-val b { font-size: 18px; }
+
+.pinned { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--fav); border-radius: 10px; padding: 8px 12px; }
+.pin-top { display: flex; align-items: center; gap: 10px; }
+.pin-number { min-width: 30px; text-align: center; font-weight: 700; font-size: 18px; color: #111; border-radius: 4px; padding: 2px 4px; }
+.pin-name { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.pin-name b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pin-name small { font-size: 12px; }
+.pin-rating { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+.pin-rating small.up { color: var(--good); }
+.pin-rating small.down { color: var(--bad); }
+.spark { display: block; width: 100%; height: 24px; margin: 4px 0; }
+.pin-stats { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; color: var(--muted); }
+.pin-stats em { font-style: normal; }
+.pin-stats b { color: var(--text); font-variant-numeric: tabular-nums; }
+.pin-stats .focus { color: var(--accent); font-weight: 600; }
+.pin-stats .focus b { color: var(--accent); font-size: 15px; }
+
+tr.focus td, tr.focus th { color: var(--accent); font-weight: 700; background: rgba(255, 211, 77, 0.08); }
+.sc-row.focus, .sc-row.focus span { color: var(--accent); font-weight: 700; }
+
+/* The favourite's alert: sits with the other small alerts, and a star on anything that is there for your club or player. */
+.fanalert { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-left: 4px solid var(--team); max-width: 100%;
+  box-shadow: 0 0 0 1px var(--fav) inset; }
+.fa-icon { font-size: 22px; line-height: 1; }
+.fa-main { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.fa-main > span { color: var(--muted); font-size: 13px; }
+.fa-main small { font-size: 11px; color: var(--accent); }
+.fa-rating { font-weight: 700; color: var(--accent); font-size: 18px; margin-left: 4px; }
+.fanalert.goal, .fanalert.assist { --team: var(--good); }
+.fanalert.red_card { --team: var(--bad); }
+.fanalert.yellow_card { --team: #ffd34d; }
+.cue[data-why] { position: relative; }
+.cue[data-why]:not(.fanalert)::after { content: "★"; position: absolute; top: 4px; right: 6px; font-size: 11px; color: var(--accent); }
+
+/* Picker */
+.modal-backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(5, 9, 13, 0.78); display: grid; place-items: center; padding: 16px; overflow-y: auto; }
+.picker { width: min(520px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; max-height: 100%; overflow-y: auto; }
+.picker h2 { margin: 0; font-size: 20px; }
+.picker-note { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.picker fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.picker legend, .picker .field { font-size: 13px; color: var(--muted); padding: 0; }
+.picker .field { display: flex; flex-direction: column; gap: 6px; }
+.picker select { width: 100%; color: var(--text); }
+.picker small { font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { display: inline-flex; align-items: center; gap: 6px; }
+.chips button.on { border-color: var(--accent); background: rgba(255, 211, 77, 0.14); }
+.chips i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; border: 1px solid rgba(255, 255, 255, 0.4); }
+.picker .segmented { align-self: flex-start; }
+.picker-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+button.primary { background: var(--accent); color: #111; font-weight: 600; border-color: var(--accent); }
+button.link { background: none; border: 0; color: var(--muted); text-decoration: underline; margin-left: auto; padding: 6px 0; }
+
+/* Side by side */
+body:has(.compare-view) { overflow: hidden; }
+.compare-view { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; height: 100vh; }
+.compare-view iframe { width: 100%; height: 100%; border: 0; background: var(--bg); }
+@media (max-width: 900px) { .compare-view { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } }
+.app.embed { padding-top: 8px; }
+.app.embed header h1 small, .app.embed .legend { display: none; }
+.app.embed header { gap: 8px; margin-bottom: 8px; }
+
+/* A narrow screen: the header, focus strip and pinned card wrap, and the picker fills the width. */
+@media (max-width: 700px) {
+  .app { padding: 8px 10px 20px; }
+  header { gap: 8px; }
+  header h1 { flex-basis: 100%; }
+  .fanalert { padding: 6px 10px; }
+  .picker { padding: 14px; }
+}
+.spot-label { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; display: none; white-space: nowrap;
+  font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: rgba(11, 18, 24, 0.88); border: 2px solid var(--fav); }

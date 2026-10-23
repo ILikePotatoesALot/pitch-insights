@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, ViewMode } from "./types";
+import { connectionParams } from "./profile";
+import type { CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 
@@ -8,8 +9,9 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  * Events go to `onEvent` (for the 3D pitch) instead of React state, so a busy
  * match doesn't re-render the page on every pass.
  */
-export function useReplay(name: string | null, lang: string, mode: ViewMode, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
+export function useReplay(name: string | null, profile: Profile, initialSpeed: number, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
                           onReset: () => void) {
+  const { lang, mode, team, player, focus } = profile;
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
   // Languages the server has stored translations for (code -> name), English always first.
@@ -20,7 +22,7 @@ export function useReplay(name: string | null, lang: string, mode: ViewMode, onE
   // pause freezes them and a seek or reconnect starts with a clear screen.
   const [cues, setCues] = useState<Cue[]>([]);
   const [status, setStatus] = useState<Status>("connecting");
-  const [speed, setSpeedState] = useState(20);
+  const [speed, setSpeedState] = useState(initialSpeed);
   // A jump belongs to the match it was made in; `n` makes a repeat jump to the same minute reconnect.
   // `at` is exact match seconds (it wins over `minute`), for a reconnect that must land on the same
   // second: a broadcast minute can't say first-half stoppage time (45+2').
@@ -36,12 +38,14 @@ export function useReplay(name: string | null, lang: string, mode: ViewMode, onE
   onResetRef.current = onReset;
   const speedRef = useRef(speed);
   speedRef.current = speed;
-  // Paused by the viewer, and the language the open connection uses: a language change reconnects,
-  // and a paused replay should stay paused through it.
+  // Paused by the viewer, and the profile the open connection uses: a change of language, club, player or focus
+  // metric reconnects (the server's Director works from the profile it was given), and a paused replay should
+  // stay paused through it.
   const pausedRef = useRef(false);
-  const langRef = useRef<string | null>(null);
-  // The viewer's mode goes to the server, so its Overlay Director keeps clean the screen this viewer sees:
-  // cues made for analysts only don't take slots on a casual fan's screen.
+  const profileKeyRef = useRef<string | null>(null);
+  // The viewer's profile goes to the server with the connection, so its Overlay Director keeps clean the screen
+  // this viewer sees (cues made for analysts only don't take slots on a casual fan's screen) and favours their
+  // club and player. Mode can also change without a reconnect (the `detail` command).
   const modeRef = useRef(mode);
   modeRef.current = mode;
 
@@ -53,12 +57,13 @@ export function useReplay(name: string | null, lang: string, mode: ViewMode, onE
     setState(null);
     setAiInfo(null);
     onResetRef.current();
-    const keepPaused = pausedRef.current && langRef.current !== null && langRef.current !== lang;
-    langRef.current = lang;
+    const key = [lang, team, player, focus].join("|");
+    const keepPaused = pausedRef.current && profileKeyRef.current !== null && profileKeyRef.current !== key;
+    profileKeyRef.current = key;
     pausedRef.current = keepPaused;
     let ended = false;
     const proto = location.protocol === "https:" ? "wss" : "ws";
-    const socket = new WebSocket(`${proto}://${location.host}/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&lang=${encodeURIComponent(lang)}`);
+    const socket = new WebSocket(`${proto}://${location.host}/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${connectionParams({ ...profile, mode: modeRef.current })}`);
     ws.current = socket;
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
@@ -108,7 +113,7 @@ export function useReplay(name: string | null, lang: string, mode: ViewMode, onE
       ended = true; // closing on purpose (new match or jump), not a lost connection
       socket.close();
     };
-  }, [name, from, jump.n, lang]);
+  }, [name, from, jump.n, lang, team, player, focus]);
 
   const send = (cmd: object) => ws.current?.readyState === WebSocket.OPEN && ws.current.send(JSON.stringify(cmd));
 

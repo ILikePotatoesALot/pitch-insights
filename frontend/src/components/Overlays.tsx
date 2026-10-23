@@ -7,17 +7,23 @@ import type { Cue, CueTemplate, MatchMeta, ViewMode } from "../types";
 // lower-third). If a narrow, short pitch ever runs out of room, the bottom column is pushed out of the pitch
 // and clipped, not drawn over the top. The Director's rules (one of each template, at most two cards) keep
 // the bands from filling up.
-const TOP_LEFT: CueTemplate[] = ["rating_alert", "speed_popup"];
+const TOP_LEFT: CueTemplate[] = ["fan_alert", "rating_alert", "speed_popup"];
 const TOP_RIGHT: CueTemplate[] = ["stat_card"];
 const BOTTOM: CueTemplate[] = ["player_tag", "lower_third"];
 
 const ROW_LABELS: Record<string, [string, string]> = {
   possession_pct: ["Possession", "%"], shots: ["Shots", ""], shots_on_target: ["On target", ""], xg: ["xG", ""],
   pass_accuracy_pct: ["Pass accuracy", "%"], field_tilt: ["Field tilt", "%"], pressures_high: ["High pressures", ""],
+  xt_added: ["Threat (xT)", ""], win_probability: ["Win chance", "%"],
   ppda: ["PPDA", ""], tackles_won: ["Tackles won", ""], interceptions: ["Interceptions", ""],
 };
 const CARD_TITLES: Record<string, string> = { summary: "Match summary", control: "Who is in control", pressing: "Pressing" };
 const TAG_EVENTS: Record<string, string> = { goal: "Goal", red_card: "Sent off" };
+const ALERT_TEXT: Record<string, [string, string]> = {
+  goal: ["⚽", "scores"], assist: ["🅰", "sets up the goal"], red_card: ["🟥", "is sent off"], yellow_card: ["🟨", "is booked"],
+  rating_up: ["▲", "is playing well"], rating_down: ["▼", "is struggling"], rating_milestone: ["★", "hits a high"],
+};
+const WHY: Record<string, string> = { favourite_player: "★ Your player", favourite_club: "★ Your club" };
 
 function teamColour(cue: Cue, meta: MatchMeta, colours: [string, string]): string | undefined {
   const t = cue.about.team_id;
@@ -38,6 +44,7 @@ export function Overlays({ cues, meta, mode, colours }: {
       case "player_tag": return <PlayerTag key={cue.id} cue={cue} style={style} />;
       case "rating_alert": return <RatingAlert key={cue.id} cue={cue} style={style} />;
       case "speed_popup": return <SpeedPopup key={cue.id} cue={cue} style={style} />;
+      case "fan_alert": return <FanAlert key={cue.id} cue={cue} style={style} />;
     }
   };
   const drawAll = (templates: CueTemplate[]) => templates.flatMap((t) => visible.filter((c) => c.template === t)).map(draw);
@@ -57,7 +64,7 @@ function LowerThird({ cue, mode, style }: { cue: Cue; mode: ViewMode; style?: CS
   // The agents' line for this viewer; an analyst without one sees the next fact from the evidence pack.
   const text = (mode === "casual" ? d.casual : d.analyst) ?? (mode === "analyst" ? d.fact : null);
   return (
-    <div className={`cue lowerthird ${cue.tier} kind-${d.kind}`} style={style} data-cue={cue.id}>
+    <div className={`cue lowerthird ${cue.tier} kind-${d.kind}`} style={style} data-cue={cue.id} data-why={cue.why}>
       <span className="lt-clock">{d.clock}</span>
       <span className="lt-head">{d.headline}</span>
       {text && <span className="lt-fact">{text}</span>}
@@ -68,17 +75,17 @@ function LowerThird({ cue, mode, style }: { cue: Cue; mode: ViewMode; style?: CS
 function StatCard({ cue, meta, colours }: { cue: Cue; meta: MatchMeta; colours: [string, string] }) {
   const d = cue.data;
   return (
-    <div className={`cue statcard ${d.kind}`} data-cue={cue.id}>
+    <div className={`cue statcard ${d.kind}`} data-cue={cue.id} data-why={cue.why}>
       <h4>{CARD_TITLES[d.kind] ?? "Match stats"} <small>{d.clock}</small></h4>
       <div className="sc-teams">
         <span><i style={{ background: colours[0] }} />{meta.home.short_name}</span>
         <span>{meta.away.short_name}<i style={{ background: colours[1] }} /></span>
       </div>
-      {(d.rows as { key: string; home: number; away: number }[]).map((r) => {
+      {(d.rows as { key: string; home: number; away: number; focus?: boolean }[]).map((r) => {
         const [label, unit] = ROW_LABELS[r.key] ?? [r.key, ""];
         return (
-          <div className="sc-row" key={r.key}>
-            <b>{r.home}{unit}</b><span>{label}</span><b>{r.away}{unit}</b>
+          <div className={`sc-row${r.focus ? " focus" : ""}`} key={r.key}>
+            <b>{r.home}{unit}</b><span>{r.focus ? "★ " : ""}{label}</span><b>{r.away}{unit}</b>
           </div>
         );
       })}
@@ -89,7 +96,7 @@ function StatCard({ cue, meta, colours }: { cue: Cue; meta: MatchMeta; colours: 
 function PlayerTag({ cue, style }: { cue: Cue; style?: CSSProperties }) {
   const d = cue.data;
   return (
-    <div className="cue playertag" style={style} data-cue={cue.id}>
+    <div className="cue playertag" style={style} data-cue={cue.id} data-why={cue.why}>
       <span className="pt-number">{d.number ?? "–"}</span>
       <span className="pt-main">
         <b>{d.name}</b>
@@ -104,7 +111,7 @@ function RatingAlert({ cue, style }: { cue: Cue; style?: CSSProperties }) {
   const d = cue.data;
   const arrow = d.direction === "down" ? "▼" : d.direction === "up" ? "▲" : "★";
   return (
-    <div className={`cue ratingalert ${d.direction}`} style={style} data-cue={cue.id}>
+    <div className={`cue ratingalert ${d.direction}`} style={style} data-cue={cue.id} data-why={cue.why}>
       <span className="ra-arrow">{arrow}</span>
       <b>{d.name}</b>
       <span className="ra-rating">{typeof d.rating === "number" ? d.rating.toFixed(1) : ""}</span>
@@ -113,10 +120,26 @@ function RatingAlert({ cue, style }: { cue: Cue; style?: CSSProperties }) {
   );
 }
 
+/** The favourite player did something notable: for everyone with a favourite, casual fans included. */
+function FanAlert({ cue, style }: { cue: Cue; style?: CSSProperties }) {
+  const d = cue.data;
+  const [icon, text] = ALERT_TEXT[d.event] ?? ["★", ""];
+  return (
+    <div className={`cue fanalert ${d.event}`} style={style} data-cue={cue.id} data-why={cue.why}>
+      <span className="fa-icon">{icon}</span>
+      <span className="fa-main">
+        <b>{d.name}</b> <span>{text}</span>
+        <small>{WHY[cue.why ?? "favourite_player"]} · {d.clock}{typeof d.change === "number" ? ` · ${d.change >= 0 ? "+" : ""}${d.change.toFixed(1)}` : ""}</small>
+      </span>
+      {typeof d.rating === "number" && <span className="fa-rating">{d.rating.toFixed(1)}</span>}
+    </div>
+  );
+}
+
 function SpeedPopup({ cue, style }: { cue: Cue; style?: CSSProperties }) {
   const d = cue.data;
   return (
-    <div className="cue speedpopup" style={style} data-cue={cue.id}>
+    <div className="cue speedpopup" style={style} data-cue={cue.id} data-why={cue.why}>
       <b>{d.speed_kmh}</b><small>km/h</small><span>{d.name}</span>
     </div>
   );

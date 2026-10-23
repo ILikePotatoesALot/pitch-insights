@@ -9,7 +9,7 @@ For a full pick-up guide (branches, how to run, rules, what's waiting, ordered n
 - **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
 - **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna was refused, so the agents stay on GPT-4o. Details: [DESIGN.md, Agents](DESIGN.md#agents).
 - **Agents core merged** (ILikePotatoesALot/pitch-insights#4): Explainer and Narrator on GPT-4o through Agent Framework, code groundedness check with one retry and a fallback, stored commentary for the three samples (52 moments, all grounded), commentary shown in the app with an AI-generated note. Reviewed by `/code-review` and a second reviewer; all findings fixed.
-- **Next, not blocked:** live simulation mode, Personalise. (Memory agent, SoccerTrack loader and the Overlay Director have since been built.)
+- **Next, not blocked:** live simulation mode. (Memory agent, SoccerTrack loader, the Overlay Director and Personalise have since been built.)
 - **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights (placeholders are in `.env`).
 - **Decided 21 Oct:** the video path uses pre-trained detection on a short clip (fine-tuning maybe later); licensed footage is fine, so no clarification question; registration confirmed.
 - **Team:** Austin and Claude. Teammates are GitHub collaborators but not registered participants (prize verification, rule 8.2).
@@ -74,6 +74,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - Profile: analyst or casual, club, favourite player, language, focus metric.
 - Filters cues, rewrites tone and language, player-focus mode with a spotlight, favourite-player card with live rating and sparkline.
 - Broadcast mode: overlays only. Fan mode: adds a side panel.
+- Built 23 Oct as deterministic code (the viewer's choices, not a model call): [DESIGN.md, Personalise](DESIGN.md#personalise).
 
 ## Microsoft stack
 

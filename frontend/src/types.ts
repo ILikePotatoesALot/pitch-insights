@@ -167,7 +167,7 @@ export type ViewMode = "casual" | "analyst";
 /** Broadcast shows the pitch and its overlays only; fan adds the side panel. */
 export type LayoutMode = "broadcast" | "fan";
 
-export type CueTemplate = "lower_third" | "stat_card" | "player_tag" | "rating_alert" | "speed_popup";
+export type CueTemplate = "lower_third" | "stat_card" | "player_tag" | "rating_alert" | "speed_popup" | "fan_alert";
 
 /**
  * An overlay the Overlay Director chose to show (see backend/pitch_insights/director/cues.py). The server
@@ -184,7 +184,35 @@ export interface Cue {
   detail: ViewMode; // "analyst" cues are for analysts only
   about: { team_id: string | null; player_id: string | null };
   topic: string | null;
+  why?: "favourite_player" | "favourite_club"; // set when the viewer's profile is why it is here or boosted
   moment_id: string | null;
   delay?: number; // seconds it waited for a free slot
   data: Record<string, any>;
+}
+
+// ---------------------------------------------------------------- Personalise
+
+/** The stat a viewer cares most about; the keys are the ones the team stats and stat-card rows use. */
+export type FocusMetric = "win_probability" | "xt_added" | "xg" | "pass_accuracy_pct" | "possession_pct" | "shots";
+
+/**
+ * What a viewer chooses, and the only thing stored about them: no name, id or history (see profile.ts). The
+ * server checks the club, player, mode and focus against the match (backend/pitch_insights/director/personalise.py).
+ */
+export interface Profile {
+  version: 1;
+  mode: ViewMode;
+  lang: string;
+  team: string | null; // favourite club id
+  player: string | null; // favourite player id
+  focus: FocusMetric | null;
+}
+
+/** A club and its squad, from GET /api/clubs, for the profile picker. */
+export interface ClubInfo {
+  id: string;
+  name: string;
+  short_name: string;
+  colours: { primary: string; secondary: string };
+  players: { id: string; name: string; number: number; position: string }[];
 }

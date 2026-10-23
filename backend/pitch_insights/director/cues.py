@@ -5,13 +5,16 @@ A cue is plain JSON, which is the contract with the app:
     {"time": 5421.0,          match seconds of what the cue is about
      "duration": 6.0,         seconds on screen, whatever the replay speed
      "priority": 92,          0-100; decides who is dropped, delayed or pre-empted
-     "template": "lower_third",  | stat_card | player_tag | rating_alert | speed_popup
+     "template": "lower_third",  | stat_card | player_tag | rating_alert | speed_popup | fan_alert
      "tier": "headline",      the moment's tier (headline, notable, minor)
      "detail": "casual",      who it is for: "casual" (everyone) or "analyst" (analysts only)
      "about": {"team_id": ..., "player_id": ...},   what a per-viewer filter can match on
      "topic": "rating_alert:CAR-9",   a player's cards on one template, so he isn't announced twice in a row
      "moment_id": "M-12",
      "data": {...}}           what the template shows; text is never set up in a language here
+
+Personalise (`personalise.py`) may add `why` ("favourite_player" or "favourite_club") to a cue and raise its priority,
+and makes the `fan_alert` cues (the favourite player's goal, assist, card or rating change).
 
 The scheduler adds an `id` (and a `delay`, if the cue waited). Text that comes from commentary is
 whatever the moment carries: the server hands over the moment in the viewer's language, so the
@@ -20,7 +23,7 @@ cue is too. Labels such as "Possession" belong to the app, and the data holds on
 
 from __future__ import annotations
 
-TEMPLATES = ("lower_third", "stat_card", "player_tag", "rating_alert", "speed_popup")
+TEMPLATES = ("lower_third", "stat_card", "player_tag", "rating_alert", "speed_popup", "fan_alert")
 CARD_TEMPLATES = tuple(t for t in TEMPLATES if t != "lower_third")
 
 # Moments that are the event itself, against ones that are the story around it.
@@ -29,7 +32,8 @@ KIND = {"goal": "goal", "red_card": "red_card", "penalty_awarded": "penalty", "b
         "half_time": "half_time", "full_time": "full_time", "milestone": "milestone",
         "momentum_swing": "momentum", "dominance": "momentum", "pressing_spell": "pressing",
         "chaos_spike": "chaos"}
-DURATION = {"stat_card": 8.0, "summary_card": 12.0, "player_tag": 6.0, "rating_alert": 5.0, "speed_popup": 4.0}
+DURATION = {"stat_card": 8.0, "summary_card": 12.0, "player_tag": 6.0, "rating_alert": 5.0, "speed_popup": 4.0,
+            "fan_alert": 6.0}
 STORY_CAP = 70  # story cues never outrank an event's lower-third
 URGENT_EVENTS = ("goal", "red_card")  # always urgent (priority 90 and up), whatever their importance
 
