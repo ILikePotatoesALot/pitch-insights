@@ -57,10 +57,13 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; al
 .controls .status { color: var(--accent); }
 
 /* Overlays: one region per template, so none can draw over another. The Director decides what is up. */
-.cue-region { position: absolute; z-index: 2; pointer-events: none; display: flex; flex-direction: column; gap: 8px; }
-.cue-region.bottom { left: 20px; right: 20px; bottom: 20px; align-items: flex-start; justify-content: flex-end; }
-.cue-region.top-left { left: 16px; top: 16px; align-items: flex-start; }
-.cue-region.top-right { right: 16px; top: 16px; align-items: flex-end; }
+.cue-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; padding: 16px 20px 20px; display: flex;
+  flex-direction: column; justify-content: space-between; gap: 8px; overflow: hidden; }
+.cue-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.cue-col { display: flex; flex-direction: column; gap: 8px; }
+.cue-col.left { align-items: flex-start; }
+.cue-col.right { align-items: flex-end; margin-left: auto; }
+.cue-bottom { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; flex-shrink: 0; }
 .cue { animation: slidein 0.4s ease-out; --team: var(--accent);
   background: linear-gradient(90deg, rgba(11,18,24,0.95), rgba(18,28,37,0.82)); border-radius: 8px; }
 .lowerthird { align-self: stretch; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
@@ -95,8 +98,11 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; al
 /* Sideways, never up or down, so a cue sliding in can't dip over the one below it. */
 @keyframes slidein { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes slidein-right { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-.cue-region.top-right .cue { animation-name: slidein-right; }
+.cue-col.right .cue { animation-name: slidein-right; }
 @media (prefers-reduced-motion: reduce) { .cue { animation: none; } }
+
+/* A narrow screen wraps the stat card under the alerts and the lower-third onto more lines: give the pitch room. */
+@media (max-width: 700px) { .pitch { min-height: 540px; } .lt-head { font-size: 17px; } }
 
 /* Broadcast: the pitch and its overlays only, bigger, in one column. */
 .app.broadcast main { grid-template-columns: minmax(0, 1fr); }

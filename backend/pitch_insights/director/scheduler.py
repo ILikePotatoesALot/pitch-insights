@@ -14,8 +14,9 @@ The clutter rules (all in `Rules`, so they're config, not code):
   longer one for the same player's card of that template (his rating alert twice in a minute);
 - a cue whose priority beats an occupant's by `preempt_margin` takes its place, once the
   occupant has been up for its template's `min_hold` seconds (so nothing flashes). Urgent cues
-  (goals, red cards, the final whistle) don't queue behind each other: the newest replaces the
-  one on screen after its `min_hold`;
+  (goals, red cards, the final whistle) don't queue behind each other: the newest replaces an
+  older one on screen after its `min_hold`, never the other way round, and when one starts it
+  drops the older urgent cues of its template still waiting ("superseded");
 - a cue that can't start waits in a short queue, highest priority first, and is dropped when
   it has waited longer than its template's `max_delay` (it would be stale), or when the queue
   is full. Urgent cues (`urgent` and above) skip cooldowns, never the limits.
@@ -132,6 +133,20 @@ class Director:
         """Time passes. Returns the messages for what changed on screen."""
         return self._settle(self._tick(now))
 
+    def withdraw(self, unwanted, now: float) -> list[dict]:
+        """Take away every cue, on screen or waiting, for which `unwanted(cue)` is true (the viewer changed
+        mode and will never see them), then let what is waiting have the slots. Withdrawn cues leave no
+        cooldown behind: the viewer never saw them."""
+        now = self._tick(now)
+        out: list[dict] = []
+        for s in [s for s in self._live if unwanted(s.cue)]:
+            self._live.remove(s)
+            out.append({"type": "cue_end", "id": s.cue["id"], "reason": "withdrawn"})
+        for p in [p for p in self._pending if unwanted(p.cue)]:
+            self._pending.remove(p)
+            self._drop(p.cue, "withdrawn", now)
+        return out + self._settle(now)
+
     # ------------------------------------------------------------ rules
 
     def _tick(self, now: float) -> float:
@@ -150,7 +165,7 @@ class Director:
         # what it took (or pushed off) changes what the others can do.
         while True:
             for p in sorted(self._pending, key=lambda p: (-p.cue["priority"], p.seq)):
-                victims = self._admission(p.cue, now)
+                victims = self._admission(p, now)
                 if victims is None:
                     continue
                 for v in victims:
@@ -159,13 +174,19 @@ class Director:
                 cue = p.cue | {"delay": round(now - p.arrived, 2)}
                 self._live.append(_Live(cue, now, p.seq))
                 out.append({"type": "cue", "cue": cue})
+                if cue["priority"] >= self.rules.urgent:  # an older goal banner must not show after a newer one
+                    for q in [q for q in self._pending if q.seq < p.seq and q.cue["template"] == cue["template"]
+                              and q.cue["priority"] >= self.rules.urgent]:
+                        self._pending.remove(q)
+                        self._drop(q.cue, "superseded", now)
                 break
             else:
                 return out
 
-    def _admission(self, cue: dict, now: float) -> list[_Live] | None:
+    def _admission(self, p: _Pending, now: float) -> list[_Live] | None:
         """The cues on screen that must make way for this one, or None if it has to wait."""
-        r, t = self.rules, cue["template"]
+        r, cue = self.rules, p.cue
+        t = cue["template"]
         victims: list[_Live] = []
         while True:
             live = [s for s in self._live if s not in victims]
@@ -181,7 +202,7 @@ class Director:
                 break
             v = min(contested, key=lambda s: (s.cue["priority"], s.start, s.seq))
             outranks = cue["priority"] >= v.cue["priority"] + r.preempt_margin
-            newest_urgent = cue["priority"] >= r.urgent and v.cue["priority"] >= r.urgent
+            newest_urgent = cue["priority"] >= r.urgent and v.cue["priority"] >= r.urgent and p.seq > v.seq
             if not (outranks or newest_urgent) or now - v.start < r.min_hold.get(v.cue["template"], 2.0) - EPS:
                 return None
             victims.append(v)

@@ -172,3 +172,23 @@ def test_a_casual_viewer_is_sent_only_the_cues_made_for_everyone():
             if msg["type"] == "cue":
                 cues.append(msg["cue"])
     assert all(c["detail"] == "casual" for c in cues)
+
+
+def test_switching_to_casual_takes_down_the_analyst_cues_on_screen():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=60&from=80") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        analyst_up = None
+        for _ in range(2000):
+            msg = ws.receive_json()
+            assert msg["type"] != "end"
+            if msg["type"] == "cue" and msg["cue"]["detail"] == "analyst":
+                analyst_up = msg["cue"]["id"]
+                break
+        assert analyst_up, "no analyst cue turned up"
+        ws.send_json({"cmd": "detail", "value": "casual"})
+        for _ in range(2000):
+            msg = ws.receive_json()
+            if msg["type"] == "cue_end" and msg["id"] == analyst_up:
+                assert msg["reason"] == "withdrawn"
+                return
+    raise AssertionError("the analyst cue stayed up")

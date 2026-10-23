@@ -20,7 +20,8 @@ The WebSocket sends, in order:
   {"type": "state", "state": ...}                       about once a second
   {"type": "cue", "cue": ...}                           an overlay to show (the Overlay Director, see
                                                         pitch_insights/director); text in the viewer's language
-  {"type": "cue_end", "id": "C-3", "reason": ...}       one to take down early ("preempted"); cues otherwise
+  {"type": "cue_end", "id": "C-3", "reason": ...}       one to take down early ("preempted", or "withdrawn" when
+                                                        the viewer's mode changed); cues otherwise
                                                         end when their `duration` (screen seconds) is up, which
                                                         the server watches, so a pause freezes them too
   {"type": "end"}                                       the final whistle; the connection stays open until the
@@ -161,7 +162,9 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     # The Overlay Director: one per connection, working in screen seconds (a cue lasts as long on the
     # screen at 60x as at 1x). A seek or a language change reconnects, so cues start afresh.
     director, builder, clock = Director(), CueBuilder(meta), ShowClock()
-    viewer = {"detail": "analyst"}  # whose screen the Director is keeping clean; the browser says
+    # Whose screen the Director is keeping clean: what the browser last asked for, and what the Director has
+    # been reconciled to (listen() only asks; play() does the sending, so two tasks never write at once).
+    viewer = {"detail": "analyst", "applied": "analyst"}
 
     def show_now() -> float:
         return clock.at(rep.now, rep.speed)
@@ -195,6 +198,14 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         for msg in messages:
             await ws.send_json(msg)
 
+    async def tick():
+        """The Director's turn between events: a changed viewer mode first (cues that viewer would never see
+        come down at once, and don't sit in the queue holding slots), then the passing of time."""
+        if viewer["applied"] != viewer["detail"]:
+            viewer["applied"] = viewer["detail"]
+            await send_all(director.withdraw(lambda c: not visible_to(c, viewer["applied"]), show_now()))
+        await send_all(director.advance(show_now()))
+
     async def play():
         loop = asyncio.get_running_loop()
         last_state = 0.0
@@ -202,7 +213,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
             try:  # wake up between events too, so cues end and start on time even in a quiet spell
                 ev = await asyncio.wait_for(rep.__anext__(), CUE_TICK_S)
             except asyncio.TimeoutError:
-                await send_all(director.advance(show_now()))
+                await tick()
                 continue
             except StopAsyncIteration:
                 break
@@ -217,12 +228,16 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 await ws.send_json({"type": "state", "state": state})
                 last_state = loop.time()
             cues = [c for m in shown_moments for c in builder.for_moment(m, state) if visible_to(c, viewer["detail"])]
-            await send_all(director.offer(cues, show_now()) if cues else director.advance(show_now()))
+            if cues:
+                await tick()  # mode changes and expiries first, so the new cues meet the screen as it is
+                await send_all(director.offer(cues, show_now()))
+            else:
+                await tick()
         await ws.send_json({"type": "state", "state": state_message(brain)})
         await ws.send_json({"type": "end"})
         while director.waiting or director.on_screen:  # the last cues get their turn and are taken down
             await asyncio.sleep(CUE_TICK_S)
-            await send_all(director.advance(show_now()))
+            await tick()
         await ws.close()
 
     # Run both together: whichever finishes first (the match ends, or the browser disconnects,

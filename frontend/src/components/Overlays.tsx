@@ -1,13 +1,15 @@
 import type { CSSProperties } from "react";
 import type { Cue, CueTemplate, MatchMeta, ViewMode } from "../types";
 
-// Three regions, each a column that stacks its cues, so cues can't draw over each other whatever their
-// height. The Director's rules (one of each template, at most two cards) keep the regions from filling up.
-const REGIONS: { name: string; templates: CueTemplate[] }[] = [
-  { name: "bottom", templates: ["player_tag", "lower_third"] },
-  { name: "top-left", templates: ["rating_alert", "speed_popup"] },
-  { name: "top-right", templates: ["stat_card"] },
-];
+// One layer over the pitch, laid out by flexbox rather than positioned piece by piece, so cues can't draw over
+// each other whatever their height or the screen's width: a top band (small alerts on the left, the stat card on
+// the right, wrapping under the alerts when there isn't room) above a bottom column (player tag over the
+// lower-third). If a narrow, short pitch ever runs out of room, the bottom column is pushed out of the pitch
+// and clipped, not drawn over the top. The Director's rules (one of each template, at most two cards) keep
+// the bands from filling up.
+const TOP_LEFT: CueTemplate[] = ["rating_alert", "speed_popup"];
+const TOP_RIGHT: CueTemplate[] = ["stat_card"];
+const BOTTOM: CueTemplate[] = ["player_tag", "lower_third"];
 
 const ROW_LABELS: Record<string, [string, string]> = {
   possession_pct: ["Possession", "%"], shots: ["Shots", ""], shots_on_target: ["On target", ""], xg: ["xG", ""],
@@ -38,14 +40,15 @@ export function Overlays({ cues, meta, mode, colours }: {
       case "speed_popup": return <SpeedPopup key={cue.id} cue={cue} style={style} />;
     }
   };
+  const drawAll = (templates: CueTemplate[]) => templates.flatMap((t) => visible.filter((c) => c.template === t)).map(draw);
   return (
-    <>
-      {REGIONS.map((r) => (
-        <div key={r.name} className={`cue-region ${r.name}`}>
-          {r.templates.flatMap((t) => visible.filter((c) => c.template === t)).map(draw)}
-        </div>
-      ))}
-    </>
+    <div className="cue-layer">
+      <div className="cue-top">
+        <div className="cue-col left">{drawAll(TOP_LEFT)}</div>
+        <div className="cue-col right">{drawAll(TOP_RIGHT)}</div>
+      </div>
+      <div className="cue-bottom">{drawAll(BOTTOM)}</div>
+    </div>
   );
 }
 

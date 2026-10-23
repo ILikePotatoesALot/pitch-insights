@@ -430,3 +430,39 @@ def test_casual_viewers_do_not_get_analyst_cues_and_so_lose_no_slots():
     assert casual and all(c["detail"] == "casual" for c in casual) and any(c["detail"] == "analyst" for c in analyst)
     assert all(visible_to(c, "analyst") for c in analyst) and not all(visible_to(c, "casual") for c in analyst)
     assert any(c["template"] == "stat_card" and c["data"]["kind"] == "summary" for c in casual)
+
+
+def test_an_older_urgent_cue_never_replaces_a_newer_one_and_is_dropped_when_passed():
+    d = Director()
+    d.offer([make(priority=95, duration=20.0)], now=0.0)          # C-1 on screen
+    d.offer([make(priority=91)], now=1.0)                         # C-2 waits, older
+    d.offer([make(priority=99)], now=1.5)                         # C-3 waits, newer and higher
+    msgs = d.advance(4.0)
+    assert [c["id"] for c in started(msgs)] == ["C-3"] and ended(msgs) == [("C-1", "preempted")]
+    assert d.waiting == 0 and d.dropped[-1]["id"] == "C-2" and d.dropped[-1]["reason"] == "superseded"
+    assert d.advance(30.0) == [{"type": "cue_end", "id": "C-3", "reason": "expired"}]  # C-2 never shows afterwards
+
+
+def test_urgent_cues_of_one_template_show_in_the_order_they_arrived():
+    d = Director()
+    shown = []
+    d.offer([make(priority=95, duration=5.0)], now=0.0)
+    for i, now in enumerate((0.5, 1.0, 1.5)):
+        d.offer([make(priority=92 + i)], now=now)
+    for t in (4.0, 5.0, 8.0, 12.0):
+        shown += [c["id"] for c in started(d.advance(t))]
+    assert shown == ["C-4"]  # the newest wins, and the older two are not shown late behind it
+
+
+def test_withdrawing_cues_takes_them_down_and_lets_the_waiting_ones_in():
+    d = Director(Rules(cooldown={"stat_card": 20.0}))
+    analyst = lambda c: c["detail"] == "analyst"  # noqa: E731
+    d.offer([make("stat_card", 50) | {"detail": "analyst"}], now=0.0)           # C-1, on screen
+    d.offer([make("stat_card", 80) | {"detail": "casual"}], now=0.5)            # C-2, waiting behind it
+    d.offer([make("stat_card", 30) | {"detail": "analyst"}], now=0.6)           # C-3, waiting
+    d.offer([make("rating_alert", 40) | {"detail": "analyst"}], now=0.6)        # C-4, on screen
+    msgs = d.withdraw(analyst, now=1.0)
+    assert {(m["id"], m["reason"]) for m in msgs if m["type"] == "cue_end"} == {("C-1", "withdrawn"), ("C-4", "withdrawn")}
+    assert [c["id"] for c in started(msgs)] == ["C-2"]  # C-1 left no cooldown behind, so the casual card starts now
+    assert [c["id"] for c in d.on_screen] == ["C-2"] and d.waiting == 0
+    assert d.dropped[-1] == {"id": "C-3", "template": "stat_card", "priority": 30, "reason": "withdrawn", "at": 1.0}
