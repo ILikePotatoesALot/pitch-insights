@@ -1,0 +1,45 @@
+# Builds the app and publishes it to Azure Static Web Apps (Free plan). Static Web Apps' own deployment action builds
+# it (Vite), so the only extra is VITE_API_BASE: the Container App's address, which the app needs at build time.
+# Setup, names and values: docs/DEPLOY.md.
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+      - .github/workflows/deploy-frontend.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the build setting
+        env:
+          API_BASE: ${{ vars.API_BASE }}
+        run: |
+          if [ -z "$API_BASE" ]; then
+            echo "Set the repository variable API_BASE to the Container App's address (https://...azurecontainerapps.io)." >&2
+            exit 1
+          fi
+
+      - name: Build and deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: frontend
+          output_location: dist
+          skip_api_build: true
+        env:
+          VITE_API_BASE: ${{ vars.API_BASE }}
