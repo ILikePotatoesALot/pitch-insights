@@ -261,3 +261,25 @@ def test_a_frame_that_is_already_out_of_date_is_skipped_not_sent():
     assert frame_is_stale(3.0, 0.2, 5)
     msgs = _stream("speed=1&at=98")
     assert [m["t"] for m in msgs if m["type"] == "frame"][0] == pytest.approx(2378.0, abs=0.01)
+
+
+# ------------------------------------------------------------------ a damaged clip
+
+def test_a_damaged_clip_is_a_clip_error_and_stays_out_of_the_match_list(tmp_path, monkeypatch, caplog):
+    import pitch_insights.server as server
+
+    truncated = (SAMPLES / "video" / f"{NAME}.frames.jsonl").read_text(encoding="utf-8")[:5000]  # cut mid-line
+    samples = _copy(tmp_path, frames=truncated)
+    with pytest.raises(ClipError, match="can't be read"):
+        find_clip(samples, NAME)
+    no_ball = json.loads((SAMPLES / "video" / f"{NAME}.benchmark.json").read_text(encoding="utf-8"))
+    del no_ball["ball"]
+    with pytest.raises(ClipError, match="KeyError"):
+        find_clip(_copy(tmp_path / "b", benchmark=json.dumps(no_ball)), NAME)
+
+    monkeypatch.setattr(server, "SAMPLES", samples)
+    names = [m["name"] for m in client.get("/api/matches").json()]
+    assert NAME not in names  # the list still works (here: no synthetic matches in the copy, and no clip)
+    with client.websocket_connect(f"/ws/replay/{NAME}") as ws:
+        msg = ws.receive_json()
+    assert msg["type"] == "error" and "can't be read" in msg["message"]

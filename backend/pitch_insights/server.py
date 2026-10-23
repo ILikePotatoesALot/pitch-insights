@@ -54,7 +54,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.store import load_commentary, with_commentary
 from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
-from pitch_insights.director import CueBuilder, Director, Personaliser, ShowClock, parse_profile, visible_to
+from pitch_insights.director import CueBuilder, Personaliser, parse_profile, visible_to
+from pitch_insights.director.session import CUE_TICK_S, ViewerSession, clamp_speed, run_until_first_done
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
@@ -63,12 +64,6 @@ from pitch_insights.video.serve import replay_clip
 
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
-CUE_TICK_S = 0.25  # how often the Director looks for cues that are over or can now start
-MIN_SPEED, MAX_SPEED = 0.1, 600.0
-
-
-def clamp_speed(speed: float) -> float:
-    return max(MIN_SPEED, min(MAX_SPEED, speed))
 
 app = FastAPI(title="Pitch Insights replay server")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"], allow_headers=["*"])
@@ -148,12 +143,12 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     await ws.accept()
     try:
         clip = find_clip(SAMPLES, name)  # a tracked video clip (samples/video/), not a synthetic match
-    except ClipError as e:
+    except ClipError as e:  # a clip whose files are missing something or damaged
         await ws.send_json({"type": "error", "message": str(e)})
         await ws.close()
         return
     if clip:
-        await replay_clip(ws, clip, speed, clamp_speed)
+        await replay_clip(ws, clip, speed)
         return
     try:
         path = _match_path(name)
@@ -202,53 +197,11 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                             "state": state_message(brain), "recent_events": recent})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
-    # The Overlay Director: one per connection, working in screen seconds (a cue lasts as long on the
-    # screen at 60x as at 1x). A seek or a language change reconnects, so cues start afresh.
-    director, builder, clock = Director(), CueBuilder(meta), ShowClock()
+    # The Overlay Director, one per connection (see director/session.py). A seek or a language change reconnects,
+    # so cues start afresh.
+    session = ViewerSession(ws, rep, profile.mode)
+    builder = CueBuilder(meta)
     personaliser = Personaliser(profile, meta)  # the favourites and focus metric: boosts, alerts, relevance
-    # Whose screen the Director is keeping clean: what the browser last asked for, and what the Director has
-    # been reconciled to (listen() only asks; play() does the sending, so two tasks never write at once).
-    viewer = {"detail": profile.mode, "applied": profile.mode}
-
-    def show_now() -> float:
-        return clock.at(rep.now, rep.speed)
-
-    async def listen():
-        """Apply the browser's commands. Ends (with WebSocketDisconnect) when the browser goes away."""
-        while True:
-            try:
-                msg = await ws.receive_json()
-            except ValueError:
-                continue  # not JSON: ignore it rather than stop listening
-            if not isinstance(msg, dict):
-                continue
-            cmd = msg.get("cmd")
-            if cmd == "speed":
-                try:
-                    value = clamp_speed(float(msg["value"]))
-                except (KeyError, TypeError, ValueError):
-                    continue
-                show_now()  # the time so far passed at the old speed
-                rep.set_speed(value)
-            elif cmd == "pause":
-                show_now()
-                rep.pause()
-            elif cmd == "resume":
-                rep.resume()
-            elif cmd == "detail" and msg.get("value") in ("casual", "analyst"):
-                viewer["detail"] = msg["value"]
-
-    async def send_all(messages: list[dict]):
-        for msg in messages:
-            await ws.send_json(msg)
-
-    async def tick():
-        """The Director's turn between events: a changed viewer mode first (cues that viewer would never see
-        come down at once, and don't sit in the queue holding slots), then the passing of time."""
-        if viewer["applied"] != viewer["detail"]:
-            viewer["applied"] = viewer["detail"]
-            await send_all(director.withdraw(lambda c: not visible_to(c, viewer["applied"]), show_now()))
-        await send_all(director.advance(show_now()))
 
     async def play():
         loop = asyncio.get_running_loop()
@@ -257,7 +210,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
             try:  # wake up between events too, so cues end and start on time even in a quiet spell
                 ev = await asyncio.wait_for(rep.__anext__(), CUE_TICK_S)
             except asyncio.TimeoutError:
-                await tick()
+                await session.tick()
                 continue
             except StopAsyncIteration:
                 break
@@ -272,27 +225,14 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 await ws.send_json({"type": "state", "state": state})
                 last_state = loop.time()
             cues = [c for c in personaliser.cues(builder, ev, shown_moments, state, lambda: state_message(brain), rep.now)
-                    if visible_to(c, viewer["detail"])]
+                    if visible_to(c, session.viewer["detail"])]
             if cues:
-                await tick()  # mode changes and expiries first, so the new cues meet the screen as it is
-                await send_all(director.offer(cues, show_now()))
+                await session.tick()  # mode changes and expiries first, so the new cues meet the screen as it is
+                await session.send_all(session.director.offer(cues, session.show_now()))
             else:
-                await tick()
+                await session.tick()
         await ws.send_json({"type": "state", "state": state_message(brain)})
         await ws.send_json({"type": "end"})
-        while director.waiting or director.on_screen:  # the last cues get their turn and are taken down
-            await asyncio.sleep(CUE_TICK_S)
-            await tick()
-        await ws.close()
+        await session.finish()
 
-    # Run both together: whichever finishes first (the match ends, or the browser disconnects,
-    # even while paused) stops the other, so nothing is left running for a closed tab.
-    tasks = {asyncio.create_task(play()), asyncio.create_task(listen())}
-    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-    for task in pending:
-        task.cancel()
-    await asyncio.gather(*pending, return_exceptions=True)
-    for task in done:
-        exc = task.exception()
-        if exc and not isinstance(exc, (WebSocketDisconnect, RuntimeError)):
-            raise exc
+    await run_until_first_done(play(), session.listen())

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import functools
 import json
+import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -76,10 +77,25 @@ def _read_lines(path: Path) -> list[dict]:
         return [json.loads(line) for line in f if line.strip()]
 
 
+log = logging.getLogger(__name__)
+
+
 @functools.lru_cache(maxsize=4)
 def _load(name: str, stamps: tuple[tuple[str, int], ...]) -> Clip:
-    """Parse a clip once; `stamps` (path and modification time) make a changed file be read again."""
-    frames_path, events_path, bench_path = (Path(p) for p, _ in stamps)
+    """Parse a clip once; `stamps` (path and modification time) make a changed file be read again. Whatever is
+    wrong with the files (unreadable, truncated, a figure missing from the benchmark) comes out as a ClipError."""
+    try:
+        clip = _parse(name, [Path(p) for p, _ in stamps])
+        credibility(clip)  # every figure the app will ask for is there
+        return clip
+    except ClipError:
+        raise
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        raise ClipError(f"clip {name!r} can't be read: {type(e).__name__}: {e}") from None
+
+
+def _parse(name: str, paths: list[Path]) -> Clip:
+    frames_path, events_path, bench_path = paths
     frames, events = _read_lines(frames_path), _read_lines(events_path)
     if not frames:
         raise ClipError(f"{frames_path.name} has no frames")
@@ -109,13 +125,16 @@ def list_clips(samples: Path) -> list[dict]:
     """What `GET /api/matches` lists for the clips: the same shape as a match, with `kind: "video"`."""
     out = []
     for name in APP_CLIPS:
-        clip = find_clip(samples, name)
+        try:
+            clip = find_clip(samples, name)
+        except ClipError as e:  # a damaged clip must not take the synthetic matches down with it
+            log.warning("clip not listed: %s", e)
+            continue
         if clip:
             meta = clip_meta(clip)
             out.append({"name": name, "kind": "video", "match_id": clip.match_id,
                         "home": {k: meta["home"][k] for k in ("id", "name", "short_name", "colours")},
-                        "away": {k: meta["away"][k] for k in ("id", "name", "short_name", "colours")},
-                        "title": meta["match"]["title"]})
+                        "away": {k: meta["away"][k] for k in ("id", "name", "short_name", "colours")}})
     return out
 
 

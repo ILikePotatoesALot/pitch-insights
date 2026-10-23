@@ -160,7 +160,6 @@ export interface LiveState {
 export interface MatchSummary {
   name: string;
   kind?: "synthetic" | "video"; // a tracked clip of real footage is "video"
-  title?: string; // a clip's description
   match_id: string;
   home: { id: string; name: string; short_name: string; colours: { primary: string } };
   away: { id: string; name: string; short_name: string; colours: { primary: string } };

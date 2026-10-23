@@ -262,7 +262,6 @@ body:has(.compare-view) { overflow: hidden; }
   font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: rgba(11, 18, 24, 0.88); border: 2px solid var(--fav); }
 
 /* The real-footage clip (the video path): its banner, credibility panel, event feed and the tapped player's label. */
-.clip-banner .teams { grid-template-columns: 1fr auto 1fr; }
 .clip-tag { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #111; background: var(--accent); border-radius: 999px; padding: 3px 12px; }
 .clip-banner .clock small { margin-left: 6px; }
 .clip-progress { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }

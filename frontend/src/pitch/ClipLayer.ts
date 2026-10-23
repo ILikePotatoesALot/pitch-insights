@@ -114,6 +114,7 @@ export class ClipLayer {
         side: THREE.DoubleSide, transparent: true, depthWrite: false }));
       ring.rotation.x = -Math.PI / 2;
       line.renderOrder = ring.renderOrder = 5;
+      line.frustumCulled = false; // its end points move, but the bounding sphere is measured once, at the origin
       this.group.add(line, ring);
       mark = { line, ring, born: 0, from: null, to: from, active: false };
       this.marks.push(mark);
@@ -147,8 +148,6 @@ export class ClipLayer {
     return { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, text: `${trackLabel(this.selected)}${kmh} · ${Math.round(p.conf * 100)}%` };
   }
 
-  hasSelected() { return this.selected !== null && this.current.has(this.selected); }
-
   clear() {
     this.snaps = [];
     this.ballLast = null;
@@ -175,7 +174,6 @@ export class ClipLayer {
     const a = this.snaps[i], b = this.snaps[Math.min(n - 1, i + 1)];
     const k = b.t > a.t ? Math.min(1, Math.max(0, (rt - a.t) / (b.t - a.t))) : 0;
     const near = k < 0.5 ? a : b;
-    this.current.clear();
     const seen = new Set<string>();
     for (const [id, p] of near.players) {
       const other = (near === a ? b : a).players.get(id);
@@ -183,12 +181,15 @@ export class ClipLayer {
       const x = other ? p.x + (other.x - p.x) * kk : p.x;
       const z = other ? p.z + (other.z - p.z) * kk : p.z;
       const y = this.heightAt(x, z);
-      this.current.set(id, { x, z, y, speed: p.speed, conf: p.conf });
+      const at = this.current.get(id);
+      if (at) Object.assign(at, { x, z, y, speed: p.speed, conf: p.conf }); // updated in place: no garbage per frame
+      else this.current.set(id, { x, z, y, speed: p.speed, conf: p.conf });
       seen.add(id);
       const mk = this.marker(id, p.team);
       mk.group.visible = true;
       mk.group.position.set(x, y + 1.35, z);
     }
+    for (const id of this.current.keys()) if (!seen.has(id)) this.current.delete(id);
     for (const [id, mk] of this.markers) if (!seen.has(id)) mk.group.visible = false;
     this.moveBall(a, b, k, rt);
     this.moveMarks(rt);
