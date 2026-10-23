@@ -9,7 +9,7 @@ For a full pick-up guide (branches, how to run, rules, what's waiting, ordered n
 - **Done, all in `main`:** event format v1, synthetic generator v1 with realism check, terminal match viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the first version of the app (ILikePotatoesALot/pitch-insights#2), and the review fixes for the original code (ILikePotatoesALot/pitch-insights#3).
 - **Azure:** moved from the school's student subscription (no chat-model quota) to Austin's personal Pay-As-You-Go subscription. Foundry in East US 2 with `gpt-4o` and `text-embedding-3-small`, both tested; quota for GPT-6 Luna was refused, so the agents stay on GPT-4o. Details: [DESIGN.md, Agents](DESIGN.md#agents).
 - **Agents core merged** (ILikePotatoesALot/pitch-insights#4): Explainer and Narrator on GPT-4o through Agent Framework, code groundedness check with one retry and a fallback, stored commentary for the three samples (52 moments, all grounded), commentary shown in the app with an AI-generated note. Reviewed by `/code-review` and a second reviewer; all findings fixed.
-- **Next, not blocked:** Memory agent (embeddings are deployed); SoccerTrack loader (data downloaded); Overlay Director; live simulation mode.
+- **Next, not blocked:** live simulation mode, Personalise. (Memory agent, SoccerTrack loader and the Overlay Director have since been built.)
 - **Waiting on Austin:** free-tier Content Safety, Translator and Speech resources and Application Insights (placeholders are in `.env`).
 - **Decided 21 Oct:** the video path uses pre-trained detection on a short clip (fine-tuning maybe later); licensed footage is fine, so no clarification question; registration confirmed.
 - **Team:** Austin and Claude. Teammates are GitHub collaborators but not registered participants (prize verification, rule 8.2).
@@ -67,7 +67,7 @@ A live "match brain": specialist agents turn football events into scored, eviden
 - Backend outputs timed overlay cues as JSON (time, duration, priority, template, data).
 - Three.js pitch surface shaped by live momentum, with spikes for shots. Own design.
 - React overlays: lower-thirds, stat cards, player tags, speed popups, rating alerts.
-- An Overlay Director agent prevents clutter.
+- The Overlay Director prevents clutter: built 23 Oct as deterministic code (rules, not a model call), see [DESIGN.md, Overlay Director](DESIGN.md#overlay-director).
 
 ## 5. Personalise (same renderer; the viewer profile decides)
 

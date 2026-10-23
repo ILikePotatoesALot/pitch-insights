@@ -13,7 +13,7 @@ Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
 1. **Ingest**: synthetic match events, plus player positions and events derived from real, licensed match video (RF-DETR detection on tiles, ByteTrack-style tracking, a fitted image-to-pitch mapping), in one shared event format.
 2. **Interpret**: stats, patterns (momentum, pressure, chaos, tempo) and live player ratings, calculated in code.
 3. **Explain**: each moment is scored by how much it changed the match, and explained from an evidence pack of computed facts.
-4. **Render**: timed, machine-readable overlay cues, drawn on a Three.js 3D pitch.
+4. **Render**: timed, machine-readable overlay cues, chosen by the Overlay Director (deterministic rules that keep the screen clean) and drawn over a Three.js 3D pitch.
 5. **Personalise**: analyst or casual mode, favourite club and player, language and focus metric.
 
 ## Repository layout

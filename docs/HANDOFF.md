@@ -14,6 +14,7 @@ Written 21 Oct 2026, updated 22 Oct (video path; fine-tuning run on Austin's GPU
 | Branch | State | Contents |
 |---|---|---|
 | `main` | On GitHub | Everything built so far: event format, generator, terminal viewer, Interpret stage (ILikePotatoesALot/pitch-insights#1), Moment Scorer, replay server and the app (ILikePotatoesALot/pitch-insights#2), review fixes for the original code (ILikePotatoesALot/pitch-insights#3), agents core (ILikePotatoesALot/pitch-insights#4), Memory agent (ILikePotatoesALot/pitch-insights#6), Content Safety, Translator, tracing and the groundedness evaluator (ILikePotatoesALot/pitch-insights#8, 22 Oct) |
+| `claude/overlay-director-1242b7` | **Local only, cut from `main` at 95fa626 (PR #11 merged); not pushed, no pull request yet** | The Overlay Director (23 Oct): `backend/pitch_insights/director/`, `cue` and `cue_end` messages in the replay server, overlays and the Broadcast/Fan switch in the app, tests, `scripts/calibrate_director.py`, DESIGN.md and this file. Reviewed with `/code-review` (see below) |
 | `video-path` | **Local only, ahead of GitHub's `video-path` (not pushed)** | Merged with `main` on 22 Oct: it holds the AMD guide (2dc2e32), which `main` doesn't have yet, plus the merge commit and the doc fixes after it |
 
 The video path (ILikePotatoesALot/pitch-insights#9, merged 22 Oct 09:56 UTC) and the fine-tuning results from Austin's GPU machine (ILikePotatoesALot/pitch-insights#10, merged 10:12 UTC; branch `video-finetune-results`) are **already in `main` on GitHub**: the pull requests were opened and merged from the GPU machine's side, so `main` has the video path as of ff4debb and the results, but not the AMD guide commit. Every branch so far has had a `/code-review` except the results branch, which has no code changes; the original code was reviewed by path on `generator-review`.
@@ -36,12 +37,13 @@ The video path (ILikePotatoesALot/pitch-insights#9, merged 22 Oct 09:56 UTC) and
 | Safety check (Azure AI Content Safety: every line screened, blocked at severity 2, fails closed) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8; 52 stored moments screened, none blocked | `backend/pitch_insights/agents/safety.py`, [DESIGN.md, Safety check](DESIGN.md#safety-check) |
 | Translations (Azure AI Translator: Spanish, French, German, Dutch, Simplified Chinese; names and clocks protected; checked; stored) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8; 9 of 3,180 kept English | `backend/pitch_insights/agents/translate.py`, [DESIGN.md, Translations](DESIGN.md#translations) |
 | Tracing (Agent Framework to Application Insights, no prompts or replies) and Foundry's groundedness evaluator (all 52 lines pass, lowest 4 of 5) | Built 22 Oct, merged in ILikePotatoesALot/pitch-insights#8 | `agents/tracing.py`, `scripts/evaluate_groundedness.py` |
-| Other agents (Personalizer, Overlay Director, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
+| Overlay Director (timed overlay cues with clutter rules: one lower-third, at most 2 cards, cooldowns, pre-emption by priority, delay then drop; deterministic code, no model call; overlays and Broadcast/Fan layouts in the app) | Built 23 Oct on `claude/overlay-director-1242b7`; checked in the browser at 60x in Broadcast and Fan, casual and analyst: no overlap, cues clear on time, pause freezes them | `backend/pitch_insights/director/`, `frontend/src/components/Overlays.tsx`, [DESIGN.md, Overlay Director](DESIGN.md#overlay-director) |
+| Other agents (Personalizer, Scenario Director) | Designed, not started | [DESIGN.md, Agents](DESIGN.md#agents) |
 | Live simulation mode | Not started (designed) | |
 | Video path (SoccerTrack v2 + RF-DETR) | Built on `video-path` (22 Oct) on a 100 s clip, reviewed; kept (22 Oct). Detector fine-tuned on Austin's GPU machine (22 Oct): 93% of players found at 97% precision (pre-trained: 90% at 85%), 0.76 m mean position error, 95% teams, 14 events (79% match SoccerTrack's within 5 s) | `video/`, `backend/pitch_insights/video/`, [DESIGN.md, Video path](DESIGN.md#video-path) |
 | Azure deployment | Not started | |
 
-**Tests:** 205 passing (51 of them for the video path, on hand-made snippets: no video, model or network) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
+**Tests:** 255 passing (51 of them for the video path, on hand-made snippets: no video, model or network; 50 for the Overlay Director and its cues in the server stream) (`cd backend && .venv\Scripts\python -m pytest`). No key or network needed: the agent tests use a fake writer that raises errors the way Agent Framework does, the memory tests use fake embedders, and Content Safety and Translator are faked with httpx's MockTransport. `test_disconnect_while_paused_ends_the_replay` failed once in a full run on 21 Oct and passed on every rerun; it's timing-sensitive (a 0.3 s sleep).
 
 **Calibration checks** (all passing; re-run after changing the generator, ratings or moments):
 
@@ -51,6 +53,7 @@ The video path (ILikePotatoesALot/pitch-insights#9, merged 22 Oct 09:56 UTC) and
 | `scripts/calibrate_ratings.py` | Live ratings look like public rating systems | Average 6.8, spread 0.76, best in match about 8.5, every position 6.8–6.9 |
 | `scripts/calibrate_moments.py` | How many moments the scorer picks | About 4 headlines and 10 shown moments a match |
 | `scripts/build_xt.py` | Rebuilds the expected-threat grid | Only needed if the generator changes a lot |
+| `scripts/calibrate_director.py` | How busy the screen is per sample match at 1x, 20x and 60x, and the clutter rules hold | Never more than 3 cues or 2 cards on screen; 23-57 cues a match at 1x |
 
 ## How to run it
 
@@ -191,8 +194,8 @@ Settled 21 Oct: registration is confirmed; licensed footage (SoccerTrack v2) is 
 |---|---|---|---|
 | 1 | Done: **agents core**, merged in ILikePotatoesALot/pitch-insights#4 (21 Oct) | | |
 | 2 | Done 22 Oct: **Foundry and AI services** (Memory agent and Content Safety, Translator, tracing and the groundedness evaluator, all merged; the latter in ILikePotatoesALot/pitch-insights#8) | | |
-| 3 | **Overlay Director**: timed, machine-readable overlay cues (time, duration, priority, template, data) so the screen never clutters | Nothing | ~2 h |
-| 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric | Steps 1–2 | ~half a day |
+| 3 | Done 23 Oct on `claude/overlay-director-1242b7` (not pushed): **Overlay Director**, timed overlay cues (time, duration, priority, template, data) with clutter rules, in the app as Broadcast and Fan layouts | | |
+| 4 | **Personalise**: favourite club and player (player-focus spotlight on the pitch, pinned card, alerts), language choice, focus metric. Builds on the cues: each carries `about` (`team_id`, `player_id`), `tier` and `detail` to filter on; the plan is to send the viewer's profile with the connection and let the Director take it (boost the favourite's priority, skip what the viewer never sees, so an analyst-only cue can't hold a slot a casual fan's screen then goes without). The `speed_popup` template is waiting for speeds from the video path | Steps 1–3 | ~half a day |
 | 5 | Decided 21 Oct: the video path uses **detection on a short clip**; kept (decided 22 Oct); fine-tuned on Austin's GPU machine (done 22 Oct, the fine-tuned model recommended) | | |
 | 6 | **Live simulation mode** and the **Scenario Director** agent that steers a live match (logged so it replays exactly) | Step 1 | ~half a day |
 | 7 | Done 22 Oct on `video-path`: **SoccerTrack loader**, tiled detection on a 100 s clip, pitch positions, `frame` messages, events, benchmark. Next, if kept: a second clip to check the settings chosen on this one, better shirt colours for teams, a `match_meta` so the Interpreter can read video events, the clip in the app (with the fine-tuned frames); check the fine-tuned model on a second clip; try SoccerTrack's own calibration (homography and intrinsics in `raw/`) against our polynomial; score the ball at event frames against SoccerTrack's reconstructed ball file | Austin's keep-or-cut call | ~half a day for the next steps |

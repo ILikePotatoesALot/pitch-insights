@@ -18,7 +18,13 @@ The WebSocket sends, in order:
   {"type": "event", "event": ...}
   {"type": "moment", "moment": ...}                     with "commentary" when the agents wrote some
   {"type": "state", "state": ...}                       about once a second
-  {"type": "end"}
+  {"type": "cue", "cue": ...}                           an overlay to show (the Overlay Director, see
+                                                        pitch_insights/director); text in the viewer's language
+  {"type": "cue_end", "id": "C-3", "reason": ...}       one to take down early ("preempted"); cues otherwise
+                                                        end when their `duration` (screen seconds) is up, which
+                                                        the server watches, so a pause freezes them too
+  {"type": "end"}                                       the final whistle; the connection stays open until the
+                                                        cues still queued or on screen have run their course
 The browser can send {"cmd": "speed", "value": 5}, {"cmd": "pause"} or {"cmd": "resume"}.
 To seek, it reconnects with a different `from` minute, or `at` (match seconds, which wins when both are
 given): a minute on the broadcast clock can say 47:00 of the second half but not 45+2 of the first.
@@ -38,12 +44,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pitch_insights.agents.memory import memory_for
 from pitch_insights.agents.store import load_commentary, with_commentary
 from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
+from pitch_insights.director import CueBuilder, Director, ShowClock
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
 
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
+CUE_TICK_S = 0.25  # how often the Director looks for cues that are over or can now start
 MIN_SPEED, MAX_SPEED = 0.1, 600.0
 
 
@@ -148,6 +156,12 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                             "state": state_message(brain), "recent_events": recent})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
+    # The Overlay Director: one per connection, working in screen seconds (a cue lasts as long on the
+    # screen at 60x as at 1x). A seek or a language change reconnects, so cues start afresh.
+    director, builder, clock = Director(), CueBuilder(meta), ShowClock()
+
+    def show_now() -> float:
+        return clock.at(rep.now, rep.speed)
 
     async def listen():
         """Apply the browser's commands. Ends (with WebSocketDisconnect) when the browser goes away."""
@@ -161,27 +175,50 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
             cmd = msg.get("cmd")
             if cmd == "speed":
                 try:
-                    rep.set_speed(clamp_speed(float(msg["value"])))
+                    value = clamp_speed(float(msg["value"]))
                 except (KeyError, TypeError, ValueError):
                     continue
+                show_now()  # the time so far passed at the old speed
+                rep.set_speed(value)
             elif cmd == "pause":
+                show_now()
                 rep.pause()
             elif cmd == "resume":
                 rep.resume()
 
+    async def send_all(messages: list[dict]):
+        for msg in messages:
+            await ws.send_json(msg)
+
     async def play():
         loop = asyncio.get_running_loop()
         last_state = 0.0
-        async for ev in rep:
+        while True:
+            try:  # wake up between events too, so cues end and start on time even in a quiet spell
+                ev = await asyncio.wait_for(rep.__anext__(), CUE_TICK_S)
+            except asyncio.TimeoutError:
+                await send_all(director.advance(show_now()))
+                continue
+            except StopAsyncIteration:
+                break
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})
-            for m in out["moments"]:
-                await ws.send_json({"type": "moment", "moment": shown(m)})
+            shown_moments = [shown(m) for m in out["moments"]]
+            for m in shown_moments:
+                await ws.send_json({"type": "moment", "moment": m})
+            state = None
             if loop.time() - last_state >= STATE_EVERY_S or ev["type"] in ("shot", "match_state") or out["moments"]:
-                await ws.send_json({"type": "state", "state": state_message(brain)})
+                state = state_message(brain)
+                await ws.send_json({"type": "state", "state": state})
                 last_state = loop.time()
+            cues = [c for m in shown_moments for c in builder.for_moment(m, state)]
+            await send_all(director.offer(cues, show_now()) if cues else director.advance(show_now()))
         await ws.send_json({"type": "state", "state": state_message(brain)})
         await ws.send_json({"type": "end"})
+        while director.waiting or director.on_screen:  # the last cues get their turn and are taken down
+            await asyncio.sleep(CUE_TICK_S)
+            await send_all(director.advance(show_now()))
+        await ws.close()
 
     # Run both together: whichever finishes first (the match ends, or the browser disconnects,
     # even while paused) stops the other, so nothing is left running for a closed tab.
