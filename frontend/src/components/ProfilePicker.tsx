@@ -25,9 +25,10 @@ export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSa
   }, [first, onClose]);
 
   const pickClub = (team: string | null) => {
-    // A player from another club stays only if the viewer picked them on purpose; a new club clears the old club's player.
-    const keep = draft.player && clubs.find((c) => c.id === draft.team)?.players.some((p) => p.id === draft.player) ? null : draft.player;
-    set({ team, player: team ? keep : draft.player });
+    // Choosing a club drops a player that came from the club chosen before (so the list isn't left on a stale pick);
+    // a player from any other club was picked on purpose and stays.
+    const fromOldClub = clubs.find((c) => c.id === draft.team)?.players.some((p) => p.id === draft.player);
+    set({ team, player: team && fromOldClub ? null : draft.player });
   };
   const ordered = [...clubs].sort((a, b) => (a.id === draft.team ? -1 : b.id === draft.team ? 1 : 0));
 

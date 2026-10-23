@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from pitch_insights.director import CueBuilder, Director, Personaliser, Profile, parse_profile, visible_to
+from pitch_insights.director import CueBuilder, Director, Personaliser, Profile, Rules, parse_profile, visible_to
 from pitch_insights.director.cues import cue
 from pitch_insights.director.personalise import FOCUS_METRICS, MAX_PARAM
 from pitch_insights.director.sheet import cue_sheet
@@ -83,7 +83,6 @@ def test_every_focus_metric_is_known_to_the_server():
 
 def test_without_favourites_or_focus_nothing_changes():
     p = personaliser()
-    assert not p.active
     c = make("rating_alert", 40, team_id="CAR", player_id="CAR-05")
     assert p.adjust(c, None) == c
 
@@ -270,6 +269,28 @@ def test_no_favourite_player_means_no_alerts():
 def test_a_player_who_does_nothing_notable_gets_no_alerts():
     quiet = next(p["id"] for p in META["home"]["players"] if p["position"] == "GK")
     assert alerts_for(quiet) == []
+
+
+def test_a_second_yellow_is_one_alert_the_sending_off_not_a_booking_too():
+    class NoCues:
+        def for_moment(self, m, state):
+            return []
+
+    p = personaliser(player_id="POT-06")
+    ev = {"type": "foul", "card": "yellow", "player_id": "POT-06", "clock": "20'"}
+    red = {"type": "red_card", "player_id": "POT-06", "team_id": "POT", "id": "M-1", "match_time": 1200.0, "clock": "20'",
+           "facts": []}
+    state = {"players": []}
+    both = p.cues(NoCues(), ev, [red], state, lambda: state, 1200.0)
+    assert [c["data"]["event"] for c in both] == ["red_card"]
+    booking = p.cues(NoCues(), ev, [], state, lambda: state, 1200.0)  # a first yellow alone is still a booking
+    assert [c["data"]["event"] for c in booking] == ["yellow_card"]
+
+
+def test_the_boost_stops_short_of_the_directors_own_urgent_line():
+    low = Rules(urgent=70)
+    p = Personaliser(Profile(player_id="POT-11"), META, director_rules=low)
+    assert p.adjust(make("lower_third", 65, "POT", "POT-11"), None)["priority"] == 69
 
 
 # ---------------------------------------------------------------- determinism and the screen rules

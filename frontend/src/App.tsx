@@ -132,7 +132,7 @@ export default function App() {
   useEffect(() => {
     const me = state?.players.find((x) => x.player_id === p.player);
     if (!state || !me) return;
-    const minute = (state.period === 2 ? 45 : 0) + state.match_minute;
+    const minute = state.match_minute; // absolute: 46 and up in the second half
     if (minute === lastSample.current) return;
     const back = minute < lastSample.current;
     lastSample.current = minute;
@@ -147,7 +147,7 @@ export default function App() {
   const compareHref = `?compare=1&match=${name ?? ""}&speed=${speed}`;
 
   return (
-    <div className={`app ${layout}${embedded ? " embed" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
+    <div className={`app ${layout}${embedded ? " embed" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
         <h1>Pitch Insights <small>live football intelligence</small></h1>
         <select value={name ?? ""} onChange={(e) => setName(e.target.value)} aria-label="Match">

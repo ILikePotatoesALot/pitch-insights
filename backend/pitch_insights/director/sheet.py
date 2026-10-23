@@ -31,7 +31,8 @@ def cue_sheet(meta: dict, events: list[dict], pace: float = 20.0, rules: Rules =
     from pitch_insights.server import state_message  # here, so the server can import the director
 
     brain, builder, director = MatchBrain(meta), CueBuilder(meta), Director(rules)
-    personaliser = Personaliser(profile or Profile(mode=detail), meta)
+    detail = profile.mode if profile else detail  # one source for the viewer's mode
+    personaliser = Personaliser(profile or Profile(mode=detail), meta, director_rules=rules)
     sheet: list[dict] = []
 
     def log(show: float, messages: list[dict]):

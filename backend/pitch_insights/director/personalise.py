@@ -25,7 +25,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
 from pitch_insights.director.cues import DURATION, CueBuilder, cue
-from pitch_insights.director.scheduler import DEFAULT_RULES
+from pitch_insights.director.scheduler import DEFAULT_RULES, Rules
 
 MODES = ("casual", "analyst")
 DEFAULT_MODE = "analyst"  # what the server assumed before profiles existed
@@ -86,18 +86,15 @@ class Personaliser:
     """Applies one viewer's profile to the Director's cues for one match. With no favourites and no focus it
     changes nothing, so a viewer without a profile sees exactly what they did before profiles existed."""
 
-    def __init__(self, profile: Profile, meta: dict, rules: PersonaliseRules = DEFAULT_PERSONALISE):
-        self.profile, self.rules = profile, rules
+    def __init__(self, profile: Profile, meta: dict, rules: PersonaliseRules = DEFAULT_PERSONALISE,
+                 director_rules: Rules = DEFAULT_RULES):
+        self.profile, self.rules, self.urgent = profile, rules, director_rules.urgent  # a boost stops short of the Director's urgent line
         self.home, self.away = meta["home"]["id"], meta["away"]["id"]
         self._people = {p["id"]: p | {"team_id": t["id"]} for t in (meta["home"], meta["away"]) for p in t["players"]}
         fav = self._people.get(profile.player_id or "")
         # Their side: the chosen club, or the club of the chosen player.
         self.side = profile.team_id or (fav["team_id"] if fav else None)
         self._priority = dict(rules.alert_priority)
-
-    @property
-    def active(self) -> bool:
-        return bool(self.profile.team_id or self.profile.player_id or self.profile.focus)
 
     # ------------------------------------------------------------ the pipeline the server and cue_sheet share
 
@@ -108,6 +105,8 @@ class Personaliser:
         otherwise `state_fn` makes it when something needs it (a yellow card makes no moment, but needs a rating)."""
         alerts = [a for m in moments if (a := self._moment_alert(m, state))] if self.profile.player_id else []
         event_alert = self._event_alert(ev, match_time)
+        if event_alert and any(m["type"] == "red_card" and m.get("player_id") == self.profile.player_id for m in moments):
+            event_alert = None  # a second yellow is also a sending-off: the red card's alert says it
         if event_alert:
             alerts.append(self._fill(event_alert, state if state is not None else state_fn()))
         # The favourite's own goal, red card or rating change replaces the generic tag or alert for that moment.
@@ -124,7 +123,7 @@ class Personaliser:
 
     def adjust(self, c: dict, state: dict | None) -> dict | None:
         """The cue as this viewer should get it, or None if it isn't for them. Never changes the cue it is given."""
-        about, urgent = c["about"], DEFAULT_RULES.urgent
+        about, urgent = c["about"], self.urgent
         fav_player = bool(self.profile.player_id) and about["player_id"] == self.profile.player_id
         fav_side = bool(self.side) and about["team_id"] == self.side
         if (self.side and not fav_player and c["priority"] < urgent and c["template"] in self.rules.skippable

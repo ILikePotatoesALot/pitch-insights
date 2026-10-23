@@ -40,7 +40,7 @@ export function teamColours(meta: MatchMeta): [THREE.Color, THREE.Color] {
 interface Spike { x: number; y: number; amp: number; born: number; goal: boolean }
 
 /** A ring and a beam that follow one player, and the page's label for them. See PitchScene.setSpotlight. */
-interface Spotlight { id: string; group: THREE.Group; pulse: THREE.Mesh; label: HTMLElement | null; target: THREE.Vector3; placed: boolean; on: boolean }
+interface Spotlight { id: string; colour: string; group: THREE.Group; pulse: THREE.Mesh; label: HTMLElement | null; target: THREE.Vector3; placed: boolean; on: boolean; labelSize: [number, number] }
 
 const BASE_COLOUR = new THREE.Color("#10202c");
 const GLOW_COLOUR = new THREE.Color("#fff6c2");
@@ -122,8 +122,8 @@ export class PitchScene {
    * a pass received, a tackle) and glides there; it stays hidden until the first such event, and while they are off.
    */
   setSpotlight(player: { id: string; colour: string } | null, label: HTMLElement | null = null) {
-    if (this.spot && player && this.spot.id === player.id) return;
-    this.clearSpotlight();
+    if (this.spot && player && this.spot.id === player.id && this.spot.colour === player.colour) return;
+    this.clearSpotlight(); // (another match can give the same player the other club's colour)
     if (!player) return;
     const colour = new THREE.Color(player.colour);
     const group = new THREE.Group();
@@ -140,7 +140,8 @@ export class PitchScene {
     group.add(ring, pulse, beam);
     group.visible = false;
     this.scene.add(group);
-    this.spot = { id: player.id, group, pulse, label, target: new THREE.Vector3(), placed: false, on: true };
+    this.spot = { id: player.id, colour: player.colour, group, pulse, label, target: new THREE.Vector3(), placed: false, on: true,
+                  labelSize: [0, 0] };
   }
 
   private clearSpotlight() {
@@ -393,7 +394,9 @@ export class PitchScene {
   private placeLabel(label: HTMLElement, at: THREE.Vector3) {
     const { clientWidth: cw, clientHeight: ch } = this.container;
     const v = this.tmpVector.set(at.x, at.y + 10, at.z).project(this.camera);
-    const w = label.offsetWidth, h = label.offsetHeight;
+    const spot = this.spot!;
+    if (!spot.labelSize[0]) spot.labelSize = [label.offsetWidth, label.offsetHeight]; // measured once: reading it every frame forces a layout
+    const [w, h] = spot.labelSize;
     const x = Math.min(cw - w - 6, Math.max(6, (v.x * 0.5 + 0.5) * cw - w / 2));
     const y = Math.min(ch - h - 6, Math.max(6, (-v.y * 0.5 + 0.5) * ch - h));
     label.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;

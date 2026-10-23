@@ -41,6 +41,7 @@ given): a minute on the broadcast clock can say 47:00 of the second half but not
 from __future__ import annotations
 
 import asyncio
+import functools
 import json
 import math
 import os
@@ -89,11 +90,11 @@ def list_matches() -> list[dict]:
     return out
 
 
-@app.get("/api/clubs")
-def list_clubs() -> list[dict]:
-    """Each club in the samples with its squad: what the profile picker offers as a favourite club and player."""
+@functools.lru_cache(maxsize=4)
+def _clubs(files: tuple[tuple[str, int], ...]) -> list[dict]:
+    """The clubs in these sample files (path and modification time, so a changed file is read again)."""
     clubs: dict[str, dict] = {}
-    for path in sorted(SAMPLES.glob("*.jsonl")):
+    for path in (Path(p) for p, _ in files):
         with path.open(encoding="utf-8") as f:
             meta = json.loads(f.readline())
         for side in ("home", "away"):
@@ -101,6 +102,12 @@ def list_clubs() -> list[dict]:
             clubs.setdefault(t["id"], {k: t[k] for k in ("id", "name", "short_name", "colours")} | {
                 "players": [{k: p[k] for k in ("id", "name", "number", "position")} for p in t["players"]]})
     return sorted(clubs.values(), key=lambda c: c["name"])
+
+
+@app.get("/api/clubs")
+def list_clubs() -> list[dict]:
+    """Each club in the samples with its squad: what the profile picker offers as a favourite club and player."""
+    return _clubs(tuple((str(p), p.stat().st_mtime_ns) for p in sorted(SAMPLES.glob("*.jsonl"))))
 
 
 @app.get("/api/matches/{name}")
