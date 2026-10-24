@@ -6,6 +6,8 @@ const W = 68;
 const GREY = "#5f6f7d"; // people the model could not give a team (keepers, officials)
 const MAX_SNAPSHOTS = 12;
 const LAG_FRAMES = 1.5; // the picture trails the stream by this many frame intervals, to ride out a late frame
+const MAX_STEP_MS = 250; // the most real time one draw may add to the clock (a hidden tab wakes up with a big gap)
+const EASE_BACK = 0.95; // while the clock is more than half a frame interval ahead of its usual lag (after a late frame), it runs a little slow to recover it
 const EVENT_SECONDS = 3.5; // how long a pass line or interception ring stays on the pitch, in clip seconds
 const HOLD_BALL_S = 1.2; // how long the last known ball position stays up (dimmed) after the ball is lost
 
@@ -36,7 +38,7 @@ const scenePoint = (ax: number, ay: number) => new THREE.Vector2(ax - L / 2, W /
 export class ClipLayer {
   readonly group = new THREE.Group();
   private snaps: Snap[] = [];
-  private anchor = { t: 0, at: 0 }; // the newest frame's time, and when (performance.now) it arrived
+  private clock: { t: number; at: number } | null = null; // the time being drawn (clip seconds), and when (performance.now) it was set
   private markers = new Map<string, Marker>();
   private mats: THREE.MeshStandardMaterial[];
   private ball: THREE.Mesh;
@@ -71,7 +73,7 @@ export class ClipLayer {
   }
 
   /** The frame as a snapshot in scene coordinates (its players' own attacking frames made absolute). */
-  push(frame: ClipFrame, meta: MatchMeta, now = performance.now()) {
+  push(frame: ClipFrame, meta: MatchMeta) {
     const dirs = meta.attacking_direction["1"] ?? {};
     const toScene = (team: string | null, x: number, y: number) => {
       const flip = dirs[team ?? frame.ref_team_id] === "right_to_left";
@@ -86,7 +88,6 @@ export class ClipLayer {
     const b = frame.ball ? toScene(null, frame.ball.x, frame.ball.y) : null;
     this.snaps.push({ t: frame.t, players, ball: b ? { x: b.x, z: b.y } : null });
     if (this.snaps.length > MAX_SNAPSHOTS) this.snaps.shift();
-    this.anchor = { t: frame.t, at: now };
     this.group.visible = true;
   }
 
@@ -150,6 +151,7 @@ export class ClipLayer {
 
   clear() {
     this.snaps = [];
+    this.clock = null;
     this.ballLast = null;
     this.current.clear();
     this.selected = null;
@@ -167,8 +169,18 @@ export class ClipLayer {
     const last = this.snaps[n - 1];
     const gap = n > 1 ? Math.max(0.2, last.t - this.snaps[n - 2].t) : 0.2;
     // The picture trails the stream by a frame and a half, so there is nearly always a next frame to move towards
-    // even when one arrives a little late. It never runs ahead of the newest frame, so a pause settles on it.
-    const rt = Math.min(last.t, this.anchor.t + ((now - this.anchor.at) / 1000) * speed - LAG_FRAMES * gap);
+    // even when one arrives a little late. The clock runs on by itself at the replay speed and only moves forward:
+    // a late frame (which lowers the usual lag) can't pull it back and make players jump backwards. It is lifted
+    // to the usual lag if it has fallen behind, and held at the newest frame if the stream runs dry, so a pause
+    // settles on that frame.
+    const usual = last.t - LAG_FRAMES * gap;
+    let rt = usual;
+    if (this.clock) {
+      const ahead = this.clock.t - usual;
+      rt = this.clock.t + (Math.min(MAX_STEP_MS, Math.max(0, now - this.clock.at)) / 1000) * speed * (ahead > 0.5 * gap ? EASE_BACK : 1);
+    }
+    rt = Math.min(last.t, Math.max(rt, usual));
+    this.clock = { t: rt, at: now };
     let i = n - 1;
     while (i > 0 && this.snaps[i].t > rt) i--;
     const a = this.snaps[i], b = this.snaps[Math.min(n - 1, i + 1)];

@@ -283,3 +283,44 @@ def test_a_damaged_clip_is_a_clip_error_and_stays_out_of_the_match_list(tmp_path
     with client.websocket_connect(f"/ws/replay/{NAME}") as ws:
         msg = ws.receive_json()
     assert msg["type"] == "error" and "can't be read" in msg["message"]
+
+
+def test_damaged_benchmark_values_are_refused_not_just_missing_keys(tmp_path):
+    good = json.loads((SAMPLES / "video" / f"{NAME}.benchmark.json").read_text(encoding="utf-8"))
+
+    def damaged(path: list[str], value) -> str:
+        b = json.loads(json.dumps(good))
+        node = b
+        for key in path[:-1]:
+            node = node[key]
+        node[path[-1]] = value
+        return json.dumps(b)
+
+    cases = [
+        (["tracked_players", "position_error_mean_m"], None),  # a null that used to crash the panel's toFixed
+        (["tracked_players", "precision"], "97%"),
+        (["tracked_players", "recall"], 93),  # a percentage where a fraction belongs
+        (["tracked_players", "team_accuracy"], float("nan")),
+        (["tracked_players", "tracks"], True),
+        (["tracked_players", "tracks"], 52.5),
+        (["tracked_players", "position_error_p90_m"], -1),
+        (["ball", "frames_with_ball"], 501),  # more frames with a ball than frames
+        (["ball", "frames"], 0),
+        (["events", "within_5s", "all", "precision"], None),
+        (["detector", "model"], ""),
+        (["clip", "from"], None),
+        (["clip", "fps_processed"], 0),
+    ]
+    for n, (path, value) in enumerate(cases):
+        text = damaged(path, value).replace("NaN", "NaN")
+        with pytest.raises(ClipError, match="benchmark"):
+            find_clip(_copy(tmp_path / f"c{n}", benchmark=text), NAME)
+
+
+def test_damaged_events_are_refused(tmp_path):
+    lines = (SAMPLES / "video" / f"{NAME}.events.jsonl").read_text(encoding="utf-8").splitlines()
+    first = json.loads(lines[0])
+    for n, change in enumerate([{"confidence": None}, {"x": "65"}, {"type": "shot"}, {"team_id": "X"}, {"end_x": 500}, {"y": float("nan")}]):
+        text = "\n".join([json.dumps(first | change), *lines[1:]]) + "\n"
+        with pytest.raises(ClipError, match="event"):
+            find_clip(_copy(tmp_path / f"e{n}", events=text), NAME)

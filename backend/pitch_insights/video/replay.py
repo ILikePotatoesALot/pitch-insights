@@ -18,6 +18,7 @@ from __future__ import annotations
 import functools
 import json
 import logging
+import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -94,6 +95,27 @@ def _load(name: str, stamps: tuple[tuple[str, int], ...]) -> Clip:
         raise ClipError(f"clip {name!r} can't be read: {type(e).__name__}: {e}") from None
 
 
+EVENT_TYPES = ("pass", "carry", "interception")
+
+
+def _check_event(file: str, e: dict) -> None:
+    """The fields the event words, cues and pitch drawing read must be there and sensible."""
+    def bad(why: str):
+        raise ClipError(f"{file}: event {e.get('seq')!r} {why}")
+
+    if e.get("type") not in EVENT_TYPES:
+        bad(f"has type {e.get('type')!r}, expected one of {EVENT_TYPES}")
+    for key, lo, hi in (("seq", 1, 10**9), ("t", 0, 10**6), ("confidence", 0, 1), ("x", 0, 105), ("y", 0, 68)):
+        v = e.get(key)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or not lo <= v <= hi:
+            bad(f"needs {key} as a number from {lo:g} to {hi:g}, got {v!r}")
+    if e.get("team_id") not in SIDES or not isinstance(e.get("player_id"), str):
+        bad("needs a team_id of L or R and a player_id")
+    for key, hi in (("end_x", 105), ("end_y", 68)):  # a pass or carry's end point, when it has one
+        if key in e and (isinstance(e[key], bool) or not isinstance(e[key], (int, float)) or not 0 <= e[key] <= hi):
+            bad(f"has {key} {e[key]!r}, expected a number from 0 to {hi}")
+
+
 def _parse(name: str, paths: list[Path]) -> Clip:
     frames_path, events_path, bench_path = paths
     frames, events = _read_lines(frames_path), _read_lines(events_path)
@@ -108,6 +130,8 @@ def _parse(name: str, paths: list[Path]) -> Clip:
         raise ClipError(f"{frames_path.name}: frame times must increase")
     if len({f["match_id"] for f in frames}) != 1 or {f["period"] for f in frames} != {1}:
         raise ClipError(f"{frames_path.name}: expected one match and one period")
+    for e in events:
+        _check_event(events_path.name, e)
     events.sort(key=lambda e: (e["t"], e["seq"]))
     benchmark = json.loads(bench_path.read_text(encoding="utf-8"))
     return Clip(name, frames[0]["match_id"], frames, events, benchmark)
@@ -162,36 +186,57 @@ def clip_meta(clip: Clip) -> dict:
             "attacking_direction": {"1": {"L": "left_to_right", "R": "right_to_left"}}}
 
 
+def _number(source: dict, key: str, lo: float, hi: float, whole: bool = False) -> float:
+    """A figure from a stored file that must be a real number in [lo, hi] (a null, a string, a bool, NaN or a
+    percentage typed as 97 for 0.97 would otherwise reach the app and break it)."""
+    v = source[key]
+    if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or not lo <= v <= hi or (whole and v != int(v)):
+        raise ClipError(f"benchmark: {key!r} must be {'a whole number' if whole else 'a number'} from {lo:g} to {hi:g}, got {v!r}")
+    return int(v) if whole else v
+
+
+def _text(source: dict, key: str) -> str:
+    v = source[key]
+    if not isinstance(v, str) or not v.strip():
+        raise ClipError(f"benchmark: {key!r} must be text, got {v!r}")
+    return v
+
+
 def credibility(clip: Clip) -> dict:
-    """The figures behind the positions, straight from the benchmark file, and what they do and don't cover."""
+    """The figures behind the positions, straight from the benchmark file, and what they do and don't cover.
+    Every value is checked (type and range), so a damaged benchmark is a ClipError at load, never a crash in the app."""
     b = clip.benchmark
-    tp, ball = b["tracked_players"], b["ball"]
-    ev = b["events"]["within_5s"]["all"]
-    detector = b["detector"]
-    pitch = f"{b['clip']['from']} to {b['clip']['to']} of the first half"
+    tp, ball, ev, detector, span = b["tracked_players"], b["ball"], b["events"]["within_5s"]["all"], b["detector"], b["clip"]
+    frames = _number(ball, "frames", 1, 10**7, whole=True)
+    ball_frames = _number(ball, "frames_with_ball", 0, frames, whole=True)
+    figures = {"precision": _number(tp, "precision", 0, 1), "recall": _number(tp, "recall", 0, 1),
+               "position_error_mean_m": _number(tp, "position_error_mean_m", 0, 100),
+               "position_error_median_m": _number(tp, "position_error_median_m", 0, 100),
+               "position_error_p90_m": _number(tp, "position_error_p90_m", 0, 100),
+               "team_accuracy": _number(tp, "team_accuracy", 0, 1), "id_consistency": _number(tp, "id_consistency", 0, 1),
+               "tracks": _number(tp, "tracks", 0, 10**6, whole=True),
+               "players_on_pitch": _number(tp, "ground_truth_players", 0, 100, whole=True),
+               "match_radius_m": _number(tp, "match_radius_m", 0, 100),
+               "ball_frames": ball_frames, "frames": frames,
+               "event_precision": _number(ev, "precision", 0, 1), "event_recall": _number(ev, "recall", 0, 1)}
+    model, fine_tuned = _text(detector, "model"), detector.get("fine_tuned") is True
+    from_, to = _text(span, "from"), _text(span, "to")
+    pitch = f"{from_} to {to} of the first half"
     return {
-        "clip": {"match": b["clip"]["match"], "from": b["clip"]["from"], "to": b["clip"]["to"], "frames": len(clip.frames),
-                 "fps": b["clip"]["fps_processed"], "start": clip.start, "duration": clip.duration},
-        "model": detector["model"], "fine_tuned": bool(detector.get("fine_tuned")), "tiles": detector.get("tiles"),
-        "credit": CREDIT, "credit_url": CREDIT_URL,
-        "figures": {"precision": tp["precision"], "recall": tp["recall"],
-                    "position_error_mean_m": tp["position_error_mean_m"],
-                    "position_error_median_m": tp["position_error_median_m"],
-                    "position_error_p90_m": tp["position_error_p90_m"], "team_accuracy": tp["team_accuracy"],
-                    "id_consistency": tp["id_consistency"], "tracks": tp["tracks"],
-                    "players_on_pitch": tp["ground_truth_players"], "match_radius_m": tp["match_radius_m"],
-                    "ball_frames": ball["frames_with_ball"], "frames": ball["frames"],
-                    "event_precision": ev["precision"], "event_recall": ev["recall"]},
+        "clip": {"match": _text(span, "match"), "from": from_, "to": to, "frames": len(clip.frames),
+                 "fps": _number(span, "fps_processed", 0.1, 1000), "start": clip.start, "duration": clip.duration},
+        "model": model, "fine_tuned": fine_tuned, "tiles": detector["tiles"] if isinstance(detector.get("tiles"), str) else None,
+        "credit": CREDIT, "credit_url": CREDIT_URL, "figures": figures,
         "limits": [
             f"Positions come from a computer-vision model reading the video, not from tags or a data feed, so some "
             f"are off or missing. Scored on one {round(clip.duration)}-second clip ({pitch}) against SoccerTrack's "
             f"own tracking labels, which have no referees and no ball.",
             "The model was fine-tuned on the first four minutes of this same half (never on this clip), so the "
-            "figures may not carry over to another pitch or match." if detector.get("fine_tuned") else
+            "figures may not carry over to another pitch or match." if fine_tuned else
             "The model is used as released, with no fine-tuning.",
             "Numbers after # are tracker IDs, not shirt numbers, and a player can get a new ID after being hidden. "
             "Grey markers are people the model could not give a team (keepers, officials).",
-            f"The ball is followed in {ball['frames_with_ball']} of {ball['frames']} frames and is not scored. "
+            f"The ball is followed in {ball_frames} of {frames} frames and is not scored. "
             "Passes, carries and interceptions are inferred from it; shots are not detected.",
         ],
     }
