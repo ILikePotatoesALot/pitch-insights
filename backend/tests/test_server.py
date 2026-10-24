@@ -50,6 +50,40 @@ def test_disconnect_while_paused_ends_the_replay():
     time.sleep(0.3)  # the server side must have finished; TestClient would hang on exit otherwise
 
 
+def test_a_connection_cancelled_while_its_tasks_wind_down_ends_quietly():
+    """Starlette ends a connection by cancelling its handler through an anyio cancel scope, which absorbs only
+    its own cancellation. If that lands while the handler waits for its other task to stop, the error must still be
+    anyio's: asyncio.gather used to raise the task's own CancelledError instead, which escaped (flaky tests in CI)."""
+    import asyncio
+
+    import anyio
+
+    from pitch_insights.director.session import run_until_first_done
+
+    async def quick():
+        return
+
+    async def slow_to_stop():  # takes 0.2 s to stop, then ends cancelled with its own (plain) CancelledError
+        try:
+            await anyio.sleep_forever()
+        except asyncio.CancelledError:
+            loop = asyncio.get_running_loop()
+            end = loop.time() + 0.2
+            while (left := end - loop.time()) > 0:
+                try:
+                    await asyncio.sleep(left)
+                except asyncio.CancelledError:
+                    pass
+            raise asyncio.CancelledError() from None
+
+    async def main():
+        with anyio.move_on_after(0.1) as scope:
+            await run_until_first_done(quick(), slow_to_stop())
+        return scope.cancelled_caught
+
+    assert anyio.run(main)
+
+
 def test_moments_carry_stored_commentary():
     with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=87") as ws:
         meta = ws.receive_json()
