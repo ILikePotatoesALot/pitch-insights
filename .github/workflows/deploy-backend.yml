@@ -6,7 +6,9 @@ name: Deploy backend
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - claude/deploy-bec969   # TEMPORARY, for the bring-up: remove before the pull request is merged (docs/DEPLOY.md)
     paths:
       - backend/pyproject.toml
       - backend/pitch_insights/**
@@ -65,9 +67,13 @@ jobs:
 
       - name: Push to Azure Container Registry
         env:
-          REGISTRY: ${{ vars.ACR_NAME }}.azurecr.io
+          ACR_NAME: ${{ vars.ACR_NAME }}
         run: |
-          az acr login --name "${{ vars.ACR_NAME }}"
+          # Ask the registry for its address instead of assuming <name>.azurecr.io: a registry with a
+          # domain name label scope has a hash in its hostname. The later steps use the same value.
+          REGISTRY=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
+          echo "REGISTRY=$REGISTRY" >> "$GITHUB_ENV"
+          az acr login --name "$ACR_NAME"
           docker tag "$IMAGE:test" "$REGISTRY/$IMAGE:${{ github.sha }}"
           docker tag "$IMAGE:test" "$REGISTRY/$IMAGE:latest"
           docker push "$REGISTRY/$IMAGE:${{ github.sha }}"
@@ -78,7 +84,6 @@ jobs:
       - name: Point the Container App at the new image
         if: ${{ vars.CONTAINER_APP_NAME != '' }}
         env:
-          REGISTRY: ${{ vars.ACR_NAME }}.azurecr.io
           APP: ${{ vars.CONTAINER_APP_NAME }}
           GROUP: ${{ vars.RESOURCE_GROUP }}
         run: |

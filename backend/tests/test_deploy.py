@@ -158,6 +158,55 @@ def test_the_async_azure_clients_can_be_built():
     asyncio.run(go())
 
 
+def test_cosmos_client_is_entered_before_use_and_closed_if_that_fails(monkeypatch):
+    """The async SDK client has to be entered (`__aenter__`) before its container is used."""
+    import azure.cosmos.aio as cosmos_aio
+    import azure.identity.aio as identity_aio
+
+    events = []
+
+    class FakeCredential:
+        async def close(self):
+            events.append("credential closed")
+
+    class FakeClient:
+        fail = False
+
+        def __init__(self, endpoint, credential):
+            events.append("made")
+
+        async def __aenter__(self):
+            events.append("entered")
+            if FakeClient.fail:
+                raise RuntimeError("no network")
+            return self
+
+        async def close(self):
+            events.append("closed")
+
+        def get_database_client(self, name):
+            return self
+
+        def get_container_client(self, name):
+            return "container"
+
+    monkeypatch.setattr(cosmos_aio, "CosmosClient", FakeClient)
+    monkeypatch.setattr(identity_aio, "DefaultAzureCredential", FakeCredential)
+
+    async def go():
+        ok = profiles.CosmosProfileStore("https://x/", "db", "profiles")
+        assert await ok._open() == "container" and await ok._open() == "container"  # opened once
+        assert events == ["made", "entered"]
+        events.clear()
+        FakeClient.fail = True
+        bad = profiles.CosmosProfileStore("https://x/", "db", "profiles")
+        with pytest.raises(RuntimeError):
+            await bad._open()
+        assert events == ["made", "entered", "closed", "credential closed"] and bad._container is None
+
+    asyncio.run(go())
+
+
 def test_the_environment_picks_the_store(monkeypatch):
     def fresh(**env):
         for k in ("COSMOS_ENDPOINT", "PITCH_PROFILE_STORE"):

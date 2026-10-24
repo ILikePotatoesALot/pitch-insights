@@ -58,9 +58,11 @@ export class LocalProfileStore implements ProfileStore {
 }
 
 const VIEWER_KEY = "pitch-insights.viewer.v1";
+const PENDING_KEY = "pitch-insights.profile.unsynced.v1"; // set while the browser's copy is newer than the server's
 const REMOTE_TIMEOUT_MS = 3000; // the first screen waits for this, so a sleeping or broken server mustn't hold it long
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 let sessionViewer: string | null = null; // the id, if the browser won't keep one
+let saveSeq = 0; // numbers the saves, so a slow earlier one can't mark a newer, failed one as sent
 
 /** The random id this browser files its profile under (the Cosmos DB document id and partition key). It is made on
  *  the first save and links to nothing else: no name, email or account. Null if none exists and `create` is false. */
@@ -77,9 +79,20 @@ function viewerId(create: boolean): string | null {
   }
 }
 
+function unsynced(set?: boolean): boolean {
+  try {
+    if (set === true) localStorage.setItem(PENDING_KEY, "1");
+    else if (set === false) localStorage.removeItem(PENDING_KEY);
+    return localStorage.getItem(PENDING_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 /** The deployed site's store: the browser's copy (always kept, always the fallback) plus the same five choices in
  *  Cosmos DB, one document per viewer id, through the replay server's /api/profile. Anything that goes wrong with
- *  the server (asleep, throttled, not set up: 503) just means the browser's copy is used. */
+ *  the server (asleep, throttled, not set up: 503) just means the browser's copy is used. A save the server didn't
+ *  take is remembered (`unsynced`) and sent up at the next visit before the server's older copy is read back. */
 export class RemoteProfileStore implements ProfileStore {
   constructor(private local: ProfileStore, private url: (path: string) => string) {}
 
@@ -89,10 +102,20 @@ export class RemoteProfileStore implements ProfileStore {
     });
   }
 
+  /** Send a profile up; true if the server took it. */
+  private async push(id: string, profile: Profile) {
+    try { return (await this.call(id, { method: "PUT", body: JSON.stringify(profile) })).ok; } catch { return false; }
+  }
+
   async load() {
     const local = await this.local.load();
     const id = viewerId(false);
+    if (!local) unsynced(false); // nothing to send
     if (!id) return local;
+    if (local && unsynced()) { // changed while the server couldn't be reached: the browser's copy is the newer one
+      if (await this.push(id, local)) unsynced(false);
+      return local;
+    }
     try {
       const r = await this.call(id);
       if (r.ok) {
@@ -100,7 +123,7 @@ export class RemoteProfileStore implements ProfileStore {
         await this.local.save(remote);
         return remote;
       }
-      if (r.status === 404 && local) await this.call(id, { method: "PUT", body: JSON.stringify(local) }); // not there yet (or expired)
+      if (r.status === 404 && local) await this.push(id, local); // not there yet (or expired)
     } catch { /* offline or asleep: the browser's copy */ }
     return local;
   }
@@ -109,11 +132,14 @@ export class RemoteProfileStore implements ProfileStore {
     await this.local.save(profile);
     const id = viewerId(true);
     if (!id) return;
-    try { await this.call(id, { method: "PUT", body: JSON.stringify(profile) }); } catch { /* kept in the browser only */ }
+    const n = ++saveSeq;
+    unsynced(true);
+    if (await this.push(id, profile) && n === saveSeq) unsynced(false);
   }
 
   async clear() {
     await this.local.clear();
+    unsynced(false);
     const id = viewerId(false);
     sessionViewer = null;
     try { localStorage.removeItem(VIEWER_KEY); } catch { /* nothing to remove */ }

@@ -104,9 +104,18 @@ class CosmosProfileStore:
                 from azure.cosmos.aio import CosmosClient
                 from azure.identity.aio import DefaultAzureCredential
 
-                self._credential = DefaultAzureCredential()
-                self._client = CosmosClient(self.endpoint, credential=self._credential)
-                self._container = self._client.get_database_client(self.database).get_container_client(self.container_name)
+                credential = DefaultAzureCredential()
+                client = CosmosClient(self.endpoint, credential=credential)
+                try:
+                    # The async client must be entered before use (it sets up its pipeline and session tracking), as
+                    # Microsoft's async-client guidance says; `async with` would close it at the end of the block.
+                    await client.__aenter__()
+                except BaseException:
+                    await client.close()
+                    await credential.close()
+                    raise
+                self._credential, self._client = credential, client
+                self._container = client.get_database_client(self.database).get_container_client(self.container_name)
         return self._container
 
     async def get(self, viewer_id: str) -> dict | None:
