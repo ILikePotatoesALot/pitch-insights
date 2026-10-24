@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { wsUrl } from "./api";
 import { connectionParams } from "./profile";
 import type { ClipEventLine, ClipFrame, ClipInfo, CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile } from "./types";
 
@@ -74,8 +75,7 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
     profileKeyRef.current = key;
     pausedRef.current = keepPaused;
     let ended = false;
-    const proto = location.protocol === "https:" ? "wss" : "ws";
-    const socket = new WebSocket(`${proto}://${location.host}/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${connectionParams({ ...profile, mode: modeRef.current })}`);
+    const socket = new WebSocket(wsUrl(`/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${connectionParams({ ...profile, mode: modeRef.current })}`));
     ws.current = socket;
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);

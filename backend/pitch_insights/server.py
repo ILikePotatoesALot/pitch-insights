@@ -6,6 +6,7 @@ GET  /api/matches                list of demo matches in samples/, then the vide
                                  (`kind` is "synthetic" or "video")
 GET  /api/matches/{name}         that match's match_meta (a clip's is made up of its teams, Left and Right)
 GET  /api/clubs                  the clubs and their squads (for the app's profile picker)
+GET/PUT/DELETE /api/profile/{id} a viewer's saved choices (Cosmos DB when deployed; see pitch_insights/profiles.py)
 WS   /ws/replay/{name}?speed=20&from=0&lang=en&at=0&mode=casual&team=POT&player=POT-09&focus=xg
 
 The WebSocket sends, in order:
@@ -42,8 +43,10 @@ given): a minute on the broadcast clock can say 47:00 of the second half but not
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import functools
 import json
+import logging
 import math
 import os
 from pathlib import Path
@@ -59,14 +62,28 @@ from pitch_insights.director.session import CUE_TICK_S, ViewerSession, clamp_spe
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
+from pitch_insights.origins import LOCALHOST, configured_origins, origin_allowed
+from pitch_insights.profiles import close_store, router as profiles_router
+from pitch_insights.telemetry import setup_telemetry
 from pitch_insights.video.replay import ClipError, clip_meta, find_clip, list_clips
 from pitch_insights.video.serve import replay_clip
 
+log = logging.getLogger("pitch_insights.server")
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
 
-app = FastAPI(title="Pitch Insights replay server")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"], allow_headers=["*"])
+@contextlib.asynccontextmanager
+async def lifespan(_: FastAPI):
+    yield
+    await close_store()
+
+
+app = FastAPI(title="Pitch Insights replay server", lifespan=lifespan)
+# Only the static site (PITCH_ALLOWED_ORIGINS) and localhost may call this from a page; see pitch_insights/origins.py.
+app.add_middleware(CORSMiddleware, allow_origins=configured_origins(), allow_origin_regex=LOCALHOST,
+                   allow_methods=["GET", "PUT", "DELETE"], allow_headers=["Content-Type"])
+app.include_router(profiles_router)
+setup_telemetry(app)
 
 
 def _match_path(name: str) -> Path:
@@ -140,6 +157,10 @@ def state_message(brain: MatchBrain) -> dict:
 
 @app.websocket("/ws/replay/{name}")
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
+    if not origin_allowed(ws.headers.get("origin")):  # CORS doesn't cover WebSockets, so check the page's origin here
+        log.warning("refused a replay from origin %r: add it to PITCH_ALLOWED_ORIGINS if it should be allowed", ws.headers.get("origin"))
+        await ws.close(code=1008)
+        return
     await ws.accept()
     try:
         clip = find_clip(SAMPLES, name)  # a tracked video clip (samples/video/), not a synthetic match

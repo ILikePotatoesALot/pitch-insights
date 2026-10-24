@@ -1,0 +1,101 @@
+# Builds the replay server's image, pushes it to Azure Container Registry and points the Container App at it.
+# Signs in to Azure with OpenID Connect (a federated credential on a user-assigned managed identity): no secret is
+# stored, GitHub hands the job a short-lived token that Microsoft Entra ID accepts for this repository and branch.
+# Setup, names and values: docs/DEPLOY.md.
+name: Deploy backend
+
+on:
+  push:
+    branches:
+      - main
+      - claude/deploy-bec969   # TEMPORARY, for the bring-up: remove before the pull request is merged (docs/DEPLOY.md)
+    paths:
+      - backend/pyproject.toml
+      - backend/pitch_insights/**
+      - backend/tests/**
+      - samples/**
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/deploy-backend.yml
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # to ask GitHub for the OIDC token that azure/login exchanges
+  contents: read
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+env:
+  IMAGE: pitch-insights-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The tests that cover the server and what it serves, on the same packages the image gets (no model SDKs).
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Test the server
+        working-directory: backend
+        run: |
+          pip install -e . pytest
+          python -m pytest -q tests/test_deploy.py tests/test_server.py
+
+      - name: Build the image and check that it serves
+        run: |
+          docker build -t "$IMAGE:test" .
+          docker run -d --name api -p 8000:8000 "$IMAGE:test"
+          for i in $(seq 1 20); do
+            curl -fsS http://localhost:8000/api/matches > /dev/null && break
+            sleep 1
+          done
+          curl -fsS http://localhost:8000/api/matches | python -c "import json,sys; print(len(json.load(sys.stdin)), 'matches')"
+          docker rm -f api
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Push to Azure Container Registry
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+        run: |
+          # Ask the registry for its address instead of assuming <name>.azurecr.io: a registry with a
+          # domain name label scope has a hash in its hostname. The later steps use the same value.
+          REGISTRY=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
+          echo "REGISTRY=$REGISTRY" >> "$GITHUB_ENV"
+          az acr login --name "$ACR_NAME"
+          docker tag "$IMAGE:test" "$REGISTRY/$IMAGE:${{ github.sha }}"
+          docker tag "$IMAGE:test" "$REGISTRY/$IMAGE:latest"
+          docker push "$REGISTRY/$IMAGE:${{ github.sha }}"
+          docker push "$REGISTRY/$IMAGE:latest"
+
+      # Skipped until the Container App exists (the repository variable CONTAINER_APP_NAME is set after that): the
+      # first run only fills the registry, so the app can be created from a real image.
+      - name: Point the Container App at the new image
+        if: ${{ vars.CONTAINER_APP_NAME != '' }}
+        env:
+          APP: ${{ vars.CONTAINER_APP_NAME }}
+          GROUP: ${{ vars.RESOURCE_GROUP }}
+        run: |
+          az extension add --name containerapp --upgrade --only-show-errors
+          az containerapp update --name "$APP" --resource-group "$GROUP" \
+            --image "$REGISTRY/$IMAGE:${{ github.sha }}" --output none
+          fqdn=$(az containerapp show --name "$APP" --resource-group "$GROUP" \
+            --query properties.configuration.ingress.fqdn --output tsv)
+          echo "Waiting for https://$fqdn"
+          for i in $(seq 1 30); do
+            curl -fsS "https://$fqdn/api/matches" > /dev/null && { echo "up"; exit 0; }
+            sleep 6
+          done
+          echo "the app didn't answer in 3 minutes" >&2
+          exit 1

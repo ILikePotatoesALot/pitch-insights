@@ -37,12 +37,13 @@ import sys
 import time
 from array import array
 from pathlib import Path
-from typing import Protocol
-
-import openai
+from typing import TYPE_CHECKING, Protocol
 
 from pitch_insights.agents.store import sibling_path, write_json
 from pitch_insights.explain.moments import ordinal
+
+if TYPE_CHECKING:  # imported where it's used (FoundryEmbedder), so the replay server runs without the openai package
+    import openai
 
 log = logging.getLogger("pitch_insights.agents")
 
@@ -211,6 +212,7 @@ class FoundryEmbedder:
             return self.cache[text]
         if time.monotonic() < self._paused_until:
             return None
+        import openai
         try:
             _, [v] = embed_batch(self.client, self.deployment, [text])
         except (openai.AuthenticationError, openai.PermissionDeniedError, openai.NotFoundError) as e:

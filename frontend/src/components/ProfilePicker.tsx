@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { remoteServer } from "../api";
 import { DEFAULT_PROFILE, FOCUS_OPTIONS, LANGUAGE_NAMES } from "../profile";
 import type { ClubInfo, FocusMetric, Profile, ViewMode } from "../types";
 
@@ -43,7 +44,7 @@ export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSa
         <h2 id="picker-title">{first ? "Make it yours" : "Your profile"}</h2>
         <p className="picker-note">
           {first ? "Pick a club and a player and the app follows them: a spotlight on the pitch, a pinned card, alerts. " : ""}
-          {fromLink ? "This view was opened from a link, so its profile lives in the link and isn't saved. " : "Saved only in this browser, and only these choices: no name, no account. "}
+          {fromLink ? "This view was opened from a link, so its profile lives in the link and isn't saved. " : (remoteServer ? "Saved in this browser and, under a random id, in this app's Azure Cosmos DB (deleted after 90 days unused), and only these choices: no name, no account. " : "Saved only in this browser, and only these choices: no name, no account. ")}
           Everything is optional.
         </p>
 
