@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "./api";
 import { connectionParams } from "./profile";
-import type { CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile } from "./types";
+import type { ClipEventLine, ClipFrame, ClipInfo, CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 
@@ -10,8 +10,8 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  * Events go to `onEvent` (for the 3D pitch) instead of React state, so a busy
  * match doesn't re-render the page on every pass.
  */
-export function useReplay(name: string | null, profile: Profile, initialSpeed: number, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
-                          onReset: () => void) {
+export function useReplay(name: string | null, profile: Profile, defaultSpeed: number, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
+                          onReset: () => void, onFrame: (frame: ClipFrame, meta: MatchMeta) => void = () => {}) {
   const { lang, mode, team, player, focus } = profile;
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
@@ -23,7 +23,15 @@ export function useReplay(name: string | null, profile: Profile, initialSpeed: n
   // pause freezes them and a seek or reconnect starts with a clear screen.
   const [cues, setCues] = useState<Cue[]>([]);
   const [status, setStatus] = useState<Status>("connecting");
-  const [speed, setSpeedState] = useState(initialSpeed);
+  // The speed belongs to the match it was chosen in, so another match starts at its own default (a clip of
+  // real footage plays at 1x, a synthetic match at 20x).
+  const [chosen, setChosen] = useState<{ match: string | null; value: number }>({ match: null, value: 0 });
+  const speed = chosen.match === name ? chosen.value : defaultSpeed;
+  // The video clip: what the credibility panel shows, the events detected so far (in the viewer's language),
+  // and how far in the replay is (whole seconds into the half, so the page re-renders once a second, not per frame).
+  const [clip, setClip] = useState<ClipInfo | null>(null);
+  const [clipEvents, setClipEvents] = useState<ClipEventLine[]>([]);
+  const [clipT, setClipT] = useState<number | null>(null);
   // A jump belongs to the match it was made in; `n` makes a repeat jump to the same minute reconnect.
   // `at` is exact match seconds (it wins over `minute`), for a reconnect that must land on the same
   // second: a broadcast minute can't say first-half stoppage time (45+2').
@@ -37,6 +45,8 @@ export function useReplay(name: string | null, profile: Profile, initialSpeed: n
   onEventRef.current = onEvent;
   const onResetRef = useRef(onReset);
   onResetRef.current = onReset;
+  const onFrameRef = useRef(onFrame);
+  onFrameRef.current = onFrame;
   const speedRef = useRef(speed);
   speedRef.current = speed;
   // Paused by the viewer, and the profile the open connection uses: a change of language, club, player or focus
@@ -57,6 +67,8 @@ export function useReplay(name: string | null, profile: Profile, initialSpeed: n
     setCues([]);
     setState(null);
     setAiInfo(null);
+    setClipEvents([]);
+    setClipT(null);
     onResetRef.current();
     const key = [lang, team, player, focus].join("|");
     const keepPaused = pausedRef.current && profileKeyRef.current !== null && profileKeyRef.current !== key;
@@ -72,17 +84,27 @@ export function useReplay(name: string | null, profile: Profile, initialSpeed: n
           metaRef.current = data.meta;
           setMeta(data.meta);
           setAiInfo(data.commentary ?? null);
+          setClip(data.kind === "video" ? data.clip : null);
           setLanguages(data.languages ?? { en: "English" });
           socket.send(JSON.stringify({ cmd: "detail", value: modeRef.current }));
           if (keepPaused) socket.send(JSON.stringify({ cmd: "pause" }));
           setStatus(keepPaused ? "paused" : "live");
           break;
         case "catchup":
+          if (data.events) { // a clip: the events before the jump, for the feed
+            setClipEvents(data.events);
+            break;
+          }
           setMoments(data.moments);
           setState(data.state);
           if (metaRef.current) for (const ev of data.recent_events ?? []) onEventRef.current(ev, metaRef.current);
           break;
+        case "frame":
+          if (metaRef.current) onFrameRef.current(data, metaRef.current);
+          setClipT(Math.floor(data.t));
+          break;
         case "event":
+          if (data.text !== undefined) setClipEvents((e) => [...e, { event: data.event, text: data.text }]);
           if (metaRef.current) onEventRef.current(data.event, metaRef.current);
           break;
         case "moment":
@@ -120,13 +142,14 @@ export function useReplay(name: string | null, profile: Profile, initialSpeed: n
   useEffect(() => { send({ cmd: "detail", value: mode }); }, [mode]);
 
   const setSpeed = useCallback((value: number) => {
-    setSpeedState(value);
+    setChosen({ match: name, value });
     send({ cmd: "speed", value });
-  }, []);
+  }, [name]);
   const pause = useCallback(() => { send({ cmd: "pause" }); pausedRef.current = true; setStatus("paused"); }, []);
   const resume = useCallback(() => { send({ cmd: "resume" }); pausedRef.current = false; setStatus("live"); }, []);
   const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, at: null, n: j.n + 1 })), [name]);
   const seekAt = useCallback((seconds: number) => setJump((j) => ({ match: name, minute: 0, at: seconds, n: j.n + 1 })), [name]);
 
-  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, seek, seekAt };
+  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, seek, seekAt,
+           clip, clipEvents, clipT };
 }
