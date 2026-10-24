@@ -16,6 +16,7 @@ export interface TeamMeta {
 
 export interface MatchMeta {
   type: "match_meta";
+  source?: "video"; // set for the real-footage clip: two sides, no squads, colours used as given
   match: { id: string; seed: number; competition: string; matchday: number; venue: string };
   home: TeamMeta;
   away: TeamMeta;
@@ -158,6 +159,7 @@ export interface LiveState {
 
 export interface MatchSummary {
   name: string;
+  kind?: "synthetic" | "video"; // a tracked clip of real footage is "video"
   match_id: string;
   home: { id: string; name: string; short_name: string; colours: { primary: string } };
   away: { id: string; name: string; short_name: string; colours: { primary: string } };
@@ -215,4 +217,42 @@ export interface ClubInfo {
   short_name: string;
   colours: { primary: string; secondary: string };
   players: { id: string; name: string; number: number; position: string }[];
+}
+
+// ---------------------------------------------------------------- Video clip
+
+/** One person in a `frame` message, in their own team's attacking frame (see DESIGN.md, Video path). */
+export interface ClipPlayer { id: string; team_id: string | null; x: number; y: number; speed: number | null; confidence: number }
+
+/** Positions of everyone at one moment of the clip; `t` is seconds since the half started. */
+export interface ClipFrame {
+  type: "frame";
+  t: number;
+  clock: string;
+  ref_team_id: string;
+  players: ClipPlayer[];
+  ball: { x: number; y: number; confidence: number } | null;
+}
+
+/** An event the video path detected (a pass, carry or interception), with a confidence below 1. */
+export interface ClipEvent extends MatchEvent { source: "video"; confidence: number; receiver_id?: string }
+
+/** The events as the viewer reads them: the server's words, in the viewer's language. */
+export interface ClipEventLine { event: ClipEvent; text: string }
+
+/** What the credibility panel shows: from the benchmark file, with the credit and what the figures don't cover. */
+export interface ClipInfo {
+  clip: { match: string; from: string; to: string; frames: number; fps: number; start: number; duration: number };
+  model: string;
+  fine_tuned: boolean;
+  tiles: string | null;
+  credit: string;
+  credit_url: string;
+  figures: {
+    precision: number; recall: number; position_error_mean_m: number; position_error_median_m: number;
+    position_error_p90_m: number; team_accuracy: number; id_consistency: number; tracks: number;
+    players_on_pitch: number; match_radius_m: number; ball_frames: number; frames: number;
+    event_precision: number; event_recall: number;
+  };
+  limits: string[];
 }

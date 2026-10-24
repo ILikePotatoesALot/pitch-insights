@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { ClipBanner, ClipCredit, ClipEvents, ClipPanel, mmss } from "./components/ClipPanels";
 import { Overlays } from "./components/Overlays";
 import { FocusStrip, MomentFeed, MomentumChart, PinnedPlayer, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { ProfilePicker } from "./components/ProfilePicker";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { PitchScene, teamColours } from "./pitch/PitchScene";
-import type { ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
+import type { ClipEvent, ClipFrame, ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
 
 const SPEEDS = [1, 5, 20, 60];
+const CLIP_SPEEDS = [0.5, 1, 2, 5]; // the clip is 100 s of real footage: slower than a synthetic match, and it starts at 1x
 // What a link can set besides the profile: `match` (a sample's name), `layout` (broadcast | fan) and `speed`, so
 // two views of one match can be opened side by side (see CompareView) and set up the same way every time.
 const query = new URLSearchParams(location.search);
@@ -31,6 +33,7 @@ export default function App() {
   const sceneRef = useRef<PitchScene | null>(null);
   const pitchEl = useRef<HTMLDivElement>(null);
   const spotLabel = useRef<HTMLDivElement>(null);
+  const clipLabel = useRef<HTMLDivElement>(null);
   const firstHalfEnd = useRef<number | null>(null);
   const p = profile ?? DEFAULT_PROFILE;
 
@@ -57,10 +60,12 @@ export default function App() {
     if (!pitchEl.current) return;
     const scene = new PitchScene(pitchEl.current);
     sceneRef.current = scene;
+    scene.setClipLabel(clipLabel.current);
     return () => scene.dispose();
   }, []);
 
   const onEvent = useCallback((ev: MatchEvent, meta: MatchMeta) => {
+    if (meta.source === "video") return sceneRef.current?.addClipEvent(ev as ClipEvent, meta);
     if (ev.type === "match_state" && ev.state === "half_time") firstHalfEnd.current = ev.t;
     const t = ev.period === 2 ? (firstHalfEnd.current ?? 2700) + ev.t : ev.t;
     sceneRef.current?.addEvent(ev, meta, t);
@@ -70,16 +75,25 @@ export default function App() {
     sceneRef.current?.reset();
   }, []);
 
+  const onFrame = useCallback((frame: ClipFrame, meta: MatchMeta) => sceneRef.current?.showFrame(frame, meta), []);
+
+  // A clip of real footage (the video path) has its own speeds, panels and controls; a synthetic match is as before.
+  const clipMode = matches.find((m) => m.name === name)?.kind === "video";
+  const speeds = clipMode ? CLIP_SPEEDS : SPEEDS;
   const ready = profile !== null && picker !== "first";
-  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, seek, seekAt } =
-    useReplay(ready ? name : null, p, SPEEDS.includes(urlSpeed) ? urlSpeed : 20, onEvent, onReset);
+  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, seek, seekAt, clip, clipEvents, clipT } =
+    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame);
+  const showingClip = clipMode && meta?.source === "video"; // (the old match's meta stays for a moment after a switch)
+  const showingMatch = !clipMode && !!meta && meta.source !== "video";
+  useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
 
   // A change to language, club, player or focus metric reconnects (the server works from the profile it was
   // given) from the current moment, not the start of the minute, so nothing replays. It goes by match seconds,
   // because a minute can't say first-half stoppage time (45+2'). Before the first state arrives there is no
   // current moment, so the reconnect keeps the jump already made. Mode alone doesn't reconnect.
   const reconnectHere = () => {
-    if (state?.period === 1) seekAt(state.match_minute * 60);
+    if (showingClip) seekAt(Math.max(0, (clipT ?? 0) - (clip?.clip.start ?? 0)));
+    else if (state?.period === 1) seekAt(state.match_minute * 60);
     else if (state) seekAt((firstHalfEnd.current ?? 2700) + (state.match_minute - 45) * 60);
   };
   const commit = (next: Profile, save = true) => {
@@ -156,8 +170,8 @@ export default function App() {
     <div className={`app ${layout}${embedded ? " embed" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
         <h1>Pitch Insights <small>live football intelligence</small></h1>
-        <select value={name ?? ""} onChange={(e) => setName(e.target.value)} aria-label="Match">
-          {matches.map((m) => <option key={m.name} value={m.name}>{m.home.name} v {m.away.name} ({m.name.split("-")[0]})</option>)}
+        <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); }} aria-label="Match">
+          {matches.map((m) => <option key={m.name} value={m.name}>{m.kind === "video" ? `${m.home.name} v ${m.away.name} · real footage` : `${m.home.name} v ${m.away.name} (${m.name.split("-")[0]})`}</option>)}
         </select>
         <select value={p.lang} onChange={(e) => commit({ ...p, lang: e.target.value })} aria-label="Language">
           {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
@@ -182,12 +196,14 @@ export default function App() {
 
       <main>
         <section className="stage">
-          {meta && <Scoreboard meta={meta} state={state} colours={colours} />}
-          {meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
-          {meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
+          {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} />}
+          {showingMatch && meta && <Scoreboard meta={meta} state={state} colours={colours} />}
+          {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
+          {showingMatch && meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
                                            history={ratingHistory} onChange={() => setPicker("edit")} />}
           <div className="pitch" ref={pitchEl}>
             {pinned && <div className="spot-label" ref={spotLabel} style={{ borderColor: pinned.colour }}>#{pinned.number} {pinned.name.split(" ").slice(-1)[0]}</div>}
+            <div className="clip-label" ref={clipLabel} />
             {meta && <Overlays cues={cues} meta={meta} mode={p.mode} colours={colours} />}
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
             {status === "error" && <div className="overlay-msg">Can't reach the replay server. Is it running on port 8000?</div>}
@@ -196,24 +212,47 @@ export default function App() {
           <div className="controls">
             {status === "paused" ? <button onClick={resume}>Play</button> : <button onClick={pause} disabled={status !== "live"}>Pause</button>}
             <div className="segmented" role="group" aria-label="Speed">
-              {SPEEDS.map((s) => <button key={s} className={speed === s ? "on" : ""} onClick={() => setSpeed(s)}>{s}×</button>)}
+              {speeds.map((s) => <button key={s} className={speed === s ? "on" : ""} onClick={() => setSpeed(s)}>{s}×</button>)}
             </div>
-            <label className="seek">
-              Jump to <input type="range" min={0} max={90} step={1} value={seekTo} onChange={(e) => setSeekTo(Number(e.target.value))} />
-              <b>{seekTo}'</b>
-              <button onClick={() => { clearHistory(); seek(seekTo); }}>Go</button>
-            </label>
-            {status === "ended" && <span className="status">Match over</span>}
+            {clipMode ? (
+              <label className="seek">
+                Jump to <input type="range" min={0} max={Math.floor(clip?.clip.duration ?? 99)} step={1} value={seekTo} onChange={(e) => setSeekTo(Number(e.target.value))} />
+                <b>{mmss((clip?.clip.start ?? 0) + seekTo)}</b>
+                <button onClick={() => seekAt(seekTo)}>Go</button>
+              </label>
+            ) : (
+              <label className="seek">
+                Jump to <input type="range" min={0} max={90} step={1} value={seekTo} onChange={(e) => setSeekTo(Number(e.target.value))} />
+                <b>{seekTo}'</b>
+                <button onClick={() => { clearHistory(); seek(seekTo); }}>Go</button>
+              </label>
+            )}
+            {status === "ended" && (clipMode ? <button onClick={() => { setSeekTo(0); seekAt(0); }}>Replay the clip</button> : <span className="status">Match over</span>)}
           </div>
-          <MomentumChart state={state} colours={colours} />
-          <p className="legend">
-            The surface rises where each team has been active in the last two minutes, coloured by which team owns that space.
-            Spikes are shots: the taller, the better the chance. Goals glow.
-            {pinned && " The ring follows your player: it sits where they last touched the ball."}
-          </p>
+          {showingMatch && <MomentumChart state={state} colours={colours} />}
+          {showingClip && clip && <ClipCredit info={clip} />}
+          {showingClip ? (
+            <p className="legend">
+              Each marker is one tracked person: {meta?.home.name} in blue, {meta?.away.name} in white, grey where the model could not tell
+              the team. The number is the tracker's ID, not a shirt number; tap a marker for its label. Lines are detected passes and
+              carries, a ring is an interception. The ball shows only where the video found it. The surface rises where each side's
+              players have been in the last two minutes.
+            </p>
+          ) : (
+            <p className="legend">
+              The surface rises where each team has been active in the last two minutes, coloured by which team owns that space.
+              Spikes are shots: the taller, the better the chance. Goals glow.
+              {pinned && " The ring follows your player: it sits where they last touched the ball."}
+            </p>
+          )}
         </section>
 
-        {layout === "fan" && <aside>
+        {layout === "fan" && showingClip && meta && <aside>
+          {clip && <ClipPanel info={clip} lang={p.lang} />}
+          <ClipEvents events={clipEvents} mode={p.mode} colours={colours} meta={meta} info={clip} />
+        </aside>}
+
+        {layout === "fan" && showingMatch && <aside>
           {meta && <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} />}
           {meta && <Ratings state={state} meta={meta} colours={colours} favourite={inspected} setFavourite={setInspected} />}
           {meta && p.mode === "analyst" && <StatsPanel state={state} meta={meta} focus={p.focus} />}
