@@ -63,7 +63,7 @@ from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
 from pitch_insights.origins import LOCALHOST, configured_origins, origin_allowed
-from pitch_insights.profiles import close_store, router as profiles_router
+from pitch_insights.profiles import close_store, router as profiles_router, warm_store
 from pitch_insights.telemetry import setup_telemetry
 from pitch_insights.video.replay import ClipError, clip_meta, find_clip, list_clips
 from pitch_insights.video.serve import replay_clip
@@ -74,7 +74,9 @@ STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
 
 @contextlib.asynccontextmanager
 async def lifespan(_: FastAPI):
+    warm = asyncio.create_task(warm_store())  # in the background: the server answers while it signs in to Cosmos DB
     yield
+    warm.cancel()
     await close_store()
 
 

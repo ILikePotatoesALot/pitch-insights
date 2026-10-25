@@ -60,6 +60,7 @@ export class LocalProfileStore implements ProfileStore {
 const VIEWER_KEY = "pitch-insights.viewer.v1";
 const PENDING_KEY = "pitch-insights.profile.unsynced.v1"; // set while the browser's copy is newer than the server's
 const REMOTE_TIMEOUT_MS = 3000; // the first screen waits for this, so a sleeping or broken server mustn't hold it long
+const REMOTE_SAVE_TIMEOUT_MS = 10000; // nothing waits for a save, so it can outlast a slow first call to the database
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 let sessionViewer: string | null = null; // the id, if the browser won't keep one
 let saveSeq = 0; // numbers the saves, so a slow earlier one can't mark a newer, failed one as sent
@@ -96,15 +97,15 @@ function unsynced(set?: boolean): boolean {
 export class RemoteProfileStore implements ProfileStore {
   constructor(private local: ProfileStore, private url: (path: string) => string) {}
 
-  private call(id: string, init: RequestInit = {}) {
+  private call(id: string, init: RequestInit = {}, timeoutMs = REMOTE_TIMEOUT_MS) {
     return fetch(this.url(`/api/profile/${id}`), {
-      ...init, signal: AbortSignal.timeout(REMOTE_TIMEOUT_MS), headers: { "Content-Type": "application/json" },
+      ...init, signal: AbortSignal.timeout(timeoutMs), headers: { "Content-Type": "application/json" },
     });
   }
 
   /** Send a profile up; true if the server took it. */
-  private async push(id: string, profile: Profile) {
-    try { return (await this.call(id, { method: "PUT", body: JSON.stringify(profile) })).ok; } catch { return false; }
+  private async push(id: string, profile: Profile, timeoutMs = REMOTE_TIMEOUT_MS) {
+    try { return (await this.call(id, { method: "PUT", body: JSON.stringify(profile) }, timeoutMs)).ok; } catch { return false; }
   }
 
   async load() {
@@ -134,7 +135,7 @@ export class RemoteProfileStore implements ProfileStore {
     if (!id) return;
     const n = ++saveSeq;
     unsynced(true);
-    if (await this.push(id, profile) && n === saveSeq) unsynced(false);
+    if (await this.push(id, profile, REMOTE_SAVE_TIMEOUT_MS) && n === saveSeq) unsynced(false);
   }
 
   async clear() {
@@ -144,7 +145,7 @@ export class RemoteProfileStore implements ProfileStore {
     sessionViewer = null;
     try { localStorage.removeItem(VIEWER_KEY); } catch { /* nothing to remove */ }
     if (!id) return;
-    try { await this.call(id, { method: "DELETE" }); } catch { /* it expires by itself after 90 days */ }
+    try { await this.call(id, { method: "DELETE" }, REMOTE_SAVE_TIMEOUT_MS); } catch { /* it expires by itself after 90 days */ }
   }
 }
 
