@@ -167,6 +167,19 @@ def get_store() -> ProfileStore | None:
     return _store
 
 
+async def warm_store() -> None:
+    """Sign in to Cosmos DB and open the connection before the first viewer needs it. The first call after a start
+    is slow (the managed identity's token, the account's address and the connection), slower than the app's timeout
+    for a save; one read of an id nobody has (about 1 RU) takes that cost at startup instead. Failures are only logged."""
+    store = get_store()
+    if not isinstance(store, CosmosProfileStore):
+        return
+    try:
+        await store.get("00000000-0000-4000-8000-000000000000")
+    except Exception as e:  # noqa: BLE001
+        log.warning("profile store warm-up failed: %s", type(e).__name__)
+
+
 async def close_store() -> None:
     if isinstance(_store, CosmosProfileStore):
         await _store.close()

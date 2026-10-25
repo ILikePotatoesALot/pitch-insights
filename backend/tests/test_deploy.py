@@ -207,6 +207,26 @@ def test_cosmos_client_is_entered_before_use_and_closed_if_that_fails(monkeypatc
     asyncio.run(go())
 
 
+def test_warm_up_reads_once_from_cosmos_and_never_raises(monkeypatch):
+    calls = []
+
+    class Cosmos(profiles.CosmosProfileStore):
+        def __init__(self, fail=False):
+            super().__init__("https://x/", "db", "profiles")
+            self.fail = fail
+
+        async def get(self, viewer_id):
+            calls.append(viewer_id)
+            if self.fail:
+                raise RuntimeError("no token")
+
+    for store, expected in ((Cosmos(), 1), (Cosmos(fail=True), 1), (profiles.MemoryProfileStore(), 0), (None, 0)):
+        calls.clear()
+        monkeypatch.setattr(profiles, "get_store", lambda s=store: s)
+        asyncio.run(profiles.warm_store())  # a failing store is logged, not raised
+        assert len(calls) == expected
+
+
 def test_the_environment_picks_the_store(monkeypatch):
     def fresh(**env):
         for k in ("COSMOS_ENDPOINT", "PITCH_PROFILE_STORE"):

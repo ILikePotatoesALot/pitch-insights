@@ -91,10 +91,20 @@ async def run_until_first_done(*coroutines: Awaitable) -> None:
     """Run them together: whichever finishes first (the replay ends, or the browser disconnects, even while
     paused) stops the others, so nothing is left running for a closed tab."""
     tasks = {asyncio.ensure_future(c) for c in coroutines}
-    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-    for task in pending:
-        task.cancel()
-    await asyncio.gather(*pending, return_exceptions=True)
+    for task in tasks:  # a task can end after this one is cancelled; read its outcome so asyncio doesn't log it
+        task.add_done_callback(lambda t: t.cancelled() or t.exception())
+    try:
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+    finally:
+        # Also when this handler is itself cancelled (the server shutting the connection down): no task may
+        # outlive the connection, still sending to a closed socket.
+        for task in tasks:
+            task.cancel()
+    if pending:
+        # asyncio.wait, not gather: if this handler is cancelled while waiting, gather would raise the children's
+        # CancelledError in place of the server's own, and anyio (Starlette's server side) then can't tell it's
+        # its own cancellation and lets it escape the connection.
+        await asyncio.wait(pending)
     for task in done:
         exc = task.exception()
         if exc and not isinstance(exc, (WebSocketDisconnect, RuntimeError)):

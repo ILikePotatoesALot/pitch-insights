@@ -6,9 +6,7 @@ name: Deploy backend
 
 on:
   push:
-    branches:
-      - main
-      - claude/deploy-bec969   # TEMPORARY, for the bring-up: remove before the pull request is merged (docs/DEPLOY.md)
+    branches: [main]
     paths:
       - backend/pyproject.toml
       - backend/pitch_insights/**
