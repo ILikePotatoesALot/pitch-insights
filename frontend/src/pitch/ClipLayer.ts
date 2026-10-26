@@ -162,7 +162,7 @@ export class ClipLayer {
   }
 
   /** Draw the clip as of now. Call once per rendered frame. */
-  update(speed: number, now = performance.now()) {
+  update(speed: number, now = performance.now(), beforeDraw?: (t: number) => void) {
     const n = this.snaps.length;
     if (!n) return;
     const last = this.snaps[n - 1];
@@ -180,6 +180,7 @@ export class ClipLayer {
     }
     rt = Math.min(last.t, Math.max(rt, usual));
     this.clock = { t: rt, at: now };
+    beforeDraw?.(rt); // terrain and markers must sample exactly the same replay moment
     let i = n - 1;
     while (i > 0 && this.snaps[i].t > rt) i--;
     const a = this.snaps[i], b = this.snaps[Math.min(n - 1, i + 1)];

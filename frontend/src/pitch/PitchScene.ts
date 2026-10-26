@@ -2,13 +2,16 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { ClipEvent, ClipFrame, MatchEvent, MatchMeta } from "../types";
 import { ClipLayer } from "./ClipLayer";
+import { SurfaceTimeline } from "./SurfaceTimeline";
 
 const L = 105;
 const W = 68;
 const NX = 105; // grid cells along the length (1 m each)
 const NZ = 68;
 const TERRITORY_TAU = 120; // seconds of match time for activity to fade to ~37%
-const SPIKE_TAU = 75;
+const SPIKE_TAU = 10;
+const SPIKE_RISE_S = 0.35;
+const GOAL_GLOW_TAU = 3;
 const SIGMA = 7; // metres: how far one action's influence spreads
 const CLIP_HEAT_PER_S = 0.015; // territory a tracked player adds each second, at their spot (an event adds 0.2 to 0.9)
 const PICK_DRAG_PX = 5; // a press that moves further than this is a camera drag, not a tap on a player
@@ -74,6 +77,9 @@ export class PitchScene {
   private frame = 0;
   private observer: ResizeObserver;
   private dirty = true;
+  private surface = new SurfaceTimeline((NX + 1) * (NZ + 1));
+  private surfaceHeights = new Float32Array((NX + 1) * (NZ + 1));
+  private surfaceColours = new Float32Array((NX + 1) * (NZ + 1) * 3);
   private tmpColour = new THREE.Color();
   private spot: Spotlight | null = null;
   private playerPositions = new Map<string, [number, number]>();
@@ -182,6 +188,11 @@ export class PitchScene {
   /** A detected event of the clip: a line (pass, carry) or ring (interception) that fades. */
   addClipEvent(ev: ClipEvent, meta: MatchMeta) {
     if (meta.home.id !== this.homeId) this.setMatch(meta);
+    if (ev.type === "shot") {
+      this.matchTime = Math.max(this.matchTime, ev.t);
+      this.addShot(ev, meta, ev.t);
+      return;
+    }
     this.clip.addEvent(ev, meta);
   }
 
@@ -313,6 +324,17 @@ export class PitchScene {
     this.heat[0].fill(0);
     this.heat[1].fill(0);
     this.spikes = [];
+    this.surface.reset();
+    // A seek must remove old hills immediately, including while paused.
+    const position = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const normal = this.geometry.getAttribute("normal") as THREE.BufferAttribute;
+    const colour = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+    for (let k = 0; k < position.count; k++) {
+      position.setY(k, 0);
+      normal.setXYZ(k, 0, 1, 0);
+      colour.setXYZ(k, BASE_COLOUR.r, BASE_COLOUR.g, BASE_COLOUR.b);
+    }
+    position.needsUpdate = normal.needsUpdate = colour.needsUpdate = true;
     this.matchTime = 0;
     this.lastDecayTime = 0;
     this.dirty = true;
@@ -346,9 +368,16 @@ export class PitchScene {
       this.moveBall(pos[0], pos[1]);
     }
     if (ev.type === "shot") {
-      const goal = ev.outcome === "goal";
-      this.spikes.push({ x: pos[0], y: pos[1], amp: 6 + (ev.xg ?? 0.05) * 55 + (goal ? 10 : 0), born: matchTime, goal });
+      this.addShot(ev, meta, matchTime);
     }
+    this.dirty = true;
+  }
+
+  private addShot(ev: MatchEvent, meta: MatchMeta, matchTime: number) {
+    const pos = toAbsolute(ev, meta);
+    if (!pos) return;
+    const goal = ev.outcome === "goal";
+    this.spikes.push({ x: pos[0], y: pos[1], amp: 4 + (ev.xg ?? 0.05) * 12 + (goal ? 3 : 0), born: matchTime, goal });
     this.dirty = true;
   }
 
@@ -528,6 +557,7 @@ export class PitchScene {
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
     g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    g.computeVertexNormals();
     return g;
   }
 
@@ -596,18 +626,25 @@ export class PitchScene {
   }
 
   private heightAt(x: number, y: number) {
-    const i = Math.min(NX, Math.max(0, Math.round((x / L) * NX)));
-    const j = Math.min(NZ, Math.max(0, Math.round((y / W) * NZ)));
-    return (this.geometry.getAttribute("position") as THREE.BufferAttribute).getY(this.idx(i, j));
+    const gx = Math.min(NX, Math.max(0, (x / L) * NX)), gy = Math.min(NZ, Math.max(0, (y / W) * NZ));
+    const i = Math.min(NX - 1, Math.floor(gx)), j = Math.min(NZ - 1, Math.floor(gy));
+    const u = gx - i, v = gy - j;
+    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const a = pos.getY(this.idx(i, j)), b = pos.getY(this.idx(i + 1, j));
+    const c = pos.getY(this.idx(i, j + 1)), d = pos.getY(this.idx(i + 1, j + 1));
+    return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v;
   }
 
-  private updateSurface() {
-    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
-    const col = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+  private updateSurface(now: number) {
     const [ch, ca] = this.colours;
     const tmp = this.tmpColour;
     const spikes = this.spikes;
-    const amps = spikes.map((s) => s.amp * Math.exp(-(this.matchTime - s.born) / SPIKE_TAU));
+    const amps = spikes.map((s) => {
+      const age = Math.max(0, this.matchTime - s.born);
+      // Sparse event feeds need an immediate target; tracked feeds have frames throughout the rise.
+      const rise = this.clip.group.visible ? 1 - Math.exp(-age / SPIKE_RISE_S) : 1;
+      return s.amp * rise * Math.exp(-age / SPIKE_TAU);
+    });
     for (let j = 0; j <= NZ; j++) {
       for (let i = 0; i <= NX; i++) {
         const k = this.idx(i, j);
@@ -621,9 +658,9 @@ export class PitchScene {
           const d2 = (x - s.x) ** 2 + (y - s.y) ** 2;
           const v = amps[n] * Math.exp(-d2 / (2 * 2.2 * 2.2));
           height += v;
-          if (s.goal) glow = Math.max(glow, Math.min(1, v / 8));
+          if (s.goal) glow = Math.max(glow, Math.min(1, v / 5) * Math.exp(-Math.max(0, this.matchTime - s.born) / GOAL_GLOW_TAU));
         }
-        pos.setY(k, height);
+        this.surfaceHeights[k] = height;
         const raw = total > 1e-4 ? hh / total : 0.5;
         // Who owns this space, from -1 (away) to 1 (home), sharpened smoothly so ownership reads without hard edges.
         // Shared space fades to slate rather than mixing the colours, which turned a red and a blue team's pitch purple.
@@ -632,13 +669,37 @@ export class PitchScene {
         const strength = Math.min(1, total / 1.5);
         tmp.lerp(BASE_COLOUR, 1 - (0.3 + 0.7 * strength));
         if (glow > 0) tmp.lerp(GLOW_COLOUR, glow * 0.8);
-        col.setXYZ(k, tmp.r, tmp.g, tmp.b);
+        this.surfaceColours[k * 3] = tmp.r;
+        this.surfaceColours[k * 3 + 1] = tmp.g;
+        this.surfaceColours[k * 3 + 2] = tmp.b;
       }
     }
-    pos.needsUpdate = true;
-    col.needsUpdate = true;
-    this.geometry.computeVertexNormals();
+    if (this.clip.group.visible) this.surface.push(this.matchTime, this.surfaceHeights, this.surfaceColours);
+    else this.surface.transition(now / 1000, 0.18, this.surfaceHeights, this.surfaceColours);
   }
+
+  private drawSurface(t: number) {
+    if (!this.surface.sample(t)) return;
+    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const col = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+    const normals = this.geometry.getAttribute("normal") as THREE.BufferAttribute;
+    const heights = this.surface.heights;
+    for (let j = 0; j <= NZ; j++) for (let i = 0; i <= NX; i++) {
+      const k = this.idx(i, j);
+      pos.setY(k, heights[k]);
+      // Smooth grid gradients avoid rebuilding every triangle's normals on every draw.
+      const left = Math.max(0, i - 1), right = Math.min(NX, i + 1);
+      const top = Math.max(0, j - 1), bottom = Math.min(NZ, j + 1);
+      const dx = (heights[this.idx(right, j)] - heights[this.idx(left, j)]) / ((right - left) * L / NX);
+      const dy = (heights[this.idx(i, bottom)] - heights[this.idx(i, top)]) / ((bottom - top) * W / NZ);
+      const length = Math.hypot(dx, 1, dy);
+      normals.setXYZ(k, -dx / length, 1 / length, dy / length);
+    }
+    (col.array as Float32Array).set(this.surface.colours);
+    pos.needsUpdate = col.needsUpdate = normals.needsUpdate = true;
+  }
+
+  private drawTrackedSurface = (t: number) => this.drawSurface(t);
 
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.container;
@@ -689,15 +750,17 @@ export class PitchScene {
 
   private loop = () => {
     this.frame = requestAnimationFrame(this.loop);
+    const now = performance.now();
     if (this.dirty) {
-      this.updateSurface();
+      this.updateSurface(now);
       this.dirty = false;
     }
+    if (this.clip.group.visible) this.clip.update(this.clipSpeed, now, this.drawTrackedSurface);
+    else this.drawSurface(now / 1000);
     const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
     const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
     this.ball.position.lerp(target, 0.18);
     this.ball.visible = !this.clip.group.visible; // a clip draws its own ball, only where the video found it
-    this.clip.update(this.clipSpeed);
     this.moveSpotlight();
     this.placeGoals();
     this.drawTrail();

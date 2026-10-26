@@ -23,6 +23,11 @@ real-footage clip remain available.
   the end of the ball's flight. Outcomes remain probabilistic.
 - Tracking frames and validated match events share one replay clock. Existing
   statistics, ratings and deterministic explanations consume the generated events.
+- Terrain heights and colours interpolate on the same buffered clock as the
+  players. Shot peaks rise and fade, with a brief glow for goals. Pausing holds
+  the surface at the latest frame; seeking clears its old shape immediately.
+- Player and ball ground height is interpolated across the terrain grid to avoid
+  steps when crossing a slope.
 - Tap a marker or follow someone from the ratings list to inspect them without
   reconnecting. Return to favourite restores the profile's player.
 - Pause, speed, minute seeking, replay and comparison work with the new feed.
@@ -56,4 +61,6 @@ Backend coverage checks deterministic generation, 22 persistent identities,
 movement limits, pass reception, tackle contact, event schema and intelligence
 compatibility, paused exact-time seeking, listing and end-of-replay handling.
 Frontend coverage includes selecting and following simulated players without
-action events, plus the existing player following and replay regression tests.
+action events, terrain interpolation and pause behaviour, shot peaks and goal
+glow, slope sampling and playback clock alignment, plus the existing player
+following and replay regression tests.
