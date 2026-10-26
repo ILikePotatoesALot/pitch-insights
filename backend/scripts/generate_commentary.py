@@ -53,6 +53,8 @@ def sample_paths(names: list[str]) -> list[Path]:
 
 
 def exists(path: Path) -> bool:
+    if path.stem == "continuous-prototype":
+        return True
     return (SAMPLES / CLIP_DIR / f"{path.stem}.frames.jsonl").exists() if is_clip(path) else path.exists()
 
 
@@ -61,6 +63,13 @@ async def run_match(path: Path, writer, header: dict, force: bool, limit: int | 
     if is_clip(path):  # moments from the detected events, written by the video narrator
         meta, all_moments = load_clip_moments(SAMPLES, path.stem)
         header = file_header(writer, video=True)
+    elif path.stem == "continuous-prototype":
+        from pitch_insights.generator.continuous import prototype
+        from pitch_insights.explain.simulation import prototype_moments
+        meta = prototype()[0]
+        all_moments = prototype_moments()
+        from pitch_insights.agents.prompts import SIMULATION_PROMPT_VERSION
+        header = header | {"prompt_version": SIMULATION_PROMPT_VERSION}
     else:
         meta, events = read_match(path)
         brain = MatchBrain(meta, memory=memory_for(path, meta))

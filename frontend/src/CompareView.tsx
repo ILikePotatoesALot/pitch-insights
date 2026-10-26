@@ -13,11 +13,16 @@ type PaneMessage = { type: "ready"; epoch: number; ready: ReplayReady } | { type
 
 export default function CompareView() {
   const q = useMemo(() => new URLSearchParams(location.search), []);
-  const own = useMemo(() => (["a", "b"] as const).map((side) => new URLSearchParams(q.get(side) ?? PRESETS[side])), [q]);
+  const own = useMemo(() => (["a", "b"] as const).map((side) => {
+    const preset = q.get("match") === "continuous-prototype" && side === "a"
+      ? PRESETS.a.replace("POT-11", "POT-07").replace("lang=de", "lang=en") : PRESETS[side];
+    return new URLSearchParams(q.get(side) ?? preset);
+  }), [q]);
   const initialSpeed = Number(q.get("speed"));
   const [speed, setSpeed] = useState([0.5, 1, 2, 5, 20, 60].includes(initialSpeed) ? initialSpeed : 20);
   const [loadSpeed, setLoadSpeed] = useState(speed);
   const [loadedKind, setLoadedKind] = useState<"synthetic" | "video">("synthetic");
+  const [loadedTracking, setLoadedTracking] = useState(false);
   const [minute, setMinute] = useState(0);
   const [jumpTo, setJumpTo] = useState(0);
   const [epoch, setEpoch] = useState(0);
@@ -85,6 +90,7 @@ export default function CompareView() {
     setJumpTo(target);
     setLoadSpeed(speed);
     setLoadedKind(kind);
+    setLoadedTracking(simulation);
     readiesRef.current = [null, null];
     setReadies([null, null]);
     setWaiting(true);
@@ -102,11 +108,13 @@ export default function CompareView() {
     if (!waiting && !ended && !failed) dispatch({ cmd: "speed", value, wall: wallAfter(readiesRef.current) });
   };
   const kind = readies[0]?.kind ?? "synthetic";
-  const simulation = !!readies[0]?.tracking;
-  const limit = kind === "video" ? Math.floor(readies[0]?.duration ?? 99) : simulation ? Math.floor((readies[0]?.duration ?? 360) / 60) : 90;
+  const simulation = readies[0]?.tracking ?? loadedTracking;
+  const seconds = kind === "video" || simulation;
+  const limit = kind === "video" ? Math.floor(readies[0]?.duration ?? 99) : simulation ? Math.floor(readies[0]?.duration ?? 360) : 90;
   const names = own.map((pane, index) => {
     const profile = profileFromUrl(`?${pane}`);
-    return `Viewer ${index ? "B" : "A"} · ${profile?.mode === "casual" ? "Casual fan" : "Analyst"} · ${LANGUAGE_NAMES[profile?.lang ?? "en"] ?? profile?.lang ?? "English"}`;
+    const lang = readies[index]?.lang ?? profile?.lang ?? "en";
+    return `Viewer ${index ? "B" : "A"} · ${profile?.mode === "casual" ? "Casual fan" : "Analyst"} · ${LANGUAGE_NAMES[lang] ?? lang}`;
   });
   const panes = own.map((pane) => {
     const url = new URLSearchParams(pane);
@@ -115,7 +123,7 @@ export default function CompareView() {
     url.set("sync", String(epoch));
     url.set("speed", String(loadSpeed));
     if (q.has("match")) url.set("match", q.get("match")!);
-    if (loadedKind === "video") url.set("at", String(minute));
+    if (loadedKind === "video" || loadedTracking) url.set("at", String(minute));
     else url.set("from", String(minute));
     return `/?${url}`;
   });
@@ -130,9 +138,9 @@ export default function CompareView() {
           <label>Speed <select value={speed} disabled={waiting || failed} onChange={(e) => changeSpeed(Number(e.target.value))}>
             {(kind === "video" || simulation ? [0.5, 1, 2, 5] : [1, 5, 20, 60]).map((value) => <option key={value} value={value}>{value}×</option>)}
           </select></label>
-          <label>Jump to <input type="number" min={0} max={limit} value={jumpTo} onChange={(e) => setJumpTo(Number(e.target.value))} aria-label={kind === "video" ? "Clip second" : "Match minute"} />
-            {kind === "video" ? " s" : "′"}</label>
-          <button type="button" onClick={() => reload(Math.min(limit, Math.max(0, jumpTo)))} disabled={waiting}>Go</button>
+          <label>Jump to <input type="number" min={0} max={limit} value={jumpTo} onChange={(e) => setJumpTo(Number(e.target.value))} aria-label={seconds ? "Replay second" : "Match minute"} />
+            {seconds ? " s" : "′"}</label>
+          <button type="button" onClick={() => reload(jumpTo)} disabled={waiting || !Number.isInteger(jumpTo) || jumpTo < 0 || jumpTo > limit}>Go</button>
           {ended && <button type="button" onClick={() => { setPlaying(true); reload(0); }}>Replay both</button>}
           {failed && <span role="alert">A viewer lost its connection. Press Go to reconnect both.</span>}
           {waiting && <span role="status">Preparing both viewers…</span>}

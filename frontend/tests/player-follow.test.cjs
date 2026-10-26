@@ -16,6 +16,7 @@ const { ClipLayer } = require('../src/pitch/ClipLayer.ts');
 const { SurfaceTimeline } = require('../src/pitch/SurfaceTimeline.ts');
 const { PlayerContextLayer } = require('../src/pitch/PlayerContextLayer.ts');
 const { TrackingHistory } = require('../src/pitch/TrackingHistory.ts');
+const { cameraFocus, cameraBlend } = require('../src/pitch/CameraFollow.ts');
 
 const meta = { home: { id: 'POT' }, attacking_direction: {
   '1': { POT: 'left_to_right', CAR: 'right_to_left' },
@@ -325,4 +326,17 @@ test('selected context draws only that player, distinguishes nearby teams, and h
   assert.equal(context.history.segments('POT-07', 0.2).length, 0);
   assert.equal(context.ribbon.geometry.drawRange.count, 0);
   context.dispose();
+});
+
+test('camera follow clamps the focus, holds when a track disappears, and gives manual control priority', () => {
+  assert.deepEqual(cameraFocus('ball', { x: 52, z: 33 }, undefined), { x: 35, z: 20 });
+  assert.deepEqual(cameraFocus('player', null, { x: -50, z: -30 }), { x: -35, z: -20 });
+  assert.equal(cameraFocus('player', { x: 0, z: 0 }, undefined), null);
+  assert.equal(cameraFocus('ball', null, { x: 0, z: 0 }), null);
+  assert.equal(cameraFocus('manual', { x: 0, z: 0 }, { x: 0, z: 0 }), null);
+  assert.equal(cameraFocus('full', { x: 0, z: 0 }, { x: 0, z: 0 }), null);
+  const one = cameraBlend(1 / 30), half = cameraBlend(1 / 60);
+  assert.ok(Math.abs(one - (1 - (1 - half) ** 2)) < 0.00001);
+  assert.equal(cameraBlend(-1), 0);
+  assert.equal(cameraBlend(10), cameraBlend(0.1));
 });

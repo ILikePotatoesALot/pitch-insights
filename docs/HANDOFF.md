@@ -1,5 +1,61 @@
 # Handoff
 
+## Paused at Austin's request, 27 Oct 2026
+
+Work is on local branch `codex/continuous-match-simulation`. Austin asked to keep
+the remaining work as a plan and continue tomorrow. Do not continue implementation
+or start model calls automatically. The previous completed render checkpoint was
+`2aa7ac6`; the work after it is saved as a checkpoint, with final verification pending.
+
+Implemented in this checkpoint:
+
+- Distinct kick-offs, goal kicks and saved-ball possession, keeper distribution,
+  basic marking, teammate spacing and less automatic forward passing/shooting.
+- Measured team width/depth, defensive line and nearby-player counts, plus
+  periodic off-ball-run evidence and the Position insights panel.
+- A Simulation narrator through Microsoft Agent Framework and the configured
+  Foundry `gpt-4o`. Stored English commentary is in
+  `samples/continuous-prototype.commentary.json`. The final generation completed:
+  13 records, 13 OK, zero fallbacks, zero retries, all screened by Content Safety.
+  The current simulation prompt version is `2026-10-27.2`. Audience validation
+  rejects measurements in casual lines, and selected invented-intention phrases
+  are rejected. Playback makes no model calls.
+- Exact-second exhibition and comparison seeking, Watch this play buttons,
+  Full pitch/Follow ball/Follow player camera choices and manual drag/zoom override.
+- Exhibition ratings labelled illustrative, full-match win predictions removed,
+  season-goal increments removed from evidence, actual fallback-language labels,
+  and an explicit bench message for a player who has not entered the match.
+
+Resume plan:
+
+1. Inspect the final stored casual and analyst lines and confirm their hashes
+   still match the evidence. Reuse valid records; do not regenerate unnecessarily.
+2. Finish the small interrupted comment cleanup in `agents/desk.py` and
+   `agents/grounding.py`: `with_hedging` now checks simulation audience rules as
+   well as video hedging, so its old "video moments only" comment/docstring is stale.
+3. Restart only the local preview API on port 8002 and refresh the UI on port
+   5176. Its process currently caches older evidence/commentary from before the
+   last two commentary revisions. Check the updated English commentary, removed
+   season facts, positional panel, second seeking, Watch this play and camera modes.
+4. Complete browser verification at desktop and 320/390-pixel widths. The shared
+   comparison was already checked at 75 seconds with both viewers paused at 1:15,
+   and both labels correctly showed English when German was requested but unavailable.
+5. Finish the final code review and report findings as plain Markdown in chat.
+   Fix any findings and run checks appropriate to those changes. Publishing has
+   not been requested for this checkpoint; await Austin's instruction before pushing.
+
+Checks already run: full backend suite 435 passed; 44 replay/clip protocol tests
+passed after the language change; the final audience/evidence/agent checks passed
+79 tests. Frontend tests: 29 passed. Production build passed. Do not infer that
+the full suite was rerun after the last audience-only change. The last usage
+check was 45% of the five-hour allowance used, with no reset credit spent.
+
+The local API and Vite preview were left running. See
+[CONTINUOUS-SIMULATION.md](CONTINUOUS-SIMULATION.md) for behaviour, regeneration
+instructions and remaining model limitations. Full-match calibration, a complete
+goalkeeper reach model, additional set pieces, offside/cards/substitutions, a
+second half and prototype translations remain future work.
+
 Written 21 Oct 2026, updated 22 Oct (video path; fine-tuning run on Austin's GPU machine) 23 Oct (Overlay Director; deploy prep; Personalise), 25 Oct (Azure deployment) and 26 Oct (renderer polish, live ratings fix, the real-footage clip brought into the product; handed over to Codex). The single place to pick this project up: where things stand, how to run it, the rules we agreed, what's waiting, and what to do next. For the full plan see [PLAN.md](PLAN.md); for how each part works see [DESIGN.md](DESIGN.md).
 
 ## Start here (26 Oct, evening): handover to Codex

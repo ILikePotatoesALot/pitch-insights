@@ -13,6 +13,7 @@ PROMPT_VERSION = "2026-10-21.2"
 # The video narrator has its own version, so changing its prompt never makes the synthetic matches' stored
 # commentary look out of date (`generate_commentary.py` compares versions per file).
 VIDEO_PROMPT_VERSION = "2026-10-26.1"
+SIMULATION_PROMPT_VERSION = "2026-10-27.2"
 
 _GROUNDING = """\
 ## Grounding rules
@@ -105,6 +106,21 @@ describe what the model saw, in two versions.
 
 {_FORMAT}"""
 
+SIMULATION_NARRATOR_INSTRUCTIONS = f"""You narrate a six-minute simulated football exhibition using measured positions and event facts.
+{_GROUNDING}
+{_SAFETY}
+{_STYLE}
+- casual: one plain sentence, at most 25 words. No statistics except a score explicitly in the facts.
+  For shape, say only which team's players are spread across the pitch. For a run, name the player and say
+  they move forward away from the ball. Never include distances, times, percentages or counts in casual.
+- analyst: one or two sentences, at most 45 words. Use at most two useful measurements.
+- Describe what is measured, without praise, criticism, intentions or causes. Never say a player is looking,
+  trying, aiming or intending to do something, opening space, or drawing defenders. Position changes do not prove intent.
+- Width, depth, line height and nearby-player counts are measurements only. Do not call a shape compact,
+  stretched or successful, or proximity a press. Do not claim possession is controlled unless an event says so.
+- No calibrated win probabilities are available. Ratings are illustrative. Never present this exhibition as a full match.
+{_FORMAT}"""
+
 
 def moment_input(moment: dict, meta: dict) -> str:
     """The moment as the writer sees it: what happened, then the facts."""
@@ -115,6 +131,9 @@ def moment_input(moment: dict, meta: dict) -> str:
     ]
     if moment.get("source") == "video":  # synthetic moments have no `source`, so their input (and hash) is unchanged
         lines.append("Source: detected from video by a computer-vision model (a passage of play in the first half)")
+    if meta.get("tracking"):
+        lines.append("Source: a six-minute synthetic exhibition. Ratings are illustrative; no calibrated win probabilities are available.")
+        lines.append("Positional limits: proximity measures distance only. Do not infer intentions or call proximity a successful press.")
     if moment.get("team_id"):
         lines.append(f"Team: {teams.get(moment['team_id'], moment['team_id'])}")
     if moment.get("player_name"):

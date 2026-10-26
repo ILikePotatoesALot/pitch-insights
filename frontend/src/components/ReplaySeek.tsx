@@ -1,8 +1,9 @@
 import { useEffect, useId, useState } from "react";
 
-export function ReplaySeek({ value, max, unit, positionLabel, onChange, onSeek }: {
+export function ReplaySeek({ value, max, unit, positionLabel, onChange, onSeek, inputLabel }: {
   value: number; max: number; unit: "minute" | "second"; positionLabel: string;
   onChange: (value: number) => void; onSeek: (value: number) => void;
+  inputLabel?: string;
 }) {
   const id = useId();
   const [draft, setDraft] = useState(String(value));
@@ -19,7 +20,7 @@ export function ReplaySeek({ value, max, unit, positionLabel, onChange, onSeek }
              aria-label="Replay position" aria-valuetext={positionLabel} onChange={(event) => onChange(Number(event.target.value))} />
       <span className="seek-value">
         <input type="number" required min={0} max={max} step={1} value={draft} inputMode="numeric"
-               aria-label={unit === "minute" ? "Match minute" : "Seconds into clip"} onChange={(event) => {
+               aria-label={inputLabel ?? (unit === "minute" ? "Match minute" : "Seconds into clip")} onChange={(event) => {
                  setDraft(event.target.value);
                  if (valid(event.target.value)) onChange(Number(event.target.value));
                }} />

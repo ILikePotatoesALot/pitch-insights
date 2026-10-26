@@ -150,6 +150,7 @@ export class ClipLayer {
   }
 
   playersNow(): ReadonlyMap<string, DrawnPlayer> { return this.current; }
+  ballNow(): { x: number; z: number } | null { return this.ball.visible ? this.ball.position : null; }
   get drawnTime(): number { return this.clock?.t ?? this.snaps[this.snaps.length - 1]?.t ?? 0; }
 
   clear() {

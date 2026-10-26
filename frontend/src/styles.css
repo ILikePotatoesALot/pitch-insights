@@ -454,6 +454,11 @@ header select { max-width: 100%; }
 .pitch-tools > label { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; font-size: 13px; cursor: pointer; }
 .pitch-tools input { accent-color: var(--accent); width: 16px; height: 16px; }
 .pitch-tools p { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.exhibition-note { color: var(--muted); font-size: 12px; line-height: 1.45; margin: 8px 0 0; }
+.phase-label { font-weight: 700; color: var(--text); }
+.position-insights table { width: 100%; font-size: 13px; text-align: center; border-collapse: collapse; }
+.position-insights td, .position-insights th { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.moment .moment-jump { width: auto; margin: 0 10px 8px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
 @media (max-width: 700px) {
   .pitch-tools > .segmented { flex-basis: 100%; display: flex; }
   .pitch-tools > .segmented > button { flex: 1; min-height: 44px; }

@@ -5,6 +5,7 @@ import { ClipLayer } from "./ClipLayer";
 import { SurfaceTimeline } from "./SurfaceTimeline";
 import { PlayerContextLayer, type PlayerContextOptions } from "./PlayerContextLayer";
 import type { TrackPoint } from "./TrackingHistory";
+import { cameraFocus, cameraBlend, type CameraMode } from "./CameraFollow";
 
 export type SurfaceView = "current" | "history";
 
@@ -107,6 +108,11 @@ export class PitchScene {
   private trailLine: THREE.Line;
   private userMoved = false; // once the viewer turns or zooms, a resize no longer reframes the pitch
   private flyTo: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
+  private cameraMode: CameraMode = "full";
+  private cameraModeChanged: ((mode: CameraMode) => void) | null = null;
+  private followOffset = new THREE.Vector3();
+  private followTarget = new THREE.Vector3();
+  private lastCameraAt: number | null = null;
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -168,6 +174,8 @@ export class PitchScene {
     this.scene.add(this.context.group);
     this.renderer.domElement.addEventListener("pointerdown", this.onPress);
     this.renderer.domElement.addEventListener("pointerup", this.onRelease);
+    this.renderer.domElement.addEventListener("pointermove", this.onCameraDrag);
+    this.renderer.domElement.addEventListener("wheel", this.onCameraWheel, { passive: true });
     this.renderer.domElement.addEventListener("dblclick", this.onResetView);
 
     this.observer = new ResizeObserver(() => this.resize());
@@ -230,7 +238,36 @@ export class PitchScene {
   }
 
   /** The replay speed, which the drawing needs to move smoothly between frames. */
-  setClipSpeed(speed: number) { this.clipSpeed = speed; }
+  setClipSpeed(speed: number) {
+    this.clipSpeed = speed;
+    if (this.cameraMode === "ball" || this.cameraMode === "player") this.setFollowOffset();
+  }
+
+  setOnCameraMode(fn: (mode: CameraMode) => void) { this.cameraModeChanged = fn; }
+
+  setCameraMode(mode: CameraMode) {
+    if (this.cameraMode === mode) return;
+    this.cameraMode = mode;
+    if (mode === "full") { this.onResetView(); return; }
+    this.endFlight();
+    this.userMoved = true;
+    if (mode !== "manual") {
+      this.setFollowOffset();
+      this.controls.enableDamping = false;
+    }
+    this.cameraModeChanged?.(mode);
+  }
+
+  private setFollowOffset() {
+    const fit = this.fittedView();
+    this.followOffset.copy(fit.position).sub(fit.target).multiplyScalar(this.clipSpeed > 2 ? 0.95 : 0.82);
+  }
+
+  private onCameraWheel = () => this.setCameraMode("manual");
+  private onCameraDrag = (event: PointerEvent) => {
+    if (this.pressAt && Math.hypot(event.clientX - this.pressAt[0], event.clientY - this.pressAt[1]) > PICK_DRAG_PX)
+      this.setCameraMode("manual");
+  };
 
   /** Called with a tracked person's id when the viewer taps them on the pitch (to follow them with the spotlight). */
   setOnPick(fn: ((id: string) => void) | null) { this.onPick = fn; }
@@ -246,6 +283,8 @@ export class PitchScene {
 
   /** Double-click: glide back to the default view, framed to fit. */
   private onResetView = () => {
+    this.cameraMode = "full";
+    this.cameraModeChanged?.("full");
     this.userMoved = false;
     this.flyTo = this.fittedView();
     this.controls.enableDamping = false; // drops any spin left over from the last drag, which would fight the glide
@@ -422,6 +461,8 @@ export class PitchScene {
     this.clearSpotlight();
     this.renderer.domElement.removeEventListener("pointerdown", this.onPress);
     this.renderer.domElement.removeEventListener("pointerup", this.onRelease);
+    this.renderer.domElement.removeEventListener("pointermove", this.onCameraDrag);
+    this.renderer.domElement.removeEventListener("wheel", this.onCameraWheel);
     this.renderer.domElement.removeEventListener("dblclick", this.onResetView);
     this.controls.removeEventListener("start", this.onUserMove);
     this.clip.dispose();
@@ -754,6 +795,7 @@ export class PitchScene {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    if (this.cameraMode === "ball" || this.cameraMode === "player") this.setFollowOffset();
     if (!this.userMoved) this.frameView();
   }
 
@@ -811,6 +853,15 @@ export class PitchScene {
     this.ball.position.lerp(target, 0.18);
     this.ball.visible = !this.clip.group.visible; // a clip draws its own ball, only where the video found it
     this.moveSpotlight();
+    const focus = cameraFocus(this.cameraMode, this.clip.ballNow(), this.spot ? this.clip.positionOf(this.spot.id) : undefined);
+    const blend = cameraBlend(this.lastCameraAt === null ? 0 : (now - this.lastCameraAt) / 1000);
+    this.lastCameraAt = now;
+    if (focus) {
+      this.followTarget.set(focus.x, this.heightAt(focus.x + L / 2, W / 2 - focus.z) * 0.3, focus.z);
+      this.controls.target.lerp(this.followTarget, blend);
+      this.tmpVector.copy(this.followTarget).add(this.followOffset);
+      this.camera.position.lerp(this.tmpVector, blend);
+    }
     this.placeGoals();
     this.drawTrail();
     if (this.flyTo) {

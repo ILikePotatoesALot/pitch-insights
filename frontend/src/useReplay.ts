@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "./api";
 import { connectionParams } from "./profile";
-import type { ClipEventLine, ClipFrame, ClipInfo, CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile } from "./types";
+import type { ClipEventLine, ClipFrame, ClipInfo, CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile, PositionAnalysis } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 export type ReplayCommand = { cmd: "pause" | "resume" | "speed"; value?: number; wall?: number };
-export type ReplayReady = { server_time: number; kind: "synthetic" | "video"; duration?: number; tracking?: boolean };
+export type ReplayReady = { server_time: number; kind: "synthetic" | "video"; duration?: number; tracking?: boolean; lang?: string };
 export type ReplayOptions = { controlled?: boolean; initialMinute?: number; initialAt?: number | null; onReady?: (ready: ReplayReady) => void };
 
 /**
@@ -36,6 +36,8 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   const [clip, setClip] = useState<ClipInfo | null>(null);
   const [clipEvents, setClipEvents] = useState<ClipEventLine[]>([]);
   const [clipT, setClipT] = useState<number | null>(null);
+  const [position, setPosition] = useState<PositionAnalysis | null>(null);
+  const positionSecond = useRef<number | null>(null);
   // A jump belongs to the match it was made in; `n` makes a repeat jump to the same minute reconnect.
   // `at` is exact match seconds (it wins over `minute`), for a reconnect that must land on the same
   // second: a broadcast minute can't say first-half stoppage time (45+2').
@@ -76,6 +78,8 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
     setAiInfo(null);
     setClipEvents([]);
     setClipT(null);
+    setPosition(null);
+    positionSecond.current = null;
     onResetRef.current();
     const keepPaused = options.controlled || (pausedRef.current && matchRef.current === name);
     matchRef.current = name;
@@ -114,6 +118,10 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
         case "frame":
           if (metaRef.current) onFrameRef.current(data, metaRef.current);
           setClipT(Math.floor(data.t));
+          if (data.analysis && positionSecond.current !== Math.floor(data.t)) {
+            positionSecond.current = Math.floor(data.t);
+            setPosition(data.analysis);
+          }
           break;
         case "event":
           if (data.text !== undefined) setClipEvents((e) => [...e, { event: data.event, text: data.text }]);
@@ -172,5 +180,5 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   }, [name]);
 
   return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, command, seek, seekAt, restart,
-           clip, clipEvents, clipT };
+           clip, clipEvents, clipT, position };
 }

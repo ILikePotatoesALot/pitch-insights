@@ -27,6 +27,7 @@ from pitch_insights.agents.middleware import RunLogMiddleware, moment_id_var
 from pitch_insights.agents.prompts import (
     EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, VIDEO_NARRATOR_INSTRUCTIONS, VIDEO_PROMPT_VERSION,
     input_hash, moment_input, retry_input,
+    SIMULATION_NARRATOR_INSTRUCTIONS,
 )
 from pitch_insights.agents.safety import ContentSafety
 
@@ -57,6 +58,8 @@ def agent_for(moment: dict) -> str:
     """Moments detected from video (`source == "video"`) go to the video narrator, whatever their type."""
     if moment.get("source") == "video":
         return "video_narrator"
+    if moment.get("source") == "simulation":
+        return "simulation_narrator"
     return "explainer" if moment["type"] in EXPLAINER_TYPES else "narrator"
 
 
@@ -212,7 +215,7 @@ class CommentaryDesk:
 
 
 class AgentWriter:
-    """The three writing agents, built with Microsoft Agent Framework."""
+    """The four writing agents, built with Microsoft Agent Framework."""
 
     def __init__(self, client, provider: str, model: str, max_tokens: int = 220, temperature: float = 0.4):
         from agent_framework import Agent
@@ -229,6 +232,8 @@ class AgentWriter:
             "video_narrator": Agent(client, VIDEO_NARRATOR_INSTRUCTIONS, name="video_narrator",
                                     description="Describes a passage of play detected from real match footage.",
                                     middleware=mw),
+            "simulation_narrator": Agent(client, SIMULATION_NARRATOR_INSTRUCTIONS, name="simulation_narrator",
+                                         description="Describes measured positions in a short simulated exhibition.", middleware=mw),
         }
 
     async def aclose(self) -> None:

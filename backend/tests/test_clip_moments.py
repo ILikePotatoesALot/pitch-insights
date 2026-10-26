@@ -210,7 +210,7 @@ def test_the_video_narrators_instructions_carry_the_clip_rules():
         assert rule in text, rule
 
 
-def test_the_writer_builds_three_agents():
+def test_the_writer_builds_the_four_writing_agents():
     class Client:  # Agent Framework only stores the client until a run
         pass
 
@@ -220,7 +220,7 @@ def test_the_writer_builds_three_agents():
         writer = AgentWriter(Client(), "fake", "m")
     except Exception as e:  # pragma: no cover - a client type Agent Framework refuses
         pytest.skip(f"Agent needs a real chat client here: {e}")
-    assert set(writer.agents) == {"explainer", "narrator", "video_narrator"}
+    assert set(writer.agents) == {"explainer", "narrator", "video_narrator", "simulation_narrator"}
     assert all(isinstance(a, Agent) for a in writer.agents.values())
 
 

@@ -178,6 +178,10 @@ def hedging(casual: str, analyst: str, moment: dict) -> list[str]:
 def with_hedging(grounded: "Grounding", casual: str, analyst: str, moment: dict) -> "Grounding":
     """`grounded` with the hedging problems added to what is unsupported (and to the claims, which lowers the score)."""
     problems = hedging(casual, analyst, moment)
+    if moment.get("source") == "simulation":
+        without_score = re.sub(r"\d+\s*[–-]\s*\d+", "", casual)
+        if NUMBER.search(without_score) or word_claims(without_score):
+            problems.append("casual measurements: rewrite casual without numbers; put measurements in analyst only")
     if not problems:
         return grounded
     claims = grounded.claims + len(problems)
@@ -218,5 +222,10 @@ def check(text: str, moment: dict, meta: dict) -> Grounding:
         for word in dict.fromkeys(m.group(1).lower() for m in VIDEO_BANNED.finditer(text)):
             claims += 1
             unsupported.append(word)
+    if moment.get("source") == "simulation":
+        for phrase in dict.fromkeys(m.group(0).lower() for m in re.finditer(
+            r"\b(?:looking to|trying to|aiming to|intending to|opening (?:up )?space|drawing defenders|compact|stretched|successful press)\b", text, re.I)):
+            claims += 1
+            unsupported.append(phrase)
     score = 1.0 if claims == 0 else (claims - len(unsupported)) / claims
     return Grounding(score=score, claims=claims, unsupported=unsupported)

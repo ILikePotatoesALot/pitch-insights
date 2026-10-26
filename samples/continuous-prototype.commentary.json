@@ -1,0 +1,421 @@
+{
+ "ai_generated": true,
+ "provider": "foundry",
+ "model": "gpt-4o",
+ "prompt_version": "2026-10-27.2",
+ "match": "continuous-prototype",
+ "summary": {
+  "moments": 13,
+  "ok": 13,
+  "fallback": 0,
+  "retried": 0,
+  "grounding_mean": 1.0,
+  "safety_checked": 13,
+  "safety_blocked": 0
+ },
+ "moments": {
+  "S-30": {
+   "moment_id": "S-30",
+   "input_hash": "b0ba6662cf597d3b",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Kofi Doküssler moves forward away from the ball, covering ground towards the opposing goal.",
+   "analyst": "Kofi Doküssler advances 24 m towards the opposing goal over 4 seconds without possession, with Carrot's players spread 56 m wide and 47 m deep.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 6,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-60": {
+   "moment_id": "S-60",
+   "input_hash": "2b4d4603e555072c",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Carrot's players are spread across the pitch, with their defenders positioned further from their goal than Potato's.",
+   "analyst": "Carrot's shape spans 54 m wide and 59 m deep, with defenders positioned 49 m from their goal line. Potato's defenders are much closer at 4 m.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 6,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-90": {
+   "moment_id": "S-90",
+   "input_hash": "8fe85935169b4e13",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Carrot's players are spread across the pitch, with one player near the ball.",
+   "analyst": "Carrot's shape spans 56 m wide and 49 m deep, with defenders positioned 44 m from their goal line.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 4,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "M-1": {
+   "moment_id": "M-1",
+   "input_hash": "cf4de78d34921e8b",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Gyokerland scores for Carrot to make it 1–0 against Potato.",
+   "analyst": "Gyokerland converts Mbeulier's assist with an xG of 0.29, giving Carrot a 1–0 lead over Potato.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 9,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-120": {
+   "moment_id": "S-120",
+   "input_hash": "38bbafe536c35f4a",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Carrot's players are spread across the pitch, with one close to the ball.",
+   "analyst": "Carrot's team shape spans 55 m wide and 45 m deep, with defenders positioned 40 m from their goal.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 4,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-150": {
+   "moment_id": "S-150",
+   "input_hash": "1aca917edfed569a",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Carrot FC's players are spread across the pitch, with one player near the ball.",
+   "analyst": "Carrot FC's shape spans 51 m wide and 51 m deep, with defenders positioned 46 m from their goal line and one player close to the ball.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 4,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-180": {
+   "moment_id": "S-180",
+   "input_hash": "d3228b93a3d2b513",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Moritz Kimmedor makes a forward run away from the ball.",
+   "analyst": "Moritz Kimmedor advances 9 m forward over 4 seconds without possession, with Potato's defenders positioned 2 m from their goal line.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 5,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-240": {
+   "moment_id": "S-240",
+   "input_hash": "3727d2033700f535",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Moritz Kimmedor moves forward off the ball.",
+   "analyst": "Moritz Kimmedor advances 18 metres towards the opposing goal over 4 seconds without possession, as Potato's defenders hold a median position 18 metres from their goal.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 5,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-270": {
+   "moment_id": "S-270",
+   "input_hash": "3175c523fd880f02",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Joaquín Frimpander moves forward off the ball.",
+   "analyst": "Joaquín Frimpander advances 10 m towards the opposing goal over 4 seconds without the ball, with Carrot's shape spanning 53 m wide and 47 m deep.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 6,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "M-2": {
+   "moment_id": "M-2",
+   "input_hash": "502b0c85ea248afc",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Gyokerland scores again, making it 2–0 for Carrot against Potato.",
+   "analyst": "Gyokerland nets his second goal, increasing Carrot's lead to 2–0. Carrot dominates with 5 shots (xG 1.19) in the last five minutes.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 10,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-300": {
+   "moment_id": "S-300",
+   "input_hash": "c04d3d7903b55b0c",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Yuri Sakinelli moves forward away from the ball, heading towards the opposing goal.",
+   "analyst": "Yuri Sakinelli advances 22 m towards the opposing goal over 4 seconds without possessing the ball. Potato's shape spans 54 m wide and 51 m deep.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 6,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "S-330": {
+   "moment_id": "S-330",
+   "input_hash": "d6e73d152d284e53",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Enzo Trentowski moves forward off the ball, advancing towards the opposing goal.",
+   "analyst": "Enzo Trentowski advances 20 metres towards the opposing goal over 4 seconds without possession, with Potato FC spread 57 metres wide and 50 metres deep.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 6,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "M-4": {
+   "moment_id": "M-4",
+   "input_hash": "ab541a641448e710",
+   "agent": "simulation_narrator",
+   "status": "ok",
+   "casual": "Exhibition ends: Potato 0–2 Carrot.",
+   "analyst": "Potato 0–2 Carrot at full time. Carrot dominate with 58.9% possession and 5 shots (xG 1.19), Anders Gyokerland scoring both goals.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 10,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  }
+ }
+}
