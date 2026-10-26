@@ -19,6 +19,7 @@ export function trackLabel(id: string): string {
 }
 
 interface Pt { x: number; z: number; team: 0 | 1 | 2; speed: number | null; conf: number }
+export interface DrawnPlayer extends Pt { y: number }
 interface Snap { t: number; players: Map<string, Pt>; ball: { x: number; z: number } | null }
 interface Marker { id: string; group: THREE.Group; label: THREE.Sprite; team: 0 | 1 | 2 }
 interface EventMark { line: THREE.Line; ring: THREE.Mesh; born: number; from: THREE.Vector2 | null; to: THREE.Vector2; active: boolean }
@@ -50,7 +51,7 @@ export class ClipLayer {
   private colours: THREE.Color[] = [];
   private bodyGeo = new THREE.CapsuleGeometry(0.7, 1.3, 4, 10);
   private tmp = new THREE.Vector3();
-  private current = new Map<string, { x: number; z: number; y: number; speed: number | null; conf: number }>();
+  private current = new Map<string, DrawnPlayer>();
 
   constructor(private heightAt: (x: number, z: number) => number) {
     this.mats = [0, 1, 2].map(() => new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1 }));
@@ -148,6 +149,9 @@ export class ClipLayer {
     return this.current.get(id);
   }
 
+  playersNow(): ReadonlyMap<string, DrawnPlayer> { return this.current; }
+  get drawnTime(): number { return this.clock?.t ?? this.snaps[this.snaps.length - 1]?.t ?? 0; }
+
   clear() {
     this.snaps = [];
     this.clock = null;
@@ -194,8 +198,8 @@ export class ClipLayer {
       const z = other ? p.z + (other.z - p.z) * kk : p.z;
       const y = this.heightAt(x, z);
       const at = this.current.get(id);
-      if (at) Object.assign(at, { x, z, y, speed: p.speed, conf: p.conf }); // updated in place: no garbage per frame
-      else this.current.set(id, { x, z, y, speed: p.speed, conf: p.conf });
+      if (at) Object.assign(at, { x, z, y, team: p.team, speed: p.speed, conf: p.conf }); // updated in place: no garbage per frame
+      else this.current.set(id, { x, z, y, team: p.team, speed: p.speed, conf: p.conf });
       seen.add(id);
       const mk = this.marker(id, p.team);
       mk.group.visible = true;

@@ -28,6 +28,15 @@ real-footage clip remain available.
   the surface at the latest frame; seeking clears its old shape immediately.
 - Player and ball ground height is interpolated across the terrain grid to avoid
   steps when crossing a slope.
+- Current play is the default tracking view: current player positions, quickly
+  fading movement and a local emphasis around the observed ball. Activity history
+  retains the longer activity surface. Both accumulate while watching, so changing
+  views also works while paused and does not reconnect the replay.
+- Selecting a player reveals up to eight seconds of their observed movement and
+  rings around players within twelve metres, in team colours. Each overlay can be
+  switched off. Trails are cleared on seeking and break across missing detections,
+  gaps over 0.6 seconds and position jumps faster than 11 m/s. They use the same
+  buffered drawing time as the markers and never include future observations.
 - Tap a marker or follow someone from the ratings list to inspect them without
   reconnecting. Return to favourite restores the profile's player.
 - Pause, speed, minute seeking, replay and comparison work with the new feed.
@@ -62,5 +71,6 @@ movement limits, pass reception, tackle contact, event schema and intelligence
 compatibility, paused exact-time seeking, listing and end-of-replay handling.
 Frontend coverage includes selecting and following simulated players without
 action events, terrain interpolation and pause behaviour, shot peaks and goal
-glow, slope sampling and playback clock alignment, plus the existing player
-following and replay regression tests.
+glow, slope sampling, switching between surface views, movement gaps and identity
+jumps, nearby-player filtering, overlay toggles and playback clock alignment,
+plus the existing player following and replay regression tests.

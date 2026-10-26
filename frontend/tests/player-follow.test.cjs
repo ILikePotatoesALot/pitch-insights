@@ -14,6 +14,8 @@ require.extensions['.ts'] = (module, filename) => {
 const { PitchScene } = require('../src/pitch/PitchScene.ts');
 const { ClipLayer } = require('../src/pitch/ClipLayer.ts');
 const { SurfaceTimeline } = require('../src/pitch/SurfaceTimeline.ts');
+const { PlayerContextLayer } = require('../src/pitch/PlayerContextLayer.ts');
+const { TrackingHistory } = require('../src/pitch/TrackingHistory.ts');
 
 const meta = { home: { id: 'POT' }, attacking_direction: {
   '1': { POT: 'left_to_right', CAR: 'right_to_left' },
@@ -27,10 +29,15 @@ function scene() {
   const scene = Object.create(PitchScene.prototype);
   Object.assign(scene, { scene: new THREE.Scene(), spot: null, playerPositions: new Map(), homeId: 'POT',
     heat: [new Float32Array(106 * 69), new Float32Array(106 * 69)], spikes: [], touches: [], matchTime: 0, lastDecayTime: 0,
-    clip: new ClipLayer(() => 0), ballTarget: new THREE.Vector3() });
+    clip: new ClipLayer(() => 0), ballTarget: new THREE.Vector3(), lastFrameT: null });
   scene.surface = new SurfaceTimeline(106 * 69);
   scene.surfaceHeights = new Float32Array(106 * 69);
   scene.surfaceColours = new Float32Array(106 * 69 * 3);
+  scene.recentHeat = [new Float32Array(106 * 69), new Float32Array(106 * 69)];
+  scene.instantHeat = [new Float32Array(106 * 69), new Float32Array(106 * 69)];
+  scene.surfaceView = 'history';
+  scene.currentBall = null;
+  scene.context = new PlayerContextLayer(() => 0);
   scene.colours = [new THREE.Color('#4f7cff'), new THREE.Color('#ff5a5a')];
   scene.tmpColour = new THREE.Color();
   scene.geometry = scene.buildGeometry();
@@ -223,4 +230,99 @@ test('irregular event updates ease from the displayed surface without changing t
   surface.sample(11);
   assert.equal(surface.heights[0], 6);
   assert.equal(surface.sample(12), false);
+});
+
+const trackedMeta = { ...meta, home: { id: 'POT', players: [{ id: 'POT-07', number: 7 }] },
+  away: { id: 'CAR', players: [{ id: 'CAR-07', number: 7 }] } };
+function trackingFrame(t, x = 20, patch = {}) {
+  return { type: 'frame', t, period: 1, ref_team_id: 'POT', ball: { x: 50, y: 34, confidence: 1 },
+    players: [{ id: 'POT-07', team_id: 'POT', x, y: 30, speed: 5, confidence: 1 }], ...patch };
+}
+
+test('movement trails use pitch coordinates and stop at the drawn time, including an interpolated head', () => {
+  const history = new TrackingHistory();
+  history.push(trackingFrame(0, 20), trackedMeta);
+  history.push(trackingFrame(0.2, 21), trackedMeta);
+  history.push(trackingFrame(0.4, 22), trackedMeta);
+  const path = history.segments('POT-07', 0.3, { x: 21.5, y: 30 });
+  assert.equal(path.length, 2);
+  assert.deepEqual(path.at(-1).b, { x: 21.5, y: 30 });
+  assert.ok(path.every((s) => s.t <= 0.3));
+  const away = history.push(trackingFrame(0.6, 20, { players: [{ id: 'CAR-07', team_id: 'CAR', x: 20, y: 30 }] }), trackedMeta);
+  assert.equal(away.players.get('CAR-07').x, 85);
+  assert.equal(away.players.get('CAR-07').y, 38);
+  const secondHalf = history.push(trackingFrame(1, 20, { period: 2 }), trackedMeta);
+  assert.equal(secondHalf.players.get('POT-07').x, 85);
+});
+
+test('lost detections, implausible identity jumps and old observations never create invented trail links', () => {
+  const history = new TrackingHistory();
+  history.push(trackingFrame(0, 20), trackedMeta);
+  history.push(trackingFrame(0.2, 21), trackedMeta);
+  history.push(trackingFrame(0.4, 22, { players: [] }), trackedMeta);
+  history.push(trackingFrame(0.6, 23), trackedMeta);
+  history.push(trackingFrame(0.8, 70), trackedMeta);
+  assert.equal(history.segments('POT-07', 0.8).length, 1);
+  assert.equal(history.segments('POT-07', 9).length, 0);
+  history.reset();
+  assert.equal(history.segments('POT-07', 0.8).length, 0);
+  for (let i = 0; i < 300; i++) history.push(trackingFrame(i * 0.2, 20), trackedMeta);
+  assert.ok(history.frames.length <= 51);
+  assert.ok(history.segments('POT-07', 59.8).every((s) => s.t >= 51.8));
+});
+
+test('current play is visible immediately and switching to history preserves both layers', () => {
+  const s = scene();
+  s.splat = PitchScene.prototype.splat.bind(s);
+  s.setSurfaceView('current');
+  s.showFrame(trackingFrame(0), trackedMeta);
+  s.updateSurface(0);
+  s.drawSurface(0);
+  const initial = s.heightAt(20, 30);
+  assert.ok(initial > 0.5);
+  assert.ok(s.heightAt(50, 34) > 1); // the ball has its own local emphasis
+  s.setSurfaceView('history');
+  s.updateSurface(0);
+  s.drawSurface(0);
+  assert.equal(s.heightAt(20, 30), 0);
+  s.setSurfaceView('current');
+  s.updateSurface(0);
+  s.drawSurface(0);
+  assert.equal(s.heightAt(20, 30), initial);
+  s.showFrame(trackingFrame(0.2), trackedMeta);
+  const k = s.idx(20, 30), recent = s.recentHeat[0][k];
+  s.showFrame(trackingFrame(10.2, 90), trackedMeta);
+  assert.ok(s.recentHeat[0][k] < recent / 10); // a feed gap must age the short-lived activity fully
+  s.reset();
+  assert.equal(s.recentHeat[0][k], 0);
+  assert.equal(s.instantHeat[0][k], 0);
+  assert.equal(s.currentBall, null);
+});
+
+test('selected context draws only that player, distinguishes nearby teams, and honours toggles', () => {
+  const context = new PlayerContextLayer(() => 0);
+  context.history.push(trackingFrame(0, 20), trackedMeta);
+  context.history.push(trackingFrame(0.2, 21), trackedMeta);
+  const drawn = (x, z, team) => ({ x, z, team, y: 0, speed: 5, conf: 1 });
+  const players = new Map([
+    ['POT-07', drawn(-31.5, 4, 0)], ['ally', drawn(-29.5, 4, 0)],
+    ['opponent', drawn(-21.5, 4, 1)], ['far', drawn(-18.5, 4, 1)], ['unknown', drawn(-30.5, 4, 2)],
+  ]);
+  const colours = [new THREE.Color('#0000ff'), new THREE.Color('#ff0000')];
+  context.update(0.2, 'POT-07', players, colours, { trail: true, nearby: true });
+  assert.ok(context.ribbon.geometry.drawRange.count > 0);
+  assert.equal(context.boundary.visible, true);
+  assert.equal(context.rings.get('ally').visible, true);
+  assert.equal(context.rings.get('opponent').visible, true);
+  assert.equal(context.rings.has('far'), false);
+  assert.equal(context.rings.has('unknown'), false);
+  assert.equal(context.rings.get('opponent').material.color.getHexString(), 'ff0000');
+  context.update(0.2, 'POT-07', players, colours, { trail: false, nearby: false });
+  assert.equal(context.group.visible, false);
+  context.update(0.2, 'missing', players, colours, { trail: true, nearby: true });
+  assert.equal(context.group.visible, false);
+  context.clear();
+  assert.equal(context.history.segments('POT-07', 0.2).length, 0);
+  assert.equal(context.ribbon.geometry.drawRange.count, 0);
+  context.dispose();
 });

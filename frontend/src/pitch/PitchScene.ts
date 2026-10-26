@@ -3,12 +3,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { ClipEvent, ClipFrame, MatchEvent, MatchMeta } from "../types";
 import { ClipLayer } from "./ClipLayer";
 import { SurfaceTimeline } from "./SurfaceTimeline";
+import { PlayerContextLayer, type PlayerContextOptions } from "./PlayerContextLayer";
+import type { TrackPoint } from "./TrackingHistory";
+
+export type SurfaceView = "current" | "history";
 
 const L = 105;
 const W = 68;
 const NX = 105; // grid cells along the length (1 m each)
 const NZ = 68;
 const TERRITORY_TAU = 120; // seconds of match time for activity to fade to ~37%
+const CURRENT_TAU = 3; // recent movement responds quickly, separately from the activity history
 const SPIKE_TAU = 10;
 const SPIKE_RISE_S = 0.35;
 const GOAL_GLOW_TAU = 3;
@@ -67,6 +72,12 @@ export class PitchScene {
   private controls: OrbitControls;
   private geometry: THREE.BufferGeometry;
   private heat: [Float32Array, Float32Array];
+  private recentHeat: [Float32Array, Float32Array] = [new Float32Array((NX + 1) * (NZ + 1)), new Float32Array((NX + 1) * (NZ + 1))];
+  private instantHeat: [Float32Array, Float32Array] = [new Float32Array((NX + 1) * (NZ + 1)), new Float32Array((NX + 1) * (NZ + 1))];
+  private surfaceView: SurfaceView = "current";
+  private currentBall: TrackPoint | null = null;
+  private context: PlayerContextLayer;
+  private contextOptions: PlayerContextOptions = { trail: true, nearby: true };
   private spikes: Spike[] = [];
   private ball: THREE.Mesh;
   private ballTarget = new THREE.Vector3(0, 1, 0);
@@ -153,6 +164,8 @@ export class PitchScene {
 
     this.clip = new ClipLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
     this.scene.add(this.clip.group);
+    this.context = new PlayerContextLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
+    this.scene.add(this.context.group);
     this.renderer.domElement.addEventListener("pointerdown", this.onPress);
     this.renderer.domElement.addEventListener("pointerup", this.onRelease);
     this.renderer.domElement.addEventListener("dblclick", this.onResetView);
@@ -177,13 +190,33 @@ export class PitchScene {
   showFrame(frame: ClipFrame, meta: MatchMeta) {
     if (meta.home.id !== this.homeId) this.setMatch(meta);
     this.clip.push(frame, meta);
-    const dt = this.lastFrameT === null ? 0 : Math.min(1, Math.max(0, frame.t - this.lastFrameT));
+    const snapshot = this.context.history.push(frame, meta);
+    const elapsed = this.lastFrameT === null ? 0 : Math.max(0, frame.t - this.lastFrameT);
+    const dt = Math.min(1, elapsed);
     this.lastFrameT = frame.t;
     this.matchTime = frame.t;
     this.decay();
-    for (const p of this.clip.lastPlayers()) this.splat(p.side, p.x, p.y, CLIP_HEAT_PER_S * dt);
+    const fade = Math.exp(-elapsed / CURRENT_TAU);
+    for (const h of this.recentHeat) for (let k = 0; k < h.length; k++) h[k] *= fade;
+    for (const h of this.instantHeat) h.fill(0);
+    for (const p of snapshot.players.values()) {
+      if (p.side === 2) continue;
+      this.splat(p.side, p.x, p.y, CLIP_HEAT_PER_S * dt);
+      this.stamp(this.recentHeat[p.side], p.x, p.y, 0.12 * dt, 4);
+      this.stamp(this.instantHeat[p.side], p.x, p.y, 0.4, 4);
+    }
+    this.currentBall = snapshot.ball;
     this.dirty = true;
   }
+
+  setSurfaceView(view: SurfaceView) {
+    if (this.surfaceView === view) return;
+    this.surfaceView = view;
+    this.surface.reset();
+    this.dirty = true;
+  }
+
+  setPlayerContext(options: PlayerContextOptions) { this.contextOptions = options; }
 
   /** A detected event of the clip: a line (pass, carry) or ring (interception) that fades. */
   addClipEvent(ev: ClipEvent, meta: MatchMeta) {
@@ -319,6 +352,9 @@ export class PitchScene {
     this.playerPositions.clear();
     if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
     this.clip.clear();
+    this.context.clear();
+    for (const h of [...this.recentHeat, ...this.instantHeat]) h.fill(0);
+    this.currentBall = null;
     this.touches = [];
     this.lastFrameT = null;
     this.heat[0].fill(0);
@@ -389,6 +425,8 @@ export class PitchScene {
     this.renderer.domElement.removeEventListener("dblclick", this.onResetView);
     this.controls.removeEventListener("start", this.onUserMove);
     this.clip.dispose();
+    this.scene.remove(this.context.group);
+    this.context.dispose();
     this.observer.disconnect();
     this.controls.dispose();
     this.scene.traverse((obj) => {
@@ -601,13 +639,16 @@ export class PitchScene {
   }
 
   private splat(side: number, x: number, y: number, amount: number) {
-    const h = this.heat[side];
-    const r = Math.ceil(SIGMA * 2.5);
+    this.stamp(this.heat[side], x, y, amount, SIGMA);
+  }
+
+  private stamp(h: Float32Array, x: number, y: number, amount: number, sigma: number) {
+    const r = Math.ceil(sigma * 2.5);
     const ci = Math.round((x / L) * NX), cj = Math.round((y / W) * NZ);
     for (let j = Math.max(0, cj - r); j <= Math.min(NZ, cj + r); j++) {
       for (let i = Math.max(0, ci - r); i <= Math.min(NX, ci + r); i++) {
         const dx = (i / NX) * L - x, dy = (j / NZ) * W - y;
-        h[this.idx(i, j)] += amount * Math.exp(-(dx * dx + dy * dy) / (2 * SIGMA * SIGMA));
+        h[this.idx(i, j)] += amount * Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
       }
     }
   }
@@ -639,6 +680,7 @@ export class PitchScene {
     const [ch, ca] = this.colours;
     const tmp = this.tmpColour;
     const spikes = this.spikes;
+    const current = this.clip.group.visible && this.surfaceView === "current";
     const amps = spikes.map((s) => {
       const age = Math.max(0, this.matchTime - s.born);
       // Sparse event feeds need an immediate target; tracked feeds have frames throughout the rise.
@@ -648,11 +690,14 @@ export class PitchScene {
     for (let j = 0; j <= NZ; j++) {
       for (let i = 0; i <= NX; i++) {
         const k = this.idx(i, j);
-        const hh = this.heat[0][k], ha = this.heat[1][k];
+        const hh = current ? this.recentHeat[0][k] + this.instantHeat[0][k] : this.heat[0][k];
+        const ha = current ? this.recentHeat[1][k] + this.instantHeat[1][k] : this.heat[1][k];
         const total = hh + ha;
         let height = 9 * Math.tanh(total / 3);
         const x = (i / NX) * L, y = (j / NZ) * W;
         let glow = 0;
+        const ballInfluence = current && this.currentBall ? Math.exp(-((x - this.currentBall.x) ** 2 + (y - this.currentBall.y) ** 2) / 50) : 0;
+        height += 1.8 * ballInfluence;
         for (let n = 0; n < spikes.length; n++) {
           const s = spikes[n];
           const d2 = (x - s.x) ** 2 + (y - s.y) ** 2;
@@ -667,7 +712,9 @@ export class PitchScene {
         const lead = Math.tanh((raw - 0.5) * 4);
         tmp.copy(CONTESTED_COLOUR).lerp(lead >= 0 ? ch : ca, Math.min(1, Math.abs(lead) * 1.2));
         const strength = Math.min(1, total / 1.5);
-        tmp.lerp(BASE_COLOUR, 1 - (0.3 + 0.7 * strength));
+        const visibility = current ? 1 - Math.exp(-total * 1.7) : 0.3 + 0.7 * strength;
+        tmp.lerp(BASE_COLOUR, 1 - visibility);
+        if (ballInfluence) tmp.lerp(GLOW_COLOUR, ballInfluence * 0.15);
         if (glow > 0) tmp.lerp(GLOW_COLOUR, glow * 0.8);
         this.surfaceColours[k * 3] = tmp.r;
         this.surfaceColours[k * 3 + 1] = tmp.g;
@@ -757,6 +804,8 @@ export class PitchScene {
     }
     if (this.clip.group.visible) this.clip.update(this.clipSpeed, now, this.drawTrackedSurface);
     else this.drawSurface(now / 1000);
+    if (this.clip.group.visible) this.context.update(this.clip.drawnTime, this.spot?.id ?? null,
+      this.clip.playersNow(), this.colours, this.contextOptions);
     const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
     const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
     this.ball.position.lerp(target, 0.18);

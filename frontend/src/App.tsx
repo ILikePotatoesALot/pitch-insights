@@ -9,7 +9,7 @@ import { ReplaySeek } from "./components/ReplaySeek";
 import { apiUrl } from "./api";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { trackLabel } from "./pitch/ClipLayer";
-import { PitchScene, teamColours } from "./pitch/PitchScene";
+import { PitchScene, teamColours, type SurfaceView } from "./pitch/PitchScene";
 import type { ClipEvent, ClipFrame, ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
 
@@ -34,6 +34,9 @@ export default function App() {
   const [layout, setLayout] = useState<LayoutMode>(urlLayout);
   const [inspected, setInspected] = useState<string | null>(null);
   const [seekTo, setSeekTo] = useState(0);
+  const [surfaceView, setSurfaceView] = useState<SurfaceView>("current");
+  const [showTrail, setShowTrail] = useState(true);
+  const [showNearby, setShowNearby] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [panel, setPanel] = useState<DetailPanel>("moments");
   const settingsButton = useRef<HTMLButtonElement>(null);
@@ -146,6 +149,8 @@ export default function App() {
   const showingClip = clipMode && meta?.source === "video"; // (the old match's meta stays for a moment after a switch)
   const showingMatch = !clipMode && !!meta && meta.source !== "video";
   useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
+  useEffect(() => { sceneRef.current?.setSurfaceView(clipMode || simulationMode ? surfaceView : "history"); }, [surfaceView, clipMode, simulationMode]);
+  useEffect(() => { sceneRef.current?.setPlayerContext({ trail: showTrail, nearby: showNearby }); }, [showTrail, showNearby]);
 
   // A change to language, club, player or focus metric reconnects (the server works from the profile it was
   // given) from the current moment, not the start of the minute, so nothing replays. It goes by match seconds,
@@ -327,8 +332,17 @@ export default function App() {
           {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
           {showingMatch && meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
                                            history={ratingHistory} onChange={() => setPicker("edit")} />}
+          {(showingClip || (showingMatch && simulationMode)) && <section className="pitch-tools" aria-label="Pitch layers">
+            <div className="segmented" role="group" aria-label="Surface view">
+              <button type="button" aria-pressed={surfaceView === "current"} className={surfaceView === "current" ? "on" : ""} onClick={() => setSurfaceView("current")}>Current play</button>
+              <button type="button" aria-pressed={surfaceView === "history"} className={surfaceView === "history" ? "on" : ""} onClick={() => setSurfaceView("history")}>Activity history</button>
+            </div>
+            <label><input type="checkbox" checked={showTrail} disabled={!spotlit} onChange={(e) => setShowTrail(e.target.checked)} /> Player trail</label>
+            <label><input type="checkbox" checked={showNearby} disabled={!spotlit} onChange={(e) => setShowNearby(e.target.checked)} /> Nearby players</label>
+            <p>{spotlit ? `${showTrail ? "Trail: up to eight seconds. Tracking gaps break the trail. " : ""}${showNearby ? "Nearby: players within 12 metres, in team colours." : ""}` : "Tap a player to reveal their recent path and nearby players."}</p>
+          </section>}
           {(showingMatch || showingClip) && <p className="pitch-caption">
-            {simulationMode ? "Simulated positions · 22 players · 5 updates/s" : showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: activity over the last two minutes
+            {simulationMode ? "Simulated positions · 22 players · 5 updates/s" : showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: {(showingClip || simulationMode) && surfaceView === "current" ? "recent movement and ball" : "activity history"}
           </p>}
           <div className="pitch" ref={pitchEl}>
             {spotlit && <div className="spot-label" ref={spotLabel} style={{ borderColor: spotlit.colour }}>
@@ -349,11 +363,14 @@ export default function App() {
               Each marker is one tracked person: {meta?.home.name} in blue, {meta?.away.name} in white, grey where the model could not tell
               the team. The number is the tracker's ID, not a shirt number; tap a marker to follow that player. Lines are detected passes and
               carries, a ring is an interception. The ball shows only where the video found it. The surface rises where each side's
-              players have been in the last two minutes. Drag to turn the pitch, scroll to zoom, double-click to reset.
+              players have been. Current play follows recent movement and the ball; Activity history keeps the longer view.
+              Select a player to show their last eight seconds of movement and highlight players within 12 metres.
+              Gaps in detection break the path. Drag to turn the pitch, scroll to zoom, double-click to reset.
             </p>
           ) : simulationMode ? (
             <p className="legend">Each numbered marker is a simulated player wearing their shirt number. Tap any player to follow them.
-              The ball moves between players; lines show passes and carries. The surface shows where players have been over the last two minutes.
+              The ball moves between players; lines show passes and carries. Current play follows recent movement and the ball;
+              Activity history keeps the longer view. Player trail shows the last eight seconds, and Nearby players highlights those within 12 metres.
               Drag to turn the pitch, scroll to zoom, double-click to reset.</p>
           ) : (
             <p className="legend">
