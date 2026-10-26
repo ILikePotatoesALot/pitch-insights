@@ -10,7 +10,7 @@ The app is named **Seize the game**, with `seize-the-game` used in package and s
 
 ## Try it
 
-**Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit asks for a favourite club and player; "Skip" goes straight in.
+**Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit starts playing immediately. "Watch demo" applies a favourite player and win-probability preset for this visit; "Personalise" opens the optional profile editor. Playback controls stay above the pitch, with a slider, numeric time entry and replay after full time.
 
 - **[Two viewers, one match](https://blue-moss-06018420f.1.azurestaticapps.net/?compare=1)**: a Potato FC fan watching casually in German beside a Carrot FC analyst in English, on the same replay.
 - **[Real footage](https://blue-moss-06018420f.1.azurestaticapps.net/?match=117093-38min_ft&follow=L-t11)**: 100 seconds of a real match, with players tracked from video by a fine-tuned detector, AI commentary that says how sure the detector was, and a spotlight that follows one real player (tap any other to switch).

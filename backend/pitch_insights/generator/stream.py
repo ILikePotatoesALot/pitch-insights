@@ -52,25 +52,29 @@ class Replay:
         """Current match time in seconds."""
         if self.paused:
             return self._match_t
-        return self._match_t + (time.monotonic() - self._wall) * self.speed
+        return self._match_t + max(0.0, time.monotonic() - self._wall) * self.speed
 
     def _rebase(self):
         self._match_t, self._wall = self.now, time.monotonic()
 
-    def set_speed(self, speed: float):
+    def _at_wall(self, wall_time: float | None) -> float:
+        return self.now if wall_time is None or self.paused else self.now + (wall_time - time.time()) * self.speed
+
+    def set_speed(self, speed: float, wall_time: float | None = None):
         if speed <= 0:
             raise ValueError("speed must be positive")
-        self._rebase()
+        self._match_t = self._at_wall(wall_time)
+        self._wall = time.monotonic() + (wall_time - time.time() if wall_time is not None else 0.0)
         self.speed = speed
 
-    def pause(self):
-        self._rebase()
+    def pause(self, wall_time: float | None = None):
+        self._match_t = self._at_wall(wall_time)
         self.paused = True
 
-    def resume(self):
+    def resume(self, wall_time: float | None = None):
         if not self.paused:  # resetting the wall clock while running would rewind the match
             return
-        self._wall = time.monotonic()
+        self._wall = time.monotonic() + (wall_time - time.time() if wall_time is not None else 0.0)
         self.paused = False
 
     def seek(self, t: float):

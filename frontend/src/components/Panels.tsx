@@ -16,11 +16,13 @@ export function Scoreboard({ meta, state, colours }: { meta: MatchMeta; state: L
         <span className="team away">{meta.away.name}<i style={{ background: colours[1] }} /></span>
       </div>
       <div className="clock">{state?.finished ? "Full time" : state?.clock ?? "0'"}</div>
-      <div className="winprob" title="Live win probability">
+      <div className="winprob-label">Win probability</div>
+      <div className="winprob" role="img" aria-label={`Win probability: ${meta.home.name} ${pct(wp.home)}, draw ${pct(wp.draw)}, ${meta.away.name} ${pct(wp.away)}`}>
         <div style={{ width: pct(wp.home), background: colours[0] }}>{wp.home >= 0.12 && pct(wp.home)}</div>
         <div className="draw" style={{ width: pct(wp.draw) }}>{wp.draw >= 0.12 && `Draw ${pct(wp.draw)}`}</div>
         <div style={{ width: pct(wp.away), background: colours[1] }}>{wp.away >= 0.12 && pct(wp.away)}</div>
       </div>
+      <div className="winprob-key" aria-hidden="true"><span>{meta.home.short_name}</span><span>Draw</span><span>{meta.away.short_name}</span></div>
     </div>
   );
 }
@@ -99,6 +101,7 @@ export function PinnedPlayer({ state, meta, colours, playerId, mode, focus, hist
         <div className="pin-name">
           <b>{person.name}</b>
           <small>★ Your player · {person.position}{p && !p.on_pitch ? " · off" : ""}</small>
+          <small>Ring: last recorded action position</small>
         </div>
         {p && <div className="pin-rating">
           <b className="bigrating">{p.rating.toFixed(1)}</b>

@@ -30,6 +30,21 @@ def test_replay_streams_events_moments_and_state():
     assert seen["meta"] == 1 and seen["catchup"] == 1 and seen["event"] > 50 and seen["moment"] >= 2 and seen["state"] >= 1
 
 
+def test_comparison_viewer_waits_for_the_shared_start():
+    import time
+
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=600&from=87&paused=1") as ws:
+        assert ws.receive_json()["type"] == "meta"
+        assert ws.receive_json()["type"] == "catchup"
+        ready = ws.receive_json()
+        assert ready["type"] == "ready" and ready["kind"] == "synthetic"
+        assert abs(ready["server_time"] - time.time()) < 2
+        ws.send_json({"cmd": "resume", "wall": ready["server_time"] + 0.4})
+        while (message := ws.receive_json())["type"] != "event":
+            assert message["type"] in ("state", "cue", "cue_end")
+        assert message["event"]["minute"] >= 88
+
+
 def test_a_replay_from_kick_off_opens_with_the_starting_xi_at_their_opening_rating():
     with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0") as ws:
         meta = ws.receive_json()
