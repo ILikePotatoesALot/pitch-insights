@@ -49,6 +49,13 @@ def with_commentary(moment: dict, stored: dict, meta: dict) -> dict:
     return moment | {"commentary": {k: v for k, v in rec.items() if k != "pending"}}
 
 
+def commentary_info(stored: dict) -> dict | None:
+    """Who wrote the stored commentary, for the app's AI-generated label (None when there is none)."""
+    if not stored["moments"]:
+        return None
+    return {k: stored.get(k) for k in ("ai_generated", "provider", "model", "prompt_version", "summary")}
+
+
 def summarise(records: list[dict]) -> dict:
     ok = [r for r in records if r["status"] == "ok"]
     scores = [r["grounding"]["score"] for r in records if r.get("grounding")]

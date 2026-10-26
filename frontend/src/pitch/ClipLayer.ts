@@ -45,8 +45,6 @@ export class ClipLayer {
   private ballLast: { x: number; z: number; t: number } | null = null;
   private labels = new Map<string, THREE.CanvasTexture>();
   private marks: EventMark[] = [];
-  private ringSelect: THREE.Mesh;
-  private selected: string | null = null;
   private colours: THREE.Color[] = [];
   private bodyGeo = new THREE.CapsuleGeometry(0.7, 1.3, 4, 10);
   private tmp = new THREE.Vector3();
@@ -57,11 +55,7 @@ export class ClipLayer {
     this.ball = new THREE.Mesh(new THREE.SphereGeometry(0.9, 20, 16),
       new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.6, transparent: true }));
     this.ball.visible = false;
-    this.ringSelect = new THREE.Mesh(new THREE.RingGeometry(1.5, 2.1, 40), new THREE.MeshBasicMaterial({
-      color: 0xffd34d, side: THREE.DoubleSide, transparent: true, opacity: 0.95, depthWrite: false }));
-    this.ringSelect.rotation.x = -Math.PI / 2;
-    this.ringSelect.visible = false;
-    this.group.add(this.ball, this.ringSelect);
+    this.group.add(this.ball);
     this.group.visible = false;
   }
 
@@ -127,8 +121,6 @@ export class ClipLayer {
     mark.ring.visible = !to;
   }
 
-  select(id: string | null) { this.selected = id; }
-
   /** The id of the marker nearest a point on the page (CSS pixels in the pitch box), within `radius`, or null. */
   pick(px: number, py: number, camera: THREE.Camera, w: number, h: number, radius = 22): string | null {
     let best: string | null = null, bestD = radius * radius;
@@ -140,13 +132,9 @@ export class ClipLayer {
     return best;
   }
 
-  /** Where the selected marker is on screen (CSS pixels, above its head) and what to say about it, or null. */
-  selectedInfo(camera: THREE.Camera, w: number, h: number): { x: number; y: number; text: string } | null {
-    const p = this.selected ? this.current.get(this.selected) : undefined;
-    if (!p || !this.selected) return null;
-    const v = this.tmp.set(p.x, p.y + 4.5, p.z).project(camera);
-    const kmh = p.speed === null ? "" : ` · ${Math.round(p.speed * 3.6)} km/h`;
-    return { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, text: `${trackLabel(this.selected)}${kmh} · ${Math.round(p.conf * 100)}%` };
+  /** Where a tracked person is drawn now (scene x and z), or undefined if the tracker hasn't got them. */
+  positionOf(id: string): { x: number; z: number } | undefined {
+    return this.current.get(id);
   }
 
   clear() {
@@ -154,11 +142,9 @@ export class ClipLayer {
     this.clock = null;
     this.ballLast = null;
     this.current.clear();
-    this.selected = null;
     for (const m of this.markers.values()) m.group.visible = false;
     for (const m of this.marks) { m.active = false; m.line.visible = m.ring.visible = false; }
     this.ball.visible = false;
-    this.ringSelect.visible = false;
     this.group.visible = false;
   }
 
@@ -205,9 +191,6 @@ export class ClipLayer {
     for (const [id, mk] of this.markers) if (!seen.has(id)) mk.group.visible = false;
     this.moveBall(a, b, k, rt);
     this.moveMarks(rt);
-    const sel = this.selected ? this.current.get(this.selected) : undefined;
-    this.ringSelect.visible = !!sel;
-    if (sel) this.ringSelect.position.set(sel.x, sel.y + 0.4, sel.z);
   }
 
   dispose() {

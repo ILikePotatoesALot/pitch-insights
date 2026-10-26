@@ -2,6 +2,7 @@
 
     python scripts/evaluate_groundedness.py                     # every sample in ../samples
     python scripts/evaluate_groundedness.py comeback-POT-CAR    # one match
+    python scripts/evaluate_groundedness.py 117093-38min_ft     # the real-footage clip, in samples/video/
 
 Our own groundedness check (agents/grounding.py) only sees names and numbers. This asks a
 judge model (the Foundry GPT-4o deployment, through azure-ai-evaluation's GroundednessEvaluator)
@@ -10,7 +11,8 @@ passes). It catches claims our check can't, such as "dominating" without the num
 https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/rag-evaluators
 
 Only lines not yet scored for the same text are sent, so re-running is cheap. Writes
-samples/<name>.evaluation.json. Run it after scripts/generate_commentary.py.
+samples/<name>.evaluation.json (samples/video/<name>.evaluation.json for the clip). Run it after
+scripts/generate_commentary.py. With no names, every sample match and clip is done.
 """
 
 from __future__ import annotations
@@ -32,6 +34,8 @@ from pitch_insights.agents.settings import load_settings
 from pitch_insights.agents.store import load_commentary, sibling_path, with_commentary, write_json
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
+from pitch_insights.video.moments import load_clip_moments
+from pitch_insights.video.replay import APP_CLIPS, CLIP_DIR, stored_path
 
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 API_VERSION = "2024-10-21"  # the evaluator's Azure OpenAI client needs a dated API version
@@ -42,11 +46,27 @@ def text_hash(context: str, response: str) -> str:
     return hashlib.sha256(f"{context}\x1f{response}".encode()).hexdigest()[:16]
 
 
+def is_clip(path: Path) -> bool:
+    """A clip's stored files are named as if for `samples/video/<name>.jsonl` (see video.replay.stored_path)."""
+    return path.parent.name == CLIP_DIR
+
+
+def sample_paths(names: list[str]) -> list[Path]:
+    if not names:
+        return sorted(SAMPLES.glob("*.jsonl")) + [stored_path(SAMPLES, n) for n in APP_CLIPS]
+    return [stored_path(SAMPLES, n) if (SAMPLES / CLIP_DIR / f"{n}.frames.jsonl").exists() else SAMPLES / f"{n}.jsonl"
+            for n in names]
+
+
 def run_match(path: Path, evaluator, model: str) -> dict:
-    meta, events = read_match(path)
-    brain = MatchBrain(meta, memory=memory_for(path, meta))
-    for ev in events:
-        brain.update(ev)
+    if is_clip(path):
+        meta, all_moments = load_clip_moments(SAMPLES, path.stem)
+    else:
+        meta, events = read_match(path)
+        brain = MatchBrain(meta, memory=memory_for(path, meta))
+        for ev in events:
+            brain.update(ev)
+        all_moments = brain.moments
     stored = load_commentary(path)
     out_path = sibling_path(path, ".evaluation.json")
     try:
@@ -55,7 +75,7 @@ def run_match(path: Path, evaluator, model: str) -> dict:
         old = {}
 
     results = {}
-    for m in brain.moments:
+    for m in all_moments:
         c = with_commentary(m, stored, meta).get("commentary")
         if not c or c["status"] != "ok":
             continue
@@ -104,7 +124,7 @@ def main() -> int:
     config = AzureOpenAIModelConfiguration(azure_endpoint=endpoint, api_key=settings.embedding_api_key,
                                            azure_deployment=model, api_version=API_VERSION)
     evaluator = GroundednessEvaluator(config)
-    paths = [SAMPLES / f"{n}.jsonl" for n in args.names] if args.names else sorted(SAMPLES.glob("*.jsonl"))
+    paths = sample_paths(args.names)
     for path in paths:
         run_match(path, evaluator, model)
     return 0

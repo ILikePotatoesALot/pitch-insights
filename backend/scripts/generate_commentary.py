@@ -2,6 +2,7 @@
 
     python scripts/generate_commentary.py                     # every sample in ../samples
     python scripts/generate_commentary.py comeback-POT-CAR    # one match
+    python scripts/generate_commentary.py 117093-38min_ft     # the real-footage clip, in samples/video/
     python scripts/generate_commentary.py --force             # rewrite even if up to date
     python scripts/generate_commentary.py --limit 5           # first 5 moments only, printed, not saved
 
@@ -9,6 +10,10 @@ Moments already written from the same facts, by the same provider, model and pro
 kept, so re-running is cheap. Kept lines written before the safety check existed are screened
 by Azure AI Content Safety without calling the model again. Uses the provider in .env
 (LLM_PROVIDER). Stops without saving if the provider refuses the key, access or deployment.
+
+The clip's moments (video/moments.py) go to the video narrator and its file, samples/video/<name>.commentary.json,
+carries the video prompt version, so the synthetic matches' files stay as they are. With no names, every sample match
+and every clip the app lists is done.
 """
 
 from __future__ import annotations
@@ -28,18 +33,42 @@ from pitch_insights.agents.store import load_commentary, summarise, write_commen
 from pitch_insights.agents.tracing import flush_tracing, setup_tracing
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
+from pitch_insights.video.moments import load_clip_moments
+from pitch_insights.video.replay import APP_CLIPS, CLIP_DIR, stored_path
 
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 
 
+def is_clip(path: Path) -> bool:
+    """A clip's stored files are named as if for `samples/video/<name>.jsonl` (see video.replay.stored_path)."""
+    return path.parent.name == CLIP_DIR
+
+
+def sample_paths(names: list[str]) -> list[Path]:
+    """The samples to do: named ones (a sample match or a clip), or all of them."""
+    if not names:
+        return sorted(SAMPLES.glob("*.jsonl")) + [stored_path(SAMPLES, n) for n in APP_CLIPS]
+    return [stored_path(SAMPLES, n) if (SAMPLES / CLIP_DIR / f"{n}.frames.jsonl").exists() else SAMPLES / f"{n}.jsonl"
+            for n in names]
+
+
+def exists(path: Path) -> bool:
+    return (SAMPLES / CLIP_DIR / f"{path.stem}.frames.jsonl").exists() if is_clip(path) else path.exists()
+
+
 async def run_match(path: Path, writer, header: dict, force: bool, limit: int | None,
                     concurrency: int, safety=None) -> dict:
-    meta, events = read_match(path)
-    brain = MatchBrain(meta, memory=memory_for(path, meta))
+    if is_clip(path):  # moments from the detected events, written by the video narrator
+        meta, all_moments = load_clip_moments(SAMPLES, path.stem)
+        header = file_header(writer, video=True)
+    else:
+        meta, events = read_match(path)
+        brain = MatchBrain(meta, memory=memory_for(path, meta))
+        for ev in events:
+            brain.update(ev)
+        all_moments = brain.moments
     desk = CommentaryDesk(writer, meta, safety=safety)
-    for ev in events:
-        brain.update(ev)
-    moments = [m for m in brain.moments if desk.wants(m)][:limit]
+    moments = [m for m in all_moments if desk.wants(m)][:limit]
     old = load_commentary(path)
     reuse = not force and all(old.get(k) == header[k] for k in ("provider", "model", "prompt_version"))
     sem = asyncio.Semaphore(concurrency)
@@ -82,8 +111,8 @@ async def main() -> int:
     if safety is None:
         print("Content Safety isn't configured in .env, so no line is screened; see .env.example")
     header = file_header(writer)
-    paths = [SAMPLES / f"{n}.jsonl" for n in args.names] if args.names else sorted(SAMPLES.glob("*.jsonl"))
-    missing = [p.name for p in paths if not p.exists()]
+    paths = sample_paths(args.names)
+    missing = [p.stem for p in paths if not exists(p)]
     if missing:
         print("No such sample: " + ", ".join(missing))
         return 1

@@ -11,6 +11,11 @@ kinds of claim:
 
 It can't catch made-up claims without a name or a number ("a stunning volley"); the prompt
 rules and, later, Foundry's groundedness evaluator cover those.
+
+Moments detected from video (`source == "video"`) get two more checks, because the detector only sees passes,
+carries and interceptions and is often unsure: words for things it can't see or that no fact says (goals, shots,
+fouls, cards, a score, tactical labels, directions, shirt numbers) count as unsupported claims, and a version of the
+commentary must hedge when an event under 60% confidence is in the moment (`hedging`).
 """
 
 from __future__ import annotations
@@ -144,6 +149,42 @@ def known_names(meta: dict) -> dict[str, str]:
     return names
 
 
+# What video commentary must not say. The detector sees passes, carries and interceptions only, the real score isn't
+# known, the facts hold no directions or tactics, and the numbers after "#" are tracker IDs, not shirt numbers.
+VIDEO_BANNED = re.compile(
+    r"(?<!\w)(goals?|shots?|fouls?|cards?|penalt(?:y|ies)|offsides?|corners?|sav(?:e|es|ed|ing)|scor(?:e|es|ed|ing)|shirts?"
+    r"|pressing|presses|counter-?attack\w*|dominat\w+|forwards?|backwards?|number \d+)(?!\w)", re.I)
+LOW_CONFIDENCE_PCT = 60
+HEDGES = re.compile(
+    r"\b(appears?|seems?|seemingly|looks?|suggests?|possibly|apparently|likely|unsure|uncertain|not sure|"
+    r"(?:was|is|were)n't (?:sure|certain)|confidence is low|only \d+% (?:sure|confident)|low confidence|may|might)\b", re.I)
+
+
+def _is_low_confidence_event(fact: dict) -> bool:
+    value = fact.get("value")
+    return (fact.get("kind") in ("pass", "pass_incomplete", "carry", "interception") and isinstance(value, dict)
+            and isinstance(value.get("confidence_pct"), (int, float)) and value["confidence_pct"] < LOW_CONFIDENCE_PCT)
+
+
+def hedging(casual: str, analyst: str, moment: dict) -> list[str]:
+    """The versions that state a video moment flatly although it holds an event the model was under 60% sure of.
+    Empty for any other moment, and for a video moment whose events were all 60% or more."""
+    if moment.get("source") != "video" or not any(_is_low_confidence_event(f) for f in moment.get("facts", [])):
+        return []
+    return [f"{name}: no hedge on events the model was under {LOW_CONFIDENCE_PCT}% sure of"
+            for name, text in (("casual", casual), ("analyst", analyst)) if not HEDGES.search(text)]
+
+
+def with_hedging(grounded: "Grounding", casual: str, analyst: str, moment: dict) -> "Grounding":
+    """`grounded` with the hedging problems added to what is unsupported (and to the claims, which lowers the score)."""
+    problems = hedging(casual, analyst, moment)
+    if not problems:
+        return grounded
+    claims = grounded.claims + len(problems)
+    unsupported = grounded.unsupported + problems
+    return Grounding(score=(claims - len(unsupported)) / claims, claims=claims, unsupported=unsupported)
+
+
 def _mentions(name: str, text: str) -> bool:
     return re.search(rf"(?<!\w){re.escape(name)}(?!\w)", text) is not None
 
@@ -173,5 +214,9 @@ def check(text: str, moment: dict, meta: dict) -> Grounding:
         claims += 1
         if name not in playing and not _mentions(name, source):
             unsupported.append(label)
+    if moment.get("source") == "video":
+        for word in dict.fromkeys(m.group(1).lower() for m in VIDEO_BANNED.finditer(text)):
+            claims += 1
+            unsupported.append(word)
     score = 1.0 if claims == 0 else (claims - len(unsupported)) / claims
     return Grounding(score=score, claims=claims, unsupported=unsupported)

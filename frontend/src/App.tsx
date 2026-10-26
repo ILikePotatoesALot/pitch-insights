@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ClipBanner, ClipCredit, ClipEvents, ClipPanel, mmss } from "./components/ClipPanels";
+import { ClipBanner, ClipCredit, ClipEvents, ClipPanel, ClipPinned, ClipPlayers, mmss } from "./components/ClipPanels";
+import { TrackingTotals, type ClipTracking } from "./clipStats";
 import { Overlays } from "./components/Overlays";
 import { FocusStrip, MomentFeed, MomentumChart, PinnedPlayer, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { ProfilePicker } from "./components/ProfilePicker";
 import { apiUrl } from "./api";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
+import { trackLabel } from "./pitch/ClipLayer";
 import { PitchScene, teamColours } from "./pitch/PitchScene";
 import type { ClipEvent, ClipFrame, ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
@@ -17,6 +19,9 @@ const query = new URLSearchParams(location.search);
 const urlLayout: LayoutMode = query.get("layout") === "broadcast" ? "broadcast" : "fan";
 const urlSpeed = Number(query.get("speed"));
 const embedded = query.has("embed");
+// A tracked player to follow in a clip ("L-t11"): not part of the profile, since tracker numbers belong to one clip.
+const urlFollow = /^[LR]-t\d+$/.test(query.get("follow") ?? "") ? query.get("follow") : null;
+const NO_TRACKING: ClipTracking = { players: [], possession: [0, 0] };
 
 export default function App() {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
@@ -34,7 +39,10 @@ export default function App() {
   const sceneRef = useRef<PitchScene | null>(null);
   const pitchEl = useRef<HTMLDivElement>(null);
   const spotLabel = useRef<HTMLDivElement>(null);
-  const clipLabel = useRef<HTMLDivElement>(null);
+  const [follow, setFollow] = useState<string | null>(urlFollow);
+  const tracking = useRef(new TrackingTotals());
+  const [trackingView, setTrackingView] = useState<ClipTracking>(NO_TRACKING);
+  const trackingShown = useRef(0);
   const firstHalfEnd = useRef<number | null>(null);
   const p = profile ?? DEFAULT_PROFILE;
 
@@ -61,7 +69,7 @@ export default function App() {
     if (!pitchEl.current) return;
     const scene = new PitchScene(pitchEl.current);
     sceneRef.current = scene;
-    scene.setClipLabel(clipLabel.current);
+    scene.setOnPick((id) => { if (/^[LR]-t\d+$/.test(id)) setFollow(id); }); // a person with no team can't be followed
     return () => scene.dispose();
   }, []);
 
@@ -74,9 +82,19 @@ export default function App() {
   const onReset = useCallback(() => {
     firstHalfEnd.current = null;
     sceneRef.current?.reset();
+    tracking.current.reset();
+    setTrackingView(NO_TRACKING);
   }, []);
 
-  const onFrame = useCallback((frame: ClipFrame, meta: MatchMeta) => sceneRef.current?.showFrame(frame, meta), []);
+  const onFrame = useCallback((frame: ClipFrame, meta: MatchMeta) => {
+    sceneRef.current?.showFrame(frame, meta);
+    tracking.current.push(frame, meta);
+    const now = performance.now();
+    if (now - trackingShown.current > 500) { // the panels redraw twice a second, not on every frame
+      trackingShown.current = now;
+      setTrackingView(tracking.current.snapshot());
+    }
+  }, []);
 
   // A clip of real footage (the video path) has its own speeds, panels and controls; a synthetic match is as before.
   const clipMode = matches.find((m) => m.name === name)?.kind === "video";
@@ -136,9 +154,12 @@ export default function App() {
     return person ? { ...person, colour: home ? colours[0] : colours[1] } : null;
   }, [meta, p.player, colours]);
 
+  // In a clip the spotlight follows the tracked player the viewer picked; in a match, their favourite player.
+  const followed = showingClip && follow ? { id: follow, colour: colours[follow.startsWith("L-") ? 0 : 1] } : null;
+  const spotlit = showingClip ? followed : pinned;
   useEffect(() => {
-    sceneRef.current?.setSpotlight(pinned ? { id: pinned.id, colour: pinned.colour } : null, spotLabel.current);
-  }, [pinned, meta]);
+    sceneRef.current?.setSpotlight(spotlit ? { id: spotlit.id, colour: spotlit.colour } : null, spotLabel.current);
+  }, [spotlit?.id, spotlit?.colour, meta]); // (by id: `followed` is a new object every render)
 
   // The favourite's rating, one sample a match minute, for the card's sparkline. It survives a reconnect at the
   // same moment (a language change) and starts again when the viewer jumps to another minute or changes player.
@@ -171,7 +192,7 @@ export default function App() {
     <div className={`app ${layout}${embedded ? " embed" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
         <h1>Pitch Insights <small>live football intelligence</small></h1>
-        <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); }} aria-label="Match">
+        <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); setFollow(null); }} aria-label="Match">
           {matches.map((m) => <option key={m.name} value={m.name}>{m.kind === "video" ? `${m.home.name} v ${m.away.name} · real footage` : `${m.home.name} v ${m.away.name} (${m.name.split("-")[0]})`}</option>)}
         </select>
         <select value={p.lang} onChange={(e) => commit({ ...p, lang: e.target.value })} aria-label="Language">
@@ -197,14 +218,16 @@ export default function App() {
 
       <main>
         <section className="stage">
-          {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} />}
+          {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} tracking={trackingView} />}
+          {showingClip && follow && <ClipPinned stats={trackingView.players.find((x) => x.id === follow)} id={follow} colours={colours}
+                                                events={clipEvents} info={clip} onStop={() => setFollow(null)} />}
           {showingMatch && meta && <Scoreboard meta={meta} state={state} colours={colours} />}
           {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
           {showingMatch && meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
                                            history={ratingHistory} onChange={() => setPicker("edit")} />}
           <div className="pitch" ref={pitchEl}>
-            {pinned && <div className="spot-label" ref={spotLabel} style={{ borderColor: pinned.colour }}>#{pinned.number} {pinned.name.split(" ").slice(-1)[0]}</div>}
-            <div className="clip-label" ref={clipLabel} />
+            {spotlit && <div className="spot-label" ref={spotLabel} style={{ borderColor: spotlit.colour }}>
+              {followed ? `★ ${trackLabel(followed.id)}` : pinned && `#${pinned.number} ${pinned.name.split(" ").slice(-1)[0]}`}</div>}
             {meta && <Overlays cues={cues} meta={meta} mode={p.mode} colours={colours} />}
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
             {status === "error" && <div className="overlay-msg">Can't reach the replay server. {import.meta.env.DEV ? "Is it running on port 8000?" : "It may be waking up: try again in a moment."}</div>}
@@ -235,7 +258,7 @@ export default function App() {
           {showingClip ? (
             <p className="legend">
               Each marker is one tracked person: {meta?.home.name} in blue, {meta?.away.name} in white, grey where the model could not tell
-              the team. The number is the tracker's ID, not a shirt number; tap a marker for its label. Lines are detected passes and
+              the team. The number is the tracker's ID, not a shirt number; tap a marker to follow that player. Lines are detected passes and
               carries, a ring is an interception. The ball shows only where the video found it. The surface rises where each side's
               players have been in the last two minutes. Drag to turn the pitch, scroll to zoom, double-click to reset.
             </p>
@@ -250,8 +273,10 @@ export default function App() {
         </section>
 
         {layout === "fan" && showingClip && meta && <aside>
+          <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} allTiers follow={follow} />
+          <ClipPlayers tracking={trackingView} colours={colours} follow={follow} setFollow={setFollow} />
+          {p.mode === "analyst" && <ClipEvents events={clipEvents} mode={p.mode} colours={colours} meta={meta} info={clip} follow={follow} />}
           {clip && <ClipPanel info={clip} lang={p.lang} />}
-          <ClipEvents events={clipEvents} mode={p.mode} colours={colours} meta={meta} info={clip} />
         </aside>}
 
         {layout === "fan" && showingMatch && <aside>

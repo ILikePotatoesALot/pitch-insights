@@ -9,6 +9,7 @@ JSON, so the backend needs no torch, opencv or rfdetr) and prepares what the app
 - `credibility`: the benchmark figures, the model and the credit the app shows next to the positions.
 - `describe`: the words for a detected event (a headline and a detail line) in the viewer's language.
 - `cue_for_event`: the Overlay Director's cue for a detected event.
+- `stored_path`: where the clip's stored commentary and translations sit (`video/moments.py` builds its moments).
 
 Players are only ever labelled by side and tracker number ("Left #12"), never with names (DESIGN.md, Video path).
 """
@@ -71,6 +72,13 @@ def _files(samples: Path, name: str) -> tuple[Path, Path, Path] | None:
     base = samples / CLIP_DIR
     paths = (base / f"{name}.frames.jsonl", base / f"{name}.events.jsonl", base / f"{name}.benchmark.json")
     return paths if all(p.is_file() and p.resolve().parent == base.resolve() for p in paths) else None
+
+
+def stored_path(samples: Path, name: str) -> Path:
+    """Where a clip's stored extras sit, as `agents/store.py` and `agents/translate.py` name things: they add their own
+    suffix to this file's stem, so `samples/video/<name>.commentary.json` and `<name>.translations.json`. (The file
+    itself isn't there: a clip's own files are `.frames.jsonl`, `.events.jsonl` and `.benchmark.json`.)"""
+    return samples / CLIP_DIR / f"{name}.jsonl"
 
 
 def _read_lines(path: Path) -> list[dict]:

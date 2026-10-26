@@ -55,7 +55,7 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from pitch_insights.agents.memory import memory_for
-from pitch_insights.agents.store import load_commentary, with_commentary
+from pitch_insights.agents.store import commentary_info, load_commentary, with_commentary
 from pitch_insights.agents.translate import LANGUAGES, TRANSLATION_VERSION, load_translations, translated_moment
 from pitch_insights.director import CueBuilder, Personaliser, parse_profile, visible_to
 from pitch_insights.director.session import CUE_TICK_S, ViewerSession, clamp_speed, run_until_first_done
@@ -137,13 +137,6 @@ def get_match(name: str) -> dict:
     return meta
 
 
-def commentary_info(stored: dict) -> dict | None:
-    """Who wrote the stored commentary, for the app's AI-generated label."""
-    if not stored["moments"]:
-        return None
-    return {k: stored.get(k) for k in ("ai_generated", "provider", "model", "prompt_version", "summary")}
-
-
 def state_message(brain: MatchBrain) -> dict:
     """The live state the app needs, kept small enough to send every second."""
     snap = brain.interp.snapshot(top_moments=3)
@@ -171,7 +164,7 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         await ws.close()
         return
     if clip:
-        await replay_clip(ws, clip, speed)
+        await replay_clip(ws, clip, speed, SAMPLES)
         return
     try:
         path = _match_path(name)

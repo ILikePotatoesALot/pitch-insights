@@ -191,12 +191,12 @@ def test_streams_every_frame_and_event_in_order_then_ends():
     events = [m for m in msgs if m["type"] == "event"]
     assert len(events) == len(find_clip(SAMPLES, NAME).events)
     assert events[0]["text"] == "Left #11 runs with the ball" and events[0]["event"]["source"] == "video"
-    assert not any(m["type"] in ("moment", "state", "catchup") for m in msgs)  # no commentary, no synthetic state
+    assert not any(m["type"] in ("state", "catchup") for m in msgs)  # no synthetic state; moments: test_clip_moments.py
 
 
 def test_meta_carries_the_clip_info_the_panel_shows():
     meta = _stream("speed=600&at=99.8")[0]
-    assert meta["kind"] == "video" and meta["commentary"] is None and meta["lang"] == "en"
+    assert meta["kind"] == "video" and meta["commentary"]["ai_generated"] is True and meta["lang"] == "en"
     assert meta["clip"]["credit"] == "SoccerTrack v2 (CC BY 4.0)" and meta["clip"]["figures"]["recall"] == 0.9314
     assert meta["clip"]["clip"]["duration"] == pytest.approx(99.8)
     assert set(meta["languages"]) == {"en", "es", "fr", "de", "nl", "zh-Hans"}

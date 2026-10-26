@@ -91,8 +91,9 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
           setStatus(keepPaused ? "paused" : "live");
           break;
         case "catchup":
-          if (data.events) { // a clip: the events before the jump, for the feed
+          if (data.events) { // a clip: the events and moments before the jump, for the feeds
             setClipEvents(data.events);
+            setMoments(data.moments ?? []);
             break;
           }
           setMoments(data.moments);

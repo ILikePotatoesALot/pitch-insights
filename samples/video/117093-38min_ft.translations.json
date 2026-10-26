@@ -1,0 +1,394 @@
+{
+ "service": "azure-translator",
+ "api_version": "3.0",
+ "version": "2026-10-22.2",
+ "source": "en",
+ "languages": [
+  "es",
+  "fr",
+  "de",
+  "nl",
+  "zh-Hans"
+ ],
+ "machine_translated": true,
+ "kept_english": {
+  "es": 0,
+  "fr": 6,
+  "de": 5,
+  "nl": 1,
+  "zh-Hans": 5
+ },
+ "moments": {
+  "C-1": {
+   "source_hash": "2f024a2be1cd10a5",
+   "failed": {
+    "fr": [
+     "fact.7"
+    ],
+    "de": [
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Left con el balón: 2 acarreos y 1 pase",
+    "fact.0": "El modelo de vídeo detectó 3 eventos en 3 segundos de 38:00: 2 acarreos y 1 pasada.",
+    "fact.1": "38:00 Left #11 carreras con la bola durante 5 m; el modelo estaba 72% seguro.",
+    "fact.2": "38:01 Left #11 pasa a Left #6, 27 m; el modelo estaba 64% seguro.",
+    "fact.3": "38:02 Left #6 carreras con la bola durante 12 m; el modelo solo estaba un 49% seguro (baja confianza).",
+    "fact.4": "Right #19 se seguía a 19 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.5": "Left #6 se seguía a 18 km/h o más durante al menos un segundo en ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.6": "A los 38:02 Left tenía 3 de sus 9 jugadores seguidos en el tercio ofensivo y 0 en su propio tercio, repartidos 44 m por el campo y 30 m de atrás hacia adelante.",
+    "fact.7": "A los 38:02 Right tenía 0 de sus 4 jugadores rastreados en el tercio ofensivo y 3 en su propio tercio, repartidos 28 m por el campo y 21 m de atrás hacia adelante.",
+    "casual": "Left #11 lleva el balón y pasa a Left #6, que parece llevarlo más lejos.",
+    "analyst": "Left #11 lleva la pelota durante 5 m y pasa 27 m a Left #6. Left #6 parece llevarla 12 m, pero el modelo no está seguro de eso."
+   },
+   "fr": {
+    "headline": "Left au ballon : 2 courses et 1 passe",
+    "fact.0": "Le modèle vidéo a détecté 3 événements en 3 secondes de 38:00 : 2 portées et 1 passage.",
+    "fact.1": "38:00 Left #11 course avec la balle sur 5 m ; le modèle était sûr à 72 %.",
+    "fact.2": "38:01 Left #11 passe à Left #6, 27 m ; le modèle était sûr à 64 %.",
+    "fact.3": "38:02 Left #6 course avec la balle pendant 12 m ; le modèle n’était sûr que de 49 % (faible confiance).",
+    "fact.4": "Right #19 était suivi à 19 km/h ou plus pendant au moins une seconde à cette époque (les vitesses du suivi peuvent être faussées).",
+    "fact.5": "Left #6 était suivie à 18 km/h ou plus pendant au moins une seconde autour de cette période (les vitesses du suivi peuvent être faussées).",
+    "fact.6": "À 38:02, Left avait 3 de ses 9 joueurs sur pistes dans le tiers offensif et 0 dans son propre tiers, répartis sur 44 m sur le terrain et 30 m de l’arrière vers l’avant.",
+    "casual": "Left #11 porte le ballon et passe à Left #6, qui semble le pousser plus loin.",
+    "analyst": "Left #11 porte la balle sur 5 m et passe 27 m à Left #6. Left #6 semble la porter sur 12 m, mais le modèle n’en est pas certain."
+   },
+   "de": {
+    "headline": "Left am Ball: 2 Läufe und 1 Pass",
+    "fact.0": "Das Videomodell erkannte 3 Ereignisse innerhalb von 3 Sekunden von 38:00: 2 Läufe und 1 Pass.",
+    "fact.1": "38:00 Left #11 läuft mit dem Ball 5 m; das Modell war zu 72 % sicher.",
+    "fact.2": "38:01 Left #11 geht Left #6, 27 m; das Modell war zu 64 % sicher.",
+    "fact.3": "38:02 Left #6 läuft mit dem Ball über 12 m; das Modell war nur zu 49 % sicher (geringe Zuverlässigkeit).",
+    "fact.4": "Right #19 wurde damals mindestens eine Sekunde lang mit 19 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können abweichen).",
+    "fact.5": "Left #6 wurde damals mindestens eine Sekunde lang mit 18 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können daneben liegen).",
+    "fact.7": "Bei 38:02 hatte Right 0 seiner 4 Feldspieler im Angriffsdrittel und 3 im eigenen Drittel, verteilt 28 m über das Spielfeld und 21 m von hinten nach vorne.",
+    "casual": "Left #11 trägt den Ball und passt zu Left #6, der ihn offenbar weiterführt.",
+    "analyst": "Left #11 trägt den Ball 5 m und passt 27 m bis Left #6. Left #6 scheint ihn 12 m zu tragen, aber das Modell ist sich da nicht sicher."
+   },
+   "nl": {
+    "headline": "Left aan de bal: 2 carries en 1 pass",
+    "fact.0": "Het videomodel detecteerde 3 gebeurtenissen binnen 3 seconden van 38:00: 2 carries en 1 pass.",
+    "fact.1": "38:00 Left #11 loopt met de bal 5 m; het model was 72% zeker.",
+    "fact.2": "38:01 Left #11 gaat naar Left #6, 27 m; het model was 64% zeker.",
+    "fact.3": "38:02 Left #6 loopt met de bal 12 m; het model was slechts 49% zeker (laag vertrouwen).",
+    "fact.4": "Right #19 werd toen minstens een seconde op 19 km/u of meer gevolgd (de snelheid van de tracker kan niet kloppen).",
+    "fact.5": "Left #6 werd toen minstens een seconde op 18 km/u of meer gevolgd (de snelheid van de tracker kan afwijken).",
+    "fact.6": "Op 38:02 had Left 3 van zijn 9 gevolgde spelers in het aanvallende derde en 0 in het eigen derde honk, verspreid over 44 meter over het veld en 30 meter van achter naar voor.",
+    "fact.7": "Op 38:02 had Right 0 van de 4 getraceerde spelers in het aanvallende derde en 3 in het eigen derde deel, verspreid over 28 meter over het veld en 21 meter van achter naar voor.",
+    "casual": "Left #11 draagt de bal en speelt naar Left #6, die hem lijkt verder te dragen.",
+    "analyst": "Left #11 draagt de bal 5 m en past 27 m naar Left #6. Left #6 lijkt hem 12 m te dragen, maar het model is daar niet zeker van."
+   },
+   "zh-Hans": {
+    "headline": "持球Left：2次冲球和1次传球",
+    "fact.0": "视频模型在38：00的3秒内检测到3个事件：2次冲刺和1次传球。",
+    "fact.1": "38分00秒 Left #11 持球跑5米;模型有72%的把握率。",
+    "fact.2": "38：01Left #11Left #6，27米;模型确定率为64%。",
+    "fact.3": "持球跑12米，38分02秒 Left #6 ;模型的确定度仅为49%（置信度低）。",
+    "fact.4": "Right #19 在那段时间内至少有19公里/小时或更高的速度被跟踪（追踪器速度可能不对）。",
+    "fact.5": "Left #6 在那段时间内至少有18公里/小时或更高的速度被跟踪（追踪器速度可能有偏差）。",
+    "fact.6": "比赛进行到38分02秒时， Left 9名被追踪球员中有3人进入进攻区，而本方三分之一区域则为0人，场地宽度为44米，后场至前场30米。",
+    "fact.7": "比赛时间为38分02秒， Right 4名被追踪球员中有0人进入进攻三分之一区域，3人进入本方三分之一区域，场地宽度为28米，后场至前场为21米。",
+    "casual": "Left #11 带球并传给 Left #6，后者似乎带球更远。",
+    "analyst": "Left #11 带球5米，传球27米给 Left #6。 Left #6 似乎带球12米，但模型不确定。"
+   }
+  },
+  "C-2": {
+   "source_hash": "46b7b5c12b45911a",
+   "failed": {
+    "fr": [
+     "fact.0",
+     "fact.5"
+    ],
+    "de": [
+     "fact.0",
+     "fact.4"
+    ],
+    "nl": [
+     "fact.4"
+    ]
+   },
+   "es": {
+    "headline": "Left #16 pasa a #26",
+    "fact.0": "El modelo de vídeo detectó 1 evento, en el minuto 38:32.",
+    "fact.1": "38:32 Left #16 pasa a Left #26, 12 m; el modelo solo estaba un 46% seguro (baja confianza).",
+    "fact.2": "Left #5 se seguía a 14 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.3": "Left #16 se seguía a 10 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.4": "A los 38:32 Left tenía 1 de sus 8 jugadores seguidos en el tercio ofensivo y 0 en su propio tercio, repartidos 40 m a lo largo del campo y 27 m de atrás hacia adelante.",
+    "fact.5": "A los 38:32 Right tenía 0 de sus 5 jugadores seguidos en el tercio ofensivo y 3 en su propio tercio, repartidos 24 m por el campo y 26 m de atrás hacia adelante.",
+    "casual": "Left #16 parece pasar a Left #26 a más de 12 metros.",
+    "analyst": "A los 38:32, Left #16 parece pasar 12 metros a Left #26, con el modelo solo un 46% seguro. Los jugadores rastreados de Left están distribuidos a 40 metros de ancho y 27 metros de profundidad."
+   },
+   "fr": {
+    "headline": "Left #16 passe à #26",
+    "fact.1": "38:32 Left #16 passe à Left #26, 12 m ; le modèle n’était sûr que 46 % (faible confiance).",
+    "fact.2": "Left #5 était suivie à 14 km/h ou plus pendant au moins une seconde à cette époque (les vitesses du traceur peuvent être faussées).",
+    "fact.3": "Left #16 était suivie à 10 km/h ou plus pendant au moins une seconde à ce moment-là (les vitesses du suivi peuvent être faussées).",
+    "fact.4": "À 38:32, Left avait 1 de ses 8 joueurs sur piste dans le tiers offensif et 0 dans son propre tiers, réparti sur 40 m sur le terrain et 27 m de l’arrière vers l’avant.",
+    "casual": "Left #16 semble passer à Left #26 à plus de 12 mètres.",
+    "analyst": "À 38:32, Left #16 semble passer de 12 mètres à Left #26, le modèle n’étant sûr que de 46 %. Les joueurs suivis de Left sont écartés sur 40 mètres de large et 27 mètres de profondeur."
+   },
+   "de": {
+    "headline": "Left #16 passt an #26",
+    "fact.1": "38:32 Left #16 geht nach Left #26, 12 m; das Modell war nur zu 46 % sicher (geringe Zuversicht).",
+    "fact.2": "Left #5 wurde damals mindestens eine Sekunde lang mit 14 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können abweichen).",
+    "fact.3": "Left #16 wurde damals mindestens eine Sekunde lang mit 10 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können abweichen).",
+    "fact.5": "Bei 38:32 hatte Right 0 seiner 5 Feldspieler im Angriffsdrittel und 3 im eigenen Drittel, verteilt auf 24 m über das Spielfeld und 26 m von hinten nach vorne.",
+    "casual": "Left #16 scheint Left #26 über 12 Meter zu erreichen.",
+    "analyst": "Bei 38:32 scheint Left #16 12 Meter bis Left #26 zu passieren, wobei das Modell sich nur zu 46 % sicher ist. Die Kettenfahrzeuge Left sind 40 Meter breit und 27 Meter tief."
+   },
+   "nl": {
+    "headline": "Left #16 gaat naar #26",
+    "fact.0": "Het video-model detecteerde 1 gebeurtenis, op 38:32.",
+    "fact.1": "38:32 Left #16 gaat naar Left #26, 12 m; het model was slechts 46% zeker (laag vertrouwen).",
+    "fact.2": "Left #5 werd toen minstens een seconde op 14 km/u of meer gevolgd (de trackersnelheid kan afwijken).",
+    "fact.3": "Left #16 werd toen minstens een seconde op 10 km/u of meer gevolgd (de snelheid van de tracker kan afwijken).",
+    "fact.5": "Om 38:32 had Right 0 van zijn 5 getraceerde spelers in het aanvallende derde en 3 in het eigen derde honk, verspreid over 24 meter over het veld en 26 meter van achter naar voor.",
+    "casual": "Left #16 lijkt meer dan 12 meter te Left #26 .",
+    "analyst": "Op 38:32 lijkt Left #16 12 meter te passeren tot Left #26, waarbij het model slechts voor 46% zeker is. De getrackte spelers van Left zijn verspreid over 40 meter breed en 27 meter diep."
+   },
+   "zh-Hans": {
+    "headline": "Left #16 传给 #26",
+    "fact.0": "视频模型在38分32秒检测到1个事件。",
+    "fact.1": "38：32Left #16Left #26，12米;模型的确定性仅为46%（置信度低）。",
+    "fact.2": "Left #5 在那时以14公里/小时或更高的速度被跟踪了至少一秒钟（追踪器速度可能不对）。",
+    "fact.3": "Left #16 在那段时间内至少有10公里/小时或更高的速度被跟踪（追踪器速度可能会不对）。",
+    "fact.4": "38分32秒时， Left 8名被追踪球员中有1人进入进攻区，自己三分之一区域则为0人，场地宽度为40米，后场至前场27米。",
+    "fact.5": "38分32秒时， Right 5名被追踪球员中有0人进入进攻区，3人进入本方三分区，场地宽度为24米，后场至前场26米。",
+    "casual": "Left #16 似乎可以 Left #26 超过12米。",
+    "analyst": "在38：32时， Left #16 似乎通过了12米到 Left #26，模型的确定率仅为46%。 Left的履带播放器分布在宽40米、深27米的范围内。"
+   }
+  },
+  "C-3": {
+   "source_hash": "7b1b7370848d1cf8",
+   "failed": {
+    "fr": [
+     "fact.7"
+    ],
+    "de": [
+     "analyst"
+    ],
+    "zh-Hans": [
+     "fact.0"
+    ]
+   },
+   "es": {
+    "headline": "Left con el balón: 2 acarreos y 1 pase",
+    "fact.0": "El modelo de vídeo detectó 3 eventos en 2 segundos de 38:39: 2 acarreos y 1 pasada.",
+    "fact.1": "38:39 Left #16 carreras con la bola durante 4 m; el modelo solo estaba un 34% seguro (baja confianza).",
+    "fact.2": "38:41 Left #16 pasa a Left #9, 2 m; el modelo solo estaba seguro al 51% (baja confianza).",
+    "fact.3": "38:41 Left #9 carreras con la bola durante 5 m; el modelo solo estaba un 47% seguro (baja confianza).",
+    "fact.4": "Left #9 se seguía a 15 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.5": "Right #28 se seguía a 13 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.6": "A los 38:41 Left tenía 2 de sus 6 jugadores con pista en el tercio ofensivo y 0 en su propio tercio, repartidos 48 m por el campo y 28 m de atrás hacia adelante.",
+    "fact.7": "A los 38:41 Right tenía 0 de sus 8 jugadores seguidos en el tercio ofensivo y 5 en su propio tercio, repartidos 33 m por el campo y 23 m de atrás hacia adelante.",
+    "casual": "Left #16 parece llevar el balón y pasar a Left #9, que parece llevarlo más lejos.",
+    "analyst": "El modelo no estaba seguro, pero Left #16 parece llevar la pelota 4 m antes de pasar 2 m a Left #9, que parece llevarla 5 m. A los 38:41, Left está distribuida 48 m a lo largo del campo con 2 jugadores con orugas en el tercio ofensivo, mientras que Right tiene 5 jugadores con orugas en su propio tercio, distribuida 33 m de ancho."
+   },
+   "fr": {
+    "headline": "Left au ballon : 2 courses et 1 passe",
+    "fact.0": "Le modèle vidéo a détecté 3 événements en 2 secondes de 38:39 : 2 portées et 1 passage.",
+    "fact.1": "38:39 Left #16 course avec la balle sur 4 m ; le modèle n’était sûr que de 34 % (faible confiance).",
+    "fact.2": "38:41 Left #16 passe à Left #9, 2 m ; le modèle n’était sûr que 51 % (faible confiance).",
+    "fact.3": "38:41 Left #9 course avec la balle sur 5 m ; le modèle n’était sûr que de 47 % (faible confiance).",
+    "fact.4": "Left #9 était suivie à 15 km/h ou plus pendant au moins une seconde autour de cette période (les vitesses du traceur peuvent être faussées).",
+    "fact.5": "Right #28 était suivi à 13 km/h ou plus pendant au moins une seconde à ce moment-là (les vitesses du suivi peuvent être faussées).",
+    "fact.6": "À 38:41, Left avait 2 de ses 6 joueurs suivis dans le tiers offensif et 0 dans son propre tiers, répartis sur 48 m sur le terrain et 28 m de l’arrière vers l’avant.",
+    "casual": "Left #16 semble porter le ballon et le passer à Left #9, qui semble le porter plus loin.",
+    "analyst": "Le modèle n’était pas certain, mais Left #16 semble porter la balle de 4 m avant de passer 2 m à Left #9, qui semble la porter sur 5 m. À 38:41, Left est répartie sur 48 m sur le terrain avec 2 joueurs suivis dans le tiers offensif, tandis que Right compte 5 joueurs à chenilles dans son propre tiers, étalés sur 33 m de large."
+   },
+   "de": {
+    "headline": "Left am Ball: 2 Läufe und 1 Pass",
+    "fact.0": "Das Videomodell erkannte 3 Ereignisse innerhalb von 2 Sekunden von 38:39: 2 Läufe und 1 Pass.",
+    "fact.1": "38:39 Left #16 läuft mit dem Ball 4 m; das Modell war nur zu 34 % sicher (geringes Vertrauen).",
+    "fact.2": "38:41 Left #16 geht zu Left #9, 2 m; das Modell war nur zu 51 % sicher (geringe Zuversicht).",
+    "fact.3": "38:41 Left #9 läuft 5 m mit dem Ball; das Modell war nur zu 47 % sicher (geringes Vertrauen).",
+    "fact.4": "Left #9 wurde damals mindestens eine Sekunde lang mit 15 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können daneben liegen).",
+    "fact.5": "Right #28 wurde damals mindestens eine Sekunde lang mit 13 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können abweichen).",
+    "fact.6": "Bei 38:41 hatte Left 2 der 6 Feldspieler im Angriffsdrittel und 0 im eigenen Drittel, verteilt 48 m über das Spielfeld und 28 m von hinten nach vorne.",
+    "fact.7": "Bei 38:41 hatte Right 0 seiner 8 verfolgten Spieler im Angriffsdrittel und 5 im eigenen Drittel, verteilt 33 m über das Spielfeld und 23 m von hinten nach vorne.",
+    "casual": "Left #16 scheint den Ball zu tragen und zu Left #9 zu passen, der ihn offenbar weiterführt."
+   },
+   "nl": {
+    "headline": "Left aan de bal: 2 carries en 1 pass",
+    "fact.0": "Het videomodel detecteerde 3 gebeurtenissen binnen 2 seconden van 38:39: 2 carries en 1 pass.",
+    "fact.1": "38:39 Left #16 loopt 4 m met de bal; het model was slechts 34% zeker (laag vertrouwen).",
+    "fact.2": "38:41 Left #16 gaat naar Left #9, 2 m; het model was slechts 51% zeker (laag vertrouwen).",
+    "fact.3": "38:41 Left #9 loopt met de bal 5 m; het model was slechts 47% zeker (laag vertrouwen).",
+    "fact.4": "Left #9 werd toen minstens een seconde op 15 km/u of meer gevolgd (de snelheid van de tracker kan afwijken).",
+    "fact.5": "Right #28 werd toen minstens een seconde op 13 km/u of meer gevolgd (de snelheid van de tracker kan afwijken).",
+    "fact.6": "Op 38:41 had Left 2 van de 6 getraceerde spelers in het aanvallende derde en 0 in het eigen derde deel, verspreid over 48 meter over het veld en 28 meter van achter naar voor.",
+    "fact.7": "Op 38:41 had Right 0 van zijn 8 getrackte spelers in het aanvallende derde en 5 in het eigen derde honk, verspreid over 33 meter over het veld en 23 meter van achter naar voor.",
+    "casual": "Left #16 lijkt de bal te dragen en naar Left #9 te passen, die hem verder lijkt te dragen.",
+    "analyst": "Het model was niet zeker, maar Left #16 lijkt de bal 4 m te dragen voordat hij 2 m naar Left #9 geeft, die hem 5 m lijkt te dragen. Op 38:41 is Left 48 m verspreid over het veld met 2 gevolgde spelers in het aanvallende derde deel, terwijl Right 5 getraceerde spelers in zijn eigen derde derde heeft, verspreid over 33 meter."
+   },
+   "zh-Hans": {
+    "headline": "持球Left：2次冲球和1次传球",
+    "fact.1": "38分39秒 Left #16 持球跑4米;模型的确定性仅为34%（置信度低）。",
+    "fact.2": "38：41 Left #16 Left #9，2 米;模型的确信度仅为51%（置信度低）。",
+    "fact.3": "38分41秒 Left #9 持球跑5米;模型的确定性仅为47%（置信度低）。",
+    "fact.4": "Left #9 在那时至少有一秒钟以15公里/小时或更高的速度被跟踪（追踪器速度可能不对）。",
+    "fact.5": "Right #28 在那时至少有13公里/小时的速度被跟踪（追踪器速度可能有偏差）。",
+    "fact.6": "比赛进行到38分41秒时， Left 6名被追踪球员中有2人进入进攻区，而本方三分之一区域则为0人，场地宽度为48米，后场至前场为28米。",
+    "fact.7": "比赛进行到38分41秒时， Right 8名被追踪球员中有0人进入进攻区，5人进入本方三分之一区，场地宽度为33米，后场至前场为23米。",
+    "casual": "Left #16 似乎带球并传给 Left #9，后者似乎带球更远。",
+    "analyst": "模型不确定，但 Left #16 似乎先带球4米，再传2米给 Left #9，似乎带球5米。在38：41， Left 在场地中48米，进攻三分区有2名被追踪球员，而 Right 在自己的三分之一区域有5名被追踪球员，宽度为33米。"
+   }
+  },
+  "C-4": {
+   "source_hash": "cd3019e9197fd274",
+   "failed": {
+    "fr": [
+     "fact.6"
+    ],
+    "de": [
+     "fact.6"
+    ],
+    "zh-Hans": [
+     "fact.0"
+    ]
+   },
+   "es": {
+    "headline": "Right recupera el balón tras un pase de Left que se pierde",
+    "fact.0": "El modelo de vídeo detectó 2 eventos en un plazo de 1 segundo de 38:48: 1 pase y 1 intercepción.",
+    "fact.1": "38:48 Left #11 pasada de 25 m se perdió; el modelo estaba 62% seguro.",
+    "fact.2": "38:48 Right #4 gana el balón; el modelo estaba 62% seguro.",
+    "fact.3": "Right #36 se seguía a 16 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desactivadas).",
+    "fact.4": "Right #19 se seguía a 16 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desactivadas).",
+    "fact.5": "A los 38:48 Left tenía 4 de sus 8 jugadores en el tercio ofensivo y 0 en su propio tercio, repartidos 56 m por el campo y 39 m de atrás hacia adelante.",
+    "fact.6": "A los 38:48 Right tenía 0 de sus 8 jugadores con pista en el tercio ofensivo y 6 en su propio tercio, repartidos 48 m por el campo y 36 m de atrás hacia adelante.",
+    "casual": "Right #4 recupera el balón tras un pase de Left #11 fallado.",
+    "analyst": "A los 38:48, el pase de 25 m de Left #11 parece desviarse y Right #4 parece interceptar. Los jugadores rastreados de Left están dispersos 56 m de ancho, mientras que Right tienen 48 m de ancho."
+   },
+   "fr": {
+    "headline": "Right gagne le ballon après que la passe de Left ait été égarée",
+    "fact.0": "Le modèle vidéo a détecté 2 événements en 1 seconde après 38:48 : 1 passe et 1 interception.",
+    "fact.1": "38:48 Left #11 le passage de 25 m se perd ; le modèle était sûr à 62 %.",
+    "fact.2": "38:48 Right #4 remporte le ballon ; le modèle était sûr à 62 %.",
+    "fact.3": "Right #36 était suivie à 16 km/h ou plus pendant au moins une seconde autour de cette période (les vitesses du suivi peuvent être faussées).",
+    "fact.4": "Right #19 était suivie à 16 km/h ou plus pendant au moins une seconde autour de cette période (les vitesses du suivi peuvent être faussées).",
+    "fact.5": "À 38:48, Left avait 4 de ses 8 joueurs sur pistes dans le tiers offensif et 0 dans son propre tiers, répartis sur 56 m sur le terrain et 39 m de l’arrière vers l’avant.",
+    "casual": "Right #4 récupère le ballon après que la passe de Left #11 ait été manquée.",
+    "analyst": "À 38:48, la passe de 25 m de Left #11 semble s’égarer, et Right #4 semble intercepter. Les joueurs suivis de Left sont écartés sur 56 m de large, tandis que Right sont larges de 48 m."
+   },
+   "de": {
+    "headline": "Right gewinnt den Ball, nachdem Left's Pass fehlgeleitet ist",
+    "fact.0": "Das Videomodell erkannte 2 Ereignisse innerhalb von 1 Sekunde von 38:48: 1 Pass und 1 Interception.",
+    "fact.1": "38:48 Left #11 Vorbeigehen von 25 m fehlt; das Modell war zu 62 % sicher.",
+    "fact.2": "38:48 Right #4 gewinnt den Ball; das Modell war sich zu 62 % sicher.",
+    "fact.3": "Right #36 wurde damals mindestens eine Sekunde lang mit 16 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können daneben liegen).",
+    "fact.4": "Right #19 wurde damals mindestens eine Sekunde lang mit 16 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können daneben liegen).",
+    "fact.5": "Um 38:48 hatte Left 4 der 8 Feldspieler im Angriffsdrittel und 0 im eigenen Drittel, verteilt 56 m über das Spielfeld und 39 m von hinten nach vorne.",
+    "casual": "Right #4 gewinnt den Ball, nachdem Left #11's Pass fehlt.",
+    "analyst": "Bei 38:48 scheint Left #11's 25-m-Pass fehlzulaufen, und Right #4 scheint abgefangen zu werden. Left's verfolgte Spieler sind 56 m breit, während Right 48 m breit sind."
+   },
+   "nl": {
+    "headline": "Right wint de bal nadat Left's pass misgaat",
+    "fact.0": "Het videomodel detecteerde 2 gebeurtenissen binnen 1 seconde van 38:48: 1 pass en 1 interceptie.",
+    "fact.1": "38:48 Left #11's pass van 25 m gaat mis; het model was 62% zeker.",
+    "fact.2": "38:48 Right #4 wint de bal; het model was 62% zeker.",
+    "fact.3": "Right #36 werd toen minstens een seconde op 16 km/u of meer gevolgd (trackersnelheden kunnen afwijken).",
+    "fact.4": "Right #19 werd toen minstens een seconde op 16 km/u of meer gevolgd (trackersnelheden kunnen afwijken).",
+    "fact.5": "Om 38:48 had Left 4 van zijn 8 getrackte spelers in het aanvallende derde en 0 in het eigen derde honk, verspreid over 56 m over het veld en 39 m van achter naar voor.",
+    "fact.6": "Om 38:48 had Right 0 van zijn 8 getrackte spelers in het aanvallende derde en 6 in het eigen derde honk, verspreid over 48 meter over het veld en 36 meter van achter naar voor.",
+    "casual": "Right #4 wint de bal nadat Left #11's pass misgaat.",
+    "analyst": "Op 38:48 lijkt Left #11's pass van 25 m verkeerd te gaan, en Right #4 lijkt te onderscheppen. Left worden gevolgd spelers 56 m breed, terwijl Right 48 m breed zijn."
+   },
+   "zh-Hans": {
+    "headline": "Right 在 Left的传球失误后赢得了球权",
+    "fact.1": "38分48秒 Left #11的25米经过偏离目标;模型确定率为62%。",
+    "fact.2": "38：48 Right #4 赢得球权;模型有62%的把握率。",
+    "fact.3": "Right #36 在那时至少有一秒钟以16公里/小时或更高的速度被跟踪（追踪器速度可能会有偏差）。",
+    "fact.4": "Right #19 在那时至少有一秒钟以16公里/小时或更高的速度被跟踪（追踪器速度可能会有偏差）。",
+    "fact.5": "38分48秒时， Left 8名被追踪球员中有4人进入进攻区，自己三分区0人，场地宽度为56米，后场至前场39米。",
+    "fact.6": "38分48秒时， Right 8名被追踪球员中有0人进入进攻区，6人进入本方三分区，场地宽度为48米，后场至前场36米。",
+    "casual": "Right #4 在 Left #11的传球失误后赢得了球权。",
+    "analyst": "在38分48秒时， Left #11的25米传球似乎偏离目标， Right #4 似乎被拦截了。 Left的被追踪球员宽度为56米，而 Right的宽度为48米。"
+   }
+  },
+  "C-5": {
+   "source_hash": "beb275191aa75cd8",
+   "failed": {
+    "fr": [
+     "fact.9"
+    ],
+    "zh-Hans": [
+     "fact.0",
+     "fact.5",
+     "fact.9"
+    ]
+   },
+   "es": {
+    "headline": "Right recupera el balón tras un pase de Left que se pierde",
+    "fact.0": "El modelo de vídeo detectó 5 eventos en un plazo de 9 segundos de 39:21: 1 acarreo, 3 pases y 1 intercepción.",
+    "fact.1": "39:21 Right #37 pasa a Right #43, 1 m; el modelo solo estaba un 35% seguro (baja confianza).",
+    "fact.2": "39:27 Left #11 carreras con la bola durante 3 m; el modelo solo estaba 50% seguro (baja confianza).",
+    "fact.3": "39:27 Left #11 pasa de 21 m se pierde; el modelo solo estaba un 44% seguro (baja confianza).",
+    "fact.4": "39:29 Right #46 gana el balón; el modelo solo estaba un 44% seguro (baja confianza).",
+    "fact.5": "39:30 Right #46 pasa a Right #30, 23 m; el modelo solo estaba un 32% seguro (baja confianza).",
+    "fact.6": "Left #11 se seguía a 17 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.7": "Right #30 se seguía a 17 km/h o más durante al menos un segundo alrededor de ese momento (las velocidades del rastreador pueden estar desajustadas).",
+    "fact.8": "A los 39:30 Left tenía 5 de sus 7 jugadores seguidos en el tercio ofensivo y 0 en su propio tercio, distribuidos 19 m a lo largo del campo y 33 m de atrás hacia adelante.",
+    "fact.9": "A los 39:30 Right tenía 0 de sus 9 jugadores con pista en el tercio ofensivo y 9 en su propio tercio, repartidos 34 m por el campo y 18 m de atrás hacia adelante.",
+    "casual": "El modelo sugiere que Right #46 gana el balón después de que el pase de Left #11 se pierda, pero no estaba seguro sobre la mayoría de los eventos.",
+    "analyst": "El modelo indica una posible pérdida de balón en el minuto 39:30, ya que Right #46 parece interceptar el pase de Left #11, pero la confianza en los acontecimientos es baja a lo largo de esta secuencia."
+   },
+   "fr": {
+    "headline": "Right gagne le ballon après que la passe de Left ait été égarée",
+    "fact.0": "Le modèle vidéo a détecté 5 événements en 9 secondes de 39:21 : 1 course, 3 passes et 1 interception.",
+    "fact.1": "39:21 Right #37 passe à Right #43, 1 m ; le modèle n’était sûr que à 35 % (faible confiance).",
+    "fact.2": "39:27 Left #11 course avec la balle sur 3 m ; le modèle n’était sûr que 50 % (faible confiance).",
+    "fact.3": "39:27 Left #11 passe de 21 m se perd ; le modèle n’était sûr que 44 % (faible confiance).",
+    "fact.4": "39:29 Right #46 remporte le ballon ; le modèle n’était sûr que à 44 % (faible confiance).",
+    "fact.5": "39:30 Right #46 passe à Right #30, 23 m ; le modèle n’était sûr que 32 % (faible confiance).",
+    "fact.6": "Left #11 était suivie à 17 km/h ou plus pendant au moins une seconde autour de ce moment-là (les vitesses du suivi peuvent être faussées).",
+    "fact.7": "Right #30 était suivie à 17 km/h ou plus pendant au moins une seconde autour de ce moment-là (les vitesses du suivi peuvent être faussées).",
+    "fact.8": "À 39:30, Left avait 5 de ses 7 joueurs sur pistes dans le tiers offensif et 0 dans son propre tiers, répartis sur 19 m sur le terrain et 33 m de l’arrière vers l’avant.",
+    "casual": "Le modèle suggère Right #46 récupère le ballon après que la passe de Left #11 ait été égarée, mais il n’était pas sûr de la plupart des événements.",
+    "analyst": "Le modèle indique un possible turnover à 39:30 car Right #46 semble intercepter la passe de Left #11, mais la confiance dans les événements reste faible tout au long de cette séquence."
+   },
+   "de": {
+    "headline": "Right gewinnt den Ball, nachdem Left's Pass fehlgeleitet ist",
+    "fact.0": "Das Videomodell erkannte 5 Ereignisse innerhalb von 9 Sekunden von 39:21: 1 Lauf, 3 Pässe und 1 Interception.",
+    "fact.1": "39:21 Right #37 geht zu Right #43, 1 m; das Modell war nur zu 35 % sicher (geringe Sicherheit).",
+    "fact.2": "39:27 Left #11 läuft mit dem Ball über 3 m; das Modell war nur zu 50 % sicher (geringes Vertrauen).",
+    "fact.3": "39:27 Left #11's Durchlauf von 21 m fehlt; das Modell war nur zu 44 % sicher (geringe Zuversicht).",
+    "fact.4": "39:29 Right #46 gewinnt den Ball; das Modell war nur zu 44 % sicher (geringe Zuversicht).",
+    "fact.5": "39:30 Right #46 geht nach Right #30, 23 m; das Modell war nur zu 32 % sicher (geringe Zuversicht).",
+    "fact.6": "Left #11 wurde damals mindestens eine Sekunde lang mit 17 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können abweichen).",
+    "fact.7": "Right #30 wurde damals mindestens eine Sekunde lang mit 17 km/h oder mehr verfolgt (die Tracker-Geschwindigkeiten können abweichen).",
+    "fact.8": "Um 39:30 hatte Left 5 der 7 Feldspieler im Angriffsdrittel und 0 im eigenen Drittel, verteilt 19 m über das Spielfeld und 33 m von hinten nach vorne.",
+    "fact.9": "Um 39:30 hatte Right 0 seiner 9 Feldspieler im Angriffsdrittel und 9 im eigenen Drittel, verteilt 34 m über das Spielfeld und 18 m von hinten nach vorne.",
+    "casual": "Das Modell legt nahe, Right #46 den Ball gewinnt, nachdem Left #11's Pass fehlgeleitet ist, aber bei den meisten Ereignissen war man sich nicht sicher.",
+    "analyst": "Das Modell zeigt einen möglichen Turnover bei 39:30 an, da Right #46 scheinbar Left #11 Pass abfängt, aber das Vertrauen in die Ereignisse ist während dieser Sequenz gering."
+   },
+   "nl": {
+    "headline": "Right wint de bal nadat Left's pass misgaat",
+    "fact.0": "Het videomodel detecteerde 5 gebeurtenissen binnen 9 seconden van 39:21: 1 carry, 3 passes en 1 interceptie.",
+    "fact.1": "39:21 Right #37 gaat naar Right #43, 1 m; het model was slechts 35% zeker (laag vertrouwen).",
+    "fact.2": "39:27 Left #11 met de bal 3 m lopen; het model was slechts 50% zeker (laag vertrouwen).",
+    "fact.3": "39:27 Left #11's passage van 21 m loopt verkeerd af; het model was slechts 44% zeker (laag vertrouwen).",
+    "fact.4": "39:29 Right #46 wint de bal; het model was slechts 44% zeker (laag vertrouwen).",
+    "fact.5": "39:30 Right #46 gaat naar Right #30, 23 m; het model was slechts 32% zeker (laag vertrouwen).",
+    "fact.6": "Left #11 werd toen minstens een seconde op 17 km/u of meer gevolgd (de snelheid van de tracker kan afwijken).",
+    "fact.7": "Right #30 werd toen minstens een seconde op 17 km/u of meer gevolgd (de snelheid van de tracker kan afwijken).",
+    "fact.8": "Om 39:30 had Left 5 van de 7 getrackte spelers in het aanvallende derde en 0 in het eigen derde honk, verspreid over 19 meter over het veld en 33 meter van achter naar voor.",
+    "fact.9": "Om 39:30 had Right 0 van de 9 getraceerde spelers in het aanvallende derde en 9 in het eigen derde honk, verspreid over 34 meter over het veld en 18 meter van achter naar voor.",
+    "casual": "Het model suggereert dat Right #46 de bal wint nadat Left #11's pass misgaat, maar bij de meeste gebeurtenissen was het niet zeker.",
+    "analyst": "Het model geeft een mogelijke turnover aan op 39:30 omdat Right #46 lijkt Left #11 pass te onderscheppen, maar het vertrouwen in de gebeurtenissen is gedurende deze reeks laag."
+   },
+   "zh-Hans": {
+    "headline": "Right 在 Left的传球失误后赢得了球权",
+    "fact.1": "39：21Right #37Right #43，1米;模型的确定性仅为35%（置信度低）。",
+    "fact.2": "39分27秒 Left #11 持球跑3米;模型的确定性仅为50%（置信度低）。",
+    "fact.3": "39：27 Left #11的21米经过偏离轨道;模型的确定性仅为44%（置信度低）。",
+    "fact.4": "39：29 Right #46 赢得球权;模型的确信率仅为44%（置信度较低）。",
+    "fact.6": "Left #11 在那时至少有17公里/小时的速度被跟踪（追踪器速度可能不对）。",
+    "fact.7": "Right #30 在那时至少有17公里/小时的速度被跟踪（追踪器速度可能不对）。",
+    "fact.8": "39分30秒时， Left 7名被追踪球员中有5人进入进攻区，自己三分之一区域则为0人，场地宽度为19米，后场至前场33米。",
+    "casual": "模型认为 Right #46 在 Left #11的传球失误后赢得球权，但对大多数事件并不确定。",
+    "analyst": "模型显示39分30秒可能发生失误，因为 Right #46 似乎拦截了 Left #11的传球，但在整个过程中对事件的信心较低。"
+   }
+  }
+ }
+}

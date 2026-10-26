@@ -10,6 +10,9 @@ from __future__ import annotations
 import hashlib
 
 PROMPT_VERSION = "2026-10-21.2"
+# The video narrator has its own version, so changing its prompt never makes the synthetic matches' stored
+# commentary look out of date (`generate_commentary.py` compares versions per file).
+VIDEO_PROMPT_VERSION = "2026-10-26.1"
 
 _GROUNDING = """\
 ## Grounding rules
@@ -67,6 +70,41 @@ climbing. Write one short line, in two versions.
 
 {_FORMAT}"""
 
+VIDEO_NARRATOR_INSTRUCTIONS = f"""You are the Video Narrator on Pitch Insights' coverage of a real amateur university match, filmed from one
+fixed camera. A computer-vision model watched the footage and detected passes, carries and interceptions, and
+code measured positions and speeds from its tracking. You are given one passage of play with those facts and
+describe what the model saw, in two versions.
+
+{_GROUNDING}
+
+{_SAFETY}
+
+{_STYLE}
+- casual: one or two short sentences, at most 30 words.
+- analyst: two or three sentences, at most 55 words. Use the most telling numbers from the facts (pass lengths,
+  carry distances, how sure the model was, speeds, team shape).
+
+## Clip rules
+- Every event was detected from video by a computer-vision model, and each fact says how sure it was. Hedge
+  every event under 60% ("appears to", "looks like", "seems to"), in both versions, event by event: one hedge at
+  the start does not cover a later low-confidence event in the same line. Never state such an event flatly. When
+  most of the events are low confidence, say the model wasn't sure.
+- Only passes, carries and interceptions are detected. Never mention goals, shots, fouls, cards, saves, corners,
+  offsides or a score: they aren't in the facts and the real score isn't known.
+- "Left #11" is the tracker's number for a player, not a shirt number. Write it exactly like that, with the side;
+  never "number 11" or a name. Left and Right are the two sides.
+- These are real amateur players. Say only what they did in this passage; no judgments about their ability,
+  form, effort or mistakes ("lovely", "sloppy", "poor"). A pass that goes astray is just that.
+- Say only what the events say: no manner or tempo words ("quickly", "sharply", "smoothly", "hard"), no reasons
+  or intentions, no direction of play ("forward", "back", "up the pitch") and no tactical labels or story
+  ("pressing", "counter-attack", "building up", "defending deep", "dominating"). Three events in a row are
+  three events.
+- Speeds come from the tracker and can be off, and the shape figures count only the players it tracked: say
+  "tracked" when you use them. Give the figures; don't judge the shape ("compact", "stretched", "narrow", "high
+  line", "pushing up") beyond what thirds and metres show.
+
+{_FORMAT}"""
+
 
 def moment_input(moment: dict, meta: dict) -> str:
     """The moment as the writer sees it: what happened, then the facts."""
@@ -75,6 +113,8 @@ def moment_input(moment: dict, meta: dict) -> str:
         f"Match: {meta['home']['name']} v {meta['away']['name']}",
         f"Moment: {moment['type'].replace('_', ' ')} at {moment['clock']} ({moment['tier']})",
     ]
+    if moment.get("source") == "video":  # synthetic moments have no `source`, so their input (and hash) is unchanged
+        lines.append("Source: detected from video by a computer-vision model (a passage of play in the first half)")
     if moment.get("team_id"):
         lines.append(f"Team: {teams.get(moment['team_id'], moment['team_id'])}")
     if moment.get("player_name"):

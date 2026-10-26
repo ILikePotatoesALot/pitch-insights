@@ -11,7 +11,7 @@ Built for the Microsoft Premier League Hackathon (October 2026).
 **Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit asks for a favourite club and player; "Skip" goes straight in.
 
 - **[Two viewers, one match](https://blue-moss-06018420f.1.azurestaticapps.net/?compare=1)**: a Potato FC fan watching casually in German beside a Carrot FC analyst in English, on the same replay.
-- **[Real footage](https://blue-moss-06018420f.1.azurestaticapps.net/?match=117093-38min_ft)**: 100 seconds of a real match, with players tracked from video by a fine-tuned detector, and the benchmark behind it.
+- **[Real footage](https://blue-moss-06018420f.1.azurestaticapps.net/?match=117093-38min_ft&follow=L-t11)**: 100 seconds of a real match, with players tracked from video by a fine-tuned detector, AI commentary that says how sure the detector was, and a spotlight that follows one real player (tap any other to switch).
 - **[A personalised link](https://blue-moss-06018420f.1.azurestaticapps.net/?match=comeback-POT-CAR&team=POT&player=POT-11&mode=casual&lang=es&focus=xg)**: any profile can be set from the address bar (`team`, `player`, `mode`, `lang`, `focus`).
 
 **Demo video:** *(link added at submission)*
@@ -24,7 +24,7 @@ Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
 - **Finds the moments that matter** and explains each one in two voices, casual and analyst, from the computed facts behind it. "Why?" shows those facts.
 - **Keeps the screen clean**: an Overlay Director schedules lower-thirds, stat cards, player tags and rating alerts so they never pile up.
 - **Personalises per viewer**: favourite club and player (a spotlight follows them on the pitch, with a pinned card and alerts), language (English, Spanish, French, German, Dutch, Simplified Chinese), level of detail and one focus metric.
-- **Works on real video too**: players tracked from licensed match footage feed the same messages, overlays and app.
+- **Works on real video too**: players tracked from licensed match footage feed the same app: the agents comment on the detected play (hedging what the detector wasn't sure of), and a viewer can follow any tracked player, whose real position the spotlight rides frame by frame.
 
 ## Architecture
 

@@ -72,7 +72,7 @@ export interface Moment {
 /** One moment's commentary from the agents, checked against its evidence pack. */
 export interface Commentary {
   moment_id: string;
-  agent: "explainer" | "narrator";
+  agent: "explainer" | "narrator" | "video_narrator";
   status: "ok" | "fallback";
   casual: string;
   analyst: string;
