@@ -52,11 +52,10 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   onPositionsRef.current = onPositions;
   const speedRef = useRef(speed);
   speedRef.current = speed;
-  // Paused by the viewer, and the profile the open connection uses: a change of language, club, player or focus
-  // metric reconnects (the server's Director works from the profile it was given), and a paused replay should
-  // stay paused through it.
+  // Reconnecting within the same match preserves the viewer's pause, including a seek or profile change.
+  // A different match and a replay after the end start playing normally.
   const pausedRef = useRef(false);
-  const profileKeyRef = useRef<string | null>(null);
+  const matchRef = useRef<string | null>(null);
   // The viewer's profile goes to the server with the connection, so its Overlay Director keeps clean the screen
   // this viewer sees (cues made for analysts only don't take slots on a casual fan's screen) and favours their
   // club and player. Mode can also change without a reconnect (the `detail` command).
@@ -73,9 +72,8 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
     setClipEvents([]);
     setClipT(null);
     onResetRef.current();
-    const key = [lang, team, player, focus].join("|");
-    const keepPaused = pausedRef.current && profileKeyRef.current !== null && profileKeyRef.current !== key;
-    profileKeyRef.current = key;
+    const keepPaused = pausedRef.current && matchRef.current === name;
+    matchRef.current = name;
     pausedRef.current = keepPaused;
     let ended = false;
     const socket = new WebSocket(wsUrl(`/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${connectionParams({ ...profile, mode: modeRef.current })}`));
@@ -126,6 +124,7 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
           break;
         case "end":
           ended = true;
+          pausedRef.current = false;
           setStatus("ended");
           break;
         case "error":
