@@ -21,7 +21,7 @@ from opentelemetry import trace
 log = logging.getLogger("pitch_insights.agents")
 
 
-def setup_tracing(settings, service_name: str = "pitch-insights") -> bool:
+def setup_tracing(settings, service_name: str = "seize-the-game") -> bool:
     """Send traces to Application Insights. Returns False (and does nothing) if it isn't configured."""
     if not settings.appinsights:
         return False

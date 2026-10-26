@@ -105,7 +105,7 @@ async def main() -> int:
     logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING, format="%(message)s")
 
     settings = load_settings()
-    tracing = setup_tracing(settings, "pitch-insights-commentary")
+    tracing = setup_tracing(settings, "seize-the-game-commentary")
     writer = writer_from_settings(settings)
     safety = safety_from_settings(settings)
     if safety is None:
