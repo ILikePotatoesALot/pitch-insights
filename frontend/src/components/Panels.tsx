@@ -101,7 +101,7 @@ export function PinnedPlayer({ state, meta, colours, playerId, mode, focus, hist
         <div className="pin-name">
           <b>{person.name}</b>
           <small>★ Your player · {person.position}{p && !p.on_pitch ? " · off" : ""}</small>
-          <small>Ring: last recorded action position</small>
+          <small>{meta.tracking ? "Ring: continuous simulated position" : "Ring: last recorded action position"}</small>
         </div>
         {p && <div className="pin-rating">
           <b className="bigrating">{p.rating.toFixed(1)}</b>

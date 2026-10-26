@@ -85,6 +85,10 @@ test('a replacement label is attached even when the selected player is unchanged
 
 test('an unassigned clip marker cannot intercept selection of a nearby player', () => {
   const clip = new ClipLayer(() => 0);
+  clip.push({ t: 0, ref_team_id: 'L', ball: null, players: [
+    { id: 'U-t1', team_id: null, x: 52.5, y: 34, speed: 0, confidence: 1 },
+    { id: 'L-t11', team_id: 'L', x: 53.5, y: 34, speed: 0, confidence: 1 },
+  ] }, { home: { id: 'L', players: [] }, away: { id: 'R', players: [] }, attacking_direction: { '1': {} } });
   const camera = new THREE.PerspectiveCamera(38, 1, 1, 1000);
   camera.position.set(0, 50, 50);
   camera.lookAt(0, 0, 0);
@@ -93,4 +97,30 @@ test('an unassigned clip marker cannot intercept selection of a nearby player', 
   clip.current.set('L-t11', { x: 1, y: 0, z: 0 });
   const at = new THREE.Vector3(0, 1, 0).project(camera);
   assert.equal(clip.pick((at.x * 0.5 + 0.5) * 500, (-at.y * 0.5 + 0.5) * 500, camera, 500, 500), 'L-t11');
+});
+
+test('a simulated player can be selected and follows positions without touching the ball', () => {
+  const s = scene();
+  const trackedMeta = { ...meta, home: { id: 'POT', players: [{ id: 'POT-07', number: 7 }] },
+    away: { id: 'CAR', players: [] } };
+  s.clip.push({ t: 1, period: 1, ref_team_id: 'POT', ball: null,
+    players: [{ id: 'POT-07', team_id: 'POT', x: 53.5, y: 34, speed: 2, confidence: 1 }] }, trackedMeta);
+  s.clip.current.set('POT-07', { x: 1, y: 0, z: 0 });
+  const camera = new THREE.PerspectiveCamera(38, 1, 1, 1000);
+  camera.position.set(0, 50, 50);
+  camera.lookAt(0, 0, 0);
+  camera.updateMatrixWorld();
+  const at = new THREE.Vector3(1, 1, 0).project(camera);
+  assert.equal(s.clip.pick((at.x * 0.5 + 0.5) * 500, (-at.y * 0.5 + 0.5) * 500, camera, 500, 500), 'POT-07');
+  s.setSpotlight({ id: 'POT-07', colour: '#6893ef' });
+  s.heightAt = () => 0;
+  s.moveSpotlight();
+  assert.equal(s.spot.group.visible, true);
+  s.clip.current.set('POT-07', { x: 3, y: 0, z: 2 });
+  s.moveSpotlight();
+  assert.deepEqual(s.spot.target.toArray(), [3, 0, 2]);
+  assert.equal(s.playerPositions.size, 0);
+  assert.equal(s.clip.numbers.get('POT-07'), '7');
+  s.reset();
+  assert.equal(s.clip.pick(250, 250, camera, 500, 500), null);
 });

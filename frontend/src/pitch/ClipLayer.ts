@@ -44,6 +44,8 @@ export class ClipLayer {
   private ball: THREE.Mesh;
   private ballLast: { x: number; z: number; t: number } | null = null;
   private labels = new Map<string, THREE.CanvasTexture>();
+  private numbers = new Map<string, string>();
+  private selectable = new Set<string>();
   private marks: EventMark[] = [];
   private colours: THREE.Color[] = [];
   private bodyGeo = new THREE.CapsuleGeometry(0.7, 1.3, 4, 10);
@@ -68,7 +70,14 @@ export class ClipLayer {
 
   /** The frame as a snapshot in scene coordinates (its players' own attacking frames made absolute). */
   push(frame: ClipFrame, meta: MatchMeta) {
-    const dirs = meta.attacking_direction["1"] ?? {};
+    const dirs = meta.attacking_direction[String(frame.period ?? 1)] ?? {};
+    for (const team of [meta.home, meta.away]) for (const p of team.players) {
+      if (this.numbers.get(p.id) !== String(p.number)) {
+        this.numbers.set(p.id, String(p.number));
+        const marker = this.markers.get(p.id);
+        if (marker) this.paintLabel(marker);
+      }
+    }
     const toScene = (team: string | null, x: number, y: number) => {
       const flip = dirs[team ?? frame.ref_team_id] === "right_to_left";
       return scenePoint(flip ? L - x : x, flip ? W - y : y);
@@ -78,6 +87,7 @@ export class ClipLayer {
       const s = toScene(p.team_id, p.x, p.y);
       players.set(p.id, { x: s.x, z: s.y, team: p.team_id === meta.home.id ? 0 : p.team_id === meta.away.id ? 1 : 2,
                           speed: p.speed, conf: p.confidence });
+      if (p.team_id === meta.home.id || p.team_id === meta.away.id) this.selectable.add(p.id);
     }
     const b = frame.ball ? toScene(null, frame.ball.x, frame.ball.y) : null;
     this.snaps.push({ t: frame.t, players, ball: b ? { x: b.x, z: b.y } : null });
@@ -125,7 +135,7 @@ export class ClipLayer {
   pick(px: number, py: number, camera: THREE.Camera, w: number, h: number, radius = 22): string | null {
     let best: string | null = null, bestD = radius * radius;
     for (const [id, p] of this.current) {
-      if (!/^[LR]-t\d+$/.test(id)) continue; // an unassigned marker must not steal a tap from a selectable player
+      if (!this.selectable.has(id)) continue;
       const v = this.tmp.set(p.x, p.y + 1, p.z).project(camera);
       const d = ((v.x * 0.5 + 0.5) * w - px) ** 2 + ((-v.y * 0.5 + 0.5) * h - py) ** 2;
       if (d < bestD) { best = id; bestD = d; }
@@ -143,6 +153,8 @@ export class ClipLayer {
     this.clock = null;
     this.ballLast = null;
     this.current.clear();
+    this.selectable.clear();
+    this.numbers.clear();
     for (const m of this.markers.values()) m.group.visible = false;
     for (const m of this.marks) { m.active = false; m.line.visible = m.ring.visible = false; }
     this.ball.visible = false;
@@ -232,7 +244,7 @@ export class ClipLayer {
   }
 
   private paintLabel(mk: Marker) {
-    const text = mk.id.slice(mk.id.lastIndexOf("t") + 1); // the tracker number: "L-t12" is "12"
+    const text = this.numbers.get(mk.id) ?? mk.id.slice(mk.id.lastIndexOf("t") + 1);
     const hex = `#${(this.colours[mk.team] ?? new THREE.Color(GREY)).getHexString()}`;
     const tex = this.labels.get(`${text}|${hex}`) ?? this.makeLabel(text, hex);
     this.labels.set(`${text}|${hex}`, tex);

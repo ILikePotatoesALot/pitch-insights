@@ -5,7 +5,7 @@ import type { ClipEventLine, ClipFrame, ClipInfo, CommentaryInfo, Cue, LiveState
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
 export type ReplayCommand = { cmd: "pause" | "resume" | "speed"; value?: number; wall?: number };
-export type ReplayReady = { server_time: number; kind: "synthetic" | "video"; duration?: number };
+export type ReplayReady = { server_time: number; kind: "synthetic" | "video"; duration?: number; tracking?: boolean };
 export type ReplayOptions = { controlled?: boolean; initialMinute?: number; initialAt?: number | null; onReady?: (ready: ReplayReady) => void };
 
 /**

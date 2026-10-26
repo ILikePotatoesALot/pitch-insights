@@ -63,6 +63,7 @@ from pitch_insights.director import CueBuilder, Personaliser, parse_profile, vis
 from pitch_insights.director.session import CUE_TICK_S, ViewerSession, clamp_speed, run_until_first_done
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
+from pitch_insights.generator.continuous import NAME as SIMULATION, prototype, summary as simulation_summary
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
 from pitch_insights.origins import LOCALHOST, configured_origins, origin_allowed
 from pitch_insights.profiles import close_store, router as profiles_router, warm_store
@@ -107,7 +108,7 @@ def list_matches() -> list[dict]:
                     "kind": "synthetic",
                     "home": {k: meta["home"][k] for k in ("id", "name", "short_name", "colours")},
                     "away": {k: meta["away"][k] for k in ("id", "name", "short_name", "colours")}})
-    return out + list_clips(SAMPLES)  # the real-footage clip(s) in samples/video/, listed after the synthetic matches
+    return out + [simulation_summary()] + list_clips(SAMPLES)
 
 
 @functools.lru_cache(maxsize=4)
@@ -132,6 +133,8 @@ def list_clubs() -> list[dict]:
 
 @app.get("/api/matches/{name}")
 def get_match(name: str) -> dict:
+    if name == SIMULATION:
+        return prototype()[0]
     clip = find_clip(SAMPLES, name)
     if clip:
         return clip_meta(clip)
@@ -182,9 +185,14 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if clip:
         await replay_clip(ws, clip, speed, SAMPLES)
         return
+    frames = []
     try:
-        path = _match_path(name)
-        meta, events = read_match(path)
+        if name == SIMULATION:
+            meta, events, frames = await asyncio.to_thread(prototype)
+            path = SAMPLES / f"{SIMULATION}.jsonl"
+        else:
+            path = _match_path(name)
+            meta, events = read_match(path)
     except HTTPException as e:
         await ws.send_json({"type": "error", "message": e.detail})
         await ws.close()
@@ -218,6 +226,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         start = max(0.0, at)
     else:
         start = start_seconds(events, from_minute) if from_minute > 0 else 0.0
+    if frames:
+        start = min(start, frames[-1]["t"])
     times = match_seconds(events)
     first = next((i for i, t in enumerate(times) if t >= start), len(events))
     for ev in events[:first]:
@@ -231,10 +241,17 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     else:  # from kick-off there is no catch-up, but the app still needs the starting XI at their opening ratings
         await ws.send_json({"type": "state", "state": state_message(brain)})
 
-    rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
+    timeline = events
+    if frames:
+        timeline = sorted(events + [{"t": f["t"], "period": 1, "frame": f} for f in frames],
+                          key=lambda e: (e["t"], "frame" not in e))
+    rep = Replay(timeline, speed=clamp_speed(speed), start_at=start if frames else times[first] if first < len(events) else start, poll=0.05)
+    if frames:
+        await ws.send_json(frames[min(len(frames) - 1, int(start * 5))])
     if ws.query_params.get("paused") == "1":
         rep.paused = True
-        await ws.send_json({"type": "ready", "server_time": time.time(), "kind": "synthetic"})
+        await ws.send_json({"type": "ready", "server_time": time.time(), "kind": "synthetic",
+                            **({"duration": frames[-1]["t"], "tracking": True} if frames else {})})
     # The Overlay Director, one per connection (see director/session.py). A seek or a language change reconnects,
     # so cues start afresh.
     session = ViewerSession(ws, rep, profile.mode)
@@ -252,6 +269,12 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 continue
             except StopAsyncIteration:
                 break
+            if "frame" in ev:
+                # At accelerated speeds, retain events but skip obsolete drawing frames.
+                if ev["t"] == frames[-1]["t"] or rep.now - ev["t"] < max(0.3, rep.speed * 0.08):
+                    await ws.send_json(ev["frame"])
+                await session.tick()
+                continue
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})
             shown_moments = [shown(m) for m in out["moments"]]

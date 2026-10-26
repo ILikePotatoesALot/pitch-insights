@@ -15,6 +15,7 @@ export interface TeamMeta {
 }
 
 export interface MatchMeta {
+  tracking?: { kind: "simulation"; hz: number; duration: number };
   type: "match_meta";
   source?: "video"; // set for the real-footage clip: two sides, no squads, colours used as given
   match: { id: string; seed: number; competition: string; matchday: number; venue: string };
@@ -158,6 +159,7 @@ export interface LiveState {
 }
 
 export interface MatchSummary {
+  tracking?: boolean;
   name: string;
   kind?: "synthetic" | "video"; // a tracked clip of real footage is "video"
   match_id: string;
@@ -226,6 +228,7 @@ export interface ClipPlayer { id: string; team_id: string | null; x: number; y: 
 
 /** Positions of everyone at one moment of the clip; `t` is seconds since the half started. */
 export interface ClipFrame {
+  period?: 1 | 2;
   type: "frame";
   t: number;
   clock: string;
