@@ -9,7 +9,7 @@ stop conditions, and report in the format at the end.
 
 ## The project and your task
 
-**Pitch Insights** is Austin's entry to the Microsoft Premier League Hackathon (deadline 27 Oct 2026, 11:59 pm Pacific).
+**Seize the game** is Austin's entry to the Microsoft Premier League Hackathon (deadline 27 Oct 2026, 11:59 pm Pacific).
 The **video path** turns real, licensed match footage (SoccerTrack v2, CC BY 4.0) into player positions and events, and is
 scored against SoccerTrack's ground truth. It uses RF-DETR small as the detector. Your task is to **fine-tune that
 detector on this machine's GPU, measure whether it beats the pre-trained model, and hand the results back.**

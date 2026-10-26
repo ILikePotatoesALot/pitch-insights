@@ -202,7 +202,7 @@ export default function App() {
   return (
     <div className={`app ${layout}${embedded ? " embed" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
-        <h1>Pitch Insights <small>live football intelligence</small></h1>
+        <h1>Seize the game <small>live football intelligence</small></h1>
         <button type="button" className="mobile-settings-toggle" ref={settingsButton} aria-expanded={settingsOpen}
                 aria-controls="view-settings" onClick={() => setSettingsOpen((open) => !open)}>Settings</button>
         <div className="header-settings" id="view-settings" data-open={settingsOpen} onKeyDown={(e) => {

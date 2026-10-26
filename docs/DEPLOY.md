@@ -1,4 +1,6 @@
-# Deploying Pitch Insights to Azure
+# Deploying Seize the game to Azure
+
+The app and its image are now named Seize the game and `seize-the-game-api`. Existing Azure resources and the GitHub repository still use their original identifiers below. Keep those identifiers when updating this deployment; the workflow publishes the renamed image to the existing registry and points the existing Container App at it.
 
 Written 23 Oct 2026. Step 8 in [HANDOFF.md](HANDOFF.md); how it is built and why is in [DESIGN.md, Deployment](DESIGN.md#deployment-azure). The goal: a public link judges can open, kept up until **10 Nov 2026**.
 
@@ -58,7 +60,7 @@ No secret is stored: GitHub gives each workflow run a short-lived token, and Azu
 
 > **Testing from a branch:** the workflows trigger on `main` only. To try a change before merging it, once the workflow is on `main` use **Actions → Deploy backend → Run workflow** and pick the branch; that needs a second federated credential (Entity **Branch**, that branch's name) on `id-pitch-insights-deploy`, which should be deleted afterwards. The bring-up credential `github-deploy-branch` (branch `claude/deploy-bec969`) is no longer needed: delete it. The frontend workflow stays on `main` only, because a branch deployment would go to a separate preview address that the server doesn't allow.
 
-**Check (after the code is pushed):** Actions → **Deploy backend** → the run is green, and the registry's **Repositories** shows `pitch-insights-api` with a tag. If **Test the server** or **Build the image** fails, nothing has reached Azure; if **azure/login** fails, the federated credential's branch or names don't match (the error prints the subject Azure received).
+**Check (after the code is pushed):** Actions → **Deploy backend** → the run is green, and the registry's **Repositories** shows `seize-the-game-api` with a tag. If **Test the server** or **Build the image** fails, nothing has reached Azure; if **azure/login** fails, the federated credential's branch or names don't match (the error prints the subject Azure received).
 
 ## Stage 3: Key Vault (one secret)
 
@@ -105,7 +107,7 @@ Needs the image from Stage 2 in the registry.
 
 1. Search **Container Apps** → **Create** → **Container App**.
    - **Basics:** Resource group `rg-pitch-insights`, Name `ca-pitch-insights-api`, **Deployment source: Container image**, Region **East US 2**. Container Apps environment → **Create new**: Name `cae-pitch-insights`, Environment type **Consumption only**; Monitoring: Log Analytics workspace **Create new** `log-pitch-insights`; networking: leave public. Create.
-   - **Container:** untick **Use quickstart image**. Image source **Azure Container Registry**, Registry `acrpitchinsights<sfx>`, Image `pitch-insights-api`, Image tag `latest`. Authentication type **Managed identity** → Identity `id-pitch-insights-app`. (If this box isn't offered, finish creating with the quickstart image and set the registry afterwards under **Settings → Containers → Edit and deploy**.) CPU and memory **0.5 CPU cores, 1 Gi**.
+   - **Container:** untick **Use quickstart image**. Image source **Azure Container Registry**, Registry `acrpitchinsights<sfx>`, Image `seize-the-game-api`, Image tag `latest`. Authentication type **Managed identity** → Identity `id-pitch-insights-app`. (If this box isn't offered, finish creating with the quickstart image and set the registry afterwards under **Settings → Containers → Edit and deploy**.) CPU and memory **0.5 CPU cores, 1 Gi**.
      Environment variables (type the values; none is a secret): `AZURE_CLIENT_ID` = the **Client ID** of `id-pitch-insights-app` (its Overview), `COSMOS_ENDPOINT` = the Cosmos URI from Stage 4.
    - **Ingress:** Enabled; **Ingress traffic: Accepting traffic from anywhere**; Ingress type **HTTP**; Target port **8000**; Insecure connections **off**.
    - Create. When it's done, open the app → **Settings → Identity → User assigned** and confirm `id-pitch-insights-app` is attached (add it if not).
@@ -134,7 +136,7 @@ Open the live link in a browser and check: a replay from kick-off and a seek; th
 
 ## Deploying changes
 
-Merging to `main` runs the workflows: backend changes (`backend/`, `samples/`, the Dockerfile) build and deploy the image; `frontend/` changes redeploy the app. Both can be run by hand from the Actions tab. Each image is tagged with its commit, so a bad deploy can be rolled back: Container App → **Revisions and replicas** → activate the earlier revision, or run `az containerapp update -n ca-pitch-insights-api -g rg-pitch-insights --image acrpitchinsights<sfx>.azurecr.io/pitch-insights-api:<commit>`.
+Merging to `main` runs the workflows: backend changes (`backend/`, `samples/`, the Dockerfile) build and deploy the image; `frontend/` changes redeploy the app. Both can be run by hand from the Actions tab. Each image is tagged with its commit, so a bad deploy can be rolled back: Container App → **Revisions and replicas** → activate the earlier revision, or run `az containerapp update -n ca-pitch-insights-api -g rg-pitch-insights --image acrpitchinsights<sfx>.azurecr.io/seize-the-game-api:<commit>`.
 
 When live simulation is added later: its keys go in Key Vault as new secrets (Stage 3), get a secret reference (Stage 5 step 3) and an environment variable (step 4); the app's identity already has the right to read them.
 

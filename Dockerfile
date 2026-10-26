@@ -1,5 +1,5 @@
 # The replay server's image, for Azure Container Apps. Build from the repo root:
-#   docker build -t pitch-insights-api .
+#   docker build -t seize-the-game-api .
 # CPU only and small: just what the server imports (FastAPI, Cosmos DB and Azure Monitor SDKs). It makes no model
 # calls, so no Agent Framework, openai or evaluation packages; and nothing for the video path (video/.venv).
 # The match files are read from /app/samples (PITCH_SAMPLES).
