@@ -6,15 +6,69 @@ Pitch Insights is an AI system that turns live football match events into explai
 
 Built for the Microsoft Premier League Hackathon (October 2026).
 
+## Try it
+
+**Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit asks for a favourite club and player; "Skip" goes straight in.
+
+- **[Two viewers, one match](https://blue-moss-06018420f.1.azurestaticapps.net/?compare=1)**: a Potato FC fan watching casually in German beside a Carrot FC analyst in English, on the same replay.
+- **[Real footage](https://blue-moss-06018420f.1.azurestaticapps.net/?match=117093-38min_ft)**: 100 seconds of a real match, with players tracked from video by a fine-tuned detector, and the benchmark behind it.
+- **[A personalised link](https://blue-moss-06018420f.1.azurestaticapps.net/?match=comeback-POT-CAR&team=POT&player=POT-11&mode=casual&lang=es&focus=xg)**: any profile can be set from the address bar (`team`, `player`, `mode`, `lang`, `focus`).
+
+**Demo video:** *(link added at submission)*
+
 Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
+
+## What it does
+
+- **Replays a match on a 3D pitch** with live stats, momentum, win probability and player ratings that move with every action.
+- **Finds the moments that matter** and explains each one in two voices, casual and analyst, from the computed facts behind it. "Why?" shows those facts.
+- **Keeps the screen clean**: an Overlay Director schedules lower-thirds, stat cards, player tags and rating alerts so they never pile up.
+- **Personalises per viewer**: favourite club and player (a spotlight follows them on the pitch, with a pinned card and alerts), language (English, Spanish, French, German, Dutch, Simplified Chinese), level of detail and one focus metric.
+- **Works on real video too**: players tracked from licensed match footage feed the same messages, overlays and app.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    G[Synthetic match generator] --> I
+    V[Real video: RF-DETR + tracker] --> I
+    I[Interpreter: stats, patterns, ratings, win probability] --> M[Moment Scorer: evidence packs]
+    M --> A[Agents on Microsoft Agent Framework + Foundry GPT-4o:<br/>Memory, Explainer, Narrator]
+    A --> C[Checks: groundedness in code, Content Safety,<br/>Foundry groundedness evaluator]
+    C --> T[Translator: 5 languages]
+    T --> S[(Stored commentary)]
+    S --> R[Replay server on Container Apps]
+    I --> R
+    R --> D[Overlay Director + Personalise]
+    D -->|WebSocket| W[React + Three.js app on Static Web Apps]
+```
+
+The agents run ahead of time and their checked, translated commentary is stored, so the live app never waits on a model and makes no model calls. Everything else runs live per viewer.
+
+## Microsoft and Azure technologies
+
+| Technology | What it does here |
+|---|---|
+| **Microsoft Agent Framework** | The Explainer, Narrator and Memory agents, with deterministic orchestration, a retry on failed checks and a fallback headline |
+| **Microsoft Foundry** (GPT-4o, `text-embedding-3-small`) | Writes the commentary; embeddings let the Memory agent recall similar earlier moments |
+| **Foundry groundedness evaluator** | A second opinion on every stored line (all 52 pass, lowest score 4 of 5) |
+| **Azure AI Content Safety** | Screens every line before it can be shown; fails closed |
+| **Azure AI Translator** | Translates every moment into 5 languages, with names and clocks protected and every number checked |
+| **Application Insights** (OpenTelemetry) | Traces agent runs (without prompts or replies) and the live server's requests |
+| **Azure Machine Learning** (MLflow) | Records the video detector's benchmark runs, pre-trained and fine-tuned |
+| **Azure Container Apps** + **Container Registry** | Runs the replay server (WebSocket streaming) |
+| **Azure Static Web Apps** | Hosts the app |
+| **Azure Cosmos DB** (free tier) | Stores viewer profiles, reached through a managed identity with keys disabled |
+| **Azure Key Vault** + **managed identities** | Holds the server's secret; no keys in code, images or GitHub |
+| **GitHub Actions** with OpenID Connect | Tests, builds and deploys on every merge, with no stored Azure secret |
 
 ## Pipeline
 
 1. **Ingest**: synthetic match events, plus player positions and events derived from real, licensed match video (RF-DETR detection on tiles, ByteTrack-style tracking, a fitted image-to-pitch mapping), in one shared event format.
 2. **Interpret**: stats, patterns (momentum, pressure, chaos, tempo) and live player ratings, calculated in code.
-3. **Explain**: each moment is scored by how much it changed the match, and explained from an evidence pack of computed facts.
+3. **Explain**: each moment is scored by how much it changed the match, and explained by agents from an evidence pack of computed facts, with similar earlier moments recalled by the Memory agent.
 4. **Render**: timed, machine-readable overlay cues, chosen by the Overlay Director (deterministic rules that keep the screen clean) and drawn over a Three.js 3D pitch.
-5. **Personalise**: analyst or casual mode, favourite club and player, language and focus metric.
+5. **Personalise**: analyst or casual mode, favourite club and player, language and focus metric, sent with the connection so each viewer gets their own cues.
 
 ## Repository layout
 
@@ -46,7 +100,7 @@ python -m pitch_insights.watch ../samples/comeback-POT-CAR.jsonl --speed 60 --fr
 python -m pitch_insights.interpret ../samples/comeback-POT-CAR.jsonl --at 70 --player Madekuta   # stats, ratings, signals
 python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
-pytest
+pytest                                   # 384 tests; no keys or network needed
 ```
 
 ### Run the app
@@ -64,7 +118,7 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute.
+Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute. `/?compare=1` opens the side-by-side view.
 
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 
@@ -110,6 +164,22 @@ cd backend
 
 First full run: 52 moments across the three demo matches, all grounded, none fell back. Commentary is labelled as AI-generated in the app, and "Why?" shows the facts it came from. Details and the engineering practices we follow: [docs/DESIGN.md](docs/DESIGN.md#agents).
 
+## Overlay Director and personalisation
+
+The **Overlay Director** turns moments, stats and rating changes into timed cues (time, duration, priority, template, data) and keeps the screen clean: one lower-third at a time, at most two cards, cooldowns between similar cues, and a higher-priority cue may replace a lower one. A cue that would arrive too late is dropped rather than shown stale. It is deterministic code, so a replay always looks the same.
+
+**Personalise** takes the viewer's five choices (mode, language, favourite club, favourite player, focus metric) with the connection. Cues about the favourites get a priority boost and a star that says why, the favourite player gets their own alerts (goals, assists, cards, rating jumps), and the other side's minor alerts don't take a fan's screen space. Every goal, red card and the final whistle still reaches everyone: personalising adds emphasis and never hides the match. Profiles hold only those five choices: in the browser, and in Cosmos DB when deployed, with "Clear my profile" in the app.
+
+Details: [docs/DESIGN.md, Overlay Director](docs/DESIGN.md#overlay-director) and [Personalise](docs/DESIGN.md#personalise).
+
+## Responsible AI
+
+- **Grounded:** the agents only explain facts computed in code, a code check confirms every name and number, and "Why?" shows the evidence. A line that fails falls back to the plain headline.
+- **Screened:** Azure AI Content Safety checks every line before it can be shown, and nothing unchecked is shown if the service can't be reached.
+- **Labelled:** commentary is marked as AI-generated, machine translations are marked, and the real-footage view says its positions come from a model, with the model's measured accuracy and what the numbers don't cover.
+- **Private:** no accounts, names or viewing history; a profile is five choices the viewer can clear. Agent traces leave out prompts and replies.
+- **Fictional players, real footage with consent:** synthetic clubs and players are invented, and SoccerTrack v2's players are labelled only by side and number.
+
 ## Video path: real footage into the same messages
 
 The core pipeline runs on synthetic matches. As a second source, the video path turns real, licensed match video into the same `frame` and `event` messages: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), a fixed 4K panoramic camera over a whole pitch, amateur university players who consented, no names. Players are labelled by side and shirt number ("Left #7"), never with our fictional names.
@@ -129,7 +199,11 @@ Benchmarked against SoccerTrack's ground truth on 100 s of match 117093 (38:00â€
 
 On SoccerTrack's held-out test frames, fine-tuning lifts box precision from 45% to 98% at the same 98% recall: it learns to ignore spectators and staff.
 
-The team, ID and event settings were chosen on this clip, so those figures are optimistic until checked on another; details, limits and how to run it in [docs/DESIGN.md, Video path](docs/DESIGN.md#video-path). The output is in [`samples/video/`](samples/README.md#video-path-video).
+The team, ID and event settings were chosen on this clip, so those figures are optimistic until checked on another; details, limits and how to run it in [docs/DESIGN.md, Video path](docs/DESIGN.md#video-path). The output is in [`samples/video/`](samples/README.md#video-path-video), and the app replays it as the "real footage" match. The benchmark runs are logged to Azure Machine Learning through MLflow.
+
+## Deployment
+
+The live app runs on Azure in East US 2: the replay server on **Container Apps** (image in **Container Registry**), the app on **Static Web Apps**, viewer profiles in **Cosmos DB**, the server's one secret in **Key Vault**, and telemetry in **Application Insights**. The server reaches Key Vault, Cosmos DB and the registry through a managed identity. GitHub Actions signs in to Azure with OpenID Connect, runs the tests, builds the image and deploys on every merge into `main`. The deployed app replays stored commentary and makes no model calls. Step-by-step setup: [docs/DEPLOY.md](docs/DEPLOY.md); design notes: [docs/DESIGN.md, Deployment](docs/DESIGN.md#deployment-azure).
 
 ## Credits
 
