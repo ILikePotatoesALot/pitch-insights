@@ -1,10 +1,12 @@
-# Pitch Insights
+# Seize the game
 
 *Live football intelligence, explained and personalised.*
 
-Pitch Insights is an AI system that turns live football match events into explainable insights for broadcasters and fans. It reads match data from a synthetic event generator and from computer-vision tracking of match video. Specialist AI agents built on Microsoft Foundry and Microsoft Agent Framework calculate stats and live player ratings, find the key moments, explain why they matter, and present them as on-screen overlays on a live 3D pitch. Each viewer can personalise the experience by club, favourite player, language and level of detail. It runs on Azure.
+Seize the game is an AI system that turns live football match events into explainable insights for broadcasters and fans. It reads match data from a synthetic event generator and from computer-vision tracking of match video. Specialist AI agents built on Microsoft Foundry and Microsoft Agent Framework calculate stats and live player ratings, find the key moments, explain why they matter, and present them as on-screen overlays on a live 3D pitch. Each viewer can personalise the experience by club, favourite player, language and level of detail. It runs on Azure.
 
 Built for the Microsoft Premier League Hackathon (October 2026).
+
+The app is named **Seize the game**, with `seize-the-game` used in package and service names. The existing repository URL, Python import path `pitch_insights`, browser storage keys and Azure resource names remain in place for compatibility with the deployed app and saved profiles.
 
 ## Try it
 

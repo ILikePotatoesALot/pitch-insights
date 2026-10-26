@@ -26,7 +26,7 @@ def setup_telemetry(app) -> bool:
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
         logging.getLogger("azure").setLevel(logging.WARNING)  # the exporter logs every HTTP request at INFO
-        os.environ.setdefault("OTEL_SERVICE_NAME", "pitch-insights-api")
+        os.environ.setdefault("OTEL_SERVICE_NAME", "seize-the-game-api")
         configure_azure_monitor(connection_string=connection_string, logger_name="pitch_insights",
                                 instrumentation_options={"fastapi": {"enabled": False}})
         FastAPIInstrumentor.instrument_app(app, exclude_spans=["send", "receive"])

@@ -3,7 +3,7 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pitch-insights"
+name = "seize-the-game"
 version = "0.1.0"
 description = "Live football intelligence, explained and personalised."
 requires-python = ">=3.12"
@@ -36,7 +36,7 @@ agents = [
 ]
 # Foundry's groundedness evaluator (scripts only)
 evaluation = ["azure-ai-evaluation>=1.18,<2"]
-dev = ["pitch-insights[agents,evaluation]", "pytest>=8"]
+dev = ["seize-the-game[agents,evaluation]", "pytest>=8"]
 
 [tool.setuptools.packages.find]
 include = ["pitch_insights*"]

@@ -1,4 +1,4 @@
-"""Event format v1: the contract shared by every part of Pitch Insights.
+"""Event format v1: the contract shared by every part of Seize the game.
 
 See docs/DESIGN.md. Coordinates are metres on a 105 x 68 pitch, always from the
 acting team's attacking direction (x = 105 is the goal they attack).

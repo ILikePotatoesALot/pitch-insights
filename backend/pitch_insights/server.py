@@ -81,7 +81,7 @@ async def lifespan(_: FastAPI):
     await close_store()
 
 
-app = FastAPI(title="Pitch Insights replay server", lifespan=lifespan)
+app = FastAPI(title="Seize the game replay server", lifespan=lifespan)
 # Only the static site (PITCH_ALLOWED_ORIGINS) and localhost may call this from a page; see pitch_insights/origins.py.
 app.add_middleware(CORSMiddleware, allow_origins=configured_origins(), allow_origin_regex=LOCALHOST,
                    allow_methods=["GET", "PUT", "DELETE"], allow_headers=["Content-Type"])
