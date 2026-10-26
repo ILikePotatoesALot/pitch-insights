@@ -8,12 +8,15 @@ import type { ClubInfo, FocusMetric, Profile, ViewMode } from "../types";
  * editing later from the header. Nothing here is required; the viewer can skip it or clear it, and what is
  * stored is only these five choices.
  */
-export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSave, onReset, onClose }: {
+export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSave, onReset, onClose, fallbackFocus, clipMode = false }: {
   clubs: ClubInfo[]; languages: Record<string, string>; profile: Profile; first: boolean; fromLink: boolean;
   onSave: (p: Profile) => void; onReset: () => void; onClose: () => void;
+  fallbackFocus?: HTMLElement | null;
+  clipMode?: boolean;
 }) {
   const [draft, setDraft] = useState<Profile>(profile);
   const firstField = useRef<HTMLButtonElement>(null);
+  const form = useRef<HTMLFormElement>(null);
   const set = (patch: Partial<Profile>) => setDraft((d) => ({ ...d, ...patch }));
   const langs = { ...LANGUAGE_NAMES, ...languages };
 
@@ -21,12 +24,27 @@ export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSa
   // neither effect re-runs and the focus stays on the field the viewer is using.
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
-  useEffect(() => { firstField.current?.focus(); }, []);
   useEffect(() => {
-    if (first) return;
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
-    window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    firstField.current?.focus();
+    const keys = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !first) { e.preventDefault(); closeRef.current(); }
+      if (e.key !== "Tab") return;
+      const fields = [...(form.current?.querySelectorAll<HTMLElement>("button:not(:disabled), select:not(:disabled), a[href]") ?? [])]
+        .filter((field) => field.getClientRects().length > 0);
+      const firstItem = fields[0], lastItem = fields[fields.length - 1];
+      if (e.shiftKey && document.activeElement === firstItem) { e.preventDefault(); lastItem?.focus(); }
+      else if (!e.shiftKey && document.activeElement === lastItem) { e.preventDefault(); firstItem?.focus(); }
+    };
+    window.addEventListener("keydown", keys);
+    return () => {
+      document.body.style.overflow = overflow;
+      window.removeEventListener("keydown", keys);
+      if (trigger?.isConnected && trigger.getClientRects().length) trigger.focus();
+      else fallbackFocus?.focus();
+    };
   }, [first]);
 
   const pickClub = (team: string | null) => {
@@ -39,7 +57,7 @@ export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSa
 
   return (
     <div className="modal-backdrop" role="presentation">
-      <form className="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title"
+      <form className="picker" ref={form} role="dialog" aria-modal="true" aria-labelledby="picker-title"
             onSubmit={(e) => { e.preventDefault(); onSave(draft); }}>
         <h2 id="picker-title">{first ? "Make it yours" : "Your profile"}</h2>
         <p className="picker-note">
@@ -47,6 +65,7 @@ export function ProfilePicker({ clubs, languages, profile, first, fromLink, onSa
           {fromLink ? "This view was opened from a link, so its profile lives in the link and isn't saved. " : (remoteServer ? "Saved in this browser and, under a random id, in this app's Azure Cosmos DB (deleted after 90 days unused), and only these choices: no name, no account. " : "Saved only in this browser, and only these choices: no name, no account. ")}
           Everything is optional.
         </p>
+        {clipMode && <p className="picker-note">Favourite clubs and players apply to synthetic matches. To follow someone in this clip, use the Players list or tap their marker on the pitch.</p>}
 
         <fieldset>
           <legend>Favourite club</legend>
