@@ -239,7 +239,7 @@ export function Ratings({ state, meta, colours, favourite, setFavourite }: {
   const players = state?.players ?? [];
   const fav = players.find((p) => p.player_id === favourite);
   const teamCol = (t: string) => (t === meta.home.id ? colours[0] : colours[1]);
-  const top = [...players].filter((p) => p.minutes >= 1).sort((a, b) => b.rating - a.rating).slice(0, 8);
+  const top = [...players].sort((a, b) => b.rating - a.rating).slice(0, 8);
   return (
     <div className="panel ratings">
       <h3>Live ratings <small>tap a player</small></h3>

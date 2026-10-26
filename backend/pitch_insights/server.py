@@ -218,6 +218,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                   if t >= times[first - 1] - 180 or (ev["type"] == "match_state" and ev["state"] == "half_time")]
         await ws.send_json({"type": "catchup", "moments": [shown(m) for m in brain.moments],
                             "state": state_message(brain), "recent_events": recent})
+    else:  # from kick-off there is no catch-up, but the app still needs the starting XI at their opening ratings
+        await ws.send_json({"type": "state", "state": state_message(brain)})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
     # The Overlay Director, one per connection (see director/session.py). A seek or a language change reconnects,
