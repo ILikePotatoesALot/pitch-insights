@@ -49,9 +49,9 @@ The agents run ahead of time and their checked, translated commentary is stored,
 
 | Technology | What it does here |
 |---|---|
-| **Microsoft Agent Framework** | The Explainer, Narrator and Memory agents, with deterministic orchestration, a retry on failed checks and a fallback headline |
+| **Microsoft Agent Framework** | The Explainer, Narrator, Video Narrator and Memory agents, with deterministic orchestration, a retry on failed checks and a fallback headline |
 | **Microsoft Foundry** (GPT-4o, `text-embedding-3-small`) | Writes the commentary; embeddings let the Memory agent recall similar earlier moments |
-| **Foundry groundedness evaluator** | A second opinion on every stored line (all 52 pass, lowest score 4 of 5) |
+| **Foundry groundedness evaluator** | A second opinion on stored commentary (52 synthetic-match moments and 5 clip passages pass, lowest score 4 of 5 in each set) |
 | **Azure AI Content Safety** | Screens every line before it can be shown; fails closed |
 | **Azure AI Translator** | Translates every moment into 5 languages, with names and clocks protected and every number checked |
 | **Application Insights** (OpenTelemetry) | Traces agent runs (without prompts or replies) and the live server's requests |
@@ -100,7 +100,7 @@ python -m pitch_insights.watch ../samples/comeback-POT-CAR.jsonl --speed 60 --fr
 python -m pitch_insights.interpret ../samples/comeback-POT-CAR.jsonl --at 70 --player Madekuta   # stats, ratings, signals
 python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
-pytest                                   # 384 tests; no keys or network needed
+pytest                                   # 418 backend tests; no keys or network needed
 ```
 
 ### Run the app
@@ -119,6 +119,8 @@ npm run dev
 ```
 
 Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute. `/?compare=1` opens the side-by-side view.
+
+Frontend checks (Node 24, from `frontend/`): `npm test` runs seven player-following regression tests; `npm run build` checks TypeScript and builds the app. Selecting a player in Live ratings now updates the favourite, pinned card and spotlight together. In the real-footage clip, select a marker or player row to follow, and use "Stop following" to clear the selection.
 
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 
@@ -154,7 +156,7 @@ cd backend
 .venv\Scripts\python scripts/generate_commentary.py
 ```
 
-Every line is then screened by **Azure AI Content Safety** (blocked at the lowest harm level, and not shown if the service can't be reached), and **Foundry's groundedness evaluator** gives a second opinion: all 52 stored lines pass, the lowest scoring 4 out of 5. **Azure AI Translator** puts every moment into Spanish, French, German, Dutch and Simplified Chinese, with player and club names and match clocks protected, and a translation that loses a name or number keeps its English (9 of 3,180 did). Agent runs are traced to **Application Insights** through Agent Framework's OpenTelemetry instrumentation, without prompts or replies.
+Every line is then screened by **Azure AI Content Safety** (blocked at the lowest harm level, and not shown if the service can't be reached), and **Foundry's groundedness evaluator** gives a second opinion: all 52 synthetic-match moments and all 5 clip passages pass, the lowest scoring 4 out of 5 in each set. **Azure AI Translator** puts every moment into Spanish, French, German, Dutch and Simplified Chinese, with player and club names and match clocks protected, and a translation that loses a name or number keeps its English (9 of 3,180 did across the synthetic matches). Agent runs are traced to **Application Insights** through Agent Framework's OpenTelemetry instrumentation, without prompts or replies.
 
 ```
 cd backend
@@ -182,7 +184,9 @@ Details: [docs/DESIGN.md, Overlay Director](docs/DESIGN.md#overlay-director) and
 
 ## Video path: real footage into the same messages
 
-The core pipeline runs on synthetic matches. As a second source, the video path turns real, licensed match video into the same `frame` and `event` messages: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), a fixed 4K panoramic camera over a whole pitch, amateur university players who consented, no names. Players are labelled by side and shirt number ("Left #7"), never with our fictional names.
+The core pipeline runs on synthetic matches. As a second source, the video path turns real, licensed match video into the same `frame` and `event` messages: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), a fixed 4K panoramic camera over a whole pitch, amateur university players who consented, no names. Players are labelled by side and tracker ID ("Left #7"), never with our fictional names or as shirt numbers.
+
+A dedicated **Video Narrator** agent describes five passages of detected play in casual and analyst voices. Clip-specific checks reject unsupported event types and require hedging below 60% confidence. The app shows this checked, translated commentary alongside tracking estimates for possession, distance and top speed; tap a marker or player row to follow that player's tracked position. The clip has no score or live player ratings.
 
 **RF-DETR** (small) runs on 5 × 2 tiles of each frame: for people, a model fine-tuned on SoccerTrack's own player boxes from the first four minutes of the half (never on the benchmark clip); for the ball, the COCO-pre-trained one. A 2-D polynomial, fitted on frames before the clip, maps feet in the image to pitch metres (one homography can't describe a stitched panorama). A ByteTrack-style tracker works in pitch metres, shirt colours give the teams, and possession of the tracked ball gives passes, carries and turnovers with a `confidence`.
 

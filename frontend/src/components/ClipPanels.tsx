@@ -129,11 +129,14 @@ export function ClipPlayers({ tracking, colours, follow, setFollow }: {
       <h3>Players <small>from the tracking · tap one to follow</small></h3>
       {top.length === 0 ? <p className="empty">Players appear as the tracker finds them.</p> : <ol>
         {top.map((p) => (
-          <li key={p.id} onClick={() => setFollow(p.id === follow ? null : p.id)} className={p.id === follow ? "active" : ""}>
+          <li key={p.id} className={p.id === follow ? "active" : ""}>
+            <button type="button" className="player-row" aria-label={`Follow ${trackLabel(p.id)}`} aria-pressed={p.id === follow}
+                    onClick={() => setFollow(p.id)}>
             <i style={{ background: colours[p.side!] }} />
             <span className="pname">{p.id === follow && "★ "}{trackLabel(p.id)}</span>
             <small>top {kmh(p.topSpeed)}</small>
             <b>{Math.round(p.distance)} m</b>
+            </button>
           </li>
         ))}
       </ol>}

@@ -15,9 +15,10 @@ The WebSocket sends, in order:
                                                         (model, prompt version, groundedness summary);
                                                         languages: those with stored translations;
                                                         profile: the viewer's choices as the server applied them
-  {"type": "catchup", "moments": [...], "state": ..., "recent_events": [...]}
+  {"type": "catchup", "moments": [...], "state": ..., "recent_events": [...], "position_events": [...]}
                                                         only when starting after kick-off; recent_events
-                                                        (the last 3 minutes) let the pitch redraw at once
+                                                        (the last 3 minutes) let the pitch redraw at once;
+                                                        position_events restore players' last known positions
   then, as the match clock reaches them:
   {"type": "event", "event": ...}
   {"type": "moment", "moment": ...}                     with "commentary" when the agents wrote some
@@ -150,6 +151,20 @@ def state_message(brain: MatchBrain) -> dict:
                                   "teams", "patterns", "momentum_series")} | {"players": players}
 
 
+def position_events(events: list[dict]) -> list[dict]:
+    """A bounded set of past events that restores every player's last known position, in time order."""
+    last: dict[str, int] = {}
+    for i, ev in enumerate(events):
+        if not ev.get("team_id"):
+            continue
+        if ev.get("player_id") and ev.get("x") is not None and ev.get("y") is not None:
+            last[ev["player_id"]] = i
+        if (ev["type"] == "pass" and ev.get("outcome") == "complete" and ev.get("receiver_id")
+                and ev.get("end_x") is not None and ev.get("end_y") is not None):
+            last[ev["receiver_id"]] = i
+    return [events[i] for i in sorted(set(last.values()))]
+
+
 @app.websocket("/ws/replay/{name}")
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if not origin_allowed(ws.headers.get("origin")):  # CORS doesn't cover WebSockets, so check the page's origin here
@@ -210,7 +225,8 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         recent = [ev for ev, t in zip(events[:first], times[:first])
                   if t >= times[first - 1] - 180 or (ev["type"] == "match_state" and ev["state"] == "half_time")]
         await ws.send_json({"type": "catchup", "moments": [shown(m) for m in brain.moments],
-                            "state": state_message(brain), "recent_events": recent})
+                            "state": state_message(brain), "recent_events": recent,
+                            "position_events": position_events(events[:first])})
     else:  # from kick-off there is no catch-up, but the app still needs the starting XI at their opening ratings
         await ws.send_json({"type": "state", "state": state_message(brain)})
 

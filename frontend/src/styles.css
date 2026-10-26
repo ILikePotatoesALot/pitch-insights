@@ -136,7 +136,8 @@ aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .ai-note { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
 
 .ratings ol { list-style: none; margin: 0; padding: 0; }
-.ratings li { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.ratings li { border-bottom: 1px solid var(--line); }
+.ratings .player-row { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 4px; border: 0; border-radius: 0; background: transparent; text-align: left; }
 .ratings li:hover, .ratings li.active { background: var(--panel-2); }
 .ratings li i { width: 8px; height: 8px; border-radius: 50%; }
 .ratings .pname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

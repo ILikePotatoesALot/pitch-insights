@@ -125,6 +125,7 @@ export class ClipLayer {
   pick(px: number, py: number, camera: THREE.Camera, w: number, h: number, radius = 22): string | null {
     let best: string | null = null, bestD = radius * radius;
     for (const [id, p] of this.current) {
+      if (!/^[LR]-t\d+$/.test(id)) continue; // an unassigned marker must not steal a tap from a selectable player
       const v = this.tmp.set(p.x, p.y + 1, p.z).project(camera);
       const d = ((v.x * 0.5 + 0.5) * w - px) ** 2 + ((-v.y * 0.5 + 0.5) * h - py) ** 2;
       if (d < bestD) { best = id; bestD = d; }

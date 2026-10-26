@@ -76,6 +76,7 @@ export class PitchScene {
   private dirty = true;
   private tmpColour = new THREE.Color();
   private spot: Spotlight | null = null;
+  private playerPositions = new Map<string, [number, number]>();
   private tmpVector = new THREE.Vector3();
   private clip: ClipLayer;
   private clipSpeed = 1;
@@ -231,7 +232,14 @@ export class PitchScene {
    * a pass received, a tackle) and glides there; it stays hidden until the first such event, and while they are off.
    */
   setSpotlight(player: { id: string; colour: string } | null, label: HTMLElement | null = null) {
-    if (this.spot && player && this.spot.id === player.id && this.spot.colour === player.colour) return;
+    if (this.spot && player && this.spot.id === player.id && this.spot.colour === player.colour) {
+      if (this.spot.label !== label) {
+        if (this.spot.label) this.spot.label.style.display = "none";
+        this.spot.label = label;
+        this.spot.labelSize = [0, 0];
+      }
+      return;
+    }
     this.clearSpotlight(); // (another match can give the same player the other club's colour)
     if (!player) return;
     const colour = new THREE.Color(player.colour);
@@ -251,6 +259,7 @@ export class PitchScene {
     this.scene.add(group);
     this.spot = { id: player.id, colour: player.colour, group, pulse, label, target: new THREE.Vector3(), placed: false, on: true,
                   labelSize: [0, 0] };
+    this.placeSpotlight();
   }
 
   /** Show or hide the spotlight to match whether the player is on the pitch (from the live state). */
@@ -269,17 +278,34 @@ export class PitchScene {
     this.spot = null;
   }
 
-  /** Where this event puts the spotlit player, in pitch metres, or null if it says nothing about them. */
-  private spotPosition(ev: MatchEvent, meta: MatchMeta): [number, number] | null {
-    const id = this.spot?.id;
-    if (ev.player_id === id) {
-      return (ev.type === "carry" ? toAbsolute(ev, meta, true) : null) ?? toAbsolute(ev, meta);
+  /** Keep positions even before React attaches the selected player, including replay catch-up events. */
+  private rememberPositions(ev: MatchEvent, meta: MatchMeta) {
+    if (ev.player_id) {
+      const at = (ev.type === "carry" ? toAbsolute(ev, meta, true) : null) ?? toAbsolute(ev, meta);
+      if (at) this.playerPositions.set(ev.player_id, at);
     }
-    if (ev.type === "pass" && ev.receiver_id === id && ev.outcome === "complete") return toAbsolute(ev, meta, true);
-    return null;
+    if (ev.type === "pass" && typeof ev.receiver_id === "string" && ev.outcome === "complete") {
+      const at = toAbsolute(ev, meta, true);
+      if (at) this.playerPositions.set(ev.receiver_id, at);
+    }
+  }
+
+  private placeSpotlight() {
+    const spot = this.spot;
+    const at = spot && this.playerPositions.get(spot.id);
+    if (!spot || !at) return;
+    spot.target.set(at[0] - L / 2, 0, W / 2 - at[1]);
+    if (!spot.placed) { spot.group.position.copy(spot.target); spot.placed = true; }
+  }
+
+  /** Catch-up positions can be older than the heat map. Restore them without adding old heat or moving the ball. */
+  restorePlayerPositions(events: MatchEvent[], meta: MatchMeta) {
+    for (const ev of events) this.rememberPositions(ev, meta);
+    this.placeSpotlight();
   }
 
   reset() {
+    this.playerPositions.clear();
     if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
     this.clip.clear();
     this.touches = [];
@@ -298,15 +324,12 @@ export class PitchScene {
     if (meta.home.id !== this.homeId) this.setMatch(meta);
     this.matchTime = matchTime;
     this.decay();
+    this.rememberPositions(ev, meta);
     if (this.spot) {
       if (ev.type === "substitution" && ev.player_off_id === this.spot.id) this.spot.on = false;
       else if (ev.type === "foul" && ev.card === "red" && ev.player_id === this.spot.id) this.spot.on = false;
       else if (ev.type === "substitution" && ev.player_on_id === this.spot.id) this.spot.on = true;
-      const at = this.spotPosition(ev, meta);
-      if (at) {
-        this.spot.target.set(at[0] - L / 2, 0, W / 2 - at[1]);
-        if (!this.spot.placed) { this.spot.group.position.copy(this.spot.target); this.spot.placed = true; }
-      }
+      this.placeSpotlight();
     }
     const pos = toAbsolute(ev, meta);
     if (!pos || !ev.team_id) return;

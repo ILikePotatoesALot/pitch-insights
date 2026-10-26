@@ -11,7 +11,8 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  * match doesn't re-render the page on every pass.
  */
 export function useReplay(name: string | null, profile: Profile, defaultSpeed: number, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
-                          onReset: () => void, onFrame: (frame: ClipFrame, meta: MatchMeta) => void = () => {}) {
+                          onReset: () => void, onFrame: (frame: ClipFrame, meta: MatchMeta) => void = () => {},
+                          onPositions: (events: MatchEvent[], meta: MatchMeta) => void = () => {}) {
   const { lang, mode, team, player, focus } = profile;
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
@@ -47,6 +48,8 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   onResetRef.current = onReset;
   const onFrameRef = useRef(onFrame);
   onFrameRef.current = onFrame;
+  const onPositionsRef = useRef(onPositions);
+  onPositionsRef.current = onPositions;
   const speedRef = useRef(speed);
   speedRef.current = speed;
   // Paused by the viewer, and the profile the open connection uses: a change of language, club, player or focus
@@ -98,6 +101,7 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
           }
           setMoments(data.moments);
           setState(data.state);
+          if (metaRef.current) onPositionsRef.current(data.position_events ?? [], metaRef.current);
           if (metaRef.current) for (const ev of data.recent_events ?? []) onEventRef.current(ev, metaRef.current);
           break;
         case "frame":

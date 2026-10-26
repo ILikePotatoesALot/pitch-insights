@@ -240,9 +240,10 @@ function PlayerCard({ p, onClose }: { p: PlayerState; onClose: () => void }) {
   );
 }
 
-export function Ratings({ state, meta, colours, favourite, setFavourite }: {
+export function Ratings({ state, meta, colours, favourite, setFavourite, followed, onFollow }: {
   state: LiveState | null; meta: MatchMeta; colours: [string, string];
   favourite: string | null; setFavourite: (id: string | null) => void;
+  followed: string | null; onFollow: (id: string) => void;
 }) {
   const players = state?.players ?? [];
   const fav = players.find((p) => p.player_id === favourite);
@@ -250,15 +251,18 @@ export function Ratings({ state, meta, colours, favourite, setFavourite }: {
   const top = [...players].sort((a, b) => b.rating - a.rating).slice(0, 8);
   return (
     <div className="panel ratings">
-      <h3>Live ratings <small>tap a player</small></h3>
+      <h3>Live ratings <small>tap a player to follow</small></h3>
       {fav && <PlayerCard p={fav} onClose={() => setFavourite(null)} />}
       <ol>
         {top.map((p) => (
-          <li key={p.player_id} onClick={() => setFavourite(p.player_id)} className={p.player_id === favourite ? "active" : ""}>
+          <li key={p.player_id} className={p.player_id === followed ? "active" : ""}>
+            <button type="button" className="player-row" aria-label={`Follow ${p.name}`} aria-pressed={p.player_id === followed}
+                    onClick={() => { setFavourite(p.player_id); onFollow(p.player_id); }}>
             <i style={{ background: teamCol(p.team_id) }} />
-            <span className="pname">{p.name}</span>
+            <span className="pname">{p.player_id === followed && "★ "}{p.name}</span>
             <small>{p.position}{!p.on_pitch && " · off"}</small>
             <b className={p.rating >= 7.5 ? "hi" : p.rating < 6 ? "lo" : ""}>{p.rating.toFixed(1)}</b>
+            </button>
           </li>
         ))}
       </ol>

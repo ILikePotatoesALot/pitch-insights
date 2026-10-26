@@ -96,12 +96,16 @@ export default function App() {
     }
   }, []);
 
+  const onPositions = useCallback((events: MatchEvent[], meta: MatchMeta) => {
+    sceneRef.current?.restorePlayerPositions(events, meta);
+  }, []);
+
   // A clip of real footage (the video path) has its own speeds, panels and controls; a synthetic match is as before.
   const clipMode = matches.find((m) => m.name === name)?.kind === "video";
   const speeds = clipMode ? CLIP_SPEEDS : SPEEDS;
   const ready = profile !== null && picker !== "first";
   const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, seek, seekAt, clip, clipEvents, clipT } =
-    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame);
+    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame, onPositions);
   const showingClip = clipMode && meta?.source === "video"; // (the old match's meta stays for a moment after a switch)
   const showingMatch = !clipMode && !!meta && meta.source !== "video";
   useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
@@ -137,8 +141,8 @@ export default function App() {
 
   useEffect(() => {
     if (meta) sceneRef.current?.setMatch(meta);
-    setInspected(null);
   }, [meta]);
+  useEffect(() => { setInspected(null); }, [name]);
 
   const colours = useMemo<[string, string]>(() => {
     if (!meta) return ["#4f7cff", "#ff5a5a"];
@@ -281,7 +285,8 @@ export default function App() {
 
         {layout === "fan" && showingMatch && <aside>
           {meta && <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} />}
-          {meta && <Ratings state={state} meta={meta} colours={colours} favourite={inspected} setFavourite={setInspected} />}
+          {meta && <Ratings state={state} meta={meta} colours={colours} favourite={inspected} setFavourite={setInspected}
+                            followed={p.player} onFollow={(id) => { if (id !== p.player) commit({ ...p, player: id }); }} />}
           {meta && p.mode === "analyst" && <StatsPanel state={state} meta={meta} focus={p.focus} />}
         </aside>}
       </main>
