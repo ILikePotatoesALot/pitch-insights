@@ -6,7 +6,7 @@ const ts = require('typescript');
 
 // Run the actual hook with deterministic hook slots and a controllable WebSocket. This checks reconnects
 // and commands without timing a live server or depending on a GPU to mount the whole application.
-function replay() {
+function replay(options = {}) {
   const slots = [], sockets = [];
   let cursor = 0, pending = [], result;
   const react = {
@@ -50,7 +50,7 @@ function replay() {
     Object.assign(profile, patch);
     cursor = 0;
     pending = [];
-    result = exports.useReplay(match, profile, 20, () => {}, () => {});
+    result = exports.useReplay(match, profile, 20, () => {}, () => {}, () => {}, () => {}, options);
     pending.forEach((effect) => effect());
     return result;
   }
@@ -95,5 +95,20 @@ test('a different match and a replay after full time start playing', () => {
   r.sockets.at(-1).receive('end');
   r.render().seek(0);
   r.render(); r.meta();
+  assert.equal(r.render().status, 'live');
+});
+
+test('a coordinated viewer opens paused at the requested position and waits for its parent', () => {
+  let received;
+  const r = replay({ controlled: true, initialAt: 2400, onReady: (ready) => { received = ready; } });
+  const socket = r.sockets[0];
+  assert.match(socket.url, /at=2400/);
+  assert.match(socket.url, /paused=1/);
+  assert.equal(r.render().status, 'paused');
+  assert.ok(socket.commands.every((c) => c.cmd === 'detail'));
+  socket.receive('ready', { server_time: 1000, kind: 'video' });
+  assert.equal(received.kind, 'video');
+  r.render().command({ cmd: 'resume', wall: 1000.4 });
+  assert.equal(socket.commands.at(-1).wall, 1000.4);
   assert.equal(r.render().status, 'live');
 });

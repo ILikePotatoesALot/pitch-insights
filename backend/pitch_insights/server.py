@@ -50,6 +50,7 @@ import json
 import logging
 import math
 import os
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
@@ -231,6 +232,9 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
         await ws.send_json({"type": "state", "state": state_message(brain)})
 
     rep = Replay(events, speed=clamp_speed(speed), start_at=times[first] if first < len(events) else start, poll=0.05)
+    if ws.query_params.get("paused") == "1":
+        rep.paused = True
+        await ws.send_json({"type": "ready", "server_time": time.time(), "kind": "synthetic"})
     # The Overlay Director, one per connection (see director/session.py). A seek or a language change reconnects,
     # so cues start afresh.
     session = ViewerSession(ws, rep, profile.mode)

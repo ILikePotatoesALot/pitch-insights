@@ -20,6 +20,8 @@ const query = new URLSearchParams(location.search);
 const urlLayout: LayoutMode = query.get("layout") === "broadcast" ? "broadcast" : "fan";
 const urlSpeed = Number(query.get("speed"));
 const embedded = query.has("embed");
+const syncEpoch = query.has("sync") ? Number(query.get("sync")) : null;
+const controlled = embedded && syncEpoch !== null && Number.isSafeInteger(syncEpoch);
 // A tracked player to follow in a clip ("L-t11"): not part of the profile, since tracker numbers belong to one clip.
 const urlFollow = /^[LR]-t\d+$/.test(query.get("follow") ?? "") ? query.get("follow") : null;
 const NO_TRACKING: ClipTracking = { players: [], possession: [0, 0] };
@@ -109,8 +111,29 @@ export default function App() {
   const clipMode = matches.find((m) => m.name === name)?.kind === "video";
   const speeds = clipMode ? CLIP_SPEEDS : SPEEDS;
   const ready = profile !== null && picker !== "first";
-  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, seek, seekAt, clip, clipEvents, clipT } =
-    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame, onPositions);
+  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, command, seek, seekAt, clip, clipEvents, clipT } =
+    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame, onPositions, {
+      controlled,
+      initialMinute: controlled ? Math.max(0, Number(query.get("from")) || 0) : 0,
+      initialAt: controlled && query.has("at") ? Math.max(0, Number(query.get("at")) || 0) : null,
+      onReady: (data) => { if (controlled) window.parent.postMessage({ type: "ready", epoch: syncEpoch, ready: data }, location.origin); },
+    });
+  const commandRef = useRef(command);
+  commandRef.current = command;
+  useEffect(() => {
+    if (!controlled) return;
+    const receive = (event: MessageEvent) => {
+      if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== "seize:command" || event.data.epoch !== syncEpoch) return;
+      const action = event.data.action;
+      if (action && ["pause", "resume", "speed"].includes(action.cmd)) commandRef.current(action);
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, []);
+  useEffect(() => {
+    if (controlled && status === "ended") window.parent.postMessage({ type: "ended", epoch: syncEpoch }, location.origin);
+    if (controlled && (status === "error" || status === "disconnected")) window.parent.postMessage({ type: "fault", epoch: syncEpoch }, location.origin);
+  }, [status]);
   const showingClip = clipMode && meta?.source === "video"; // (the old match's meta stays for a moment after a switch)
   const showingMatch = !clipMode && !!meta && meta.source !== "video";
   useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
@@ -200,7 +223,7 @@ export default function App() {
   const panels: DetailPanel[] = showingClip || p.mode === "analyst" ? ["moments", "players", "stats"] : ["moments", "players"];
 
   return (
-    <div className={`app ${layout}${embedded ? " embed" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
+    <div className={`app ${layout}${embedded ? " embed" : ""}${controlled ? " sync" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
         <h1>Seize the game <small>live football intelligence</small></h1>
         <button type="button" className="mobile-settings-toggle" ref={settingsButton} aria-expanded={settingsOpen}

@@ -14,6 +14,8 @@ asks for; `tick` and `play` do the sending, so two tasks never write to the sock
 from __future__ import annotations
 
 import asyncio
+import math
+import time
 from collections.abc import Awaitable
 
 from fastapi import WebSocket, WebSocketDisconnect
@@ -51,18 +53,29 @@ class ViewerSession:
             if not isinstance(msg, dict):
                 continue
             cmd = msg.get("cmd")
+            # Comparison viewers receive one server-time deadline. Apply it even if a packet arrives a little
+            # later in one pane, so the two replay clocks keep the same anchor. Ordinary controls omit it.
+            wall = None
+            if cmd in ("speed", "pause", "resume") and "wall" in msg:
+                try:
+                    wall = float(msg["wall"])
+                except (TypeError, ValueError):
+                    continue
+                if not math.isfinite(wall) or abs(wall - time.time()) > 2:
+                    continue
+                await asyncio.sleep(max(0.0, wall - time.time()))
             if cmd == "speed":
                 try:
                     value = clamp_speed(float(msg["value"]))
                 except (KeyError, TypeError, ValueError):
                     continue
                 self.show_now()  # the time so far passed at the old speed
-                self.rep.set_speed(value)
+                self.rep.set_speed(value, wall)
             elif cmd == "pause":
                 self.show_now()
-                self.rep.pause()
+                self.rep.pause(wall)
             elif cmd == "resume":
-                self.rep.resume()
+                self.rep.resume(wall)
             elif cmd == "detail" and msg.get("value") in ("casual", "analyst"):
                 self.viewer["detail"] = msg["value"]
 

@@ -4,6 +4,9 @@ import { connectionParams } from "./profile";
 import type { ClipEventLine, ClipFrame, ClipInfo, CommentaryInfo, Cue, LiveState, MatchEvent, MatchMeta, Moment, Profile } from "./types";
 
 export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected" | "error";
+export type ReplayCommand = { cmd: "pause" | "resume" | "speed"; value?: number; wall?: number };
+export type ReplayReady = { server_time: number; kind: "synthetic" | "video"; duration?: number };
+export type ReplayOptions = { controlled?: boolean; initialMinute?: number; initialAt?: number | null; onReady?: (ready: ReplayReady) => void };
 
 /**
  * Connects to the replay server for one match and keeps the latest state.
@@ -12,7 +15,7 @@ export type Status = "connecting" | "live" | "paused" | "ended" | "disconnected"
  */
 export function useReplay(name: string | null, profile: Profile, defaultSpeed: number, onEvent: (ev: MatchEvent, meta: MatchMeta) => void,
                           onReset: () => void, onFrame: (frame: ClipFrame, meta: MatchMeta) => void = () => {},
-                          onPositions: (events: MatchEvent[], meta: MatchMeta) => void = () => {}) {
+                          onPositions: (events: MatchEvent[], meta: MatchMeta) => void = () => {}, options: ReplayOptions = {}) {
   const { lang, mode, team, player, focus } = profile;
   const [meta, setMeta] = useState<MatchMeta | null>(null);
   const [aiInfo, setAiInfo] = useState<CommentaryInfo | null>(null);
@@ -38,8 +41,8 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   // second: a broadcast minute can't say first-half stoppage time (45+2').
   const [jump, setJump] = useState<{ match: string | null; minute: number; at: number | null; n: number }>(
     { match: null, minute: 0, at: null, n: 0 });
-  const from = jump.match === name ? jump.minute : 0;
-  const at = jump.match === name ? jump.at : null;
+  const from = jump.match === name ? jump.minute : options.initialMinute ?? 0;
+  const at = jump.match === name ? jump.at : options.initialAt ?? null;
   const ws = useRef<WebSocket | null>(null);
   const metaRef = useRef<MatchMeta | null>(null);
   const onEventRef = useRef(onEvent);
@@ -52,6 +55,8 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   onPositionsRef.current = onPositions;
   const speedRef = useRef(speed);
   speedRef.current = speed;
+  const readyRef = useRef(options.onReady);
+  readyRef.current = options.onReady;
   // Reconnecting within the same match preserves the viewer's pause, including a seek or profile change.
   // A different match and a replay after the end start playing normally.
   const pausedRef = useRef(false);
@@ -72,11 +77,11 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
     setClipEvents([]);
     setClipT(null);
     onResetRef.current();
-    const keepPaused = pausedRef.current && matchRef.current === name;
+    const keepPaused = options.controlled || (pausedRef.current && matchRef.current === name);
     matchRef.current = name;
     pausedRef.current = keepPaused;
     let ended = false;
-    const socket = new WebSocket(wsUrl(`/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${connectionParams({ ...profile, mode: modeRef.current })}`));
+    const socket = new WebSocket(wsUrl(`/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${options.controlled ? "paused=1&" : ""}${connectionParams({ ...profile, mode: modeRef.current })}`));
     ws.current = socket;
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
@@ -88,8 +93,11 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
           setClip(data.kind === "video" ? data.clip : null);
           setLanguages(data.languages ?? { en: "English" });
           socket.send(JSON.stringify({ cmd: "detail", value: modeRef.current }));
-          if (keepPaused) socket.send(JSON.stringify({ cmd: "pause" }));
+          if (keepPaused && !options.controlled) socket.send(JSON.stringify({ cmd: "pause" }));
           setStatus(keepPaused ? "paused" : "live");
+          break;
+        case "ready":
+          readyRef.current?.(data as ReplayReady);
           break;
         case "catchup":
           if (data.events) { // a clip: the events and moments before the jump, for the feeds
@@ -145,15 +153,18 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
 
   useEffect(() => { send({ cmd: "detail", value: mode }); }, [mode]);
 
-  const setSpeed = useCallback((value: number) => {
-    setChosen({ match: name, value });
-    send({ cmd: "speed", value });
+  const command = useCallback((action: ReplayCommand) => {
+    send(action);
+    if (action.cmd === "speed" && action.value !== undefined) setChosen({ match: name, value: action.value });
+    if (action.cmd === "pause") { pausedRef.current = true; setStatus("paused"); }
+    if (action.cmd === "resume") { pausedRef.current = false; setStatus("live"); }
   }, [name]);
-  const pause = useCallback(() => { send({ cmd: "pause" }); pausedRef.current = true; setStatus("paused"); }, []);
-  const resume = useCallback(() => { send({ cmd: "resume" }); pausedRef.current = false; setStatus("live"); }, []);
+  const setSpeed = useCallback((value: number) => command({ cmd: "speed", value }), [command]);
+  const pause = useCallback(() => command({ cmd: "pause" }), [command]);
+  const resume = useCallback(() => command({ cmd: "resume" }), [command]);
   const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, at: null, n: j.n + 1 })), [name]);
   const seekAt = useCallback((seconds: number) => setJump((j) => ({ match: name, minute: 0, at: seconds, n: j.n + 1 })), [name]);
 
-  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, seek, seekAt,
+  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, command, seek, seekAt,
            clip, clipEvents, clipT };
 }

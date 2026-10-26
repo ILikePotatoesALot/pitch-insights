@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import asyncio
 import math
+import time
 from pathlib import Path
 
 from fastapi import WebSocket, WebSocketDisconnect
@@ -104,6 +105,14 @@ async def replay_clip(ws: WebSocket, clip: Clip, speed: float, samples: Path | N
             return
 
     rep = Replay(timeline, speed=clamp_speed(speed), start_at=start, poll=0.05)
+    if params.get("paused") == "1":
+        rep.paused = True
+        frame = next((f for f in reversed(clip.frames) if f["t"] - clip.start <= start), clip.frames[0])
+        try:
+            await ws.send_json(frame)
+            await ws.send_json({"type": "ready", "server_time": time.time(), "kind": "video", "duration": clip.duration})
+        except (WebSocketDisconnect, RuntimeError):
+            return
     session = ViewerSession(ws, rep, profile.mode)
 
     async def play():

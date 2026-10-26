@@ -200,6 +200,36 @@ def test_resume_while_playing_keeps_the_clock():
     assert abs(replay.now - paused_at) < 1.0
 
 
+def test_two_replays_follow_the_same_scheduled_wall_clock(monkeypatch):
+    from pitch_insights.generator import stream
+
+    wall = [1000.0]
+    monotonic = [100.0]
+    monkeypatch.setattr(stream.time, "time", lambda: wall[0])
+    monkeypatch.setattr(stream.time, "monotonic", lambda: monotonic[0])
+    first = Replay([], speed=20, start_at=60)
+    first.pause()
+    wall[0], monotonic[0] = 1000.2, 100.2
+    second = Replay([], speed=20, start_at=60)
+    second.pause()
+    first.resume(1000.5)
+    second.resume(1000.5)
+    wall[0], monotonic[0] = 1001.0, 101.0
+    assert first.now == pytest.approx(70)
+    assert second.now == pytest.approx(first.now)
+    first.pause(1001.2)
+    second.pause(1001.2)
+    assert first.now == pytest.approx(74)
+    assert second.now == pytest.approx(first.now)
+    first.set_speed(5)
+    second.set_speed(5)
+    first.resume(1001.5)
+    second.resume(1001.5)
+    wall[0], monotonic[0] = 1002.0, 102.0
+    assert first.now == pytest.approx(76.5)
+    assert second.now == pytest.approx(first.now)
+
+
 def test_away_only_picks_a_different_home_club():
     for seed in range(1, 40):
         meta, _, _ = simulate(seed, None, "POT")
