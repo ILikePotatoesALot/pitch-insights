@@ -25,7 +25,8 @@ from pydantic import BaseModel
 from pitch_insights.agents import grounding
 from pitch_insights.agents.middleware import RunLogMiddleware, moment_id_var
 from pitch_insights.agents.prompts import (
-    EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, input_hash, moment_input, retry_input,
+    EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, VIDEO_NARRATOR_INSTRUCTIONS, VIDEO_PROMPT_VERSION,
+    input_hash, moment_input, retry_input,
 )
 from pitch_insights.agents.safety import ContentSafety
 
@@ -44,7 +45,7 @@ class Lines(BaseModel):
 
 
 class Writer(Protocol):
-    """Anything that can write Lines for a role ("explainer" or "narrator"). The Agent
+    """Anything that can write Lines for a role ("explainer", "narrator" or "video_narrator"). The Agent
     Framework implementation is AgentWriter; tests use a fake."""
     provider: str
     model: str
@@ -53,6 +54,9 @@ class Writer(Protocol):
 
 
 def agent_for(moment: dict) -> str:
+    """Moments detected from video (`source == "video"`) go to the video narrator, whatever their type."""
+    if moment.get("source") == "video":
+        return "video_narrator"
     return "explainer" if moment["type"] in EXPLAINER_TYPES else "narrator"
 
 
@@ -170,6 +174,7 @@ class CommentaryDesk:
                     reason = "no structured output"
                     break
                 check = grounding.check(f"{lines.casual} {lines.analyst}", moment, self.meta)
+                check = grounding.with_hedging(check, lines.casual, lines.analyst, moment)  # video moments only
                 if check.passed:
                     reason = ""
                     break
@@ -207,7 +212,7 @@ class CommentaryDesk:
 
 
 class AgentWriter:
-    """The two writing agents, built with Microsoft Agent Framework."""
+    """The three writing agents, built with Microsoft Agent Framework."""
 
     def __init__(self, client, provider: str, model: str, max_tokens: int = 220, temperature: float = 0.4):
         from agent_framework import Agent
@@ -221,6 +226,9 @@ class AgentWriter:
                                middleware=mw),
             "narrator": Agent(client, NARRATOR_INSTRUCTIONS, name="narrator",
                               description="Describes the flow of play between key moments.", middleware=mw),
+            "video_narrator": Agent(client, VIDEO_NARRATOR_INSTRUCTIONS, name="video_narrator",
+                                    description="Describes a passage of play detected from real match footage.",
+                                    middleware=mw),
         }
 
     async def aclose(self) -> None:
@@ -247,6 +255,7 @@ def writer_from_settings(settings) -> AgentWriter:
                        max_tokens=settings.max_tokens, temperature=settings.temperature)
 
 
-def file_header(writer: Writer) -> dict:
+def file_header(writer: Writer, video: bool = False) -> dict:
+    """What a stored commentary file says about who wrote it. The video clip's file has its own prompt version."""
     return {"ai_generated": True, "provider": writer.provider, "model": writer.model,
-            "prompt_version": PROMPT_VERSION}
+            "prompt_version": VIDEO_PROMPT_VERSION if video else PROMPT_VERSION}

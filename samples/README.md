@@ -25,4 +25,7 @@ Output of the video path on real, licensed footage: [SoccerTrack v2](https://ato
 | `117093-38min.benchmark.json` | Scores against SoccerTrack's ground truth |
 | `117093-38min.calibration.json` | The fitted image-to-pitch mapping |
 | `117093-38min_ft.*` | The same four files with the fine-tuned detector for people (recommended) |
+| `117093-38min_ft.commentary.json` | The video narrator's stored commentary for the clip's 5 moments (`backend/pitch_insights/video/moments.py`, `backend/scripts/generate_commentary.py`) |
+| `117093-38min_ft.translations.json` | Those moments in five languages (`backend/scripts/translate_moments.py`) |
+| `117093-38min_ft.evaluation.json` | Foundry's groundedness scores for that commentary (`backend/scripts/evaluate_groundedness.py`) |
 | `117093-boxes.eval.json` | Pre-trained against fine-tuned detector boxes on SoccerTrack's held-out test frames |

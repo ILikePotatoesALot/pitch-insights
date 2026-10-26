@@ -79,9 +79,7 @@ export class PitchScene {
   private tmpVector = new THREE.Vector3();
   private clip: ClipLayer;
   private clipSpeed = 1;
-  private clipLabel: HTMLElement | null = null;
-  private clipLabelText = "";
-  private clipLabelSize: [number, number] = [0, 0];
+  private onPick: ((id: string) => void) | null = null;
   private lastFrameT: number | null = null;
   private pressAt: [number, number] | null = null;
   private movedBeforePress = false;
@@ -189,8 +187,8 @@ export class PitchScene {
   /** The replay speed, which the drawing needs to move smoothly between frames. */
   setClipSpeed(speed: number) { this.clipSpeed = speed; }
 
-  /** The page element for the label of the player the viewer tapped (kept beside them, like the spotlight's). */
-  setClipLabel(el: HTMLElement | null) { this.clipLabel = el; }
+  /** Called with a tracked person's id when the viewer taps them on the pitch (to follow them with the spotlight). */
+  setOnPick(fn: ((id: string) => void) | null) { this.onPick = fn; }
 
   private onPress = (e: PointerEvent) => { this.pressAt = [e.clientX, e.clientY]; };
 
@@ -213,7 +211,7 @@ export class PitchScene {
     this.controls.enableDamping = true;
   }
 
-  /** A tap (not a camera drag) on or near a tracked player selects them; a tap elsewhere clears it. */
+  /** A tap (not a camera drag) on or near a tracked player picks them; a tap elsewhere does nothing. */
   private onRelease = (e: PointerEvent) => {
     const down = this.pressAt;
     this.pressAt = null;
@@ -221,26 +219,9 @@ export class PitchScene {
     if (tap) this.userMoved = this.movedBeforePress; // the controls call any press a move; a tap didn't move the camera
     if (!down || !tap || !this.clip.group.visible) return;
     const box = this.renderer.domElement.getBoundingClientRect();
-    this.clip.select(this.clip.pick(e.clientX - box.left, e.clientY - box.top, this.camera, box.width, box.height));
+    const id = this.clip.pick(e.clientX - box.left, e.clientY - box.top, this.camera, box.width, box.height);
+    if (id) this.onPick?.(id);
   };
-
-  private placeClipLabel() {
-    const label = this.clipLabel;
-    if (!label) return;
-    const { clientWidth: cw, clientHeight: ch } = this.container;
-    const info = this.clip.group.visible ? this.clip.selectedInfo(this.camera, cw, ch) : null;
-    label.style.display = info ? "block" : "none";
-    if (!info) return;
-    if (info.text !== this.clipLabelText) {
-      label.textContent = info.text;
-      this.clipLabelText = info.text;
-      this.clipLabelSize = [label.offsetWidth, label.offsetHeight]; // measured when the text changes, not every frame
-    }
-    const [w, h] = this.clipLabelSize;
-    const x = Math.min(cw - w - 6, Math.max(6, info.x - w / 2));
-    const y = Math.min(ch - h - 6, Math.max(6, info.y - h));
-    label.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
-  }
 
   /**
    * Follow a player with a ring and a beam, and keep `label` (an element over the pitch) beside them, or stop
@@ -303,7 +284,6 @@ export class PitchScene {
     this.clip.clear();
     this.touches = [];
     this.lastFrameT = null;
-    if (this.clipLabel) this.clipLabel.style.display = "none";
     this.heat[0].fill(0);
     this.heat[1].fill(0);
     this.spikes = [];
@@ -649,12 +629,22 @@ export class PitchScene {
   private moveSpotlight() {
     const spot = this.spot;
     if (!spot) return;
+    const tracked = this.clip.group.visible;
+    if (tracked) { // a clip: follow the person's tracked position, frame by frame, while the tracker has them
+      const at = this.clip.positionOf(spot.id);
+      spot.on = !!at;
+      if (at) {
+        spot.target.set(at.x, 0, at.z);
+        if (!spot.placed) { spot.group.position.copy(spot.target); spot.placed = true; }
+      }
+    }
     spot.group.visible = spot.placed && spot.on;
     if (spot.label) spot.label.style.display = spot.group.visible ? "block" : "none";
     if (!spot.group.visible) return;
     const g = spot.group.position;
     const x = spot.target.x, z = spot.target.z;
-    g.set(g.x + (x - g.x) * 0.1, 0, g.z + (z - g.z) * 0.1);
+    const k = tracked ? 0.35 : 0.1; // a tracked position is already smooth: just take the edge off
+    g.set(g.x + (x - g.x) * k, 0, g.z + (z - g.z) * k);
     g.y = this.heightAt(g.x + L / 2, W / 2 - g.z) + 0.5;
     const beat = (performance.now() % 1600) / 1600; // a ring that swells and fades, once every 1.6 s
     spot.pulse.scale.setScalar(1 + beat * 0.9);
@@ -685,7 +675,6 @@ export class PitchScene {
     this.ball.position.lerp(target, 0.18);
     this.ball.visible = !this.clip.group.visible; // a clip draws its own ball, only where the video found it
     this.clip.update(this.clipSpeed);
-    this.placeClipLabel();
     this.moveSpotlight();
     this.placeGoals();
     this.drawTrail();

@@ -2,11 +2,13 @@
 
     python scripts/translate_moments.py                     # every sample in ../samples
     python scripts/translate_moments.py comeback-POT-CAR    # one match
+    python scripts/translate_moments.py 117093-38min_ft     # the real-footage clip, in samples/video/
 
 Run it after scripts/generate_commentary.py. Only moments whose English text changed are sent
 again, so re-running costs nothing when nothing changed. A translation that loses a name or a
 number keeps the English text, and isn't sent again unless you pass --retry. Writes
-samples/<name>.translations.json.
+samples/<name>.translations.json (samples/video/<name>.translations.json for the clip, whose moments come from
+video/moments.py and whose commentary is the video narrator's). With no names, every sample match and clip is done.
 """
 
 from __future__ import annotations
@@ -25,20 +27,38 @@ from pitch_insights.agents.translate import (
 )
 from pitch_insights.explain.moments import MatchBrain
 from pitch_insights.generator.io import read_match
+from pitch_insights.video.moments import load_clip_moments
+from pitch_insights.video.replay import APP_CLIPS, CLIP_DIR, stored_path
 
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 
 
+def is_clip(path: Path) -> bool:
+    """A clip's stored files are named as if for `samples/video/<name>.jsonl` (see video.replay.stored_path)."""
+    return path.parent.name == CLIP_DIR
+
+
+def sample_paths(names: list[str]) -> list[Path]:
+    if not names:
+        return sorted(SAMPLES.glob("*.jsonl")) + [stored_path(SAMPLES, n) for n in APP_CLIPS]
+    return [stored_path(SAMPLES, n) if (SAMPLES / CLIP_DIR / f"{n}.frames.jsonl").exists() else SAMPLES / f"{n}.jsonl"
+            for n in names]
+
+
 async def run_match(path: Path, translator, retry: bool = False) -> None:
-    meta, events = read_match(path)
-    brain = MatchBrain(meta, memory=memory_for(path, meta))
-    for ev in events:
-        brain.update(ev)
+    if is_clip(path):
+        meta, all_moments = load_clip_moments(SAMPLES, path.stem)
+    else:
+        meta, events = read_match(path)
+        brain = MatchBrain(meta, memory=memory_for(path, meta))
+        for ev in events:
+            brain.update(ev)
+        all_moments = brain.moments
     stored = load_commentary(path)
-    moments = [with_commentary(m, stored, meta) for m in brain.moments]
+    moments = [with_commentary(m, stored, meta) for m in all_moments]
     saved = load_translations(path)
     old = saved["moments"] if saved.get("version") == TRANSLATION_VERSION else {}  # redo after a method change
-    pattern = _names_pattern(names_for(meta))
+    pattern = _names_pattern(names_for(meta), trackers=meta.get("source") == "video")  # the clip's "Left #11" too
 
     # What still needs translating: every text of a moment whose English changed, and any text a
     # language is missing (it failed the check last time) when --retry is given.
@@ -92,7 +112,7 @@ async def main() -> int:
     if translator is None:
         print("Translator isn't configured; fill in AZURE_TRANSLATOR_KEY in .env (see .env.example)")
         return 1
-    paths = [SAMPLES / f"{n}.jsonl" for n in args.names] if args.names else sorted(SAMPLES.glob("*.jsonl"))
+    paths = sample_paths(args.names)
     try:
         for path in paths:
             await run_match(path, translator, args.retry)

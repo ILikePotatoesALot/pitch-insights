@@ -1,0 +1,44 @@
+{
+ "evaluator": "azure-ai-evaluation GroundednessEvaluator",
+ "judge_model": "gpt-4o",
+ "scale": "1-5, pass at 3",
+ "summary": {
+  "moments": 5,
+  "mean": 4.0,
+  "min": 4.0,
+  "passed": 5,
+  "not_scored": 0
+ },
+ "moments": {
+  "C-1": {
+   "text_hash": "bb4f70e8372097ad",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes the events detected by the video model, including Left #11's carry and pass to Left #6, as well as Left #6's subsequent carry with low confidence. The RESPONSE does not introduce any information outside the CONTEXT and correctly reflects the uncertainty of the model regarding Left #6's carry. However, the RESPONSE does not address why the moment matters, which is part of the QUERY. Therefore, while the RESPONSE is accurate, it is incomplete in addressing the full scope of the QUERY."
+  },
+  "C-2": {
+   "text_hash": "01604284ceaa2925",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance, using only the facts provided in the CONTEXT. The RESPONSE mentions the pass from Left #16 to Left #26 over 12 metres and notes the model's low confidence (46%). It also includes details about Left's player spread (40 metres wide and 27 metres deep). However, the RESPONSE does not address why the moment matters, which is explicitly requested in the QUERY. While the RESPONSE uses facts from the CONTEXT, it is incomplete as it omits the significance of the moment, making it a partially correct response."
+  },
+  "C-3": {
+   "text_hash": "5694981fcfe7dead",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE accurately describes the events detected by the model, including the carries and pass by Left #16 and Left #9, as well as the spatial distribution of players at 38:41. It acknowledges the model's low confidence in detecting these events, which aligns with the CONTEXT. However, the RESPONSE does not address why the moment matters, which is part of the QUERY. While the description is grounded in the CONTEXT, it is incomplete as it omits the significance of the moment. Therefore, the RESPONSE is partially correct."
+  },
+  "C-4": {
+   "text_hash": "198f4b25d521e800",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions that Right #4 wins the ball after Left #11's pass goes astray, which aligns with the CONTEXT. It also notes the width of Left's and Right's player formations, which is accurate based on the CONTEXT. However, the RESPONSE does not explain why the moment matters, as requested in the QUERY. This omission makes the answer incomplete, even though the provided details are correct."
+  },
+  "C-5": {
+   "text_hash": "befb40d77a0561cb",
+   "score": 4.0,
+   "result": "pass",
+   "reason": "Let's think step by step: The QUERY asks for a description of the football moment and its significance using only the facts provided in the CONTEXT. The RESPONSE mentions the turnover at 39:30, the interception by Right #46, and the low confidence of the model in the events, which aligns with the CONTEXT. However, the RESPONSE does not fully describe the significance of the moment or elaborate on the broader implications of the turnover, such as the positioning of players or the potential impact on the game. While the RESPONSE is accurate and grounded in the CONTEXT, it is incomplete in addressing the QUERY's request for why the moment matters. Therefore, the RESPONSE is partially correct."
+  }
+ }
+}

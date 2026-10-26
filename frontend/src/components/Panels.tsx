@@ -155,7 +155,7 @@ function CheckNote({ m }: { m: Moment }) {
   const g = c.grounding;
   return (
     <p className="check">
-      {c.agent === "explainer" ? "Explainer" : "Narrator"} agent · {g ? `${g.claims} names and numbers checked against these facts` : "checked"}
+      {{ explainer: "Explainer", narrator: "Narrator", video_narrator: "Video narrator" }[c.agent]} agent · {g ? `${g.claims} names and numbers checked against these facts` : "checked"}
       {c.corrected.length > 0 && `; first draft corrected (${c.corrected.join(", ")} weren't in the facts)`}
       {c.safety?.passed && " · screened by Azure AI Content Safety"}
       {m.lang && " · machine-translated by Azure AI Translator"}
@@ -163,15 +163,17 @@ function CheckNote({ m }: { m: Moment }) {
   );
 }
 
-function MomentCard({ m, meta, mode, colours }: { m: Moment; meta: MatchMeta; mode: ViewMode; colours: [string, string] }) {
+function MomentCard({ m, meta, mode, colours, mine }: {
+  m: Moment; meta: MatchMeta; mode: ViewMode; colours: [string, string]; mine: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const colour = m.team_id === meta.home.id ? colours[0] : m.team_id === meta.away.id ? colours[1] : "var(--muted)";
   const text = commentaryText(m, mode);
   return (
-    <li className={`moment ${m.tier}`} style={{ borderLeftColor: colour }}>
+    <li className={`moment ${m.tier}${mine ? " mine" : ""}`} style={{ borderLeftColor: colour }}>
       <button onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="mclock">{m.clock}</span>
-        <span className="mhead">{m.headline}{text && <span className="mtext">{text}</span>}</span>
+        <span className="mhead">{mine && "★ "}{m.headline}{text && <span className="mtext">{text}</span>}</span>
         <span className="why">{open ? "Hide" : "Why?"}</span>
       </button>
       {open && <>
@@ -182,12 +184,17 @@ function MomentCard({ m, meta, mode, colours }: { m: Moment; meta: MatchMeta; mo
   );
 }
 
-export function MomentFeed({ moments, meta, aiInfo, mode, colours }: {
+/**
+ * The moments so far, newest first. A casual fan sees only headline moments, unless `allTiers` (a clip, whose few
+ * moments are all worth showing). `follow` is a player whose moments get a star (a tracked player in a clip).
+ */
+export function MomentFeed({ moments, meta, aiInfo, mode, colours, allTiers = false, follow = null }: {
   moments: Moment[]; meta: MatchMeta; aiInfo: CommentaryInfo | null; mode: ViewMode; colours: [string, string];
+  allTiers?: boolean; follow?: string | null;
 }) {
   const [showMinor, setShowMinor] = useState(false);
   const shown = moments.filter((m) =>
-    mode === "casual" ? m.tier === "headline" : m.tier !== "minor" || showMinor);
+    mode === "casual" && !allTiers ? m.tier === "headline" : m.tier !== "minor" || showMinor);
   return (
     <div className="panel feed">
       <h3>
@@ -195,7 +202,8 @@ export function MomentFeed({ moments, meta, aiInfo, mode, colours }: {
         {mode === "analyst" && <label className="toggle"><input type="checkbox" checked={showMinor} onChange={(e) => setShowMinor(e.target.checked)} /> minor</label>}
       </h3>
       {shown.length === 0 ? <p className="empty">Nothing yet. Moments appear here as the match unfolds.</p> :
-        <ul>{[...shown].reverse().map((m) => <MomentCard key={m.id} m={m} meta={meta} mode={mode} colours={colours} />)}</ul>}
+        <ul>{[...shown].reverse().map((m) => <MomentCard key={m.id} m={m} meta={meta} mode={mode} colours={colours}
+                                                         mine={!!follow && m.player_id === follow} />)}</ul>}
       {aiInfo && <p className="ai-note">Commentary is AI-generated ({aiInfo.model}) from the facts under "Why?", and every name and number in it is checked against them.
         {moments.some((m) => m.lang) && " Moments are machine-translated from English."}</p>}
     </div>

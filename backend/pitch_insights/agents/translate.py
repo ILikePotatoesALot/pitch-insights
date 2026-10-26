@@ -46,10 +46,12 @@ NUMBER = re.compile(r"(?<![0-9.])[0-9]+(?:\.[0-9]+)?")
 
 
 def names_for(meta: dict) -> list[str]:
-    """Every name that must not be translated: both squads' players (full name and surname) and
-    every club in the league (name and short name). Longest first, so "Potato FC" wins over "Potato"."""
+    """Every name that must not be translated: both squads' players (full name and surname), the two sides
+    (the video clip's "Left" and "Right"; a synthetic match's are clubs already) and every club in the league
+    (name and short name). Longest first, so "Potato FC" wins over "Potato"."""
     names = set()
     for side in ("home", "away"):
+        names.update((meta[side]["name"], meta[side]["short_name"]))
         for p in meta[side]["players"]:
             names.add(p["name"])
             names.add(p["name"].split()[-1])
@@ -61,9 +63,13 @@ def names_for(meta: dict) -> list[str]:
 CLOCK = r"[0-9]+(?:\+[0-9]+)?'"  # 6', 45+2': protected too, or German reads 6' as six feet
 
 
-def _names_pattern(names: list[str]) -> re.Pattern:
-    """Names and match clocks: what a translation must keep exactly as written."""
-    alternatives = [re.escape(html.escape(n, quote=False)) for n in names] + [CLOCK]
+TRACKER = r"(?:Left|Right|Track) #[0-9]+|#[0-9]+"  # the video clip's "Left #11" and "#6": a tracker ID, never translated
+
+
+def _names_pattern(names: list[str], trackers: bool = False) -> re.Pattern:
+    """Names and match clocks: what a translation must keep exactly as written. `trackers` (for the video clip) adds
+    its player labels, "Left #11" and a bare "#6", which are the same in every language."""
+    alternatives = ([TRACKER] if trackers else []) + [re.escape(html.escape(n, quote=False)) for n in names] + [CLOCK]
     return re.compile(r"(?<!\w)(" + "|".join(alternatives) + r")(?!\w)")
 
 

@@ -1,0 +1,175 @@
+{
+ "ai_generated": true,
+ "provider": "foundry",
+ "model": "gpt-4o",
+ "prompt_version": "2026-10-26.1",
+ "match": "117093-38min_ft",
+ "summary": {
+  "moments": 5,
+  "ok": 5,
+  "fallback": 0,
+  "retried": 1,
+  "grounding_mean": 1.0,
+  "safety_checked": 5,
+  "safety_blocked": 0
+ },
+ "moments": {
+  "C-1": {
+   "moment_id": "C-1",
+   "input_hash": "efa538477d7b756d",
+   "agent": "video_narrator",
+   "status": "ok",
+   "casual": "Left #11 carries the ball and passes to Left #6, who seems to carry it further.",
+   "analyst": "Left #11 carries the ball for 5 m and passes 27 m to Left #6. Left #6 appears to carry it 12 m, but the model isn't sure about that.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 8,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "C-2": {
+   "moment_id": "C-2",
+   "input_hash": "a592590820354ec5",
+   "agent": "video_narrator",
+   "status": "ok",
+   "casual": "Left #16 appears to pass to Left #26 over 12 metres.",
+   "analyst": "At 38:32, Left #16 appears to pass 12 metres to Left #26, with the model only 46% sure. Left's tracked players are spread 40 metres wide and 27 metres deep.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 11,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "C-3": {
+   "moment_id": "C-3",
+   "input_hash": "f4badab612a3426a",
+   "agent": "video_narrator",
+   "status": "ok",
+   "casual": "Left #16 seems to carry the ball and pass to Left #9, who appears to carry it further.",
+   "analyst": "The model wasn't sure, but Left #16 appears to carry the ball 4 m before passing 2 m to Left #9, who seems to carry it 5 m. At 38:41, Left is spread 48 m across the pitch with 2 tracked players in the attacking third, while Right has 5 tracked players in its own third, spread 33 m across.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 13,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "C-4": {
+   "moment_id": "C-4",
+   "input_hash": "3dbaae7fbee3570f",
+   "agent": "video_narrator",
+   "status": "ok",
+   "casual": "Right #4 wins the ball after Left #11's pass goes astray.",
+   "analyst": "At 38:48, Left #11's 25 m pass seems to go astray, and Right #4 appears to intercept. Left's tracked players are spread 56 m wide, while Right's are 48 m wide.",
+   "attempts": 1,
+   "grounding": {
+    "score": 1.0,
+    "claims": 9,
+    "unsupported": []
+   },
+   "corrected": [],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  },
+  "C-5": {
+   "moment_id": "C-5",
+   "input_hash": "df18c821c5ba4c31",
+   "agent": "video_narrator",
+   "status": "ok",
+   "casual": "The model suggests Right #46 wins the ball after Left #11's pass goes astray, but it wasn't sure about most of the events.",
+   "analyst": "The model indicates a possible turnover at 39:30 as Right #46 appears to intercept Left #11's pass, but confidence in the events is low throughout this sequence.",
+   "attempts": 2,
+   "grounding": {
+    "score": 1.0,
+    "claims": 6,
+    "unsupported": []
+   },
+   "corrected": [
+    "casual: no hedge on events the model was under 60% sure of"
+   ],
+   "safety": {
+    "passed": true,
+    "severities": {
+     "Hate": 0,
+     "SelfHarm": 0,
+     "Sexual": 0,
+     "Violence": 0
+    },
+    "flagged": [],
+    "error": null,
+    "service": "azure-content-safety",
+    "api_version": "2024-09-01"
+   },
+   "reason": null,
+   "provider": "foundry",
+   "model": "gpt-4o"
+  }
+ }
+}
