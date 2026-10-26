@@ -120,7 +120,9 @@ npm run dev
 
 Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute. `/?compare=1` opens the side-by-side view.
 
-Frontend checks (Node 24, from `frontend/`): `npm test` runs seven player-following regression tests; `npm run build` checks TypeScript and builds the app. Selecting a player in Live ratings now updates the favourite, pinned card and spotlight together. In the real-footage clip, select a marker or player row to follow, and use "Stop following" to clear the selection.
+Frontend checks (Node 24, from `frontend/`): `npm test` runs 12 regression tests for player following and appearance preferences; `npm run build` checks TypeScript and builds the app. Selecting a player in Live ratings now updates the favourite, pinned card and spotlight together. In the real-footage clip, select a marker or player row to follow, and use "Stop following" to clear the selection.
+
+Light mode is the default, with a Light/Dark switch under Appearance. The choice is kept in this browser and shared across comparison panes. On phones, Settings holds the viewing options, and tabs switch between moments, players and stats. Momentum and the pitch guide can be expanded when needed.
 
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 

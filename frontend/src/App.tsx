@@ -4,6 +4,7 @@ import { TrackingTotals, type ClipTracking } from "./clipStats";
 import { Overlays } from "./components/Overlays";
 import { FocusStrip, MomentFeed, MomentumChart, PinnedPlayer, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { ProfilePicker } from "./components/ProfilePicker";
+import { ThemeSwitch } from "./components/ThemeSwitch";
 import { apiUrl } from "./api";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { trackLabel } from "./pitch/ClipLayer";
@@ -22,6 +23,7 @@ const embedded = query.has("embed");
 // A tracked player to follow in a clip ("L-t11"): not part of the profile, since tracker numbers belong to one clip.
 const urlFollow = /^[LR]-t\d+$/.test(query.get("follow") ?? "") ? query.get("follow") : null;
 const NO_TRACKING: ClipTracking = { players: [], possession: [0, 0] };
+type DetailPanel = "moments" | "players" | "stats";
 
 export default function App() {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
@@ -29,6 +31,9 @@ export default function App() {
   const [layout, setLayout] = useState<LayoutMode>(urlLayout);
   const [inspected, setInspected] = useState<string | null>(null);
   const [seekTo, setSeekTo] = useState(0);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [panel, setPanel] = useState<DetailPanel>("moments");
+  const settingsButton = useRef<HTMLButtonElement>(null);
   // The viewer's profile: from the link if it carries one (that tab only, never saved), else the store, else the
   // first-visit picker. Null until known; the match isn't started before then, so the server sees the right profile.
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -191,17 +196,28 @@ export default function App() {
   const chip = [p.team ? `★ ${clubs.find((c) => c.id === p.team)?.short_name ?? p.team}` : "Profile", p.mode === "casual" ? "Casual" : "Analyst",
                 LANGUAGE_NAMES[p.lang] ?? p.lang].join(" · ");
   const compareHref = `?compare=1&match=${name ?? ""}&speed=${speed}`;
+  const activePanel = panel === "stats" && !showingClip && p.mode !== "analyst" ? "moments" : panel;
+  const panels: DetailPanel[] = showingClip || p.mode === "analyst" ? ["moments", "players", "stats"] : ["moments", "players"];
 
   return (
     <div className={`app ${layout}${embedded ? " embed" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
         <h1>Pitch Insights <small>live football intelligence</small></h1>
-        <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); setFollow(null); }} aria-label="Match">
+        <button type="button" className="mobile-settings-toggle" ref={settingsButton} aria-expanded={settingsOpen}
+                aria-controls="view-settings" onClick={() => setSettingsOpen((open) => !open)}>Settings</button>
+        <div className="header-settings" id="view-settings" data-open={settingsOpen} onKeyDown={(e) => {
+          if (e.key === "Escape") { setSettingsOpen(false); settingsButton.current?.focus(); }
+        }}>
+        <label className="header-field match-field"><span className="setting-label">Match</span>
+        <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); setFollow(null); setSettingsOpen(false); }} aria-label="Match">
           {matches.map((m) => <option key={m.name} value={m.name}>{m.kind === "video" ? `${m.home.name} v ${m.away.name} · real footage` : `${m.home.name} v ${m.away.name} (${m.name.split("-")[0]})`}</option>)}
         </select>
+        </label>
+        <label className="header-field"><span className="setting-label">Language</span>
         <select value={p.lang} onChange={(e) => commit({ ...p, lang: e.target.value })} aria-label="Language">
           {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
         </select>
+        </label>
         <div className="segmented" role="group" aria-label="Layout">
           {(["broadcast", "fan"] as LayoutMode[]).map((v) => (
             <button key={v} className={layout === v ? "on" : ""} onClick={() => setLayout(v)}
@@ -213,11 +229,13 @@ export default function App() {
             <button key={v} className={p.mode === v ? "on" : ""} onClick={() => commit({ ...p, mode: v })}>{v === "casual" ? "Casual fan" : "Analyst"}</button>
           ))}
         </div>
-        <button className={`profile-chip${accent ? " fav" : ""}`} onClick={() => setPicker("edit")} aria-label="Edit your profile"
+        <button className={`profile-chip${accent ? " fav" : ""}`} onClick={() => { setSettingsOpen(false); setPicker("edit"); }} aria-label="Edit your profile"
                 title={clubAbsent ? "Your club isn't playing in this match" : "Edit your profile"}>
           {chip}{clubAbsent && " (not in this match)"}
         </button>
+        <ThemeSwitch />
         {!embedded && <a className="compare" href={compareHref} target="_blank" rel="noreferrer" title="Open two viewers of this match side by side">Compare viewers</a>}
+        </div>
       </header>
 
       <main>
@@ -257,8 +275,12 @@ export default function App() {
             )}
             {status === "ended" && (clipMode ? <button onClick={() => { setSeekTo(0); seekAt(0); }}>Replay the clip</button> : <span className="status">Match over</span>)}
           </div>
-          {showingMatch && <MomentumChart state={state} colours={colours} />}
+          {showingMatch && <>
+            <div className="desktop-momentum"><MomentumChart state={state} colours={colours} /></div>
+            <details className="mobile-momentum"><summary>Match momentum</summary><MomentumChart state={state} colours={colours} /></details>
+          </>}
           {showingClip && clip && <ClipCredit info={clip} />}
+          <details className="pitch-guide"><summary>How to read the pitch</summary>
           {showingClip ? (
             <p className="legend">
               Each marker is one tracked person: {meta?.home.name} in blue, {meta?.away.name} in white, grey where the model could not tell
@@ -274,24 +296,36 @@ export default function App() {
               {pinned && " The ring follows your player: it sits where they last touched the ball."}
             </p>
           )}
+          </details>
         </section>
 
-        {layout === "fan" && showingClip && meta && <aside>
-          <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} allTiers follow={follow} />
-          <ClipPlayers tracking={trackingView} colours={colours} follow={follow} setFollow={setFollow} />
+        {layout === "fan" && meta && (showingClip || showingMatch) && <aside aria-label="Match details">
+          <nav className="mobile-panel-tabs" aria-label="Match panels">
+            {panels.map((value) => (
+              <button type="button" key={value} className={activePanel === value ? "on" : ""} aria-pressed={activePanel === value}
+                      onClick={() => setPanel(value)}>
+                {value === "moments" ? "Moments" : value === "players" ? "Players" : showingClip ? "About clip" : "Stats"}
+              </button>
+            ))}
+          </nav>
+          <div className="detail-section" data-active={activePanel === "moments"}>
+            <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} allTiers={!!showingClip} follow={showingClip ? follow : null} />
+          </div>
+          <div className="detail-section" data-active={activePanel === "players"}>
+            {showingClip ? <ClipPlayers tracking={trackingView} colours={colours} follow={follow} setFollow={setFollow} /> :
+              <Ratings state={state} meta={meta} colours={colours} favourite={inspected} setFavourite={setInspected}
+                       followed={p.player} onFollow={(id) => { if (id !== p.player) commit({ ...p, player: id }); }} />}
+          </div>
+          <div className="detail-section" data-active={activePanel === "stats"}>
+          {showingClip ? <>
           {p.mode === "analyst" && <ClipEvents events={clipEvents} mode={p.mode} colours={colours} meta={meta} info={clip} follow={follow} />}
           {clip && <ClipPanel info={clip} lang={p.lang} />}
-        </aside>}
-
-        {layout === "fan" && showingMatch && <aside>
-          {meta && <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} />}
-          {meta && <Ratings state={state} meta={meta} colours={colours} favourite={inspected} setFavourite={setInspected}
-                            followed={p.player} onFollow={(id) => { if (id !== p.player) commit({ ...p, player: id }); }} />}
-          {meta && p.mode === "analyst" && <StatsPanel state={state} meta={meta} focus={p.focus} />}
+          </> : p.mode === "analyst" && <StatsPanel state={state} meta={meta} focus={p.focus} />}
+          </div>
         </aside>}
       </main>
 
-      {picker && <ProfilePicker clubs={clubs} languages={languages} profile={p} first={picker === "first"} fromLink={fromLink}
+      {picker && <ProfilePicker clubs={clubs} languages={languages} profile={p} first={picker === "first"} fromLink={fromLink} fallbackFocus={settingsButton.current} clipMode={!!showingClip}
                                 onSave={(next) => { commit(next); setPicker(null); }} onReset={reset} onClose={() => setPicker(null)} />}
     </div>
   );
