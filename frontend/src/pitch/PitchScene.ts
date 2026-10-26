@@ -12,6 +12,11 @@ const SPIKE_TAU = 75;
 const SIGMA = 7; // metres: how far one action's influence spreads
 const CLIP_HEAT_PER_S = 0.015; // territory a tracked player adds each second, at their spot (an event adds 0.2 to 0.9)
 const PICK_DRAG_PX = 5; // a press that moves further than this is a camera drag, not a tap on a player
+const VIEW_ELEVATION = (40 * Math.PI) / 180; // the default camera: centred on the halfway line, 40 degrees above the pitch
+const GOAL_W = 7.32;
+const GOAL_H = 2.44;
+const GOAL_D = 2;
+const TRAIL = 6; // touches shown behind the ball
 
 /** Event position in absolute pitch metres, with the home team attacking left to right in the first half. */
 export function toAbsolute(ev: MatchEvent, meta: MatchMeta, end = false): [number, number] | null {
@@ -49,6 +54,7 @@ interface Spike { x: number; y: number; amp: number; born: number; goal: boolean
 interface Spotlight { id: string; colour: string; group: THREE.Group; pulse: THREE.Mesh; label: HTMLElement | null; target: THREE.Vector3; placed: boolean; on: boolean; labelSize: [number, number] }
 
 const BASE_COLOUR = new THREE.Color("#10202c");
+const CONTESTED_COLOUR = new THREE.Color("#5d6b7d"); // space neither team owns: slate, not a muddy mix of the two colours
 const GLOW_COLOUR = new THREE.Color("#fff6c2");
 
 export class PitchScene {
@@ -78,6 +84,13 @@ export class PitchScene {
   private clipLabelSize: [number, number] = [0, 0];
   private lastFrameT: number | null = null;
   private pressAt: [number, number] | null = null;
+  private movedBeforePress = false;
+  private goals: THREE.Group[] = [];
+  private touches: { x: number; y: number; side: number }[] = [];
+  private trailDots: THREE.Mesh[] = [];
+  private trailLine: THREE.Line;
+  private userMoved = false; // once the viewer turns or zooms, a resize no longer reframes the pitch
+  private flyTo: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -85,13 +98,14 @@ export class PitchScene {
     container.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(38, 1, 1, 1000);
-    this.camera.position.set(-18, 72, 92);
+    this.camera.position.set(0, 72, 86); // replaced by the fitted view on the first resize
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(0, 0, 0);
     this.controls.enableDamping = true;
     this.controls.maxPolarAngle = Math.PI * 0.45;
     this.controls.minDistance = 40;
     this.controls.maxDistance = 220;
+    this.controls.addEventListener("start", this.onUserMove);
 
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.55));
     const sun = new THREE.DirectionalLight(0xffffff, 1.1);
@@ -108,16 +122,35 @@ export class PitchScene {
       map: this.lineTexture(), transparent: true, depthWrite: false,
       polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
     }));
-    this.scene.add(surface, lines);
+    this.scene.add(this.apron(), surface, lines);
+    for (const end of [-1, 1]) {
+      const goal = this.buildGoal(end);
+      this.goals.push(goal);
+      this.scene.add(goal);
+    }
 
     this.ball = new THREE.Mesh(new THREE.SphereGeometry(0.9, 20, 16),
       new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.6 }));
     this.scene.add(this.ball);
+    for (let n = 0; n < TRAIL; n++) {
+      const dot = new THREE.Mesh(new THREE.CircleGeometry(1, 20), new THREE.MeshBasicMaterial({
+        transparent: true, opacity: 0.85 * (1 - n / TRAIL), depthWrite: false, side: THREE.DoubleSide }));
+      dot.rotation.x = -Math.PI / 2;
+      dot.visible = false;
+      this.trailDots.push(dot);
+      this.scene.add(dot);
+    }
+    this.trailLine = new THREE.Line(new THREE.BufferGeometry().setAttribute("position",
+      new THREE.BufferAttribute(new Float32Array(TRAIL * 3), 3)),
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, depthWrite: false }));
+    this.trailLine.frustumCulled = false;
+    this.scene.add(this.trailLine);
 
     this.clip = new ClipLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
     this.scene.add(this.clip.group);
     this.renderer.domElement.addEventListener("pointerdown", this.onPress);
     this.renderer.domElement.addEventListener("pointerup", this.onRelease);
+    this.renderer.domElement.addEventListener("dblclick", this.onResetView);
 
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(container);
@@ -161,11 +194,32 @@ export class PitchScene {
 
   private onPress = (e: PointerEvent) => { this.pressAt = [e.clientX, e.clientY]; };
 
+  /** The controls' "start" (a press or a wheel turn), which comes before onPress. */
+  private onUserMove = () => {
+    this.movedBeforePress = this.userMoved;
+    this.userMoved = true;
+    this.endFlight();
+  };
+
+  /** Double-click: glide back to the default view, framed to fit. */
+  private onResetView = () => {
+    this.userMoved = false;
+    this.flyTo = this.fittedView();
+    this.controls.enableDamping = false; // drops any spin left over from the last drag, which would fight the glide
+  };
+
+  private endFlight() {
+    this.flyTo = null;
+    this.controls.enableDamping = true;
+  }
+
   /** A tap (not a camera drag) on or near a tracked player selects them; a tap elsewhere clears it. */
   private onRelease = (e: PointerEvent) => {
     const down = this.pressAt;
     this.pressAt = null;
-    if (!down || !this.clip.group.visible || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > PICK_DRAG_PX) return;
+    const tap = !!down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) <= PICK_DRAG_PX;
+    if (tap) this.userMoved = this.movedBeforePress; // the controls call any press a move; a tap didn't move the camera
+    if (!down || !tap || !this.clip.group.visible) return;
     const box = this.renderer.domElement.getBoundingClientRect();
     this.clip.select(this.clip.pick(e.clientX - box.left, e.clientY - box.top, this.camera, box.width, box.height));
   };
@@ -247,6 +301,7 @@ export class PitchScene {
   reset() {
     if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
     this.clip.clear();
+    this.touches = [];
     this.lastFrameT = null;
     if (this.clipLabel) this.clipLabel.style.display = "none";
     this.heat[0].fill(0);
@@ -279,9 +334,11 @@ export class PitchScene {
     const weight = ev.type === "shot" ? 0.9 : ev.type === "pressure" ? 0.12 : ev.type === "pass" ? 0.2 : 0.25;
     this.splat(side, pos[0], pos[1], weight);
     const end = toAbsolute(ev, meta, true);
+    if (ev.type !== "pressure" && ev.type !== "foul") this.touch(side, pos[0], pos[1]); // near the ball, not touches of it
     if (end && (ev.type === "carry" || (ev.type === "pass" && ev.outcome === "complete"))) {
       this.splat(side, end[0], end[1], 0.15);
       this.moveBall(end[0], end[1]);
+      if (ev.type === "pass") this.touch(side, end[0], end[1]);
     } else {
       this.moveBall(pos[0], pos[1]);
     }
@@ -297,11 +354,13 @@ export class PitchScene {
     this.clearSpotlight();
     this.renderer.domElement.removeEventListener("pointerdown", this.onPress);
     this.renderer.domElement.removeEventListener("pointerup", this.onRelease);
+    this.renderer.domElement.removeEventListener("dblclick", this.onResetView);
+    this.controls.removeEventListener("start", this.onUserMove);
     this.clip.dispose();
     this.observer.disconnect();
     this.controls.dispose();
     this.scene.traverse((obj) => {
-      if (!(obj instanceof THREE.Mesh)) return;
+      if (!(obj instanceof THREE.Mesh || obj instanceof THREE.Line)) return; // (LineSegments is a Line)
       obj.geometry.dispose();
       for (const m of Array.isArray(obj.material) ? obj.material : [obj.material]) {
         (m as THREE.MeshBasicMaterial).map?.dispose();
@@ -315,6 +374,130 @@ export class PitchScene {
   // ------------------------------------------------------------ internals
 
   private idx(i: number, j: number) { return j * (NX + 1) + i; }
+
+  /** A dark ground under the pitch that fades out, so the surface sits on something rather than floating. */
+  private apron() {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 128;
+    const c = canvas.getContext("2d")!;
+    const g = c.createRadialGradient(64, 64, 20, 64, 64, 64);
+    g.addColorStop(0, "rgba(7,14,20,0.9)");
+    g.addColorStop(0.7, "rgba(7,14,20,0.55)");
+    g.addColorStop(1, "rgba(7,14,20,0)");
+    c.fillStyle = g;
+    c.fillRect(0, 0, 128, 128);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(L * 1.5, W * 1.9), new THREE.MeshBasicMaterial({
+      map: tex, transparent: true, depthWrite: false }));
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.y = -0.3;
+    mesh.renderOrder = -1;
+    return mesh;
+  }
+
+  /** A goal frame and net at one end (-1 left, 1 right), opening onto the pitch. It rides the surface's height. */
+  private buildGoal(end: number) {
+    const group = new THREE.Group();
+    const frame = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.4 });
+    const t = 0.3; // thicker than a real post (0.12 m) so it reads at this distance
+    for (const z of [-GOAL_W / 2, GOAL_W / 2]) {
+      const post = new THREE.Mesh(new THREE.BoxGeometry(t, GOAL_H, t), frame);
+      post.position.set(0, GOAL_H / 2, z);
+      group.add(post);
+    }
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(t, t, GOAL_W + t), frame);
+    bar.position.set(0, GOAL_H, 0);
+    group.add(bar);
+    // The net: a faint box behind the goal line, with its edges drawn.
+    const net = new THREE.BoxGeometry(GOAL_D, GOAL_H, GOAL_W);
+    net.translate(GOAL_D / 2, GOAL_H / 2, 0);
+    group.add(new THREE.Mesh(net, new THREE.MeshBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.1, side: THREE.DoubleSide, depthWrite: false })));
+    group.add(new THREE.LineSegments(new THREE.EdgesGeometry(net), new THREE.LineBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.35, depthWrite: false })));
+    group.position.x = (end * L) / 2;
+    if (end < 0) group.rotation.y = Math.PI; // the net goes behind the goal line, away from the pitch
+    return group;
+  }
+
+  /**
+   * The default view for the pitch's current size: centred, the whole pitch and its goals in frame. A portrait box
+   * (a phone) looks down the pitch's length instead of across it, so the pitch fills the height.
+   */
+  private fittedView() {
+    const cam = this.camera.clone();
+    const target = new THREE.Vector3();
+    const az = this.camera.aspect < 0.9 ? Math.PI / 2 : 0;
+    const flat = new THREE.Vector3(Math.sin(az), 0, Math.cos(az)); // from the pitch towards the camera, along the ground
+    const dir = flat.clone().multiplyScalar(Math.cos(VIEW_ELEVATION)).setY(Math.sin(VIEW_ELEVATION));
+    const corners: THREE.Vector3[] = [];
+    for (const x of [-L / 2 - GOAL_D, L / 2 + GOAL_D]) {
+      for (const z of [-W / 2, W / 2]) for (const y of [0, 5]) corners.push(new THREE.Vector3(x, y, z));
+    }
+    const v = new THREE.Vector3();
+    let d = 120;
+    for (let n = 0; n < 8; n++) {
+      cam.position.copy(target).addScaledVector(dir, d);
+      cam.lookAt(target);
+      cam.updateMatrixWorld();
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      for (const p of corners) {
+        v.copy(p).project(cam);
+        x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y);
+      }
+      // Centre the pitch vertically (moving the target towards the far side moves the pitch down the screen)...
+      target.addScaledVector(flat, -((y0 + y1) / 2) * d * Math.tan((cam.fov * Math.PI) / 360) / Math.sin(VIEW_ELEVATION));
+      // ...and stand back just far enough to fit it, with a margin.
+      d *= Math.max((x1 - x0) / 2 / 0.94, (y1 - y0) / 2 / 0.86);
+    }
+    return { position: target.clone().addScaledVector(dir, d), target };
+  }
+
+  private frameView(view = this.fittedView()) {
+    this.controls.maxDistance = Math.max(220, view.position.distanceTo(view.target) * 1.5);
+    this.camera.position.copy(view.position);
+    this.controls.target.copy(view.target);
+    this.endFlight();
+  }
+
+  /** Remember where the ball was touched, for the trail. */
+  private touch(side: number, x: number, y: number) {
+    const last = this.touches[0];
+    if (last && last.side === side && Math.hypot(last.x - x, last.y - y) < 1) return; // (a pass's end is the next carry's start)
+    this.touches.unshift({ x, y, side });
+    if (this.touches.length > TRAIL) this.touches.length = TRAIL;
+  }
+
+  /** The last few touches as dots in the toucher's colour, joined by a line, fading with age. */
+  private drawTrail() {
+    const show = !this.clip.group.visible;
+    const line = this.trailLine.geometry.getAttribute("position") as THREE.BufferAttribute;
+    for (let n = 0; n < TRAIL; n++) {
+      const dot = this.trailDots[n];
+      const t = this.touches[n];
+      dot.visible = show && !!t;
+      if (!t) continue;
+      // Above the highest point around it, so a dot on a slope (a shot's spike) isn't buried in it.
+      let y = -Infinity;
+      for (const [dx, dy] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]]) y = Math.max(y, this.heightAt(t.x + dx, t.y + dy));
+      y += 0.25;
+      const x = t.x - L / 2, z = W / 2 - t.y;
+      dot.position.set(x, y, z);
+      (dot.material as THREE.MeshBasicMaterial).color.copy(this.colours[t.side]);
+      line.setXYZ(n, x, y + 0.05, z);
+    }
+    this.trailLine.visible = show && this.touches.length > 1;
+    this.trailLine.geometry.setDrawRange(0, this.touches.length);
+    line.needsUpdate = true;
+  }
+
+  private placeGoals() {
+    for (const goal of this.goals) {
+      const y = this.heightAt(goal.position.x + L / 2, W / 2);
+      goal.position.y += (y - goal.position.y) * 0.15;
+    }
+  }
 
   private buildGeometry() {
     const g = new THREE.BufferGeometry();
@@ -439,10 +622,12 @@ export class PitchScene {
         }
         pos.setY(k, height);
         const raw = total > 1e-4 ? hh / total : 0.5;
-        const share = 0.5 + 0.5 * Math.tanh((raw - 0.5) * 3); // sharpen smoothly, so ownership reads clearly without hard edges
-        tmp.copy(ca).lerp(ch, share);
+        // Who owns this space, from -1 (away) to 1 (home), sharpened smoothly so ownership reads without hard edges.
+        // Shared space fades to slate rather than mixing the colours, which turned a red and a blue team's pitch purple.
+        const lead = Math.tanh((raw - 0.5) * 4);
+        tmp.copy(CONTESTED_COLOUR).lerp(lead >= 0 ? ch : ca, Math.min(1, Math.abs(lead) * 1.2));
         const strength = Math.min(1, total / 1.5);
-        tmp.lerp(BASE_COLOUR, 1 - (0.25 + 0.75 * strength));
+        tmp.lerp(BASE_COLOUR, 1 - (0.3 + 0.7 * strength));
         if (glow > 0) tmp.lerp(GLOW_COLOUR, glow * 0.8);
         col.setXYZ(k, tmp.r, tmp.g, tmp.b);
       }
@@ -458,6 +643,7 @@ export class PitchScene {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    if (!this.userMoved) this.frameView();
   }
 
   private moveSpotlight() {
@@ -501,6 +687,13 @@ export class PitchScene {
     this.clip.update(this.clipSpeed);
     this.placeClipLabel();
     this.moveSpotlight();
+    this.placeGoals();
+    this.drawTrail();
+    if (this.flyTo) {
+      this.camera.position.lerp(this.flyTo.position, 0.12);
+      this.controls.target.lerp(this.flyTo.target, 0.12);
+      if (this.camera.position.distanceTo(this.flyTo.position) < 0.2) this.frameView(this.flyTo); // land exactly
+    }
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   };

@@ -237,12 +237,13 @@ export default function App() {
               Each marker is one tracked person: {meta?.home.name} in blue, {meta?.away.name} in white, grey where the model could not tell
               the team. The number is the tracker's ID, not a shirt number; tap a marker for its label. Lines are detected passes and
               carries, a ring is an interception. The ball shows only where the video found it. The surface rises where each side's
-              players have been in the last two minutes.
+              players have been in the last two minutes. Drag to turn the pitch, scroll to zoom, double-click to reset.
             </p>
           ) : (
             <p className="legend">
               The surface rises where each team has been active in the last two minutes, coloured by which team owns that space.
-              Spikes are shots: the taller, the better the chance. Goals glow.
+              Spikes are shots: the taller, the better the chance. Goals glow. Dots trace the ball's last few touches, in the colour of
+              the team that played it. Drag to turn the pitch, scroll to zoom, double-click to reset.
               {pinned && " The ring follows your player: it sits where they last touched the ball."}
             </p>
           )}
