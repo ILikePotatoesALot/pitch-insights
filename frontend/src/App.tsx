@@ -5,6 +5,7 @@ import { Overlays } from "./components/Overlays";
 import { FocusStrip, MomentFeed, MomentumChart, PinnedPlayer, Ratings, Scoreboard, StatsPanel } from "./components/Panels";
 import { ProfilePicker } from "./components/ProfilePicker";
 import { ThemeSwitch } from "./components/ThemeSwitch";
+import { ReplaySeek } from "./components/ReplaySeek";
 import { apiUrl } from "./api";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { trackLabel } from "./pitch/ClipLayer";
@@ -36,11 +37,12 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [panel, setPanel] = useState<DetailPanel>("moments");
   const settingsButton = useRef<HTMLButtonElement>(null);
-  // The viewer's profile: from the link if it carries one (that tab only, never saved), else the store, else the
-  // first-visit picker. Null until known; the match isn't started before then, so the server sees the right profile.
+  const appTitle = useRef<HTMLHeadingElement>(null);
+  // Links supply a profile for this tab; otherwise restore the viewer's saved choices or start watching immediately.
   const [profile, setProfile] = useState<Profile | null>(null);
   const [fromLink, setFromLink] = useState(false);
-  const [picker, setPicker] = useState<"first" | "edit" | null>(null);
+  const [picker, setPicker] = useState<"edit" | null>(null);
+  const [welcome, setWelcome] = useState(false);
   const [clubs, setClubs] = useState<ClubInfo[]>([]);
   const [ratingHistory, setRatingHistory] = useState<number[]>([]);
   const sceneRef = useRef<PitchScene | null>(null);
@@ -67,7 +69,7 @@ export default function App() {
     } else {
       profileStore.load().then((saved) => {
         setProfile(saved ?? DEFAULT_PROFILE);
-        if (!saved) setPicker("first");
+        setWelcome(!saved);
       });
     }
   }, []);
@@ -90,6 +92,7 @@ export default function App() {
     firstHalfEnd.current = null;
     sceneRef.current?.reset();
     tracking.current.reset();
+    trackingShown.current = Number.NEGATIVE_INFINITY;
     setTrackingView(NO_TRACKING);
   }, []);
 
@@ -110,8 +113,8 @@ export default function App() {
   // A clip of real footage (the video path) has its own speeds, panels and controls; a synthetic match is as before.
   const clipMode = matches.find((m) => m.name === name)?.kind === "video";
   const speeds = clipMode ? CLIP_SPEEDS : SPEEDS;
-  const ready = profile !== null && picker !== "first";
-  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, command, seek, seekAt, clip, clipEvents, clipT } =
+  const ready = profile !== null;
+  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, command, seek, seekAt, restart, clip, clipEvents, clipT } =
     useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame, onPositions, {
       controlled,
       initialMinute: controlled ? Math.max(0, Number(query.get("from")) || 0) : 0,
@@ -162,9 +165,25 @@ export default function App() {
     }
   };
   const reset = () => {
-    void profileStore.clear(); // nothing is kept: the next visit starts with the welcome picker again
+    void profileStore.clear();
     commit({ ...DEFAULT_PROFILE, lang: p.lang }, false);
     setPicker(null);
+    setWelcome(true);
+  };
+  const watchDemo = () => {
+    const demo = matches.find((m) => m.name === "comeback-POT-CAR") ?? matches.find((m) => m.kind !== "video");
+    if (!demo) return;
+    const club = clubs.find((c) => c.id === demo.home.id);
+    const squad = club?.players ?? (meta?.home.id === demo.home.id ? meta.home.players : meta?.away.id === demo.home.id ? meta.away.players : []);
+    const player = squad.find((person) => person.number === 11) ?? squad[0];
+    setName(demo.name);
+    setSeekTo(0);
+    setFollow(null);
+    clearHistory();
+    // A demo preset is for this visit. Only an explicit profile edit saves choices.
+    commit({ ...DEFAULT_PROFILE, team: demo.home.id, player: player?.id ?? null, focus: "win_probability" }, false);
+    restart();
+    setWelcome(false);
   };
 
   useEffect(() => {
@@ -225,7 +244,7 @@ export default function App() {
   return (
     <div className={`app ${layout}${embedded ? " embed" : ""}${controlled ? " sync" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
       <header>
-        <h1>Seize the game <small>live football intelligence</small></h1>
+        <h1 ref={appTitle} tabIndex={-1}>Seize the game <small>live football intelligence</small></h1>
         <button type="button" className="mobile-settings-toggle" ref={settingsButton} aria-expanded={settingsOpen}
                 aria-controls="view-settings" onClick={() => setSettingsOpen((open) => !open)}>Settings</button>
         <div className="header-settings" id="view-settings" data-open={settingsOpen} onKeyDown={(e) => {
@@ -263,6 +282,31 @@ export default function App() {
 
       <main>
         <section className="stage">
+          {welcome && !embedded && <section className="welcome" aria-labelledby="welcome-title">
+            <div><h2 id="welcome-title">See the match. Understand the moment.</h2>
+              <p>Try a favourite player, live ratings and explanations backed by match evidence. Personalisation is optional.</p></div>
+            <div className="welcome-actions">
+              <button type="button" className="primary" onClick={watchDemo} disabled={!matches.some((m) => m.kind !== "video")}>Watch demo</button>
+              <button type="button" onClick={() => { setWelcome(false); setPicker("edit"); }}>Personalise</button>
+              <button type="button" onClick={() => setWelcome(false)} aria-label="Dismiss welcome">Dismiss</button>
+            </div>
+          </section>}
+          <div className="controls" role="group" aria-label="Replay controls">
+            <div className="playback-state">
+              {status === "paused" ? <button onClick={resume}>Play</button> : <button onClick={pause} disabled={status !== "live"}>Pause</button>}
+              <span className="playback-clock" aria-label="Current match time">{showingClip ? mmss(clipT ?? clip?.clip.start ?? 0) : state?.finished ? "Full time" : state?.clock ?? "0′"}</span>
+            </div>
+            <div className="segmented" role="group" aria-label="Speed">
+              {speeds.map((s) => <button key={s} className={speed === s ? "on" : ""} onClick={() => setSpeed(s)}>{s}×</button>)}
+            </div>
+            <ReplaySeek key={name} value={seekTo} max={clipMode ? Math.floor(clip?.clip.duration ?? 99) : 90}
+                        unit={clipMode ? "second" : "minute"} onChange={setSeekTo}
+                        positionLabel={clipMode ? mmss((clip?.clip.start ?? 0) + seekTo) : `${seekTo} minutes`}
+                        onSeek={(value) => { clearHistory(); if (clipMode) seekAt(value); else seek(value); }} />
+            {status === "ended" && <button type="button" onClick={() => {
+              setSeekTo(0); clearHistory(); restart();
+            }}>{clipMode ? "Replay the clip" : "Replay match"}</button>}
+          </div>
           {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} tracking={trackingView} />}
           {showingClip && follow && <ClipPinned stats={trackingView.players.find((x) => x.id === follow)} id={follow} colours={colours}
                                                 events={clipEvents} info={clip} onStop={() => setFollow(null)} />}
@@ -270,6 +314,9 @@ export default function App() {
           {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
           {showingMatch && meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
                                            history={ratingHistory} onChange={() => setPicker("edit")} />}
+          {(showingMatch || showingClip) && <p className="pitch-caption">
+            {showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: activity over the last two minutes
+          </p>}
           <div className="pitch" ref={pitchEl}>
             {spotlit && <div className="spot-label" ref={spotLabel} style={{ borderColor: spotlit.colour }}>
               {followed ? `★ ${trackLabel(followed.id)}` : pinned && `#${pinned.number} ${pinned.name.split(" ").slice(-1)[0]}`}</div>}
@@ -277,26 +324,6 @@ export default function App() {
             {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
             {status === "error" && <div className="overlay-msg">Can't reach the replay server. {import.meta.env.DEV ? "Is it running on port 8000?" : "It may be waking up: try again in a moment."}</div>}
             {status === "disconnected" && <div className="overlay-msg">Lost the connection to the replay server. Pick a minute and press Go to reconnect.</div>}
-          </div>
-          <div className="controls">
-            {status === "paused" ? <button onClick={resume}>Play</button> : <button onClick={pause} disabled={status !== "live"}>Pause</button>}
-            <div className="segmented" role="group" aria-label="Speed">
-              {speeds.map((s) => <button key={s} className={speed === s ? "on" : ""} onClick={() => setSpeed(s)}>{s}×</button>)}
-            </div>
-            {clipMode ? (
-              <label className="seek">
-                Jump to <input type="range" min={0} max={Math.floor(clip?.clip.duration ?? 99)} step={1} value={seekTo} onChange={(e) => setSeekTo(Number(e.target.value))} />
-                <b>{mmss((clip?.clip.start ?? 0) + seekTo)}</b>
-                <button onClick={() => seekAt(seekTo)}>Go</button>
-              </label>
-            ) : (
-              <label className="seek">
-                Jump to <input type="range" min={0} max={90} step={1} value={seekTo} onChange={(e) => setSeekTo(Number(e.target.value))} />
-                <b>{seekTo}'</b>
-                <button onClick={() => { clearHistory(); seek(seekTo); }}>Go</button>
-              </label>
-            )}
-            {status === "ended" && (clipMode ? <button onClick={() => { setSeekTo(0); seekAt(0); }}>Replay the clip</button> : <span className="status">Match over</span>)}
           </div>
           {showingMatch && <>
             <div className="desktop-momentum"><MomentumChart state={state} colours={colours} /></div>
@@ -348,8 +375,8 @@ export default function App() {
         </aside>}
       </main>
 
-      {picker && <ProfilePicker clubs={clubs} languages={languages} profile={p} first={picker === "first"} fromLink={fromLink} fallbackFocus={settingsButton.current} clipMode={!!showingClip}
-                                onSave={(next) => { commit(next); setPicker(null); }} onReset={reset} onClose={() => setPicker(null)} />}
+      {picker && <ProfilePicker clubs={clubs} languages={languages} profile={p} fromLink={fromLink} fallbackFocus={appTitle.current} clipMode={!!showingClip}
+                                onSave={(next) => { commit(next); setWelcome(false); setPicker(null); }} onReset={reset} onClose={() => setPicker(null)} />}
     </div>
   );
 }

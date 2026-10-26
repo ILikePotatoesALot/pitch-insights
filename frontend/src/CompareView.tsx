@@ -66,6 +66,9 @@ export default function CompareView() {
         setEnded(true);
         setPlaying(false);
       } else if (message.type === "fault") {
+        playingRef.current = false;
+        dispatch({ cmd: "pause" });
+        setPlaying(false);
         setFailed(true);
         setWaiting(false);
       }
@@ -120,7 +123,7 @@ export default function CompareView() {
         <a href={`/?${single}`}>Watch one match</a>
         <div className="compare-controls">
           <button type="button" onClick={toggle} disabled={waiting || ended || failed}>{playing ? "Pause both" : "Play both"}</button>
-          <label>Speed <select value={speed} onChange={(e) => changeSpeed(Number(e.target.value))}>
+          <label>Speed <select value={speed} disabled={waiting || failed} onChange={(e) => changeSpeed(Number(e.target.value))}>
             {(kind === "video" ? [0.5, 1, 2, 5] : [1, 5, 20, 60]).map((value) => <option key={value} value={value}>{value}×</option>)}
           </select></label>
           <label>Jump to <input type="number" min={0} max={limit} value={jumpTo} onChange={(e) => setJumpTo(Number(e.target.value))} aria-label={kind === "video" ? "Clip second" : "Match minute"} />

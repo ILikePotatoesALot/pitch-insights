@@ -81,9 +81,11 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
     matchRef.current = name;
     pausedRef.current = keepPaused;
     let ended = false;
-    const socket = new WebSocket(wsUrl(`/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${options.controlled ? "paused=1&" : ""}${connectionParams({ ...profile, mode: modeRef.current })}`));
+    let disposed = false;
+    const socket = new WebSocket(wsUrl(`/ws/replay/${name}?speed=${speedRef.current}&from=${from}${at === null ? "" : `&at=${at}`}&${keepPaused ? "paused=1&" : ""}${connectionParams({ ...profile, mode: modeRef.current })}`));
     ws.current = socket;
     socket.onmessage = (msg) => {
+      if (disposed) return;
       const data = JSON.parse(msg.data);
       switch (data.type) {
         case "meta":
@@ -93,7 +95,6 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
           setClip(data.kind === "video" ? data.clip : null);
           setLanguages(data.languages ?? { en: "English" });
           socket.send(JSON.stringify({ cmd: "detail", value: modeRef.current }));
-          if (keepPaused && !options.controlled) socket.send(JSON.stringify({ cmd: "pause" }));
           setStatus(keepPaused ? "paused" : "live");
           break;
         case "ready":
@@ -141,9 +142,10 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
           break;
       }
     };
-    socket.onerror = () => { ended = true; setStatus("error"); setCues([]); };
-    socket.onclose = () => { if (!ended) { setStatus("disconnected"); setCues([]); } };
+    socket.onerror = () => { if (!disposed) { ended = true; setStatus("error"); setCues([]); } };
+    socket.onclose = () => { if (!disposed && !ended) { setStatus("disconnected"); setCues([]); } };
     return () => {
+      disposed = true;
       ended = true; // closing on purpose (new match or jump), not a lost connection
       socket.close();
     };
@@ -164,7 +166,11 @@ export function useReplay(name: string | null, profile: Profile, defaultSpeed: n
   const resume = useCallback(() => command({ cmd: "resume" }), [command]);
   const seek = useCallback((minute: number) => setJump((j) => ({ match: name, minute, at: null, n: j.n + 1 })), [name]);
   const seekAt = useCallback((seconds: number) => setJump((j) => ({ match: name, minute: 0, at: seconds, n: j.n + 1 })), [name]);
+  const restart = useCallback(() => {
+    pausedRef.current = false;
+    setJump((j) => ({ match: name, minute: 0, at: null, n: j.n + 1 }));
+  }, [name]);
 
-  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, command, seek, seekAt,
+  return { meta, aiInfo, languages, state, moments, cues, status, speed, from, setSpeed, pause, resume, command, seek, seekAt, restart,
            clip, clipEvents, clipT };
 }

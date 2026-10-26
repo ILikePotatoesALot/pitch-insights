@@ -4,6 +4,8 @@ Written 21 Oct 2026, updated 22 Oct (video path; fine-tuning run on Austin's GPU
 
 ## Start here (26 Oct, evening): handover to Codex
 
+**Demo improvements, 26 Oct, local branch `codex/demo-improvements`:** paused seeks now open an already-paused connection, and late messages from a replaced connection are ignored. Comparison viewers have shared play, pause, speed, jump and replay controls, a coordinated server-clock start, and visible mode/language labels. The remaining polish adds a sticky replay toolbar above the pitch, visible probability and position-source labels, immediate first-visit playback with an optional demo preset, numeric minute/clip-second entry and synthetic match replay. Profile editing retains keyboard focus and storage details. Frontend verification: 18 tests and the production build pass; the comparison backend changes previously passed 70 focused tests. Browser checks cover paused seeking, replay, synthetic and clip playback, profile saving, dark mode and narrow layouts. These changes are committed locally after review; they are not pushed, merged or deployed. The comparison scoreboards still refresh separately, so their displayed minutes can briefly differ at a boundary. The next publishing action must deploy both backend and frontend.
+
 **App rename, 26 Oct:** Austin renamed the app to **Seize the game**. Display titles, package metadata, the API title, telemetry service names, image name and project descriptions use the new branding, with `seize-the-game` as the slug. The repository URL, Python imports, saved browser keys and physical Azure resource/database identifiers retain their original names for compatibility. The rename is on `codex/seize-the-game-rename`, based on main after pull request #24; it is not merged or deployed.
 
 Claude Code ran out of credits for the week; **Codex continues from here.** Product work through pull request #22 is merged into `main` and deployed. The deadline is **27 Oct 2026, 11:59 pm PT**.
@@ -105,7 +107,7 @@ python -m pitch_insights.watch ../samples/comeback-POT-CAR.jsonl --speed 60 --fr
 python -m pitch_insights.interpret ../samples/comeback-POT-CAR.jsonl --at 70 --player Madekuta
 ```
 
-The app needs two terminals (a first visit opens the profile picker; `/?team=POT&player=POT-11&mode=casual&lang=de&focus=xg` skips it and sets a profile for that tab only):
+The app needs two terminals (a first visit starts watching immediately; `/?team=POT&player=POT-11&mode=casual&lang=de&focus=xg` sets a profile for that tab only):
 
 ```
 cd backend

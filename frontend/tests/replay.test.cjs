@@ -69,7 +69,8 @@ test('paused minute and exact-second jumps stay paused, including repeated jumps
     r.render();
     r.meta();
     assert.equal(r.render().status, 'paused');
-    assert.equal(r.sockets.at(-1).commands.at(-1).cmd, 'pause');
+    assert.match(r.sockets.at(-1).url, /paused=1/);
+    assert.ok(r.sockets.at(-1).commands.every((c) => c.cmd !== 'resume'));
   }
   r.render().resume();
   assert.equal(r.render().status, 'live');
@@ -111,4 +112,30 @@ test('a coordinated viewer opens paused at the requested position and waits for 
   r.render().command({ cmd: 'resume', wall: 1000.4 });
   assert.equal(socket.commands.at(-1).wall, 1000.4);
   assert.equal(r.render().status, 'live');
+});
+
+test('restarting a paused replay returns to kick-off and starts playing', () => {
+  const r = replay();
+  r.render().pause();
+  r.render().seek(87);
+  r.render(); r.meta();
+  assert.equal(r.render().status, 'paused');
+  r.render().restart();
+  r.render(); r.meta();
+  assert.match(r.sockets.at(-1).url, /from=0/);
+  assert.doesNotMatch(r.sockets.at(-1).url, /paused=1/);
+  assert.equal(r.render().status, 'live');
+});
+
+test('late messages from a replaced connection cannot end or corrupt the new replay', () => {
+  const r = replay();
+  const previous = r.sockets[0];
+  r.render().seek(30);
+  r.render(); r.meta();
+  previous.receive('state', { state: { clock: 'Full time' } });
+  previous.receive('end');
+  previous.onerror();
+  previous.onclose();
+  assert.equal(r.render().status, 'live');
+  assert.equal(r.render().state, null);
 });
