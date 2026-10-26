@@ -30,9 +30,23 @@ def test_replay_streams_events_moments_and_state():
     assert seen["meta"] == 1 and seen["catchup"] == 1 and seen["event"] > 50 and seen["moment"] >= 2 and seen["state"] >= 1
 
 
+def test_a_replay_from_kick_off_opens_with_the_starting_xi_at_their_opening_rating():
+    with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0") as ws:
+        meta = ws.receive_json()
+        assert meta["type"] == "meta"
+        first = ws.receive_json()  # before any event, so the ratings panel isn't empty until a minute of play
+        assert first["type"] == "state"
+        players = first["state"]["players"]
+        starters = [pid for side in ("home", "away") for pid in meta["meta"][side]["starting"]]
+        assert sorted(p["player_id"] for p in players) == sorted(starters)
+        assert {p["rating"] for p in players} == {6.0} and all(p["on_pitch"] for p in players)
+        assert ws.receive_json()["type"] == "event"
+
+
 def test_bad_speed_and_from_values_are_handled():
     with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0&from=abc") as ws:
         assert ws.receive_json()["type"] == "meta"
+        assert ws.receive_json()["type"] == "state"
         msg = ws.receive_json()
         assert msg["type"] == "event" and msg["event"]["seq"] == 1  # "from=abc" starts at kick-off
         ws.send_json({"cmd": "speed", "value": "fast"})  # ignored, not fatal
@@ -142,6 +156,7 @@ def test_reconnect_at_match_seconds_stays_in_first_half_stoppage_time():
 def test_a_bad_at_value_falls_back_to_from():
     with client.websocket_connect("/ws/replay/comeback-POT-CAR?speed=0&from=abc&at=soon") as ws:
         assert ws.receive_json()["type"] == "meta"
+        assert ws.receive_json()["type"] == "state"  # kick-off: the starting XI, then the first event
         assert ws.receive_json()["event"]["seq"] == 1
 
 
@@ -247,6 +262,7 @@ def test_a_bad_profile_is_ignored_not_fatal():
     with client.websocket_connect(url) as ws:
         meta = ws.receive_json()
         assert meta["profile"] == {"mode": "analyst", "team_id": None, "player_id": None, "focus": None}
+        assert ws.receive_json()["type"] == "state"
         assert ws.receive_json()["type"] == "event"
 
 
