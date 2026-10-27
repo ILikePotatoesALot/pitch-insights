@@ -1,7 +1,6 @@
 # Fine-tuning the detector on a GPU machine (Windows, PowerShell)
 
-If a coding assistant (for example Claude Code) is doing this for you, point it at [LLM_BRIEF.md](LLM_BRIEF.md): it has the
-rules, the stop conditions and what to report. This file is the procedure.
+This file contains the reproducible training procedure. Machine-specific assistant briefs are kept locally and excluded from Git.
 
 Fine-tunes RF-DETR small on SoccerTrack's own tight boxes, then scores it against the pre-trained model on
 frames it never saw, and re-runs the video pipeline on the benchmark clip. Design and reasons:
@@ -18,7 +17,7 @@ frames it never saw, and re-runs the video pipeline on the benchmark clip. Desig
 
 ## 1. Set up the machine (once)
 
-You need a GPU with 8 GB or more of video memory (16 GB or more is comfortable) and Python 3.12. Austin's machine is **AMD (ROCm on
+You need a GPU with 8 GB or more of video memory (16 GB or more is comfortable) and Python 3.12. The tested configuration uses **AMD (ROCm on
 Windows 11)**; an NVIDIA machine works too, so both routes are below.
 
 ```powershell
@@ -33,7 +32,7 @@ video\.venv\Scripts\python -m pip install --upgrade pip
 Install PyTorch **before** `requirements.txt`, from one of these two routes. Install every PyTorch package in one command
 (a later `pip install torch...` or `torchvision` on its own can swap in the CPU build from PyPI).
 
-**AMD, ROCm on Windows (Austin's machine).** AMD's official wheels: PyTorch 2.9.1 with ROCm 7.2.1, Windows 11, Python 3.12 only.
+**AMD, ROCm on Windows (tested configuration).** AMD's official wheels: PyTorch 2.9.1 with ROCm 7.2.1, Windows 11, Python 3.12 only.
 Supported cards on AMD's matrix at the time of writing: Radeon RX 9070 / 9070 XT / 9060 XT, AI PRO R9700, RX 7900 XTX,
 PRO W7900, RX 7700. Check [the compatibility matrix](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityrad/windows/windows_compatibility.html)
 for the card, and install the graphics driver AMD names for the release (26.2.2 for 7.2.1; use
@@ -142,7 +141,7 @@ Remove-Item Env:VIDEO_TAG
 ## 6. Bring the results back
 
 The weights are about 127 MB: copy `checkpoint_best_total.pth` (and `train_summary.json`) by USB or a share. The small result files
-are in git, so on the GPU machine (push only when Austin says so; an assistant works on that branch from the start, see the brief):
+are in git, so use a separate branch on the GPU machine and push when authorised by the maintainer:
 
 ```powershell
 git add samples/video
@@ -164,10 +163,10 @@ browser sign-in.
   in step 1; NVIDIA: the pytorch.org command), then re-run `pip install -r video\requirements.txt`.
 - **AMD: still False with the `+rocm` build:** the card or driver isn't on AMD's Windows list for this release (check the
   compatibility matrix and the driver version), or the ROCm SDK wheels (first command) weren't installed in the same venv.
-  Report the card, driver and the output of `python -m torch.utils.collect_env`; don't try other ROCm releases or Linux without Austin's say.
+  Report the card, driver and the output of `python -m torch.utils.collect_env`; don't try other ROCm releases or Linux without the maintainer's say.
 - **AMD: a HIP or "no kernel image" error during training, or training far slower than expected:** ROCm on Windows is a newer
   route than CUDA and this model hasn't been run on it. Try `--batch-size 2 --grad-accum 8` once; if it still fails, stop and report the error
-  text. The fallback is a cloud or NVIDIA GPU (Austin's call), not CPU training.
+  text. The fallback is a cloud or NVIDIA GPU (the maintainer's decision), not CPU training.
 - **Hugging Face says 401 or 403:** the token is wrong or the account hasn't accepted the dataset's terms
   (open the dataset page on huggingface.co while signed in).
 - **AMD (ROCm on Windows): `detect.py` or `eval_boxes.py` doesn't return after finishing.** A process that has run the detector

@@ -41,7 +41,7 @@ The real-footage view brings 100 seconds of licensed match video (SoccerTrack v2
 
 **What's next.** Live simulation driven by a Scenario Director agent, positions from video for every match, and a per-viewer full-time recap.
 
-## Notes for Austin
+## Submission checklist
 
 - Check the form's field names and word limits and trim to fit; the short description is the fallback for small boxes.
 - Add the demo video link here and in the README's "Try it" section.

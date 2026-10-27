@@ -68,11 +68,12 @@ from pitch_insights.generator.continuous import NAME as SIMULATION, prototype, s
 from pitch_insights.generator.stream import Replay, match_seconds, start_seconds
 from pitch_insights.origins import LOCALHOST, configured_origins, origin_allowed
 from pitch_insights.profiles import close_store, router as profiles_router, warm_store
-from pitch_insights.telemetry import setup_telemetry
+from pitch_insights.telemetry import configure_privacy_logging, setup_telemetry
 from pitch_insights.video.replay import ClipError, clip_meta, find_clip, list_clips
 from pitch_insights.video.serve import replay_clip
 
 log = logging.getLogger("pitch_insights.server")
+configure_privacy_logging()
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
 
@@ -177,7 +178,7 @@ def position_events(events: list[dict]) -> list[dict]:
 @app.websocket("/ws/replay/{name}")
 async def replay(ws: WebSocket, name: str, speed: float = 20.0):
     if not origin_allowed(ws.headers.get("origin")):  # CORS doesn't cover WebSockets, so check the page's origin here
-        log.warning("refused a replay from origin %r: add it to PITCH_ALLOWED_ORIGINS if it should be allowed", ws.headers.get("origin"))
+        log.warning("refused a replay from an unapproved origin")
         await ws.close(code=1008)
         return
     await ws.accept()

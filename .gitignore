@@ -1,6 +1,10 @@
 # Secrets
 .env
 
+# Internal assistant notes stay on the local machine.
+docs/HANDOFF.md
+video/finetune/LLM_BRIEF.md
+
 # Python
 .venv/
 .venv314/

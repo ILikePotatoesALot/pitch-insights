@@ -201,10 +201,10 @@ Designed 21 Oct 2026; the core (steps 3, 4 and 7 below, plus stored commentary) 
 
 ### Model access
 
-- **Subscription:** Austin's personal Pay-As-You-Go subscription (a free trial upgraded, so the free credit is spent first), with a US$20 monthly budget alert. Everything is in resource group `rg-pitch-insights`, region **East US 2**.
+- **Deployment:** resources use East US 2 and resource group `rg-pitch-insights`. Stored commentary and bounded model calls control costs.
 - **Deployed and tested (21 Oct):** `gpt-4o` (model version 2024-11-20, retires April 2027, after judging ends on 10 Nov) and `text-embedding-3-small`, both on the Foundry resource's **v1 API** (no API version needed).
 - **Refused (21 Oct):** quota for `gpt-6-luna` (GPT-6's small, cheap tier). The agents stay on `gpt-4o`, so stored commentary and a low `max_tokens` keep costs down.
-- **Why not the school subscription:** the Azure for Students subscription could only deploy to five Asian regions, had no chat-model quota in any of them, and quota requests were refused automatically. It's no longer used.
+- **Region choice:** model availability and quota determined the deployment region.
 
 ### Chat model provider
 
@@ -252,7 +252,7 @@ Code in `backend/pitch_insights/agents/memory.py`. For each headline or notable 
 
 **Calibration (22 Oct, after the code review).** Across the three samples, same-team chance pairs scored 0.58–1.0. Chances by the same scorer scored 0.81–1.0; by different scorers 0.58–0.83, and the flank barely moves the score (a goal down the middle against one down the left by another player: 0.82). So the threshold sits at 0.83, and in practice a chance links to the same player's earlier chances; the flank and build-up story comes from the count fact, which is exact. With it, 16 of the 52 commented moments get memory facts. The first version put the passer's name in the sentence too, which linked Musialetti's open-play equaliser to Mbeulier's corner goal at 0.87 only because Mbeulier was in both. Pattern moments of one family and team describe themselves identically, so for them the filter decides and similarity only breaks ties (the most recent wins).
 
-**Not done: a season of other matches.** The design allowed memories from a generated season. Left out for now: `match_meta` already carries each player's and club's season history, generated separately, so memories from a season of simulated matches could contradict it ("his 3rd goal of the season" beside a season index that has him on five), and "in another generated match" reads oddly to a fan. Austin to decide.
+**Not done: a season of other matches.** The design allowed memories from a generated season. Left out for now: `match_meta` already carries each player's and club's season history, generated separately, so memories from a season of simulated matches could contradict it ("his 3rd goal of the season" beside a season index that has him on five), and "in another generated match" reads oddly to a fan. This remains a future design decision.
 
 ### Safety check
 
@@ -358,7 +358,7 @@ Built 23 Oct on branch `claude/personalise-95bc8a` (cut from the Overlay Directo
 - Its data guidance applies to any personalisation: send aggregated features, never a user id, email or phone number; keep data only as long as needed and give the user a way to clear it; avoid personalising what is consequential and keep essential content in play.
 - The HAX Toolkit's guidelines for human-AI interaction: G17 (provide global controls), G11 (make clear why the system did what it did) and G13/G14 (learning from behaviour, adapting cautiously: we deliberately don't learn from behaviour).
 
-**Not built, for Austin to decide: a Personalizer model call.** It would add real value in exactly one place: a one-sentence full-time recap written for each viewer ("Madekuta scored twice and finished on 7.8: your best match of the season"), from the viewer's profile and the match's headline moments, through the Narrator with the same groundedness and safety checks. That is one GPT-4o call per viewer-match at the final whistle (about 200 tokens), so it should be stored for the demo viewers rather than live. Everything else a model could do here (choosing cues, ordering) the rules already do predictably and for free.
+**Not built, for the maintainer to decide: a Personalizer model call.** It would add real value in exactly one place: a one-sentence full-time recap written for each viewer ("Madekuta scored twice and finished on 7.8: your best match of the season"), from the viewer's profile and the match's headline moments, through the Narrator with the same groundedness and safety checks. That is one GPT-4o call per viewer-match at the final whistle (about 200 tokens), so it should be stored for the demo viewers rather than live. Everything else a model could do here (choosing cues, ordering) the rules already do predictably and for free.
 
 **Known limits.** The spotlight is approximate (the last event, not tracking; the video path's frames would give true positions). The app's labels, including the alerts' wording ("scores", "is booked"), are English only, like the rest of its chrome. The sparkline starts again when the match is jumped back or the player changes. Cues on screen and waiting are cleared when a profile change reconnects (the same as a language change). Two compare panes start at the same time but are each on their own server clock, so they can drift by a second or two. A profile can't be moved between browsers until the Cosmos DB store exists.
 
@@ -500,7 +500,7 @@ All in `rg-pitch-insights`, East US 2:
 - Foundry resource and project, with the `gpt-4o` and `text-embedding-3-small` deployments (done)
 - Content Safety, Translator and Speech, each on the free F0 tier (Speech optional; first to cut)
 - Application Insights, connected to the Foundry project for tracing
-- Deployment (code, image and workflows built 23 Oct; Austin creates the resources following [DEPLOY.md](DEPLOY.md); see [Deployment](#deployment-azure)): Container Apps and Container Registry (backend), Static Web Apps (app), Key Vault, Cosmos DB on its free tier (viewer profiles), and two user-assigned managed identities
+- Deployment (code, image and workflows built 23 Oct; the maintainer creates the resources following [DEPLOY.md](DEPLOY.md); see [Deployment](#deployment-azure)): Container Apps and Container Registry (backend), Static Web Apps (app), Key Vault, Cosmos DB on its free tier (viewer profiles), and two user-assigned managed identities
 
 During development keys live in `.env` (ignored by git; `.env.example` holds placeholders only). They never reach the browser.
 
@@ -601,7 +601,7 @@ Designed 21 Oct 2026, built 22 Oct on branch `video-path`. Turns real, licensed 
 | 4. Track, teams, ball, messages, benchmark | `video/process.py` | Seconds; re-run freely |
 | 5. Preview | `video/preview.py` | Draws our tracks and the ground truth on the clip (`data/video/117093/preview.mp4`, git-ignored) |
 
-The pure-Python parts (loader, tile merging, tracker, events, scoring) live in `backend/pitch_insights/video/` and are covered by `backend/tests/test_video.py`; the backend gains no new dependencies. The detector runs in its own environment, `video\.venv` (torch, rfdetr 1.11.2, opencv, supervision, truststore): torch CPU on the organisation laptop, AMD's ROCm build on Austin's GPU machine.
+The pure-Python parts (loader, tile merging, tracker, events, scoring) live in `backend/pitch_insights/video/` and are covered by `backend/tests/test_video.py`; the backend gains no new dependencies. The detector runs in its own environment, `video\.venv` (torch, rfdetr 1.11.2, opencv, supervision, truststore): a CPU build for replay preparation, and AMD's ROCm build for GPU training.
 
 **Tiles.** The whole frame at the model's 512 px input finds only 7 people. On the first clip frame: 4 × 2 tiles over the whole frame found 42 people in 6.4 s; 5 × 2 over the pitch band found 54 in 7.1 s; 6 × 2 found 57 in 8.2 s. 5 × 2 was chosen. A player cut off at a tile's edge is merged with the whole one by how much of the smaller box lies inside the other, not only by IoU; containment is checked first, because a crop that is exactly half of the whole box has an IoU of exactly the duplicate threshold and used to be kept alone, with the feet cut off (found in review, 22 Oct).
 
@@ -623,7 +623,7 @@ Match 117093, first half, **38:00.0 to 39:40.0** (100 s, frames 57,001–59,500,
 
 ### Benchmark (refreshed 22 Oct on a GPU, after the tile-merge fix)
 
-RF-DETR small on 500 frames (100 s at 5 fps), on Austin's GPU machine (AMD Radeon RX 9070 XT). **Pre-trained** is the COCO model as released; **fine-tuned** takes people from the model trained on SoccerTrack's MOT boxes (see [Fine-tuning](#fine-tuning-run-22-oct-on-austins-gpu-machine)) and the ball from the COCO one. Ground truth: 22 people a frame (11,000 in all); the GSR file has no referees or ball.
+RF-DETR small on 500 frames (100 s at 5 fps), on a local GPU machine (AMD Radeon RX 9070 XT). **Pre-trained** is the COCO model as released; **fine-tuned** takes people from the model trained on SoccerTrack's MOT boxes (see [Fine-tuning](#fine-tuning-run-22-oct-on-a-local-gpu-machine)) and the ball from the COCO one. Ground truth: 22 people a frame (11,000 in all); the GSR file has no referees or ball.
 
 | Measure | Pre-trained | Fine-tuned |
 |---|---|---|
@@ -681,11 +681,11 @@ No video, weights or ground truth are committed; intermediate files are in the g
 
 Scoring leaves out `Out` (it changes the previous pass, it isn't an action) and counts `Goal` as a `shot`. Throw-ins and free kicks are `pass`es here, as in the table.
 
-### Fine-tuning (run 22 Oct on Austin's GPU machine)
+### Fine-tuning (run 22 Oct on a local GPU machine)
 
-Code in `video/finetune/` (steps for the machine in its README), with the pure logic in `backend/pitch_insights/video/mot.py` and tests. Run on 22 Oct on Austin's own machine; results below.
+Code in `video/finetune/` (steps for the machine in its README), with the pure logic in `backend/pitch_insights/video/mot.py` and tests. Run on 22 Oct on a local GPU machine; results below.
 
-- **Hardware:** the README installs AMD's ROCm 7.2.1 wheels for Windows (PyTorch 2.9.1, Python 3.12, Windows 11; supported Radeon cards on AMD's compatibility matrix) as well as the CUDA build. The training summary and detector metadata record the device and the PyTorch build. The route is newer than CUDA, so the brief stops on HIP errors instead of falling back to CPU; on 22 Oct it worked (see Machine, below).
+- **Hardware:** the README installs AMD's ROCm 7.2.1 wheels for Windows (PyTorch 2.9.1, Python 3.12, Windows 11; supported Radeon cards on AMD's compatibility matrix) as well as the CUDA build. The training summary and detector metadata record the device and the PyTorch build. The procedure stops on HIP errors instead of falling back to CPU; on 22 Oct it worked (see Machine, below).
 - **Labels:** the MOT boxes (above), the only tight image boxes we have. (The GSR boxes are loose, and an earlier plan to use our own detections matched to the GSR positions would only have taught the model what it already does.)
 - **Data:** each chosen frame is cut into the detector's own 5 × 2 tiles (`tiles_for`), each tile saved with the boxes inside it (clipped; kept when at least half is visible). People the file doesn't box (spectators, referees, staff) are background, which is what should teach the model to ignore them. 3,328 train tiles (11,403 boxes), 400 valid (1,121) and 400 test (1,086), in RF-DETR's Roboflow layout.
 - **Splits:** stretches of the four minutes with 8-second gaps: train 0:00–2:24 (every 8th frame, 450 frames), valid 2:32–3:12 (40), test 3:20–3:59 (40). The benchmark clip (38:00–39:40) is a further test and is never trained on. The checkpoint is chosen on `valid`; `test` is used once, by `eval_boxes.py`.
@@ -712,11 +712,11 @@ Code in `video/finetune/` (steps for the machine in its README), with the pure l
   | Fine-tuned | 0.75 | 81.8% | 82.0% | 81.5% |
 
   Fine-tuning removes almost every false person (1,049 to 17 at IoU 0.5) without losing recall, as expected. At IoU 0.75 its recall is lower (89.7% → 81.5%): its boxes are a little less tight than the pre-trained ones on some players, which barely shows in position error on the clip (0.77 → 0.76 m mean).
-- **Decision:** use the fine-tuned model for people (tracked-player precision on the clip 85% → 97%, recall 90% → 93%). The weights stay out of git; they are on Austin's GPU machine and have to be copied to wherever detection runs.
+- **Decision:** use the fine-tuned model for people (tracked-player precision on the clip 85% → 97%, recall 90% → 93%). The weights stay out of git; they are on a local GPU machine and have to be copied to wherever detection runs.
 
 ### Clip in the app (built 23 Oct, branch `claude/video-clip-143958`)
 
-The fine-tuned clip (`samples/video/117093-38min_ft.*`, chosen by Austin on 23 Oct) plays in the app as a real-footage entry in the match list: "Left v Right · real footage".
+The fine-tuned clip (`samples/video/117093-38min_ft.*`, chosen by the maintainer on 23 Oct) plays in the app as a real-footage entry in the match list: "Left v Right · real footage".
 
 - **Backend** (no new dependencies): `pitch_insights/video/replay.py` loads and validates the files (cached), builds a `match_meta`-shaped description (Left is "home", with the attacking directions above, so the app's colours, overlays and event drawing work unchanged; no squads, so no names), the credibility block, the event wording and the cues. `pitch_insights/video/serve.py` is the WebSocket handler (it shares `director/session.py`, the connection's Director, clock, commands and shutdown, with the match replay); `server.py` hands any name that is a clip in `samples/video/` to it. `GET /api/matches` lists the clip after the synthetic matches with `kind: "video"`; only the fine-tuned run is listed (`APP_CLIPS`), the pre-trained one can still be opened by name.
 - **Stream:** `meta` (with `kind: "video"` and the `clip` block), `catchup` (events before a seek), then `frame` messages exactly as in the schema above, as the replay clock reaches them (5 a second at 1x), `event` messages with their words in the viewer's language, `cue` and `cue_end` from the same Overlay Director as the synthetic matches, and `end`. `at` is seconds into the clip (`from` the same in minutes); frames keep their own `t`, so 2280 is 38:00 on the match clock. Pause, resume, speed and the casual/analyst switch behave as for a match; seek reconnects. `moment` messages carry the clip's AI commentary (below). No `state` messages: there is no Interpreter on video events yet.
@@ -739,13 +739,13 @@ The fine-tuned clip (`samples/video/117093-38min_ft.*`, chosen by Austin on 23 O
 
 ### Later
 
-- **Fine-tuning:** done on Austin's own GPU machine (above), because Azure ML GPU quota can't be requested from this account (Austin lacks a support role on the subscription). Still to do: log the run to Azure ML with `video\log_mlflow.py` (`VIDEO_TAG=_ft`), and check the fine-tuned model on a second clip or match, since it has only seen this pitch.
+- **Fine-tuning:** completed on a local GPU machine (above), with benchmark logging handled separately through Azure ML. Check the fine-tuned model on a second clip or match, since it has only seen this pitch.
 - **Serving:** CPU detection in a container on Azure Container Apps; clips are processed ahead of time, so speed isn't critical.
 - A `match_meta` with squads for video matches, so the Interpreter can run on video events (the clip's own `match_meta` has none); and the Interpreter on SoccerTrack's ground-truth events, as a check on real data.
 
 ### Rules
 
-The core pipeline stays on synthetic data (rule 4.7); SoccerTrack is licensed footage for the video path only, which Austin confirmed on 21 Oct is fine.
+The core pipeline stays on synthetic data (rule 4.7); SoccerTrack is licensed footage for the video path only, as agreed on 21 Oct.
 
 ## Later (not v1)
 

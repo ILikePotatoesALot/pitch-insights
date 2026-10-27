@@ -22,4 +22,4 @@ USER app
 WORKDIR /app
 EXPOSE 8000
 # Container Apps' ingress terminates TLS and sets X-Forwarded-For; the profile API's rate limit reads it (profiles.py).
-CMD ["uvicorn", "pitch_insights.server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "pitch_insights.server:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--log-level", "warning"]
