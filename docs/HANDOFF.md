@@ -1,5 +1,30 @@
 # Handoff
 
+## Analyst formation lines, 27 Oct 2026
+
+Work is on `codex/live-formation-lines`, based on the pushed default-match commit
+`b8c1492`. The continuous simulation itself was merged through PR #27 and both
+deployment workflows succeeded. Austin requested a single pull request containing
+the default-match change and the formation feature.
+
+- Analyst-only Formation lines toggle, off by default, with a single-team selector.
+- Connects live outfield depth groups across the pitch, excluding goalkeepers.
+  Smoothed depth and a 1.5-second membership hold limit transient regrouping.
+  The displayed Observed shape is geometric, not the declared starting formation.
+- Uses the markers' interpolated drawing clock and terrain height. Clears on
+  seeking, hides during restarts and when outfield observations are incomplete.
+- Coverage includes 5-3-2 and 4-2-3-1 grouping, a sustained 4-4-2 to 5-3-2 change,
+  paused redraws, player loss, team filtering, terrain geometry, direction reversal
+  and restart phase timing. All 37 frontend tests pass; the production build passes
+  with the existing bundle-size warning. No backend or stored commentary changes.
+
+Browser checks confirm analyst-only controls, team switching, paused seeking,
+restart suppression, and no horizontal overflow at 320 and 390 pixels. The
+preview console has no warnings or errors. Final review has no unresolved
+actionable findings. Shapes remain an approximate depth-based estimate.
+
+The local preview runs at `http://127.0.0.1:5176/`, using API port 8002.
+
 ## Simulation review completed, 27 Oct 2026
 
 Austin resumed the saved plan. The remaining implementation, commentary validation
@@ -30,8 +55,7 @@ English when German is requested but unavailable. The preview console has no
 warnings or errors. The preview is available at `http://127.0.0.1:5176/`, using the
 local API on port 8002. No unresolved findings remain from this review.
 
-This branch remains local. Pushing, opening its pull request and merging have not
-been requested. Future model work is documented in
+The simulation was subsequently pushed and merged through PR #27. Future model work is documented in
 [CONTINUOUS-SIMULATION.md](CONTINUOUS-SIMULATION.md): calibration, goalkeeper
 reach, more set pieces and match rules, a full match and stored translations.
 

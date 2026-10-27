@@ -12,11 +12,13 @@ import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileT
 import { trackLabel } from "./pitch/ClipLayer";
 import { PitchScene, teamColours, type SurfaceView } from "./pitch/PitchScene";
 import type { CameraMode } from "./pitch/CameraFollow";
+import type { FormationLabels, FormationTeam } from "./pitch/FormationLayer";
 import type { ClipEvent, ClipFrame, ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
 
 const SPEEDS = [1, 5, 20, 60];
 const CLIP_SPEEDS = [0.5, 1, 2, 5]; // the clip is 100 s of real footage: slower than a synthetic match, and it starts at 1x
+const DEFAULT_MATCH = "continuous-prototype";
 // What a link can set besides the profile: `match` (a sample's name), `layout` (broadcast | fan) and `speed`, so
 // two views of one match can be opened side by side (see CompareView) and set up the same way every time.
 const query = new URLSearchParams(location.search);
@@ -39,6 +41,9 @@ export default function App() {
   const [surfaceView, setSurfaceView] = useState<SurfaceView>("current");
   const [showTrail, setShowTrail] = useState(true);
   const [showNearby, setShowNearby] = useState(true);
+  const [showFormation, setShowFormation] = useState(false);
+  const [formationTeam, setFormationTeam] = useState<FormationTeam | null>(null);
+  const [formationLabels, setFormationLabels] = useState<FormationLabels>([null, null]);
   const [cameraMode, setCameraMode] = useState<CameraMode>("full");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [panel, setPanel] = useState<DetailPanel>("moments");
@@ -65,7 +70,7 @@ export default function App() {
     fetch(apiUrl("/api/matches")).then((r) => r.json()).then((list: MatchSummary[]) => {
       setMatches(list);
       const wanted = query.get("match");
-      if (list.length) setName(list.find((m) => m.name === wanted)?.name ?? list[0].name);
+      if (list.length) setName(list.find((m) => m.name === wanted)?.name ?? list.find((m) => m.name === DEFAULT_MATCH)?.name ?? list[0].name);
     }).catch(() => setMatches([]));
     fetch(apiUrl("/api/clubs")).then((r) => r.json()).then(setClubs).catch(() => setClubs([]));
     const link = profileFromUrl(location.search);
@@ -86,6 +91,7 @@ export default function App() {
     sceneRef.current = scene;
     scene.setOnPick((id) => setFollow(id));
     scene.setOnCameraMode(setCameraMode);
+    scene.setOnFormationChange(setFormationLabels);
     return () => scene.dispose();
   }, []);
 
@@ -152,9 +158,13 @@ export default function App() {
   }, [status]);
   const showingClip = clipMode && meta?.source === "video"; // (the old match's meta stays for a moment after a switch)
   const showingMatch = !clipMode && !!meta && meta.source !== "video";
+  const formationSide = formationTeam ?? (p.team === meta?.away.id ? "away" : "home");
+  const formationEnabled = showingMatch && simulationMode && p.mode === "analyst" && showFormation;
   useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setSurfaceView(clipMode || simulationMode ? surfaceView : "history"); }, [surfaceView, clipMode, simulationMode]);
   useEffect(() => { sceneRef.current?.setPlayerContext({ trail: showTrail, nearby: showNearby }); }, [showTrail, showNearby]);
+  useEffect(() => { sceneRef.current?.setFormationOptions(formationEnabled, formationSide); }, [formationEnabled, formationSide]);
+  useEffect(() => { setFormationTeam(null); }, [name]);
   useEffect(() => {
     // Manual controls also work on event-only matches. Only automatic following needs tracking.
     sceneRef.current?.setCameraMode(clipMode || simulationMode || cameraMode === "manual" ? cameraMode : "full");
@@ -191,7 +201,7 @@ export default function App() {
     setWelcome(true);
   };
   const watchDemo = () => {
-    const demo = matches.find((m) => m.name === "comeback-POT-CAR") ?? matches.find((m) => m.kind !== "video");
+    const demo = matches.find((m) => m.name === DEFAULT_MATCH) ?? matches.find((m) => m.kind !== "video");
     if (!demo) return;
     const club = clubs.find((c) => c.id === demo.home.id);
     const squad = club?.players ?? (meta?.home.id === demo.home.id ? meta.home.players : meta?.away.id === demo.home.id ? meta.away.players : []);
@@ -355,7 +365,17 @@ export default function App() {
               <option value="player" disabled={!spotlit}>Follow player</option>
               {cameraMode === "manual" && <option value="manual">Manual view</option>}
             </select></label>
+            {simulationMode && p.mode === "analyst" && <>
+              <label><input type="checkbox" checked={showFormation} onChange={(e) => setShowFormation(e.target.checked)} /> Formation lines</label>
+              {showFormation && <label>Team <select aria-label="Formation team" value={formationSide} onChange={(e) => setFormationTeam(e.target.value as FormationTeam)}>
+                <option value="home">{meta?.home.name}</option><option value="away">{meta?.away.name}</option>
+              </select></label>}
+            </>}
             <p>{spotlit ? `${showTrail ? "Trail: up to eight seconds. Tracking gaps break the trail. " : ""}${showNearby ? "Nearby: players within 12 metres, in team colours." : ""}` : "Tap a player to reveal their recent path and nearby players."}</p>
+            {formationEnabled && <p className="formation-summary">
+              <strong>{meta?.[formationSide].short_name} observed shape: {formationLabels[formationSide === "home" ? 0 : 1] ?? "waiting for a clear shape"}.</strong>{" "}
+              Lines connect outfield players by depth and regroup after a sustained change. Hidden during restarts. Shape is inferred from positions.
+            </p>}
           </section>}
           {(showingMatch || showingClip) && <p className="pitch-caption">
             {simulationMode ? "Simulated positions · 22 players · 5 updates/s" : showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: {(showingClip || simulationMode) && surfaceView === "current" ? "recent movement and ball" : "activity history"}
@@ -387,6 +407,7 @@ export default function App() {
             <p className="legend">Each numbered marker is a simulated player wearing their shirt number. Tap any player to follow them.
               The ball moves between players; lines show passes and carries. Current play follows recent movement and the ball;
               Activity history keeps the longer view. Player trail shows the last eight seconds, and Nearby players highlights those within 12 metres.
+              Analysts can enable Formation lines for one team. The lines follow observed depth groups and change as players move, excluding the goalkeeper.
               Drag to turn the pitch, scroll to zoom, double-click to reset.</p>
           ) : (
             <p className="legend">

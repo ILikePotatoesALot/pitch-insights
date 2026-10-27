@@ -4,6 +4,7 @@ import type { ClipEvent, ClipFrame, MatchEvent, MatchMeta } from "../types";
 import { ClipLayer } from "./ClipLayer";
 import { SurfaceTimeline } from "./SurfaceTimeline";
 import { PlayerContextLayer, type PlayerContextOptions } from "./PlayerContextLayer";
+import { FormationLayer, type FormationLabels, type FormationTeam } from "./FormationLayer";
 import type { TrackPoint } from "./TrackingHistory";
 import { cameraFocus, cameraBlend, type CameraMode } from "./CameraFollow";
 
@@ -78,6 +79,7 @@ export class PitchScene {
   private surfaceView: SurfaceView = "current";
   private currentBall: TrackPoint | null = null;
   private context: PlayerContextLayer;
+  private formation: FormationLayer;
   private contextOptions: PlayerContextOptions = { trail: true, nearby: true };
   private spikes: Spike[] = [];
   private ball: THREE.Mesh;
@@ -172,6 +174,8 @@ export class PitchScene {
     this.scene.add(this.clip.group);
     this.context = new PlayerContextLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
     this.scene.add(this.context.group);
+    this.formation = new FormationLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
+    this.scene.add(this.formation.group);
     this.renderer.domElement.addEventListener("pointerdown", this.onPress);
     this.renderer.domElement.addEventListener("pointerup", this.onRelease);
     this.renderer.domElement.addEventListener("pointermove", this.onCameraDrag);
@@ -189,6 +193,7 @@ export class PitchScene {
     this.colours = teamColours(meta);
     this.homeId = meta.home.id;
     this.clip.setColours(this.colours[0], this.colours[1]);
+    this.formation.setMatch(meta);
     this.dirty = true;
   }
 
@@ -225,6 +230,9 @@ export class PitchScene {
   }
 
   setPlayerContext(options: PlayerContextOptions) { this.contextOptions = options; }
+
+  setFormationOptions(enabled: boolean, team: FormationTeam) { this.formation.setOptions(enabled, team); }
+  setOnFormationChange(callback: ((labels: FormationLabels) => void) | null) { this.formation.setOnChange(callback); }
 
   /** A detected event of the clip: a line (pass, carry) or ring (interception) that fades. */
   addClipEvent(ev: ClipEvent, meta: MatchMeta) {
@@ -392,6 +400,7 @@ export class PitchScene {
     if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
     this.clip.clear();
     this.context.clear();
+    this.formation.clear();
     for (const h of [...this.recentHeat, ...this.instantHeat]) h.fill(0);
     this.currentBall = null;
     this.touches = [];
@@ -468,6 +477,8 @@ export class PitchScene {
     this.clip.dispose();
     this.scene.remove(this.context.group);
     this.context.dispose();
+    this.scene.remove(this.formation.group);
+    this.formation.dispose();
     this.observer.disconnect();
     this.controls.dispose();
     this.scene.traverse((obj) => {
@@ -848,6 +859,8 @@ export class PitchScene {
     else this.drawSurface(now / 1000);
     if (this.clip.group.visible) this.context.update(this.clip.drawnTime, this.spot?.id ?? null,
       this.clip.playersNow(), this.colours, this.contextOptions);
+    if (this.clip.group.visible) this.formation.update(this.clip.drawnTime, this.clip.playersNow(), this.colours,
+      this.clip.drawnPeriod, this.clip.drawnPhase);
     const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
     const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
     this.ball.position.lerp(target, 0.18);

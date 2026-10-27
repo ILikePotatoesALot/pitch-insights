@@ -61,6 +61,17 @@ not implement a complete referee or all offences in those Laws.
   median distance from their own goal line and players within five metres of the
   ball. Periodic moments identify off-ball advances of at least eight metres over
   four seconds, checking that the player did not hold the ball during that period.
+- Analysts can enable Formation lines, off by default, for one selected team.
+  The selection starts with the favourite club if it is playing, otherwise the
+  home team. A selector switches sides. Lines connect outfield players across
+  each observed depth band and follow the same interpolated positions as the
+  markers, including the pitch's changing terrain height. Goalkeepers are excluded.
+  The observed shape is estimated from two to four depth bands, without using
+  the starting formation. Depth is smoothed over replay time and changed group
+  membership must persist for 1.5 seconds before adoption. Lines are hidden during
+  kick-offs and goal kicks, or when a team lacks all ten outfield observations.
+  Pausing holds the geometry and regrouping clock; seeking clears previous groups.
+  This is a geometric estimate, not a confirmed tactical formation.
 - The exhibition has stored English commentary written by the Simulation narrator
   through Microsoft Agent Framework and Foundry. Its input contains event facts
   and these positional measurements. Names, numbers and selected unsupported

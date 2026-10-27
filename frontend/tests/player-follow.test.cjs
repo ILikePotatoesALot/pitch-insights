@@ -16,6 +16,7 @@ const { ClipLayer } = require('../src/pitch/ClipLayer.ts');
 const { SurfaceTimeline } = require('../src/pitch/SurfaceTimeline.ts');
 const { PlayerContextLayer } = require('../src/pitch/PlayerContextLayer.ts');
 const { TrackingHistory } = require('../src/pitch/TrackingHistory.ts');
+const { FormationLayer } = require('../src/pitch/FormationLayer.ts');
 const { cameraFocus, cameraBlend } = require('../src/pitch/CameraFollow.ts');
 
 const meta = { home: { id: 'POT' }, attacking_direction: {
@@ -39,6 +40,7 @@ function scene() {
   scene.surfaceView = 'history';
   scene.currentBall = null;
   scene.context = new PlayerContextLayer(() => 0);
+  scene.formation = new FormationLayer(() => 0);
   scene.colours = [new THREE.Color('#4f7cff'), new THREE.Color('#ff5a5a')];
   scene.tmpColour = new THREE.Color();
   scene.geometry = scene.buildGeometry();
