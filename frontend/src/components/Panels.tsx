@@ -4,7 +4,7 @@ import type { CommentaryInfo, FocusMetric, LiveState, MatchMeta, Moment, PlayerS
 
 const pct = (p: number) => `${Math.round(p * 100)}%`;
 
-export function Scoreboard({ meta, state, colours }: { meta: MatchMeta; state: LiveState | null; colours: [string, string] }) {
+export function Scoreboard({ meta, state, colours, clock }: { meta: MatchMeta; state: LiveState | null; colours: [string, string]; clock?: string }) {
   const h = meta.home.id, a = meta.away.id;
   const score = state?.score ?? { [h]: 0, [a]: 0 };
   const wp = state?.win_probability ?? { home: 0.45, draw: 0.27, away: 0.28 };
@@ -15,14 +15,14 @@ export function Scoreboard({ meta, state, colours }: { meta: MatchMeta; state: L
         <span className="score">{score[h]}<em>–</em>{score[a]}</span>
         <span className="team away">{meta.away.name}<i style={{ background: colours[1] }} /></span>
       </div>
-      <div className="clock">{state?.finished ? "Full time" : state?.clock ?? "0'"}</div>
-      <div className="winprob-label">Win probability</div>
+      <div className="clock">{meta.tracking ? state?.finished ? "Exhibition ended" : clock ?? "0:00" : state?.finished ? "Full time" : state?.clock ?? "0'"}</div>
+      {meta.tracking ? <p className="exhibition-note">Six-minute exhibition. Ratings are illustrative; win probability is not estimated.</p> : <><div className="winprob-label">Win probability</div>
       <div className="winprob" role="img" aria-label={`Win probability: ${meta.home.name} ${pct(wp.home)}, draw ${pct(wp.draw)}, ${meta.away.name} ${pct(wp.away)}`}>
         <div style={{ width: pct(wp.home), background: colours[0] }}>{wp.home >= 0.12 && pct(wp.home)}</div>
         <div className="draw" style={{ width: pct(wp.draw) }}>{wp.draw >= 0.12 && `Draw ${pct(wp.draw)}`}</div>
         <div style={{ width: pct(wp.away), background: colours[1] }}>{wp.away >= 0.12 && pct(wp.away)}</div>
       </div>
-      <div className="winprob-key" aria-hidden="true"><span>{meta.home.short_name}</span><span>Draw</span><span>{meta.away.short_name}</span></div>
+      <div className="winprob-key" aria-hidden="true"><span>{meta.home.short_name}</span><span>Draw</span><span>{meta.away.short_name}</span></div></>}
     </div>
   );
 }
@@ -31,7 +31,7 @@ type TeamNumbers = Record<string, number | null | undefined>;
 
 /** A team's value for a focus metric, as text ("1.23", "55%"). */
 function teamFocusValue(state: LiveState, side: "home" | "away", teamId: string, focus: FocusMetric): string {
-  if (focus === "win_probability") return pct(state.win_probability[side]);
+  if (focus === "win_probability") return state.win_probability ? pct(state.win_probability[side]) : "–";
   const v = (state.teams[teamId] as unknown as TeamNumbers)[focus];
   if (v === null || v === undefined) return "–";
   return focus === "xg" || focus === "xt_added" ? v.toFixed(2) : focus.endsWith("_pct") ? `${v}%` : String(v);
@@ -41,7 +41,7 @@ function teamFocusValue(state: LiveState, side: "home" | "away", teamId: string,
 export function FocusStrip({ meta, state, colours, focus }: {
   meta: MatchMeta; state: LiveState | null; colours: [string, string]; focus: FocusMetric | null;
 }) {
-  if (!focus) return null;
+  if (!focus || (meta.tracking && focus === "win_probability")) return null;
   const sides: ["home" | "away", string, string][] = [["home", meta.home.id, colours[0]], ["away", meta.away.id, colours[1]]];
   return (
     <div className="focus-strip" title="Your focus metric (change it under Profile)">
@@ -101,7 +101,8 @@ export function PinnedPlayer({ state, meta, colours, playerId, mode, focus, hist
         <div className="pin-name">
           <b>{person.name}</b>
           <small>★ Your player · {person.position}{p && !p.on_pitch ? " · off" : ""}</small>
-          <small>Ring: last recorded action position</small>
+          <small>{meta.tracking ? "Ring: continuous simulated position" : "Ring: last recorded action position"}</small>
+          {meta.tracking && <small>Illustrative exhibition rating</small>}
         </div>
         {p && <div className="pin-rating">
           <b className="bigrating">{p.rating.toFixed(1)}</b>
@@ -115,7 +116,7 @@ export function PinnedPlayer({ state, meta, colours, playerId, mode, focus, hist
           {here && <span className="focus"><em>{here[0]}</em> <b>{here[1]}</b></span>}
           {stats.filter(([k]) => k !== here?.[0]).map(([k, v]) => <span key={k}><em>{k}</em> <b>{v}</b></span>)}
         </div>
-      </> : <p className="empty">Waiting for the match to start…</p>}
+      </> : <p className="empty">{!meta.home.starting.includes(playerId) && !meta.away.starting.includes(playerId) ? "On the bench." : "Waiting for the match to start…"}</p>}
     </div>
   );
 }
@@ -158,7 +159,7 @@ function CheckNote({ m }: { m: Moment }) {
   const g = c.grounding;
   return (
     <p className="check">
-      {{ explainer: "Explainer", narrator: "Narrator", video_narrator: "Video narrator" }[c.agent]} agent · {g ? `${g.claims} names and numbers checked against these facts` : "checked"}
+      {{ explainer: "Explainer", narrator: "Narrator", video_narrator: "Video narrator", simulation_narrator: "Simulation narrator" }[c.agent]} agent · {g ? `${g.claims} names and numbers checked against these facts` : "checked"}
       {c.corrected.length > 0 && `; first draft corrected (${c.corrected.join(", ")} weren't in the facts)`}
       {c.safety?.passed && " · screened by Azure AI Content Safety"}
       {m.lang && " · machine-translated by Azure AI Translator"}
@@ -166,8 +167,9 @@ function CheckNote({ m }: { m: Moment }) {
   );
 }
 
-function MomentCard({ m, meta, mode, colours, mine }: {
+function MomentCard({ m, meta, mode, colours, mine, onSeek }: {
   m: Moment; meta: MatchMeta; mode: ViewMode; colours: [string, string]; mine: boolean;
+  onSeek?: (time: number) => void;
 }) {
   const [open, setOpen] = useState(false);
   const colour = m.team_id === meta.home.id ? colours[0] : m.team_id === meta.away.id ? colours[1] : "var(--muted)";
@@ -179,6 +181,8 @@ function MomentCard({ m, meta, mode, colours, mine }: {
         <span className="mhead">{mine && "★ "}{m.headline}{text && <span className="mtext">{text}</span>}</span>
         <span className="why">{open ? "Hide" : "Why?"}</span>
       </button>
+      {onSeek && m.match_time !== undefined && <button type="button" className="moment-jump" aria-label={`Watch the play at ${m.clock}`}
+        onClick={() => onSeek(Math.max(0, m.match_time! - 5))}>Watch this play</button>}
       {open && <>
         <ul className="facts">{m.facts.map((f, i) => <li key={i}>{f.text}</li>)}</ul>
         <CheckNote m={m} />
@@ -191,9 +195,10 @@ function MomentCard({ m, meta, mode, colours, mine }: {
  * The moments so far, newest first. A casual fan sees only headline moments, unless `allTiers` (a clip, whose few
  * moments are all worth showing). `follow` is a player whose moments get a star (a tracked player in a clip).
  */
-export function MomentFeed({ moments, meta, aiInfo, mode, colours, allTiers = false, follow = null }: {
+export function MomentFeed({ moments, meta, aiInfo, mode, colours, allTiers = false, follow = null, onSeek }: {
   moments: Moment[]; meta: MatchMeta; aiInfo: CommentaryInfo | null; mode: ViewMode; colours: [string, string];
   allTiers?: boolean; follow?: string | null;
+  onSeek?: (time: number) => void;
 }) {
   const [showMinor, setShowMinor] = useState(false);
   const shown = moments.filter((m) =>
@@ -206,7 +211,7 @@ export function MomentFeed({ moments, meta, aiInfo, mode, colours, allTiers = fa
       </h3>
       {shown.length === 0 ? <p className="empty">Nothing yet. Moments appear here as the match unfolds.</p> :
         <ul>{[...shown].reverse().map((m) => <MomentCard key={m.id} m={m} meta={meta} mode={mode} colours={colours}
-                                                         mine={!!follow && m.player_id === follow} />)}</ul>}
+                                                         mine={!!follow && m.player_id === follow} onSeek={onSeek} />)}</ul>}
       {aiInfo && <p className="ai-note">Commentary is AI-generated ({aiInfo.model}) from the facts under "Why?", and every name and number in it is checked against them.
         {moments.some((m) => m.lang) && " Moments are machine-translated from English."}</p>}
     </div>
@@ -254,7 +259,7 @@ export function Ratings({ state, meta, colours, favourite, setFavourite, followe
   const top = [...players].sort((a, b) => b.rating - a.rating).slice(0, 8);
   return (
     <div className="panel ratings">
-      <h3>Live ratings <small>tap a player to follow</small></h3>
+      <h3>{meta.tracking ? "Exhibition ratings" : "Live ratings"} <small>tap a player to follow</small></h3>
       {fav && <PlayerCard p={fav} onClose={() => setFavourite(null)} />}
       <ol>
         {top.map((p) => (
@@ -299,7 +304,7 @@ export function StatsPanel({ state, meta, focus }: { state: LiveState | null; me
       <table>
         <thead><tr><th>{meta.home.short_name}</th><th /><th>{meta.away.short_name}</th></tr></thead>
         <tbody>
-          {focus === "win_probability" && <tr className="focus"><td>{pct(state.win_probability.home)}</td><th>★ Win probability</th><td>{pct(state.win_probability.away)}</td></tr>}
+          {focus === "win_probability" && state.win_probability && <tr className="focus"><td>{pct(state.win_probability.home)}</td><th>★ Win probability</th><td>{pct(state.win_probability.away)}</td></tr>}
           {ROWS.map(([key, label, f]) => <tr key={label} className={key && key === focus ? "focus" : ""}><td>{f(h)}</td><th>{key && key === focus ? "★ " : ""}{label}</th><td>{f(a)}</td></tr>)}
         </tbody>
       </table>

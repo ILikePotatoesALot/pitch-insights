@@ -15,6 +15,7 @@ export interface TeamMeta {
 }
 
 export interface MatchMeta {
+  tracking?: { kind: "simulation"; hz: number; duration: number };
   type: "match_meta";
   source?: "video"; // set for the real-footage clip: two sides, no squads, colours used as given
   match: { id: string; seed: number; competition: string; matchday: number; venue: string };
@@ -49,6 +50,7 @@ export interface Fact {
 }
 
 export interface Moment {
+  match_time?: number;
   id: string;
   seq: number;
   clock: string;
@@ -72,7 +74,7 @@ export interface Moment {
 /** One moment's commentary from the agents, checked against its evidence pack. */
 export interface Commentary {
   moment_id: string;
-  agent: "explainer" | "narrator" | "video_narrator";
+  agent: "explainer" | "narrator" | "video_narrator" | "simulation_narrator";
   status: "ok" | "fallback";
   casual: string;
   analyst: string;
@@ -144,7 +146,7 @@ export interface LiveState {
   match_minute: number;
   finished: boolean;
   score: Record<string, number>;
-  win_probability: { home: number; draw: number; away: number };
+  win_probability: { home: number; draw: number; away: number } | null;
   teams: Record<string, TeamStats>;
   patterns: {
     momentum: number;
@@ -158,6 +160,7 @@ export interface LiveState {
 }
 
 export interface MatchSummary {
+  tracking?: boolean;
   name: string;
   kind?: "synthetic" | "video"; // a tracked clip of real footage is "video"
   match_id: string;
@@ -226,12 +229,22 @@ export interface ClipPlayer { id: string; team_id: string | null; x: number; y: 
 
 /** Positions of everyone at one moment of the clip; `t` is seconds since the half started. */
 export interface ClipFrame {
+  analysis?: PositionAnalysis;
+  phase?: string;
+  possession_team_id?: string;
+  period?: 1 | 2;
   type: "frame";
   t: number;
   clock: string;
   ref_team_id: string;
   players: ClipPlayer[];
   ball: { x: number; y: number; confidence: number } | null;
+}
+
+export interface PositionAnalysis {
+  phase: string;
+  possession_team_id: string | null;
+  teams: Record<string, { width: number; depth: number; defensive_line: number; near_ball: number }>;
 }
 
 /** An event the video path detected (a pass, carry or interception), with a confidence below 1. */

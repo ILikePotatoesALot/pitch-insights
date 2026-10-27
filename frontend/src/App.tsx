@@ -6,10 +6,12 @@ import { FocusStrip, MomentFeed, MomentumChart, PinnedPlayer, Ratings, Scoreboar
 import { ProfilePicker } from "./components/ProfilePicker";
 import { ThemeSwitch } from "./components/ThemeSwitch";
 import { ReplaySeek } from "./components/ReplaySeek";
+import { PositionInsights } from "./components/PositionInsights";
 import { apiUrl } from "./api";
 import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { trackLabel } from "./pitch/ClipLayer";
-import { PitchScene, teamColours } from "./pitch/PitchScene";
+import { PitchScene, teamColours, type SurfaceView } from "./pitch/PitchScene";
+import type { CameraMode } from "./pitch/CameraFollow";
 import type { ClipEvent, ClipFrame, ClubInfo, LayoutMode, MatchEvent, MatchMeta, MatchSummary, Profile, ViewMode } from "./types";
 import { useReplay } from "./useReplay";
 
@@ -34,6 +36,10 @@ export default function App() {
   const [layout, setLayout] = useState<LayoutMode>(urlLayout);
   const [inspected, setInspected] = useState<string | null>(null);
   const [seekTo, setSeekTo] = useState(0);
+  const [surfaceView, setSurfaceView] = useState<SurfaceView>("current");
+  const [showTrail, setShowTrail] = useState(true);
+  const [showNearby, setShowNearby] = useState(true);
+  const [cameraMode, setCameraMode] = useState<CameraMode>("full");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [panel, setPanel] = useState<DetailPanel>("moments");
   const settingsButton = useRef<HTMLButtonElement>(null);
@@ -78,12 +84,17 @@ export default function App() {
     if (!pitchEl.current) return;
     const scene = new PitchScene(pitchEl.current);
     sceneRef.current = scene;
-    scene.setOnPick((id) => { if (/^[LR]-t\d+$/.test(id)) setFollow(id); }); // a person with no team can't be followed
+    scene.setOnPick((id) => setFollow(id));
+    scene.setOnCameraMode(setCameraMode);
     return () => scene.dispose();
   }, []);
 
   const onEvent = useCallback((ev: MatchEvent, meta: MatchMeta) => {
     if (meta.source === "video") return sceneRef.current?.addClipEvent(ev as ClipEvent, meta);
+    if (meta.tracking) {
+      if (ev.x !== undefined && ev.y !== undefined) sceneRef.current?.addClipEvent(ev as ClipEvent, meta);
+      return;
+    }
     if (ev.type === "match_state" && ev.state === "half_time") firstHalfEnd.current = ev.t;
     const t = ev.period === 2 ? (firstHalfEnd.current ?? 2700) + ev.t : ev.t;
     sceneRef.current?.addEvent(ev, meta, t);
@@ -98,6 +109,7 @@ export default function App() {
 
   const onFrame = useCallback((frame: ClipFrame, meta: MatchMeta) => {
     sceneRef.current?.showFrame(frame, meta);
+    if (meta.tracking) return;
     tracking.current.push(frame, meta);
     const now = performance.now();
     if (now - trackingShown.current > 500) { // the panels redraw twice a second, not on every frame
@@ -112,10 +124,11 @@ export default function App() {
 
   // A clip of real footage (the video path) has its own speeds, panels and controls; a synthetic match is as before.
   const clipMode = matches.find((m) => m.name === name)?.kind === "video";
-  const speeds = clipMode ? CLIP_SPEEDS : SPEEDS;
+  const simulationMode = !!matches.find((m) => m.name === name)?.tracking;
+  const speeds = clipMode || simulationMode ? CLIP_SPEEDS : SPEEDS;
   const ready = profile !== null;
-  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, command, seek, seekAt, restart, clip, clipEvents, clipT } =
-    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode ? 1 : 20, onEvent, onReset, onFrame, onPositions, {
+  const { meta, aiInfo, languages, state, moments, cues, status, speed, setSpeed, pause, resume, command, seek, seekAt, restart, clip, clipEvents, clipT, position } =
+    useReplay(ready ? name : null, p, speeds.includes(urlSpeed) ? urlSpeed : clipMode || simulationMode ? 1 : 20, onEvent, onReset, onFrame, onPositions, {
       controlled,
       initialMinute: controlled ? Math.max(0, Number(query.get("from")) || 0) : 0,
       initialAt: controlled && query.has("at") ? Math.max(0, Number(query.get("at")) || 0) : null,
@@ -140,6 +153,12 @@ export default function App() {
   const showingClip = clipMode && meta?.source === "video"; // (the old match's meta stays for a moment after a switch)
   const showingMatch = !clipMode && !!meta && meta.source !== "video";
   useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
+  useEffect(() => { sceneRef.current?.setSurfaceView(clipMode || simulationMode ? surfaceView : "history"); }, [surfaceView, clipMode, simulationMode]);
+  useEffect(() => { sceneRef.current?.setPlayerContext({ trail: showTrail, nearby: showNearby }); }, [showTrail, showNearby]);
+  useEffect(() => {
+    // Manual controls also work on event-only matches. Only automatic following needs tracking.
+    sceneRef.current?.setCameraMode(clipMode || simulationMode || cameraMode === "manual" ? cameraMode : "full");
+  }, [cameraMode, clipMode, simulationMode]);
 
   // A change to language, club, player or focus metric reconnects (the server works from the profile it was
   // given) from the current moment, not the start of the minute, so nothing replays. It goes by match seconds,
@@ -147,6 +166,7 @@ export default function App() {
   // current moment, so the reconnect keeps the jump already made. Mode alone doesn't reconnect.
   const reconnectHere = () => {
     if (showingClip) seekAt(Math.max(0, (clipT ?? 0) - (clip?.clip.start ?? 0)));
+    else if (simulationMode) seekAt(clipT ?? 0);
     else if (state?.period === 1) seekAt(state.match_minute * 60);
     else if (state) seekAt((firstHalfEnd.current ?? 2700) + (state.match_minute - 45) * 60);
   };
@@ -199,11 +219,12 @@ export default function App() {
 
   // The favourite player: who they are in this match (none if they aren't playing), for the spotlight and the card.
   const pinned = useMemo(() => {
-    if (!meta || !p.player) return null;
-    const home = meta.home.players.find((x) => x.id === p.player);
-    const person = home ?? meta.away.players.find((x) => x.id === p.player);
+    const id = simulationMode && follow ? follow : p.player;
+    if (!meta || !id) return null;
+    const home = meta.home.players.find((x) => x.id === id);
+    const person = home ?? meta.away.players.find((x) => x.id === id);
     return person ? { ...person, colour: home ? colours[0] : colours[1] } : null;
-  }, [meta, p.player, colours]);
+  }, [meta, p.player, colours, simulationMode, follow]);
 
   // In a clip the spotlight follows the tracked player the viewer picked; in a match, their favourite player.
   const followed = showingClip && follow ? { id: follow, colour: colours[follow.startsWith("L-") ? 0 : 1] } : null;
@@ -217,26 +238,27 @@ export default function App() {
   // A sample is keyed by period and minute, not compared as a number: the second half starts again near 45.
   const lastSample = useRef("");
   const clearHistory = useCallback(() => { lastSample.current = ""; setRatingHistory([]); }, []);
-  useEffect(clearHistory, [name, p.player, clearHistory]);
+  useEffect(clearHistory, [name, pinned?.id, clearHistory]);
   useEffect(() => {
-    const me = state?.players.find((x) => x.player_id === p.player);
+    const me = state?.players.find((x) => x.player_id === pinned?.id);
     if (!state || !me) return;
     const key = `${state.period}:${state.match_minute}`;
     if (key === lastSample.current) return;
     lastSample.current = key;
     setRatingHistory((h) => [...h, me.rating]);
-  }, [state, p.player]);
+  }, [state, pinned?.id]);
   // Reconcile the spotlight with who is on the pitch (a sending-off or substitution may come from a state, not an event).
   useEffect(() => {
-    const me = state?.players.find((x) => x.player_id === p.player);
+    const me = state?.players.find((x) => x.player_id === spotlit?.id);
     if (me) sceneRef.current?.setSpotlightOn(me.on_pitch);
-  }, [state, p.player]);
+  }, [state, spotlit?.id]);
 
   const clubName = meta && p.team ? [meta.home, meta.away].find((t) => t.id === p.team)?.short_name : undefined;
   const clubAbsent = !!(meta && p.team && !clubName);
   const accent = meta && p.team === meta.home.id ? colours[0] : meta && p.team === meta.away.id ? colours[1] : undefined;
+  const actualLanguage = languages[p.lang] ? p.lang : "en";
   const chip = [p.team ? `★ ${clubs.find((c) => c.id === p.team)?.short_name ?? p.team}` : "Profile", p.mode === "casual" ? "Casual" : "Analyst",
-                LANGUAGE_NAMES[p.lang] ?? p.lang].join(" · ");
+                LANGUAGE_NAMES[actualLanguage] ?? actualLanguage].join(" · ");
   const compareHref = `?compare=1&match=${name ?? ""}&speed=${speed}`;
   const activePanel = panel === "stats" && !showingClip && p.mode !== "analyst" ? "moments" : panel;
   const panels: DetailPanel[] = showingClip || p.mode === "analyst" ? ["moments", "players", "stats"] : ["moments", "players"];
@@ -256,7 +278,7 @@ export default function App() {
         </select>
         </label>
         <label className="header-field"><span className="setting-label">Language</span>
-        <select value={p.lang} onChange={(e) => commit({ ...p, lang: e.target.value })} aria-label="Language">
+        <select value={actualLanguage} onChange={(e) => commit({ ...p, lang: e.target.value })} aria-label="Language">
           {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
         </select>
         </label>
@@ -294,28 +316,49 @@ export default function App() {
           <div className="controls" role="group" aria-label="Replay controls">
             <div className="playback-state">
               {status === "paused" ? <button onClick={resume}>Play</button> : <button onClick={pause} disabled={status !== "live"}>Pause</button>}
-              <span className="playback-clock" aria-label="Current match time">{showingClip ? mmss(clipT ?? clip?.clip.start ?? 0) : state?.finished ? "Full time" : state?.clock ?? "0′"}</span>
+              <span className="playback-clock" aria-label="Current match time">{simulationMode ? status === "ended" ? "Prototype ended" : mmss(clipT ?? 0) : showingClip ? mmss(clipT ?? clip?.clip.start ?? 0) : state?.finished ? "Full time" : state?.clock ?? "0′"}</span>
             </div>
             <div className="segmented" role="group" aria-label="Speed">
               {speeds.map((s) => <button key={s} className={speed === s ? "on" : ""} onClick={() => setSpeed(s)}>{s}×</button>)}
             </div>
-            <ReplaySeek key={name} value={seekTo} max={clipMode ? Math.floor(clip?.clip.duration ?? 99) : 90}
-                        unit={clipMode ? "second" : "minute"} onChange={setSeekTo}
-                        positionLabel={clipMode ? mmss((clip?.clip.start ?? 0) + seekTo) : `${seekTo} minutes`}
-                        onSeek={(value) => { clearHistory(); if (clipMode) seekAt(value); else seek(value); }} />
+            <ReplaySeek key={name} value={seekTo} max={simulationMode ? Math.floor(meta?.tracking?.duration ?? 360) : clipMode ? Math.floor(clip?.clip.duration ?? 99) : 90}
+                        unit={clipMode || simulationMode ? "second" : "minute"} onChange={setSeekTo}
+                        inputLabel={simulationMode ? "Seconds into exhibition" : undefined}
+                        positionLabel={clipMode ? mmss((clip?.clip.start ?? 0) + seekTo) : simulationMode ? mmss(seekTo) : `${seekTo} minutes`}
+                        onSeek={(value) => { clearHistory(); if (clipMode || simulationMode) seekAt(value); else seek(value); }} />
             {status === "ended" && <button type="button" onClick={() => {
               setSeekTo(0); clearHistory(); restart();
             }}>{clipMode ? "Replay the clip" : "Replay match"}</button>}
           </div>
+          {simulationMode && <section className="welcome" aria-label="Simulation prototype">
+            <div><h2>Every player. Every movement.</h2><p>Six-minute experimental simulation. All 22 players and the ball update five times a second. Tap a player to follow their movement. Try 1× or 2×.</p>
+            <p>Passes and tackles use player positions. Marking, supporting runs and restarts are simulated.</p>
+            {position && <p className="phase-label">{({ kickoff: "Preparing a kick-off", goal_kick: "Preparing a goal kick", keeper_ball: "Goalkeeper holding the ball", open_play: "Open play" } as Record<string, string>)[position.phase] ?? position.phase}</p>}</div>
+            {follow && <button onClick={() => setFollow(null)}>Return to favourite</button>}
+          </section>}
           {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} tracking={trackingView} />}
           {showingClip && follow && <ClipPinned stats={trackingView.players.find((x) => x.id === follow)} id={follow} colours={colours}
                                                 events={clipEvents} info={clip} onStop={() => setFollow(null)} />}
-          {showingMatch && meta && <Scoreboard meta={meta} state={state} colours={colours} />}
+          {showingMatch && meta && <Scoreboard meta={meta} state={state} colours={colours} clock={simulationMode ? mmss(clipT ?? 0) : undefined} />}
           {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
           {showingMatch && meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
                                            history={ratingHistory} onChange={() => setPicker("edit")} />}
+          {(showingClip || (showingMatch && simulationMode)) && <section className="pitch-tools" aria-label="Pitch layers">
+            <div className="segmented" role="group" aria-label="Surface view">
+              <button type="button" aria-pressed={surfaceView === "current"} className={surfaceView === "current" ? "on" : ""} onClick={() => setSurfaceView("current")}>Current play</button>
+              <button type="button" aria-pressed={surfaceView === "history"} className={surfaceView === "history" ? "on" : ""} onClick={() => setSurfaceView("history")}>Activity history</button>
+            </div>
+            <label><input type="checkbox" checked={showTrail} disabled={!spotlit} onChange={(e) => setShowTrail(e.target.checked)} /> Player trail</label>
+            <label><input type="checkbox" checked={showNearby} disabled={!spotlit} onChange={(e) => setShowNearby(e.target.checked)} /> Nearby players</label>
+            <label>Camera <select aria-label="Camera view" value={cameraMode} onChange={(e) => setCameraMode(e.target.value as CameraMode)}>
+              <option value="full">Full pitch</option><option value="ball">Follow ball</option>
+              <option value="player" disabled={!spotlit}>Follow player</option>
+              {cameraMode === "manual" && <option value="manual">Manual view</option>}
+            </select></label>
+            <p>{spotlit ? `${showTrail ? "Trail: up to eight seconds. Tracking gaps break the trail. " : ""}${showNearby ? "Nearby: players within 12 metres, in team colours." : ""}` : "Tap a player to reveal their recent path and nearby players."}</p>
+          </section>}
           {(showingMatch || showingClip) && <p className="pitch-caption">
-            {showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: activity over the last two minutes
+            {simulationMode ? "Simulated positions · 22 players · 5 updates/s" : showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: {(showingClip || simulationMode) && surfaceView === "current" ? "recent movement and ball" : "activity history"}
           </p>}
           <div className="pitch" ref={pitchEl}>
             {spotlit && <div className="spot-label" ref={spotLabel} style={{ borderColor: spotlit.colour }}>
@@ -336,8 +379,15 @@ export default function App() {
               Each marker is one tracked person: {meta?.home.name} in blue, {meta?.away.name} in white, grey where the model could not tell
               the team. The number is the tracker's ID, not a shirt number; tap a marker to follow that player. Lines are detected passes and
               carries, a ring is an interception. The ball shows only where the video found it. The surface rises where each side's
-              players have been in the last two minutes. Drag to turn the pitch, scroll to zoom, double-click to reset.
+              players have been. Current play follows recent movement and the ball; Activity history keeps the longer view.
+              Select a player to show their last eight seconds of movement and highlight players within 12 metres.
+              Gaps in detection break the path. Drag to turn the pitch, scroll to zoom, double-click to reset.
             </p>
+          ) : simulationMode ? (
+            <p className="legend">Each numbered marker is a simulated player wearing their shirt number. Tap any player to follow them.
+              The ball moves between players; lines show passes and carries. Current play follows recent movement and the ball;
+              Activity history keeps the longer view. Player trail shows the last eight seconds, and Nearby players highlights those within 12 metres.
+              Drag to turn the pitch, scroll to zoom, double-click to reset.</p>
           ) : (
             <p className="legend">
               The surface rises where each team has been active in the last two minutes, coloured by which team owns that space.
@@ -359,14 +409,22 @@ export default function App() {
             ))}
           </nav>
           <div className="detail-section" data-active={activePanel === "moments"}>
-            <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} allTiers={!!showingClip} follow={showingClip ? follow : null} />
+            <MomentFeed moments={moments} meta={meta} aiInfo={aiInfo} mode={p.mode} colours={colours} allTiers={!!showingClip || simulationMode} follow={showingClip ? follow : null}
+              onSeek={!controlled && (showingClip || simulationMode) ? (time) => {
+                const seconds = Math.max(0, time - (showingClip ? clip?.clip.start ?? 0 : 0));
+                setSeekTo(Math.floor(seconds)); clearHistory(); seekAt(seconds); resume();
+              } : undefined} />
           </div>
           <div className="detail-section" data-active={activePanel === "players"}>
             {showingClip ? <ClipPlayers tracking={trackingView} colours={colours} follow={follow} setFollow={setFollow} /> :
               <Ratings state={state} meta={meta} colours={colours} favourite={inspected} setFavourite={setInspected}
-                       followed={p.player} onFollow={(id) => { if (id !== p.player) commit({ ...p, player: id }); }} />}
+                       followed={simulationMode ? pinned?.id ?? null : p.player} onFollow={(id) => {
+                         if (simulationMode) setFollow(id);
+                         else if (id !== p.player) commit({ ...p, player: id });
+                       }} />}
           </div>
           <div className="detail-section" data-active={activePanel === "stats"}>
+          {simulationMode && <PositionInsights meta={meta} position={position} />}
           {showingClip ? <>
           {p.mode === "analyst" && <ClipEvents events={clipEvents} mode={p.mode} colours={colours} meta={meta} info={clip} follow={follow} />}
           {clip && <ClipPanel info={clip} lang={p.lang} />}

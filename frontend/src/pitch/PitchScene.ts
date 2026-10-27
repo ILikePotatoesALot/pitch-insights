@@ -2,13 +2,22 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { ClipEvent, ClipFrame, MatchEvent, MatchMeta } from "../types";
 import { ClipLayer } from "./ClipLayer";
+import { SurfaceTimeline } from "./SurfaceTimeline";
+import { PlayerContextLayer, type PlayerContextOptions } from "./PlayerContextLayer";
+import type { TrackPoint } from "./TrackingHistory";
+import { cameraFocus, cameraBlend, type CameraMode } from "./CameraFollow";
+
+export type SurfaceView = "current" | "history";
 
 const L = 105;
 const W = 68;
 const NX = 105; // grid cells along the length (1 m each)
 const NZ = 68;
 const TERRITORY_TAU = 120; // seconds of match time for activity to fade to ~37%
-const SPIKE_TAU = 75;
+const CURRENT_TAU = 3; // recent movement responds quickly, separately from the activity history
+const SPIKE_TAU = 10;
+const SPIKE_RISE_S = 0.35;
+const GOAL_GLOW_TAU = 3;
 const SIGMA = 7; // metres: how far one action's influence spreads
 const CLIP_HEAT_PER_S = 0.015; // territory a tracked player adds each second, at their spot (an event adds 0.2 to 0.9)
 const PICK_DRAG_PX = 5; // a press that moves further than this is a camera drag, not a tap on a player
@@ -64,6 +73,12 @@ export class PitchScene {
   private controls: OrbitControls;
   private geometry: THREE.BufferGeometry;
   private heat: [Float32Array, Float32Array];
+  private recentHeat: [Float32Array, Float32Array] = [new Float32Array((NX + 1) * (NZ + 1)), new Float32Array((NX + 1) * (NZ + 1))];
+  private instantHeat: [Float32Array, Float32Array] = [new Float32Array((NX + 1) * (NZ + 1)), new Float32Array((NX + 1) * (NZ + 1))];
+  private surfaceView: SurfaceView = "current";
+  private currentBall: TrackPoint | null = null;
+  private context: PlayerContextLayer;
+  private contextOptions: PlayerContextOptions = { trail: true, nearby: true };
   private spikes: Spike[] = [];
   private ball: THREE.Mesh;
   private ballTarget = new THREE.Vector3(0, 1, 0);
@@ -74,6 +89,9 @@ export class PitchScene {
   private frame = 0;
   private observer: ResizeObserver;
   private dirty = true;
+  private surface = new SurfaceTimeline((NX + 1) * (NZ + 1));
+  private surfaceHeights = new Float32Array((NX + 1) * (NZ + 1));
+  private surfaceColours = new Float32Array((NX + 1) * (NZ + 1) * 3);
   private tmpColour = new THREE.Color();
   private spot: Spotlight | null = null;
   private playerPositions = new Map<string, [number, number]>();
@@ -90,6 +108,11 @@ export class PitchScene {
   private trailLine: THREE.Line;
   private userMoved = false; // once the viewer turns or zooms, a resize no longer reframes the pitch
   private flyTo: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
+  private cameraMode: CameraMode = "full";
+  private cameraModeChanged: ((mode: CameraMode) => void) | null = null;
+  private followOffset = new THREE.Vector3();
+  private followTarget = new THREE.Vector3();
+  private lastCameraAt: number | null = null;
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -147,8 +170,12 @@ export class PitchScene {
 
     this.clip = new ClipLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
     this.scene.add(this.clip.group);
+    this.context = new PlayerContextLayer((x, z) => this.heightAt(x + L / 2, W / 2 - z));
+    this.scene.add(this.context.group);
     this.renderer.domElement.addEventListener("pointerdown", this.onPress);
     this.renderer.domElement.addEventListener("pointerup", this.onRelease);
+    this.renderer.domElement.addEventListener("pointermove", this.onCameraDrag);
+    this.renderer.domElement.addEventListener("wheel", this.onCameraWheel, { passive: true });
     this.renderer.domElement.addEventListener("dblclick", this.onResetView);
 
     this.observer = new ResizeObserver(() => this.resize());
@@ -171,22 +198,76 @@ export class PitchScene {
   showFrame(frame: ClipFrame, meta: MatchMeta) {
     if (meta.home.id !== this.homeId) this.setMatch(meta);
     this.clip.push(frame, meta);
-    const dt = this.lastFrameT === null ? 0 : Math.min(1, Math.max(0, frame.t - this.lastFrameT));
+    const snapshot = this.context.history.push(frame, meta);
+    const elapsed = this.lastFrameT === null ? 0 : Math.max(0, frame.t - this.lastFrameT);
+    const dt = Math.min(1, elapsed);
     this.lastFrameT = frame.t;
     this.matchTime = frame.t;
     this.decay();
-    for (const p of this.clip.lastPlayers()) this.splat(p.side, p.x, p.y, CLIP_HEAT_PER_S * dt);
+    const fade = Math.exp(-elapsed / CURRENT_TAU);
+    for (const h of this.recentHeat) for (let k = 0; k < h.length; k++) h[k] *= fade;
+    for (const h of this.instantHeat) h.fill(0);
+    for (const p of snapshot.players.values()) {
+      if (p.side === 2) continue;
+      this.splat(p.side, p.x, p.y, CLIP_HEAT_PER_S * dt);
+      this.stamp(this.recentHeat[p.side], p.x, p.y, 0.12 * dt, 4);
+      this.stamp(this.instantHeat[p.side], p.x, p.y, 0.4, 4);
+    }
+    this.currentBall = snapshot.ball;
     this.dirty = true;
   }
+
+  setSurfaceView(view: SurfaceView) {
+    if (this.surfaceView === view) return;
+    this.surfaceView = view;
+    this.surface.reset();
+    this.dirty = true;
+  }
+
+  setPlayerContext(options: PlayerContextOptions) { this.contextOptions = options; }
 
   /** A detected event of the clip: a line (pass, carry) or ring (interception) that fades. */
   addClipEvent(ev: ClipEvent, meta: MatchMeta) {
     if (meta.home.id !== this.homeId) this.setMatch(meta);
+    if (ev.type === "shot") {
+      this.matchTime = Math.max(this.matchTime, ev.t);
+      this.addShot(ev, meta, ev.t);
+      return;
+    }
     this.clip.addEvent(ev, meta);
   }
 
   /** The replay speed, which the drawing needs to move smoothly between frames. */
-  setClipSpeed(speed: number) { this.clipSpeed = speed; }
+  setClipSpeed(speed: number) {
+    this.clipSpeed = speed;
+    if (this.cameraMode === "ball" || this.cameraMode === "player") this.setFollowOffset();
+  }
+
+  setOnCameraMode(fn: (mode: CameraMode) => void) { this.cameraModeChanged = fn; }
+
+  setCameraMode(mode: CameraMode) {
+    if (this.cameraMode === mode) return;
+    this.cameraMode = mode;
+    if (mode === "full") { this.onResetView(); return; }
+    this.endFlight();
+    this.userMoved = true;
+    if (mode !== "manual") {
+      this.setFollowOffset();
+      this.controls.enableDamping = false;
+    }
+    this.cameraModeChanged?.(mode);
+  }
+
+  private setFollowOffset() {
+    const fit = this.fittedView();
+    this.followOffset.copy(fit.position).sub(fit.target).multiplyScalar(this.clipSpeed > 2 ? 0.95 : 0.82);
+  }
+
+  private onCameraWheel = () => this.setCameraMode("manual");
+  private onCameraDrag = (event: PointerEvent) => {
+    if (this.pressAt && Math.hypot(event.clientX - this.pressAt[0], event.clientY - this.pressAt[1]) > PICK_DRAG_PX)
+      this.setCameraMode("manual");
+  };
 
   /** Called with a tracked person's id when the viewer taps them on the pitch (to follow them with the spotlight). */
   setOnPick(fn: ((id: string) => void) | null) { this.onPick = fn; }
@@ -202,6 +283,8 @@ export class PitchScene {
 
   /** Double-click: glide back to the default view, framed to fit. */
   private onResetView = () => {
+    this.cameraMode = "full";
+    this.cameraModeChanged?.("full");
     this.userMoved = false;
     this.flyTo = this.fittedView();
     this.controls.enableDamping = false; // drops any spin left over from the last drag, which would fight the glide
@@ -308,11 +391,25 @@ export class PitchScene {
     this.playerPositions.clear();
     if (this.spot) { this.spot.placed = false; this.spot.on = true; this.spot.group.visible = false; }
     this.clip.clear();
+    this.context.clear();
+    for (const h of [...this.recentHeat, ...this.instantHeat]) h.fill(0);
+    this.currentBall = null;
     this.touches = [];
     this.lastFrameT = null;
     this.heat[0].fill(0);
     this.heat[1].fill(0);
     this.spikes = [];
+    this.surface.reset();
+    // A seek must remove old hills immediately, including while paused.
+    const position = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const normal = this.geometry.getAttribute("normal") as THREE.BufferAttribute;
+    const colour = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+    for (let k = 0; k < position.count; k++) {
+      position.setY(k, 0);
+      normal.setXYZ(k, 0, 1, 0);
+      colour.setXYZ(k, BASE_COLOUR.r, BASE_COLOUR.g, BASE_COLOUR.b);
+    }
+    position.needsUpdate = normal.needsUpdate = colour.needsUpdate = true;
     this.matchTime = 0;
     this.lastDecayTime = 0;
     this.dirty = true;
@@ -346,9 +443,16 @@ export class PitchScene {
       this.moveBall(pos[0], pos[1]);
     }
     if (ev.type === "shot") {
-      const goal = ev.outcome === "goal";
-      this.spikes.push({ x: pos[0], y: pos[1], amp: 6 + (ev.xg ?? 0.05) * 55 + (goal ? 10 : 0), born: matchTime, goal });
+      this.addShot(ev, meta, matchTime);
     }
+    this.dirty = true;
+  }
+
+  private addShot(ev: MatchEvent, meta: MatchMeta, matchTime: number) {
+    const pos = toAbsolute(ev, meta);
+    if (!pos) return;
+    const goal = ev.outcome === "goal";
+    this.spikes.push({ x: pos[0], y: pos[1], amp: 4 + (ev.xg ?? 0.05) * 12 + (goal ? 3 : 0), born: matchTime, goal });
     this.dirty = true;
   }
 
@@ -357,9 +461,13 @@ export class PitchScene {
     this.clearSpotlight();
     this.renderer.domElement.removeEventListener("pointerdown", this.onPress);
     this.renderer.domElement.removeEventListener("pointerup", this.onRelease);
+    this.renderer.domElement.removeEventListener("pointermove", this.onCameraDrag);
+    this.renderer.domElement.removeEventListener("wheel", this.onCameraWheel);
     this.renderer.domElement.removeEventListener("dblclick", this.onResetView);
     this.controls.removeEventListener("start", this.onUserMove);
     this.clip.dispose();
+    this.scene.remove(this.context.group);
+    this.context.dispose();
     this.observer.disconnect();
     this.controls.dispose();
     this.scene.traverse((obj) => {
@@ -528,6 +636,7 @@ export class PitchScene {
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
     g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    g.computeVertexNormals();
     return g;
   }
 
@@ -571,13 +680,16 @@ export class PitchScene {
   }
 
   private splat(side: number, x: number, y: number, amount: number) {
-    const h = this.heat[side];
-    const r = Math.ceil(SIGMA * 2.5);
+    this.stamp(this.heat[side], x, y, amount, SIGMA);
+  }
+
+  private stamp(h: Float32Array, x: number, y: number, amount: number, sigma: number) {
+    const r = Math.ceil(sigma * 2.5);
     const ci = Math.round((x / L) * NX), cj = Math.round((y / W) * NZ);
     for (let j = Math.max(0, cj - r); j <= Math.min(NZ, cj + r); j++) {
       for (let i = Math.max(0, ci - r); i <= Math.min(NX, ci + r); i++) {
         const dx = (i / NX) * L - x, dy = (j / NZ) * W - y;
-        h[this.idx(i, j)] += amount * Math.exp(-(dx * dx + dy * dy) / (2 * SIGMA * SIGMA));
+        h[this.idx(i, j)] += amount * Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
       }
     }
   }
@@ -596,49 +708,86 @@ export class PitchScene {
   }
 
   private heightAt(x: number, y: number) {
-    const i = Math.min(NX, Math.max(0, Math.round((x / L) * NX)));
-    const j = Math.min(NZ, Math.max(0, Math.round((y / W) * NZ)));
-    return (this.geometry.getAttribute("position") as THREE.BufferAttribute).getY(this.idx(i, j));
+    const gx = Math.min(NX, Math.max(0, (x / L) * NX)), gy = Math.min(NZ, Math.max(0, (y / W) * NZ));
+    const i = Math.min(NX - 1, Math.floor(gx)), j = Math.min(NZ - 1, Math.floor(gy));
+    const u = gx - i, v = gy - j;
+    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const a = pos.getY(this.idx(i, j)), b = pos.getY(this.idx(i + 1, j));
+    const c = pos.getY(this.idx(i, j + 1)), d = pos.getY(this.idx(i + 1, j + 1));
+    return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v;
   }
 
-  private updateSurface() {
-    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
-    const col = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+  private updateSurface(now: number) {
     const [ch, ca] = this.colours;
     const tmp = this.tmpColour;
     const spikes = this.spikes;
-    const amps = spikes.map((s) => s.amp * Math.exp(-(this.matchTime - s.born) / SPIKE_TAU));
+    const current = this.clip.group.visible && this.surfaceView === "current";
+    const amps = spikes.map((s) => {
+      const age = Math.max(0, this.matchTime - s.born);
+      // Sparse event feeds need an immediate target; tracked feeds have frames throughout the rise.
+      const rise = this.clip.group.visible ? 1 - Math.exp(-age / SPIKE_RISE_S) : 1;
+      return s.amp * rise * Math.exp(-age / SPIKE_TAU);
+    });
     for (let j = 0; j <= NZ; j++) {
       for (let i = 0; i <= NX; i++) {
         const k = this.idx(i, j);
-        const hh = this.heat[0][k], ha = this.heat[1][k];
+        const hh = current ? this.recentHeat[0][k] + this.instantHeat[0][k] : this.heat[0][k];
+        const ha = current ? this.recentHeat[1][k] + this.instantHeat[1][k] : this.heat[1][k];
         const total = hh + ha;
         let height = 9 * Math.tanh(total / 3);
         const x = (i / NX) * L, y = (j / NZ) * W;
         let glow = 0;
+        const ballInfluence = current && this.currentBall ? Math.exp(-((x - this.currentBall.x) ** 2 + (y - this.currentBall.y) ** 2) / 50) : 0;
+        height += 1.8 * ballInfluence;
         for (let n = 0; n < spikes.length; n++) {
           const s = spikes[n];
           const d2 = (x - s.x) ** 2 + (y - s.y) ** 2;
           const v = amps[n] * Math.exp(-d2 / (2 * 2.2 * 2.2));
           height += v;
-          if (s.goal) glow = Math.max(glow, Math.min(1, v / 8));
+          if (s.goal) glow = Math.max(glow, Math.min(1, v / 5) * Math.exp(-Math.max(0, this.matchTime - s.born) / GOAL_GLOW_TAU));
         }
-        pos.setY(k, height);
+        this.surfaceHeights[k] = height;
         const raw = total > 1e-4 ? hh / total : 0.5;
         // Who owns this space, from -1 (away) to 1 (home), sharpened smoothly so ownership reads without hard edges.
         // Shared space fades to slate rather than mixing the colours, which turned a red and a blue team's pitch purple.
         const lead = Math.tanh((raw - 0.5) * 4);
         tmp.copy(CONTESTED_COLOUR).lerp(lead >= 0 ? ch : ca, Math.min(1, Math.abs(lead) * 1.2));
         const strength = Math.min(1, total / 1.5);
-        tmp.lerp(BASE_COLOUR, 1 - (0.3 + 0.7 * strength));
+        const visibility = current ? 1 - Math.exp(-total * 1.7) : 0.3 + 0.7 * strength;
+        tmp.lerp(BASE_COLOUR, 1 - visibility);
+        if (ballInfluence) tmp.lerp(GLOW_COLOUR, ballInfluence * 0.15);
         if (glow > 0) tmp.lerp(GLOW_COLOUR, glow * 0.8);
-        col.setXYZ(k, tmp.r, tmp.g, tmp.b);
+        this.surfaceColours[k * 3] = tmp.r;
+        this.surfaceColours[k * 3 + 1] = tmp.g;
+        this.surfaceColours[k * 3 + 2] = tmp.b;
       }
     }
-    pos.needsUpdate = true;
-    col.needsUpdate = true;
-    this.geometry.computeVertexNormals();
+    if (this.clip.group.visible) this.surface.push(this.matchTime, this.surfaceHeights, this.surfaceColours);
+    else this.surface.transition(now / 1000, 0.18, this.surfaceHeights, this.surfaceColours);
   }
+
+  private drawSurface(t: number) {
+    if (!this.surface.sample(t)) return;
+    const pos = this.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const col = this.geometry.getAttribute("color") as THREE.BufferAttribute;
+    const normals = this.geometry.getAttribute("normal") as THREE.BufferAttribute;
+    const heights = this.surface.heights;
+    for (let j = 0; j <= NZ; j++) for (let i = 0; i <= NX; i++) {
+      const k = this.idx(i, j);
+      pos.setY(k, heights[k]);
+      // Smooth grid gradients avoid rebuilding every triangle's normals on every draw.
+      const left = Math.max(0, i - 1), right = Math.min(NX, i + 1);
+      const top = Math.max(0, j - 1), bottom = Math.min(NZ, j + 1);
+      const dx = (heights[this.idx(right, j)] - heights[this.idx(left, j)]) / ((right - left) * L / NX);
+      const dy = (heights[this.idx(i, bottom)] - heights[this.idx(i, top)]) / ((bottom - top) * W / NZ);
+      const length = Math.hypot(dx, 1, dy);
+      normals.setXYZ(k, -dx / length, 1 / length, dy / length);
+    }
+    (col.array as Float32Array).set(this.surface.colours);
+    pos.needsUpdate = col.needsUpdate = normals.needsUpdate = true;
+  }
+
+  private drawTrackedSurface = (t: number) => this.drawSurface(t);
 
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.container;
@@ -646,6 +795,7 @@ export class PitchScene {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    if (this.cameraMode === "ball" || this.cameraMode === "player") this.setFollowOffset();
     if (!this.userMoved) this.frameView();
   }
 
@@ -689,16 +839,29 @@ export class PitchScene {
 
   private loop = () => {
     this.frame = requestAnimationFrame(this.loop);
+    const now = performance.now();
     if (this.dirty) {
-      this.updateSurface();
+      this.updateSurface(now);
       this.dirty = false;
     }
+    if (this.clip.group.visible) this.clip.update(this.clipSpeed, now, this.drawTrackedSurface);
+    else this.drawSurface(now / 1000);
+    if (this.clip.group.visible) this.context.update(this.clip.drawnTime, this.spot?.id ?? null,
+      this.clip.playersNow(), this.colours, this.contextOptions);
     const bx = this.ballTarget.x + L / 2, by = W / 2 - this.ballTarget.z;
     const target = new THREE.Vector3(this.ballTarget.x, this.heightAt(bx, by) + 1.4, this.ballTarget.z);
     this.ball.position.lerp(target, 0.18);
     this.ball.visible = !this.clip.group.visible; // a clip draws its own ball, only where the video found it
-    this.clip.update(this.clipSpeed);
     this.moveSpotlight();
+    const focus = cameraFocus(this.cameraMode, this.clip.ballNow(), this.spot ? this.clip.positionOf(this.spot.id) : undefined);
+    const blend = cameraBlend(this.lastCameraAt === null ? 0 : (now - this.lastCameraAt) / 1000);
+    this.lastCameraAt = now;
+    if (focus) {
+      this.followTarget.set(focus.x, this.heightAt(focus.x + L / 2, W / 2 - focus.z) * 0.3, focus.z);
+      this.controls.target.lerp(this.followTarget, blend);
+      this.tmpVector.copy(this.followTarget).add(this.followOffset);
+      this.camera.position.lerp(this.tmpVector, blend);
+    }
     this.placeGoals();
     this.drawTrail();
     if (this.flyTo) {

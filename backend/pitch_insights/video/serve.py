@@ -110,7 +110,7 @@ async def replay_clip(ws: WebSocket, clip: Clip, speed: float, samples: Path | N
         frame = next((f for f in reversed(clip.frames) if f["t"] - clip.start <= start), clip.frames[0])
         try:
             await ws.send_json(frame)
-            await ws.send_json({"type": "ready", "server_time": time.time(), "kind": "video", "duration": clip.duration})
+            await ws.send_json({"type": "ready", "server_time": time.time(), "kind": "video", "duration": clip.duration, "lang": lang})
         except (WebSocketDisconnect, RuntimeError):
             return
     session = ViewerSession(ws, rep, profile.mode)

@@ -27,6 +27,7 @@ from pitch_insights.agents.middleware import RunLogMiddleware, moment_id_var
 from pitch_insights.agents.prompts import (
     EXPLAINER_INSTRUCTIONS, NARRATOR_INSTRUCTIONS, PROMPT_VERSION, VIDEO_NARRATOR_INSTRUCTIONS, VIDEO_PROMPT_VERSION,
     input_hash, moment_input, retry_input,
+    SIMULATION_NARRATOR_INSTRUCTIONS,
 )
 from pitch_insights.agents.safety import ContentSafety
 
@@ -45,7 +46,7 @@ class Lines(BaseModel):
 
 
 class Writer(Protocol):
-    """Anything that can write Lines for a role ("explainer", "narrator" or "video_narrator"). The Agent
+    """Anything that can write Lines for a commentary role. The Agent
     Framework implementation is AgentWriter; tests use a fake."""
     provider: str
     model: str
@@ -54,9 +55,11 @@ class Writer(Protocol):
 
 
 def agent_for(moment: dict) -> str:
-    """Moments detected from video (`source == "video"`) go to the video narrator, whatever their type."""
+    """Route video and exhibition evidence to their specialist narrators, whatever the moment type."""
     if moment.get("source") == "video":
         return "video_narrator"
+    if moment.get("source") == "simulation":
+        return "simulation_narrator"
     return "explainer" if moment["type"] in EXPLAINER_TYPES else "narrator"
 
 
@@ -174,7 +177,7 @@ class CommentaryDesk:
                     reason = "no structured output"
                     break
                 check = grounding.check(f"{lines.casual} {lines.analyst}", moment, self.meta)
-                check = grounding.with_hedging(check, lines.casual, lines.analyst, moment)  # video moments only
+                check = grounding.with_hedging(check, lines.casual, lines.analyst, moment)
                 if check.passed:
                     reason = ""
                     break
@@ -212,7 +215,7 @@ class CommentaryDesk:
 
 
 class AgentWriter:
-    """The three writing agents, built with Microsoft Agent Framework."""
+    """The four writing agents, built with Microsoft Agent Framework."""
 
     def __init__(self, client, provider: str, model: str, max_tokens: int = 220, temperature: float = 0.4):
         from agent_framework import Agent
@@ -229,6 +232,8 @@ class AgentWriter:
             "video_narrator": Agent(client, VIDEO_NARRATOR_INSTRUCTIONS, name="video_narrator",
                                     description="Describes a passage of play detected from real match footage.",
                                     middleware=mw),
+            "simulation_narrator": Agent(client, SIMULATION_NARRATOR_INSTRUCTIONS, name="simulation_narrator",
+                                         description="Describes measured positions in a short simulated exhibition.", middleware=mw),
         }
 
     async def aclose(self) -> None:
