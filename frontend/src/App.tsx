@@ -17,6 +17,7 @@ import { useReplay } from "./useReplay";
 
 const SPEEDS = [1, 5, 20, 60];
 const CLIP_SPEEDS = [0.5, 1, 2, 5]; // the clip is 100 s of real footage: slower than a synthetic match, and it starts at 1x
+const DEFAULT_MATCH = "continuous-prototype";
 // What a link can set besides the profile: `match` (a sample's name), `layout` (broadcast | fan) and `speed`, so
 // two views of one match can be opened side by side (see CompareView) and set up the same way every time.
 const query = new URLSearchParams(location.search);
@@ -65,7 +66,7 @@ export default function App() {
     fetch(apiUrl("/api/matches")).then((r) => r.json()).then((list: MatchSummary[]) => {
       setMatches(list);
       const wanted = query.get("match");
-      if (list.length) setName(list.find((m) => m.name === wanted)?.name ?? list[0].name);
+      if (list.length) setName(list.find((m) => m.name === wanted)?.name ?? list.find((m) => m.name === DEFAULT_MATCH)?.name ?? list[0].name);
     }).catch(() => setMatches([]));
     fetch(apiUrl("/api/clubs")).then((r) => r.json()).then(setClubs).catch(() => setClubs([]));
     const link = profileFromUrl(location.search);
@@ -191,7 +192,7 @@ export default function App() {
     setWelcome(true);
   };
   const watchDemo = () => {
-    const demo = matches.find((m) => m.name === "comeback-POT-CAR") ?? matches.find((m) => m.kind !== "video");
+    const demo = matches.find((m) => m.name === DEFAULT_MATCH) ?? matches.find((m) => m.kind !== "video");
     if (!demo) return;
     const club = clubs.find((c) => c.id === demo.home.id);
     const squad = club?.players ?? (meta?.home.id === demo.home.id ? meta.home.players : meta?.away.id === demo.home.id ? meta.away.players : []);
