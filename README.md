@@ -17,7 +17,7 @@ The app is named **Seize the game**, with `seize-the-game` used in package and s
 - **[Real footage](https://blue-moss-06018420f.1.azurestaticapps.net/?match=117093-38min_ft&follow=L-t11)**: 100 seconds of a real match, with players tracked from video by a fine-tuned detector, AI commentary that says how sure the detector was, and a spotlight that follows one real player (tap any other to switch).
 - **[A personalised link](https://blue-moss-06018420f.1.azurestaticapps.net/?match=comeback-POT-CAR&team=POT&player=POT-11&mode=casual&lang=es&focus=xg)**: any profile can be set from the address bar (`team`, `player`, `mode`, `lang`, `focus`).
 
-**Demo video:** *(link added at submission)*
+**Demo video:** *(https://youtu.be/wKK5plbHJdw)*
 
 For architecture and setup, see [docs/DESIGN.md](docs/DESIGN.md) and [docs/DEPLOY.md](docs/DEPLOY.md). Internal assistant handoffs are kept locally and excluded from Git.
 
