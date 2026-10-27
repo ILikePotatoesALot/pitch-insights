@@ -103,6 +103,9 @@ export function ProfilePicker({ clubs, languages, profile, fromLink, onSave, onR
           <select value={draft.lang} onChange={(e) => set({ lang: e.target.value })}>
             {Object.entries(langs).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
           </select>
+          <small>Changes commentary and supporting evidence. Interface controls remain in English.
+            {!languages[draft.lang] && " This language is unavailable for this match, so its commentary uses English."}
+          </small>
         </label>
 
         <label className="field">Focus metric

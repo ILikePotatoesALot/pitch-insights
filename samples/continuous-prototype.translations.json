@@ -1,0 +1,1075 @@
+{
+ "service": "azure-translator",
+ "api_version": "3.0",
+ "version": "2026-10-22.2",
+ "source": "en",
+ "languages": [
+  "es",
+  "fr",
+  "de",
+  "nl",
+  "zh-Hans"
+ ],
+ "machine_translated": true,
+ "kept_english": {
+  "es": 0,
+  "fr": 11,
+  "de": 1,
+  "nl": 1,
+  "zh-Hans": 31
+ },
+ "moments": {
+  "S-30": {
+   "source_hash": "89ac3a7682f5186c",
+   "failed": {
+    "fr": [
+     "fact.3"
+    ],
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Kofi Doküssler avanza sin balón",
+    "fact.0": "Kofi Doküssler avanza 24 m hacia la portería rival en 4 segundos sin poseer el balón.",
+    "fact.1": "Los jugadores de campo de Potato tienen una longitud de 42 m de ancho y 50 m de profundidad.",
+    "fact.2": "Los defensores de Potato's tienen una posición mediana a 15 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "fact.4": "Los jugadores de campo de Carrot tienen una longitud de 56 m de ancho y 47 m de profundidad.",
+    "fact.5": "Los defensores de Carrot's tienen una posición mediana a 43 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Kofi Doküssler avanza alejándose del balón, cubriendo terreno hacia la portería contraria.",
+    "analyst": "Kofi Doküssler avanza 24 m hacia la portería rival en más de 4 segundos sin poseer, con los jugadores de Carrot's distribuidos a 56 m de ancho y 47 m de profundidad."
+   },
+   "fr": {
+    "headline": "Kofi Doküssler avance sans le ballon",
+    "fact.0": "Kofi Doküssler avance de 24 m vers le but adverse en 4 secondes sans posséder le ballon.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 42 m de large et 50 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's ont une position médiane à 15 m de leur propre ligne de but.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent de 56 m de large et 47 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's ont une position médiane à 43 m de leur propre ligne de but.",
+    "fact.6": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Kofi Doküssler avance loin du ballon, couvrant le terrain vers le but adverse.",
+    "analyst": "Kofi Doküssler avance de 24 m vers le but adverse en plus de 4 secondes sans possession, avec les joueurs de Carrot étalés sur 56 m de large et 47 m de profondeur."
+   },
+   "de": {
+    "headline": "Kofi Doküssler bewegt sich vom Ball nach vorne",
+    "fact.0": "Kofi Doküssler rückt in 4 Sekunden 24 m auf das gegnerische Tor zu, ohne den Ball zu besitzen.",
+    "fact.1": "Potato Außenfeldspieler sind 42 m breit und 50 m tief.",
+    "fact.2": "Die Verteidiger von Potato haben eine mediane Position 15 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "fact.4": "Carrot Außenfeldspieler spannen sich über 56 m Breite und 47 m Tiefe.",
+    "fact.5": "Carrot Verteidiger haben eine mittlere Position 43 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Kofi Doküssler bewegt sich vom Ball weg und legt Strecke auf das gegnerische Tor zu.",
+    "analyst": "Kofi Doküssler rückt in 4 Sekunden ohne Ballbesitz 24 m auf das gegnerische Tor zu, wobei die Spieler von Carrot 56 m breit und 47 m tief verteilt sind."
+   },
+   "nl": {
+    "headline": "Kofi Doküssler beweegt naar voren zonder de bal",
+    "fact.0": "Kofi Doküssler beweegt 24 meter richting het doel van de tegenstander in 4 seconden zonder de bal te bezitten.",
+    "fact.1": "Potato's buitenveldspelers zijn 42 meter breed en 50 meter diep.",
+    "fact.2": "De verdedigers van Potato hebben een mediane positie op 15 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 0 veldspelers binnen 5 meter van de bal.",
+    "fact.4": "De buitenspelers van Carrot zijn 56 meter breed en 47 meter diep.",
+    "fact.5": "De verdedigers van Carrot hebben een mediane positie op 43 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Kofi Doküssler beweegt naar voren weg van de bal en legt afstand richting het doel van de tegenstander.",
+    "analyst": "Kofi Doküssler beweegt zich in 4 seconden 24 meter richting het doel van de tegenstander, zonder balbezit, met spelers van Carrot verspreid over 56 meter breed en 47 meter diep."
+   },
+   "zh-Hans": {
+    "headline": "Kofi Doküssler 无球后向前移动",
+    "fact.0": "Kofi Doküssler 在4秒内向对方球门推进24米，且未持球。",
+    "fact.1": "Potato的场地球员宽度为42米，深度为50米。",
+    "fact.2": "Potato的防守者中位距离自家球门线15米。",
+    "fact.4": "Carrot的场地球员宽度为56米，深47米。",
+    "fact.5": "Carrot的防守者中位距离自家球门线43米。",
+    "casual": "Kofi Doküssler 向前移动，远离球，向对方球门推进。",
+    "analyst": "Kofi Doküssler 在无控球的情况下向对方球门推进24米，4秒内， Carrot队球员分布在56米宽、47米深处。"
+   }
+  },
+  "S-60": {
+   "source_hash": "9d3f5ffa9a15773c",
+   "failed": {
+    "zh-Hans": [
+     "fact.2",
+     "fact.5"
+    ]
+   },
+   "es": {
+    "headline": "Forma del equipo de Carrot",
+    "fact.0": "Los jugadores de campo de Potato's tienen 39 m de ancho y 46 m de profundidad.",
+    "fact.1": "Los defensores de Potato's tienen una posición mediana a 4 m de su propia línea de gol.",
+    "fact.2": "Potato tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "fact.3": "Los jugadores de campo de Carrot tienen una longitud de 54 m de ancho y 59 m de profundidad.",
+    "fact.4": "Los defensores de Carrot's tienen una posición media a 49 m de su propia línea de gol.",
+    "fact.5": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Los jugadores de Carrot están repartidos por todo el campo, con sus defensas situados más lejos de la portería que los de Potato.",
+    "analyst": "La forma de Carrot abarca 54 m de ancho y 59 m de profundidad, con los defensores situados a 49 m de su línea de gol. Los defensores de Potato están mucho más cerca a 4 m."
+   },
+   "fr": {
+    "headline": "Carrot's : Forme de l’équipe",
+    "fact.0": "Les joueurs de champ de Potato s’étendent sur 39 m de large et 46 m de profondeur.",
+    "fact.1": "Les défenseurs de Potato's occupent une position médiane à 4 m de leur propre ligne de but.",
+    "fact.2": "Potato compte 1 joueur de champ à moins de 5 m du ballon.",
+    "fact.3": "Les joueurs de champ de Carrot s’étendent sur 54 m de large et 59 m de profondeur.",
+    "fact.4": "Les défenseurs de Carrot's ont une position médiane à 49 m de leur propre ligne de but.",
+    "fact.5": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Les joueurs de Carrot sont répartis sur le terrain, leurs défenseurs étant plus éloignés de leur but que Potato.",
+    "analyst": "La forme de Carrot s’étend sur 54 m de large et 59 m de profondeur, avec des défenseurs positionnés à 49 m de leur ligne de but. Les défenseurs de Potato sont beaucoup plus proches à 4 m."
+   },
+   "de": {
+    "headline": "Carrot's Team-Formation",
+    "fact.0": "Die Außenfeldspieler von Potato sind 39 m breit und 46 m tief.",
+    "fact.1": "Potato Verteidiger haben eine mediane Position 4 m von der eigenen Torlinie entfernt.",
+    "fact.2": "Potato hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.3": "Die Außenfeldspieler von Carrot spannen sich über 54 m breit und 59 m tief.",
+    "fact.4": "Carrot Verteidiger haben eine mittlere Position 49 m von der eigenen Torlinie entfernt.",
+    "fact.5": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Carrot's Spieler sind über das Spielfeld verteilt, wobei ihre Verteidiger weiter vom Tor entfernt sind als Potato's.",
+    "analyst": "Die Form Carrot erstreckt sich über 54 m Breite und 59 m Tiefe, wobei die Verteidiger 49 m von ihrer Torlinie entfernt positioniert sind. Die Verteidiger Potato sind mit 4 m deutlich näher."
+   },
+   "nl": {
+    "headline": "Carrot teamvorm",
+    "fact.0": "De buitenspelers van Potato zijn 39 meter breed en 46 meter diep.",
+    "fact.1": "Potato verdedigers hebben een mediane positie op 4 meter van hun eigen doellijn.",
+    "fact.2": "Potato heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "fact.3": "De buitenveldspelers van Carrot zijn 54 m breed en 59 m diep.",
+    "fact.4": "De verdedigers van Carrot hebben een mediane positie op 49 meter van hun eigen doellijn.",
+    "fact.5": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Carrot's spelers zijn verspreid over het veld, met hun verdedigers verder van hun doel dan Potato's.",
+    "analyst": "De vorm van Carrot beslaat 54 meter breed en 59 meter diep, met verdedigers op 49 meter van hun doellijn. De verdedigers van Potato staan veel dichterbij op 4 meter."
+   },
+   "zh-Hans": {
+    "headline": "Carrot的队形",
+    "fact.0": "Potato的场地球员宽度为39米，深46米。",
+    "fact.1": "Potato的防守者在距离自家球门线4米处的中位数位置。",
+    "fact.3": "Carrot的场地球员宽度为54米，深59米。",
+    "fact.4": "Carrot的防守者在距离自家球门线49米处处于中位数位置。",
+    "casual": "Carrot队的球员分布在球场各处，他们的防守球员比 Potato队的球门更远。",
+    "analyst": "Carrot的球形宽54米，深59米，防守者距离球门线49米。 Potato的防守者距离更近，距离4米。"
+   }
+  },
+  "S-90": {
+   "source_hash": "2b19bcdd1a585aa7",
+   "failed": {
+    "fr": [
+     "fact.2"
+    ],
+    "zh-Hans": [
+     "fact.2",
+     "fact.5"
+    ]
+   },
+   "es": {
+    "headline": "Forma del equipo de Carrot",
+    "fact.0": "Los jugadores de campo de Potato's miden 43 m de ancho y 46 m de profundidad.",
+    "fact.1": "Los defensores de Potato's tienen una posición mediana a 15 m de su propia línea de gol.",
+    "fact.2": "Potato tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "fact.3": "Los jugadores de campo de Carrot tienen una longitud de 56 m de ancho y 49 m de profundidad.",
+    "fact.4": "Los defensores de Carrot's tienen una posición mediana a 44 m de su propia línea de gol.",
+    "fact.5": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Los jugadores de Carrot están repartidos por todo el campo, con uno cerca del balón.",
+    "analyst": "La forma de Carrot abarca 56 m de ancho y 49 m de profundidad, con los defensores situados a 44 m de su línea de gol."
+   },
+   "fr": {
+    "headline": "Carrot's : Forme de l’équipe",
+    "fact.0": "Les joueurs de champ de Potato s’étendent sur 43 m de large et 46 m de profondeur.",
+    "fact.1": "Les défenseurs de Potato's ont une position médiane à 15 m de leur propre ligne de but.",
+    "fact.3": "Les joueurs de champ de Carrot s’étendent sur 56 m de large et 49 m de profondeur.",
+    "fact.4": "Les défenseurs de Carrot's ont une position médiane à 44 m de leur propre ligne de but.",
+    "fact.5": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Les joueurs de Carrot sont répartis sur le terrain, avec un joueur près du ballon.",
+    "analyst": "La forme de Carrot s’étend sur 56 m de large et 49 m de profondeur, avec des défenseurs positionnés à 44 m de leur ligne de but."
+   },
+   "de": {
+    "headline": "Carrot's Team-Formation",
+    "fact.0": "Potato Außenfeldspieler spannen 43 m breit und 46 m tief.",
+    "fact.1": "Die Verteidiger von Potato haben eine mediane Position 15 m von der eigenen Torlinie entfernt.",
+    "fact.2": "Potato hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "fact.3": "Die Außenfeldspieler von Carrot sind 56 m breit und 49 m tief.",
+    "fact.4": "Die Verteidiger von Carrot haben eine mittlere Position von 44 m von der eigenen Torlinie entfernt.",
+    "fact.5": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Carrot Spieler sind über das Spielfeld verteilt, wobei ein Spieler in der Nähe des Balls ist.",
+    "analyst": "Die Formation Carrot erstreckt sich über 56 m Breite und 49 m Tiefe, wobei die Verteidiger 44 m von der eigenen Torlinie entfernt positioniert sind."
+   },
+   "nl": {
+    "headline": "Carrot teamvorm",
+    "fact.0": "De buitenveldspelers van Potato zijn 43 meter breed en 46 meter diep.",
+    "fact.1": "De verdedigers van Potato hebben een mediane positie op 15 meter van hun eigen doellijn.",
+    "fact.2": "Potato heeft 0 veldspelers binnen 5 meter van de bal.",
+    "fact.3": "De buitenveldspelers van Carrot zijn 56 m breed en 49 m diep.",
+    "fact.4": "De verdedigers van Carrot hebben een mediane positie op 44 meter van hun eigen doellijn.",
+    "fact.5": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Carrot spelers zijn verspreid over het veld, met één speler dicht bij de bal.",
+    "analyst": "De vorm van Carrot beslaat 56 meter breed en 49 meter diep, met verdedigers op 44 meter van de doellijn."
+   },
+   "zh-Hans": {
+    "headline": "Carrot的队形",
+    "fact.0": "Potato的场地球员宽度为43米，深46米。",
+    "fact.1": "Potato的防守者中位距离自家球门线15米。",
+    "fact.3": "Carrot的场地球员宽度为56米，深49米。",
+    "fact.4": "Carrot的防守者在距离自家球门线44米处的中位数位置。",
+    "casual": "Carrot的球员分布在球场各处，其中一名球员靠近球。",
+    "analyst": "Carrot的球体宽度为56米，深49米，防守方距离球门线44米。"
+   }
+  },
+  "M-1": {
+   "source_hash": "e7bb007b2274a730",
+   "failed": {
+    "fr": [
+     "fact.11"
+    ],
+    "zh-Hans": [
+     "fact.8",
+     "fact.11"
+    ]
+   },
+   "es": {
+    "headline": "Gyokerland abre el marcador",
+    "fact.0": "Ahora está Potato 0–1 Carrot.",
+    "fact.1": "Asistido por Mbeulier.",
+    "fact.2": "Calidad Chance xG 0,29.",
+    "fact.3": "Carrot jugó el 70% de los pases del tercio final en los últimos cinco minutos.",
+    "fact.4": "La valoración en directo de Gyokerland es 6,1.",
+    "fact.5": "Disparos hasta ahora: Potato 0 (xG 0,00), Carrot 1 (xG 0,29).",
+    "fact.6": "Los jugadores de campo de Potato tienen una longitud de 44 m de ancho y 38 m de profundidad.",
+    "fact.7": "Los defensores de Potato's tienen una posición mediana a 5 m de su propia línea de gol.",
+    "fact.8": "Potato tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "fact.9": "Los jugadores de campo de Carrot tienen 53 m de ancho y 50 m de profundidad.",
+    "fact.10": "Los defensores de Carrot's tienen una posición mediana a 59 m de su propia línea de gol.",
+    "fact.11": "Carrot tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "casual": "Gyokerland goles para Carrot para poner el 1–0 contra Potato.",
+    "analyst": "Gyokerland convierte la asistencia de Mbeulier con un xG de 0,29, dando a Carrot una ventaja de 1–0 sobre Potato."
+   },
+   "fr": {
+    "headline": "Gyokerland ouvre le score",
+    "fact.0": "C’est maintenant Potato 0–1 Carrot.",
+    "fact.1": "Assisté par Mbeulier.",
+    "fact.2": "Chance quality xG 0,29.",
+    "fact.3": "Carrot joué 70 % des dernières passes dans le dernier tiers dans les cinq dernières minutes.",
+    "fact.4": "La note en direct de Gyokerland est de 6,1.",
+    "fact.5": "Tirs jusqu’à présent : Potato 0 (xG 0,00), Carrot 1 (xG 0,29).",
+    "fact.6": "Les joueurs de champ de Potato s’étendent de 44 m de large et 38 m de profondeur.",
+    "fact.7": "Les défenseurs de Potato's occupent une position médiane à 5 m de leur propre ligne de but.",
+    "fact.8": "Potato compte 1 joueur de champ à moins de 5 m du ballon.",
+    "fact.9": "Les joueurs de champ de Carrot s’étendent sur 53 m de large et 50 m de profondeur.",
+    "fact.10": "Les défenseurs de Carrot's occupent une position médiane à 59 m de leur propre ligne de but.",
+    "casual": "Gyokerland a marqué pour Carrot pour porter le score à 1–0 contre Potato.",
+    "analyst": "Gyokerland transforme Mbeulier's assist avec un xG de 0,29, donnant à Carrot une avance de 1–0 sur Potato."
+   },
+   "de": {
+    "headline": "Gyokerland eröffnet die Punktewertung",
+    "fact.0": "Jetzt steht es Potato 0–1 Carrot.",
+    "fact.1": "Unterstützt von Mbeulier.",
+    "fact.2": "Chance-Qualität xG 0,29.",
+    "fact.3": "Carrot spielte in den letzten fünf Minuten 70 % der Pässe im letzten Drittel.",
+    "fact.4": "Gyokerland Live-Bewertung beträgt 6,1.",
+    "fact.5": "Bisherige Aufnahmen: Potato 0 (xG 0,00), Carrot 1 (xG 0,29).",
+    "fact.6": "Die Außenfeldspieler von Potato sind 44 m breit und 38 m tief.",
+    "fact.7": "Potato Verteidiger haben eine mediane Position 5 m von der eigenen Torlinie entfernt.",
+    "fact.8": "Potato hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.9": "Die Außenfeldspieler von Carrot sind 53 m breit und 50 m tief.",
+    "fact.10": "Die Verteidiger von Carrot haben eine mittlere Position 59 m von der eigenen Torlinie entfernt.",
+    "fact.11": "Carrot hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "casual": "Gyokerland Tore für Carrot zum 1:0 gegen Potato.",
+    "analyst": "Gyokerland verwandelt Mbeulier's Assist mit einem xG von 0,29 und bringt Carrot mit 1:0 gegen Potato in Führung."
+   },
+   "nl": {
+    "headline": "Gyokerland opent de score",
+    "fact.0": "Het staat nu Potato 0–1 Carrot.",
+    "fact.1": "Geassisteerd door Mbeulier.",
+    "fact.2": "Kanskwaliteit xG 0,29.",
+    "fact.3": "Carrot speelde 70% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.4": "De live kijkcijfers van Gyokerland zijn 6,1.",
+    "fact.5": "Beelden tot nu toe: Potato 0 (xG 0,00), Carrot 1 (xG 0,29).",
+    "fact.6": "De buitenveldspelers van Potato zijn 44 m breed en 38 m diep.",
+    "fact.7": "Potato verdedigers hebben een mediane positie op 5 meter van hun eigen doellijn.",
+    "fact.8": "Potato heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "fact.9": "De buitenveldspelers van Carrot zijn 53 m breed en 50 m diep.",
+    "fact.10": "De verdedigers van Carrot hebben een mediane positie op 59 meter van hun eigen doellijn.",
+    "fact.11": "Carrot heeft 0 veldspelers binnen 5 meter van de bal.",
+    "casual": "Gyokerland scoort voor Carrot en maakt het 1–0 tegen Potato.",
+    "analyst": "Gyokerland benut de assist van Mbeulier met een xG van 0,29, waarmee Carrot een 1–0 voorsprong op Potato brengt."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 开局得分",
+    "fact.0": "现在比分 Potato 0比1 Carrot。",
+    "fact.1": "协助者为 Mbeulier。",
+    "fact.2": "概率质量 xG 0.29。",
+    "fact.3": "Carrot 在最后五分钟完成了70%的最后三分之一传球。",
+    "fact.4": "Gyokerland的现场评分是6.1。",
+    "fact.5": "目前射击数： Potato 0（xG 0.00）， Carrot 1（xG 0.29）。",
+    "fact.6": "Potato的场地球员宽度为44米，深38米。",
+    "fact.7": "Potato的防守者在距离自己球门线5米处有中位数。",
+    "fact.9": "Carrot的场地球员宽度为53米，深50米。",
+    "fact.10": "Carrot的防守者中位距离自家球门线59米。",
+    "casual": "Gyokerland 为 Carrot 队得分，将比分改写为1比0 Potato。",
+    "analyst": "Gyokerland 以0.29的xG助攻 Mbeulier，帮助 Carrot 以1比0领先 Potato。"
+   }
+  },
+  "S-120": {
+   "source_hash": "ae0edf6d89f82f04",
+   "failed": {
+    "fr": [
+     "fact.2"
+    ],
+    "zh-Hans": [
+     "fact.2",
+     "fact.5"
+    ]
+   },
+   "es": {
+    "headline": "Forma del equipo de Carrot",
+    "fact.0": "Los jugadores de campo de Potato tienen una longitud de 41 m de ancho y 42 m de profundidad.",
+    "fact.1": "Los defensores de Potato's tienen una posición mediana a 22 m de su propia línea de gol.",
+    "fact.2": "Potato tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "fact.3": "Los jugadores de campo de Carrot tienen 55 m de ancho y 45 m de profundidad.",
+    "fact.4": "Los defensores de Carrot's tienen una posición mediana a 40 m de su propia línea de gol.",
+    "fact.5": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Los jugadores de Carrot están repartidos por el campo, con uno cerca del balón.",
+    "analyst": "La forma de equipo de Carrot abarca 55 m de ancho y 45 m de profundidad, con los defensas situados a 40 m de su portería."
+   },
+   "fr": {
+    "headline": "Carrot's : Forme de l’équipe",
+    "fact.0": "Les joueurs de champ de Potato s’étendent sur 41 m de large et 42 m de profondeur.",
+    "fact.1": "Les défenseurs de Potato's occupent une position médiane à 22 m de leur propre ligne de but.",
+    "fact.3": "Les joueurs de champ de Carrot s’étendent sur 55 m de large et 45 m de profondeur.",
+    "fact.4": "Les défenseurs de Carrot's occupent une position médiane à 40 m de leur propre ligne de but.",
+    "fact.5": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Les joueurs de Carrot sont répartis sur le terrain, dont un près du ballon.",
+    "analyst": "La forme d’équipe de Carrot s’étend sur 55 m de large sur 45 m de profondeur, avec des défenseurs positionnés à 40 m de leur but."
+   },
+   "de": {
+    "headline": "Carrot's Team-Formation",
+    "fact.0": "Die Außenfeldspieler von Potato spannen sich über 41 m breit und 42 m tief.",
+    "fact.1": "Potato Verteidiger haben eine mittlere Position 22 m von der eigenen Torlinie entfernt.",
+    "fact.2": "Potato hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "fact.3": "Carrot Außenfeldspieler spannen sich über 55 m Breite und 45 m Tiefe.",
+    "fact.4": "Carrot Verteidiger haben eine mittlere Position 40 m von der eigenen Torlinie entfernt.",
+    "fact.5": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Die Spieler Carrot sind über das Spielfeld verteilt, wobei einer in der Nähe des Balls ist.",
+    "analyst": "Die Mannschaftsstruktur Carrot umfasst 55 m Breite und 45 m Tiefe, wobei die Verteidiger 40 m vom Tor entfernt positioniert sind."
+   },
+   "nl": {
+    "headline": "Carrot teamvorm",
+    "fact.0": "De buitenveldspelers van Potato zijn 41 m breed en 42 m diep.",
+    "fact.1": "De verdedigers van Potato hebben een mediane positie op 22 meter van hun eigen doellijn.",
+    "fact.2": "Potato heeft 0 veldspelers binnen 5 meter van de bal.",
+    "fact.3": "Carrot buitenspelers zijn 55 m breed en 45 m diep.",
+    "fact.4": "De verdedigers van Carrot hebben een mediane positie op 40 meter van hun eigen doellijn.",
+    "fact.5": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "De spelers van Carrot zijn verspreid over het veld, met één dicht bij de bal.",
+    "analyst": "De teamopstelling van Carrot beslaat 55 m breed en 45 m diep, met verdedigers op 40 m van hun doel."
+   },
+   "zh-Hans": {
+    "headline": "Carrot的队形",
+    "fact.0": "Potato的场地球员宽度为41米，深42米。",
+    "fact.1": "Potato的防守者中位距离自家球门线22米。",
+    "fact.3": "Carrot的场地球员宽度为55米，深45米。",
+    "fact.4": "Carrot的防守者在距离自家球门线40米处有一个中分线位置。",
+    "casual": "Carrot的球员分布在球场各处，其中一人靠近球。",
+    "analyst": "Carrot队的队形宽55米，深45米，防守球员距离球门40米。"
+   }
+  },
+  "S-150": {
+   "source_hash": "6c28f03539695cc6",
+   "failed": {
+    "fr": [
+     "fact.2"
+    ],
+    "zh-Hans": [
+     "fact.2",
+     "fact.5"
+    ]
+   },
+   "es": {
+    "headline": "Forma del equipo de Carrot",
+    "fact.0": "Los jugadores de campo de Potato's miden 45 m de ancho y 48 m de profundidad.",
+    "fact.1": "Los defensores de Potato's tienen una posición mediana a 12 m de su propia línea de gol.",
+    "fact.2": "Potato tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "fact.3": "Los jugadores de campo de Carrot tienen 51 m de ancho y 51 m de profundidad.",
+    "fact.4": "Los defensores de Carrot's tienen una posición mediana a 46 m de su propia línea de gol.",
+    "fact.5": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Los jugadores de Carrot FC están repartidos por todo el campo, con uno cerca del balón.",
+    "analyst": "La forma de Carrot FC abarca 51 m de ancho y 51 m de profundidad, con los defensores situados a 46 m de su línea de gol y un jugador cerca del balón."
+   },
+   "fr": {
+    "headline": "Carrot's : Forme de l’équipe",
+    "fact.0": "Les joueurs de champ de Potato s’étendent sur 45 m de large et 48 m de profondeur.",
+    "fact.1": "Les défenseurs de Potato's occupent une position médiane à 12 m de leur propre ligne de but.",
+    "fact.3": "Les joueurs de champ de Carrot s’étendent sur 51 m de large et 51 m de profondeur.",
+    "fact.4": "Les défenseurs de Carrot's occupent une position médiane à 46 m de leur propre ligne de but.",
+    "fact.5": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Les joueurs de Carrot FC sont répartis sur le terrain, avec un joueur près du ballon.",
+    "analyst": "La forme de Carrot FC s’étend sur 51 m de large sur 51 m de profondeur, avec des défenseurs positionnés à 46 m de leur ligne de but et un joueur proche du ballon."
+   },
+   "de": {
+    "headline": "Carrot's Team-Formation",
+    "fact.0": "Die Außenfeldspieler von Potato spannen sich über 45 m Breite und 48 m Tiefe.",
+    "fact.1": "Potato Verteidiger haben eine mittlere Position 12 m von der eigenen Torlinie entfernt.",
+    "fact.2": "Potato hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "fact.3": "Carrot's Außenfeldspieler sind 51 m breit und 51 m tief.",
+    "fact.4": "Carrot Verteidiger haben eine mittlere Position 46 m von der eigenen Torlinie entfernt.",
+    "fact.5": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Carrot FC Spieler sind über das Spielfeld verteilt, wobei ein Spieler in der Nähe des Balls ist.",
+    "analyst": "Die Formation von Carrot FC erstreckt sich über 51 m Breite und 51 m Tiefe, mit Verteidigern 46 m von der eigenen Torlinie entfernt und einem Spieler nahe am Ball."
+   },
+   "nl": {
+    "headline": "Carrot teamvorm",
+    "fact.0": "De buitenspelers van Potato zijn 45 m breed en 48 m diep.",
+    "fact.1": "De verdedigers van Potato hebben een mediane positie op 12 meter van hun eigen doellijn.",
+    "fact.2": "Potato heeft 0 veldspelers binnen 5 meter van de bal.",
+    "fact.3": "De buitenveldspelers van Carrot zijn 51 meter breed en 51 meter diep.",
+    "fact.4": "De verdedigers van Carrot hebben een mediane positie op 46 meter van hun eigen doellijn.",
+    "fact.5": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Carrot FC spelers zijn verspreid over het veld, met één speler dicht bij de bal.",
+    "analyst": "De vorm van Carrot FC beslaat 51 m breed en 51 m diep, met verdedigers op 46 m van hun doellijn en één speler dicht bij de bal."
+   },
+   "zh-Hans": {
+    "headline": "Carrot的队形",
+    "fact.0": "Potato的场地球员宽度为45米，深48米。",
+    "fact.1": "Potato的防守者中位距离自家球门线12米。",
+    "fact.3": "Carrot的场地球员宽度为51米，深度为51米。",
+    "fact.4": "Carrot的防守者中位距离自家球门线46米。",
+    "casual": "Carrot FC的球员分布在球场各处，其中一名球员靠近球。",
+    "analyst": "Carrot FC的球形宽51米，深51米，防守者距离球门线46米，一名球员靠近球。"
+   }
+  },
+  "S-180": {
+   "source_hash": "3f8c9f45fd01c5bf",
+   "failed": {
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Moritz Kimmedor avanza sin balón",
+    "fact.0": "Moritz Kimmedor avanza 9 m hacia la portería contraria en 4 segundos sin poseer el balón.",
+    "fact.1": "Los jugadores de campo de Potato's miden 36 m de ancho y 47 m de profundidad.",
+    "fact.2": "Los defensores de Potato's tienen una posición media a 2 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 2 jugadores de campo a menos de 5 m de la pelota.",
+    "fact.4": "Los jugadores de campo de Carrot tienen 53 m de ancho y 50 m de profundidad.",
+    "fact.5": "Los defensores de Carrot's tienen una posición mediana a 57 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Moritz Kimmedor hace una carrera hacia delante alejándose del balón.",
+    "analyst": "Moritz Kimmedor avanza 9 m hacia adelante en 4 segundos sin poseer, con los defensores de Potato posicionados a 2 m de su línea de gol."
+   },
+   "fr": {
+    "headline": "Moritz Kimmedor avance sans le ballon",
+    "fact.0": "Moritz Kimmedor avance de 9 m vers le but adverse en 4 secondes sans posséder le ballon.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 36 m de large sur 47 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's occupent une position médiane à 2 m de leur propre ligne de but.",
+    "fact.3": "Potato compte 2 joueurs de champ à moins de 5 m du ballon.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent sur 53 m de large et 50 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's occupent une position médiane à 57 m de leur propre ligne de but.",
+    "fact.6": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Moritz Kimmedor s’éloigne du ballon en avant.",
+    "analyst": "Moritz Kimmedor avance de 9 m en 4 secondes sans possession, les défenseurs de Potato étant positionnés à 2 m de leur ligne de but."
+   },
+   "de": {
+    "headline": "Moritz Kimmedor bewegt sich vom Ball nach vorne",
+    "fact.0": "Moritz Kimmedor rückt in 4 Sekunden 9 m auf das gegnerische Tor zu, ohne den Ball zu besitzen.",
+    "fact.1": "Die Außenfeldspieler von Potato spannen eine Breite von 36 m und eine Tiefe von 47 m.",
+    "fact.2": "Potato Verteidiger haben eine mediane Position 2 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 2 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.4": "Die Außenfeldspieler von Carrot sind 53 m breit und 50 m tief.",
+    "fact.5": "Carrot Verteidiger haben eine mittlere Position 57 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Moritz Kimmedor macht einen Vorwärtslauf weg vom Ball.",
+    "analyst": "Moritz Kimmedor rückt in 4 Sekunden ohne Ballbesitz um 9 m vor, wobei die Verteidiger von Potato 2 m von der eigenen Torlinie entfernt positioniert sind."
+   },
+   "nl": {
+    "headline": "Moritz Kimmedor beweegt naar voren zonder de bal",
+    "fact.0": "Moritz Kimmedor beweegt 9 meter richting het doel van de tegenstander in 4 seconden zonder de bal te bezitten.",
+    "fact.1": "De buitenveldspelers van Potato zijn 36 meter breed en 47 meter diep.",
+    "fact.2": "De verdedigers van Potato hebben een mediane positie op 2 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 2 veldspelers binnen 5 m van de bal.",
+    "fact.4": "De buitenveldspelers van Carrot zijn 53 m breed en 50 m diep.",
+    "fact.5": "De verdedigers van Carrot hebben een mediane positie op 57 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Moritz Kimmedor maakt een voorwaartse run weg van de bal.",
+    "analyst": "Moritz Kimmedor schuift 9 meter vooruit in 4 seconden zonder balbezit, met de verdedigers van Potato op 2 meter van hun doellijn."
+   },
+   "zh-Hans": {
+    "headline": "Moritz Kimmedor 无球后向前移动",
+    "fact.0": "Moritz Kimmedor 在4秒内向对方球门推进9米，且未持球。",
+    "fact.1": "Potato的场地球员宽度为36米，深47米。",
+    "fact.2": "Potato的防守者在距离自家球门线2米处有中位数。",
+    "fact.4": "Carrot的场地球员宽度为53米，深50米。",
+    "fact.5": "Carrot的防守者中位距离自家球门线57米。",
+    "casual": "Moritz Kimmedor 向前冲离球。",
+    "analyst": "Moritz Kimmedor 在4秒内无球推进9米， Potato队防守者距离球门线仅2米。"
+   }
+  },
+  "S-240": {
+   "source_hash": "9bcbdca10e48d891",
+   "failed": {
+    "fr": [
+     "fact.3"
+    ],
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Moritz Kimmedor avanza sin balón",
+    "fact.0": "Moritz Kimmedor avanza 18 m hacia la portería contraria durante 4 segundos sin poseer el balón.",
+    "fact.1": "Los jugadores de campo de Potato tienen una longitud de 43 m de ancho y 52 m de profundidad.",
+    "fact.2": "Los defensores de Potato's tienen una posición mediana a 18 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "fact.4": "Los jugadores de campo de Carrot tienen una longitud de 54 m de ancho y 53 m de profundidad.",
+    "fact.5": "Los defensores de Carrot's tienen una posición mediana a 37 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Moritz Kimmedor avanza sin balón.",
+    "analyst": "Moritz Kimmedor avanza 18 metros hacia la portería rival durante 4 segundos sin poseer, mientras los defensas de Potato's mantienen una posición mediana a 18 metros de su portería."
+   },
+   "fr": {
+    "headline": "Moritz Kimmedor avance sans le ballon",
+    "fact.0": "Moritz Kimmedor avance de 18 m vers le but adverse en 4 secondes sans posséder le ballon.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 43 m de large et 52 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's occupent une position médiane à 18 m de leur propre ligne de but.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent sur 54 m de large et 53 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's ont une position médiane à 37 m de leur propre ligne de but.",
+    "fact.6": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Moritz Kimmedor avance sans le ballon.",
+    "analyst": "Moritz Kimmedor avance de 18 mètres vers le but adverse après plus de 4 secondes sans possession, les défenseurs de Potato occupant une position médiane à 18 mètres de leur but."
+   },
+   "de": {
+    "headline": "Moritz Kimmedor bewegt sich vom Ball nach vorne",
+    "fact.0": "Moritz Kimmedor rückt in 4 Sekunden ohne Ballbesitz 18 m auf das gegnerische Tor zu.",
+    "fact.1": "Potato's Außenfeldspieler sind 43 m breit und 52 m tief.",
+    "fact.2": "Die Verteidiger von Potato haben eine Medianposition 18 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "fact.4": "Carrot's Außenfeldspieler spannen 54 m breit und 53 m tief.",
+    "fact.5": "Die Verteidiger von Carrot haben eine mittlere Position 37 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Moritz Kimmedor bewegt sich ohne Ball nach vorne.",
+    "analyst": "Moritz Kimmedor rückt in 4 Sekunden ohne Ballbesitz 18 Meter auf das gegnerische Tor zu, während die Verteidiger von Potato eine Medianposition 18 Meter vom Tor entfernt halten."
+   },
+   "nl": {
+    "headline": "Moritz Kimmedor beweegt naar voren zonder de bal",
+    "fact.0": "Moritz Kimmedor beweegt 18 meter richting het doel van de tegenstander in 4 seconden zonder de bal te hebben.",
+    "fact.1": "De buitenspelers van Potato zijn 43 meter breed en 52 meter diep.",
+    "fact.2": "De verdedigers van Potato hebben een mediane positie op 18 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 0 veldspelers binnen 5 meter van de bal.",
+    "fact.4": "De buitenveldspelers van Carrot zijn 54 m breed en 53 m diep.",
+    "fact.5": "De verdedigers van Carrot hebben een mediane positie op 37 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Moritz Kimmedor beweegt naar voren zonder de bal.",
+    "analyst": "Moritz Kimmedor beweegt 18 meter naar het doel van de tegenstander in 4 seconden zonder balbezit, terwijl de verdedigers van Potato een mediane positie op 18 meter van hun doel houden."
+   },
+   "zh-Hans": {
+    "headline": "Moritz Kimmedor 无球后向前移动",
+    "fact.0": "Moritz Kimmedor 在4秒内向对方球门推进18米，且未控球。",
+    "fact.1": "Potato的场地球员宽度为43米，深52米。",
+    "fact.2": "Potato的防守者中位距离自家球门线18米。",
+    "fact.4": "Carrot的场地球员宽度为54米，深度为53米。",
+    "fact.5": "Carrot的防守者中位距离自家球门线37米。",
+    "casual": "Moritz Kimmedor 无球后向前推进。",
+    "analyst": "Moritz Kimmedor 在无球权的情况下4秒内向对方球门推进18米， Potato队的防守者占据距离球门18米的中场位置。"
+   }
+  },
+  "S-270": {
+   "source_hash": "c922d4820606f1dd",
+   "failed": {
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Joaquín Frimpander avanza sin balón",
+    "fact.0": "Joaquín Frimpander avanza 10 m hacia la portería contraria durante 4 segundos sin poseer el balón.",
+    "fact.1": "Los jugadores de campo de Potato tienen una longitud de 41 m de ancho y 42 m de profundidad.",
+    "fact.2": "Los defensores de Potato's tienen una posición mediana a 5 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 2 jugadores de campo a menos de 5 m de la pelota.",
+    "fact.4": "Los jugadores de campo de Carrot tienen 53 m de ancho y 47 m de profundidad.",
+    "fact.5": "Los defensores de Carrot's tienen una posición mediana a 59 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Joaquín Frimpander avanza sin balón.",
+    "analyst": "Joaquín Frimpander avanza 10 m hacia la portería contraria en más de 4 segundos sin el balón, con la forma de Carrot abarcando 53 m de ancho y 47 m de profundidad."
+   },
+   "fr": {
+    "headline": "Joaquín Frimpander avance sans le ballon",
+    "fact.0": "Joaquín Frimpander avance de 10 m vers le but adverse en 4 secondes sans posséder le ballon.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 41 m de large et 42 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's occupent une position médiane à 5 m de leur propre ligne de but.",
+    "fact.3": "Potato compte 2 joueurs de champ à moins de 5 m du ballon.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent sur 53 m de large et 47 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's occupent une position médiane à 59 m de leur propre ligne de but.",
+    "fact.6": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Joaquín Frimpander avance sans le ballon.",
+    "analyst": "Joaquín Frimpander avance de 10 m vers le but adverse en 4 secondes sans ballon, la forme de Carrot s’étendant sur 53 m de large sur 47 m de profondeur."
+   },
+   "de": {
+    "headline": "Joaquín Frimpander bewegt sich vom Ball nach vorne",
+    "fact.0": "Joaquín Frimpander rückt in 4 Sekunden 10 m auf das gegnerische Tor zu, ohne den Ball zu besitzen.",
+    "fact.1": "Die Außenfeldspieler von Potato spannen sich über 41 m breit und 42 m tief.",
+    "fact.2": "Potato Verteidiger haben eine mediane Position 5 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 2 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.4": "Carrot Feldspieler sind 53 m breit und 47 m tief.",
+    "fact.5": "Die Verteidiger von Carrot haben eine mittlere Position 59 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Joaquín Frimpander bewegt sich ohne Ball nach vorne.",
+    "analyst": "Joaquín Frimpander rückt in 4 Sekunden ohne Ball 10 m auf das gegnerische Tor zu, wobei Carrot Gestalt 53 m breit und 47 m tief umfasst."
+   },
+   "nl": {
+    "headline": "Joaquín Frimpander beweegt naar voren zonder de bal",
+    "fact.0": "Joaquín Frimpander beweegt zich in 4 seconden 10 meter richting het doel van de tegenstander zonder de bal te bezitten.",
+    "fact.1": "De buitenveldspelers van Potato zijn 41 m breed en 42 m diep.",
+    "fact.2": "Potato verdedigers hebben een mediane positie op 5 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 2 veldspelers binnen 5 m van de bal.",
+    "fact.4": "De buitenspelers van Carrot zijn 53 m breed en 47 m diep.",
+    "fact.5": "De verdedigers van Carrot hebben een mediane positie op 59 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Joaquín Frimpander beweegt naar voren zonder de bal.",
+    "analyst": "Joaquín Frimpander beweegt zich 10 meter richting het doel van de tegenstander in 4 seconden zonder bal, waarbij Carrot vorm 53 meter breed en 47 meter diep is."
+   },
+   "zh-Hans": {
+    "headline": "Joaquín Frimpander 无球后向前移动",
+    "fact.0": "Joaquín Frimpander 在4秒内向对方球门推进10米，且未持球。",
+    "fact.1": "Potato的场地球员宽度为41米，深42米。",
+    "fact.2": "Potato的防守者在距离自己球门线5米处有中位数。",
+    "fact.4": "Carrot的场地球员宽度为53米，深47米。",
+    "fact.5": "Carrot的防守者中位距离自家球门线59米。",
+    "casual": "Joaquín Frimpander 无球后向前推进。",
+    "analyst": "Joaquín Frimpander 在4秒内无球推进10米， Carrot的形状宽53米，深47米。"
+   }
+  },
+  "M-2": {
+   "source_hash": "9d2a151c483ecb71",
+   "failed": {
+    "fr": [
+     "fact.13"
+    ],
+    "zh-Hans": [
+     "fact.5",
+     "fact.10",
+     "fact.13"
+    ]
+   },
+   "es": {
+    "headline": "Gyokerland pone el marcador 2–0 a Carrot",
+    "fact.0": "Ahora está Potato 0–2 Carrot.",
+    "fact.1": "Calidad de Chance xG 0,30.",
+    "fact.2": "Su segundo gol del partido.",
+    "fact.3": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,58 de su equipo).",
+    "fact.4": "Carrot jugó el 90% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.5": "Carrot tuvo 5 tiros (xG 1.19) y 0 córners en los últimos cinco minutos.",
+    "fact.6": "La valoración en directo de Gyokerland es de 6,8.",
+    "fact.7": "Disparos hasta ahora: Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.8": "Los jugadores de campo de Potato tienen una longitud de 43 m de ancho y 49 m de profundidad.",
+    "fact.9": "Los defensores de Potato's tienen una posición mediana a 5 m de su propia línea de gol.",
+    "fact.10": "Potato tiene 2 jugadores de campo a menos de 5 m de la pelota.",
+    "fact.11": "Los jugadores de campo de Carrot tienen 50 m de ancho y 48 m de profundidad.",
+    "fact.12": "Los defensores de Carrot's tienen una posición mediana a 57 m de su propia línea de gol.",
+    "fact.13": "Carrot tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "casual": "Gyokerland vuelve a anotar, poniendo el 2–0 para Carrot contra Potato.",
+    "analyst": "Gyokerland marca su segundo gol, aumentando la ventaja de Carrot a 2–0. Carrot domina con 5 disparos (xG 1.19) en los últimos cinco minutos."
+   },
+   "fr": {
+    "headline": "Gyokerland porte le score à 2–0 à Carrot",
+    "fact.0": "C’est maintenant Potato 0–2 Carrot.",
+    "fact.1": "Chance qualité xG 0,30.",
+    "fact.2": "Son deuxième but du match.",
+    "fact.3": "Carrot a eu l’avantage dans les cinq dernières minutes (élan +0,58 de leur côté).",
+    "fact.4": "Carrot joué 90 % des dernières passes du dernier tiers dans les cinq dernières minutes.",
+    "fact.5": "Carrot a réalisé 5 tirs (xG 1,19) et 0 corner dans les cinq dernières minutes.",
+    "fact.6": "Gyokerland en direct est de 6,8.",
+    "fact.7": "Tirs jusqu’à présent : Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.8": "Les joueurs de champ de Potato s’étendent sur 43 m de large et 49 m de profondeur.",
+    "fact.9": "Les défenseurs de Potato's occupent une position médiane à 5 m de leur propre ligne de but.",
+    "fact.10": "Potato compte 2 joueurs de champ à moins de 5 m du ballon.",
+    "fact.11": "Les joueurs de champ de Carrot s’étendent sur 50 m de large et 48 m de profondeur.",
+    "fact.12": "Les défenseurs de Carrot's occupent une position médiane à 57 m de leur propre ligne de but.",
+    "casual": "Gyokerland marque à nouveau, portant le score à 2–0 pour Carrot contre Potato.",
+    "analyst": "Gyokerland inscrit son deuxième but, portant l’avance de Carrot à 2–0. Carrot domine avec 5 tirs (xG 1,19) dans les cinq dernières minutes."
+   },
+   "de": {
+    "headline": "Gyokerland steht 2:0 für Carrot",
+    "fact.0": "Jetzt steht es Potato 0–2 Carrot.",
+    "fact.1": "Chance-Qualität xG 0,30.",
+    "fact.2": "Sein zweites Tor des Spiels.",
+    "fact.3": "Carrot hatte in den letzten fünf Minuten die Oberhand (Momentum +0,58 von ihrer Seite).",
+    "fact.4": "Carrot spielte in den letzten fünf Minuten 90 % der Pässe im letzten Drittel.",
+    "fact.5": "Carrot hatte in den letzten fünf Minuten 5 Schüsse (xG 1,19) und 0 Eckstöße.",
+    "fact.6": "Die Live-Bewertung von Gyokerland liegt bei 6,8.",
+    "fact.7": "Bisherige Aufnahmen: Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.8": "Die Außenfeldspieler von Potato spannen sich über 43 m in der Breite und 49 m in der Tiefe.",
+    "fact.9": "Potato Verteidiger haben eine mediane Position 5 m von der eigenen Torlinie entfernt.",
+    "fact.10": "Potato hat 2 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.11": "Die Outfield-Spieler Carrot spannen 50 m breit und 48 m tief.",
+    "fact.12": "Carrot Verteidiger haben eine mittlere Position 57 m von der eigenen Torlinie entfernt.",
+    "fact.13": "Carrot hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "casual": "Gyokerland erzielte erneut ein Tor, womit es 2:0 für Carrot gegen Potato stand.",
+    "analyst": "Gyokerland erzielt sein zweites Tor und baut Carrot Führung auf 2:0 aus. Carrot dominiert mit 5 Schüssen (xG 1,19) in den letzten fünf Minuten."
+   },
+   "nl": {
+    "headline": "Gyokerland maakt het 2–0 voor Carrot",
+    "fact.0": "Het staat nu Potato 0–2 Carrot.",
+    "fact.1": "Kanskwaliteit xG 0,30.",
+    "fact.2": "Zijn tweede doelpunt van de wedstrijd.",
+    "fact.3": "Carrot had de overhand in de laatste vijf minuten (momentum +0,58 van hun kant).",
+    "fact.4": "Carrot speelde 90% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.5": "Carrot had 5 schoten (xG 1,19) en 0 corners in de laatste vijf minuten.",
+    "fact.6": "De live rating van Gyokerland is 6,8.",
+    "fact.7": "Tot nu toe aantal foto's: Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.8": "De buitenveldspelers van Potato zijn 43 m breed en 49 m diep.",
+    "fact.9": "Potato verdedigers hebben een mediane positie op 5 meter van hun eigen doellijn.",
+    "fact.10": "Potato heeft 2 veldspelers binnen 5 m van de bal.",
+    "fact.11": "De buitenveldspelers van Carrot zijn 50 m breed en 48 m diep.",
+    "fact.12": "De verdedigers van Carrot hebben een mediane positie op 57 meter van hun eigen doellijn.",
+    "fact.13": "Carrot heeft 0 veldspelers binnen 5 meter van de bal.",
+    "casual": "Gyokerland scoort opnieuw, waardoor het 2–0 is voor Carrot tegen Potato.",
+    "analyst": "Gyokerland maakt zijn tweede doelpunt en vergroot Carrot voorsprong tot 2–0. Carrot domineert met 5 schoten (xG 1,19) in de laatste vijf minuten."
+   },
+   "zh-Hans": {
+    "headline": "Gyokerland 比分变为2比0 Carrot",
+    "fact.0": "现在比分 Potato 0比2 Carrot。",
+    "fact.1": "概率质量xG 0.30。",
+    "fact.2": "这是他本场比赛的第二个进球。",
+    "fact.3": "Carrot 在最后五分钟占据上风（势头+0.58）。",
+    "fact.4": "Carrot 在最后五分钟完成了90%的最后三分之一传球。",
+    "fact.6": "Gyokerland的现场评分为6.8。",
+    "fact.7": "目前射击数： Potato 0（xG 0.00）， Carrot 5（xG 1.19）。",
+    "fact.8": "Potato的场地球员宽度为43米，深49米。",
+    "fact.9": "Potato的防守者在距离自己球门线5米处有中位数。",
+    "fact.11": "Carrot的场地球员宽度为50米，深48米。",
+    "fact.12": "Carrot的防守者中位距离自家球门线57米。",
+    "casual": "Gyokerland 再次得分， Carrot 比分变为2比0， Potato。",
+    "analyst": "Gyokerland 打进第二球，将 Carrot领先优势扩大到2比0。 Carrot 在最后五分钟射门5次（xG1.19）占据主导地位。"
+   }
+  },
+  "S-300": {
+   "source_hash": "d97384209c16877e",
+   "failed": {
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Yuri Sakinelli avanza sin balón",
+    "fact.0": "Yuri Sakinelli avanza 22 m hacia la portería contraria en 4 segundos sin poseer el balón.",
+    "fact.1": "Los jugadores de campo de Potato's miden 54 m de ancho y 51 m de profundidad.",
+    "fact.2": "Los defensores de Potato tienen una posición media a 29 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 2 jugadores de campo a menos de 5 m de la pelota.",
+    "fact.4": "Los jugadores de campo de Carrot tienen 38 m de ancho y 32 m de profundidad.",
+    "fact.5": "Los defensores de Carrot tienen una posición mediana a 32 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "casual": "Yuri Sakinelli avanza alejándose del balón, dirigiéndose hacia la portería contraria.",
+    "analyst": "Yuri Sakinelli avanza 22 m hacia la portería contraria en 4 segundos sin poseer el balón. La forma de Potato mide 54 m de ancho y 51 m de profundidad."
+   },
+   "fr": {
+    "headline": "Yuri Sakinelli avance sans le ballon",
+    "fact.0": "Yuri Sakinelli avance de 22 m vers le but adverse en 4 secondes sans posséder le ballon.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 54 m de large et 51 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's occupent une position médiane à 29 m de leur propre ligne de but.",
+    "fact.3": "Potato compte 2 joueurs de champ à moins de 5 m du ballon.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent sur 38 m de large et 32 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's occupent une position médiane à 32 m de leur propre ligne de but.",
+    "fact.6": "Carrot compte 1 joueur de champ à moins de 5 m du ballon.",
+    "casual": "Yuri Sakinelli avance loin du ballon, se dirigeant vers le but adverse.",
+    "analyst": "Yuri Sakinelli avance de 22 m vers le but adverse en 4 secondes sans posséder le ballon. La forme de Potato s’étend sur 54 m de large et 51 m de profondeur."
+   },
+   "de": {
+    "headline": "Yuri Sakinelli bewegt sich vom Ball nach vorne",
+    "fact.0": "Yuri Sakinelli rückt in 4 Sekunden 22 m auf das gegnerische Tor zu, ohne den Ball zu besitzen.",
+    "fact.1": "Die Außenfeldspieler von Potato spannen sich über 54 m Breite und 51 m Tiefe.",
+    "fact.2": "Die Verteidiger Potato haben eine mittlere Position 29 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 2 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.4": "Carrot Außenfeldspieler sind 38 m breit und 32 m tief.",
+    "fact.5": "Die Verteidiger von Carrot haben eine mediane Position 32 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "casual": "Yuri Sakinelli bewegt sich nach vorne, weg vom Ball, und steuert auf das gegnerische Tor zu.",
+    "analyst": "Yuri Sakinelli rückt in 4 Sekunden 22 m auf das gegnerische Tor zu, ohne den Ball zu besitzen. Die Formation von Potato erstreckt sich über 54 m Breite und 51 m Tiefe."
+   },
+   "nl": {
+    "headline": "Yuri Sakinelli beweegt naar voren zonder de bal",
+    "fact.0": "Yuri Sakinelli beweegt 22 meter richting het doel van de tegenstander in 4 seconden zonder de bal te hebben.",
+    "fact.1": "De buitenspelers van Potato zijn 54 m breed en 51 m diep.",
+    "fact.2": "De verdedigers van Potato hebben een mediane positie op 29 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 2 veldspelers binnen 5 m van de bal.",
+    "fact.4": "De buitenveldspelers van Carrot zijn 38 meter breed en 32 meter diep.",
+    "fact.5": "De verdedigers van Carrot hebben een mediane positie op 32 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "casual": "Yuri Sakinelli beweegt naar voren, weg van de bal, richting het doel van de tegenstander.",
+    "analyst": "Yuri Sakinelli beweegt zich 22 m richting het doel van de tegenstander in 4 seconden zonder de bal te bezitten. De vorm van Potato is 54 m breed en 51 m diep."
+   },
+   "zh-Hans": {
+    "headline": "Yuri Sakinelli 无球后向前移动",
+    "fact.0": "Yuri Sakinelli 在4秒内向对方球门推进22米，且未持球。",
+    "fact.1": "Potato的场地球员宽度为54米，深51米。",
+    "fact.2": "Potato的防守者中位距离自家球门线29米。",
+    "fact.4": "Carrot的外野球员宽度为38米，深32米。",
+    "fact.5": "Carrot的防守者中分距离自家球门线32米。",
+    "casual": "Yuri Sakinelli 向前移动，远离球门，朝对方球门方向前进。",
+    "analyst": "Yuri Sakinelli 在4秒内向对方球门推进22米，且未持球。 Potato的形状宽54米，深51米。"
+   }
+  },
+  "M-3": {
+   "source_hash": "8b8990d020716523",
+   "failed": {
+    "fr": [
+     "fact.6"
+    ],
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Hechizo de extremo a extremo",
+    "fact.0": "La posesión cambia de manos 5,6 veces por minuto.",
+    "fact.1": "Los jugadores de campo de Potato tienen 54 m de ancho y 52 m de profundidad.",
+    "fact.2": "Los defensores de Potato tienen una posición media a 29 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 2 jugadores de campo a menos de 5 m de la pelota.",
+    "fact.4": "Los jugadores de campo de Carrot tienen una longitud de 37 m de ancho y 33 m de profundidad.",
+    "fact.5": "Los defensores de Carrot's tienen una posición mediana a 33 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 0 jugadores de campo a menos de 5 m del balón."
+   },
+   "fr": {
+    "headline": "Sort de bout en bout",
+    "fact.0": "La possession change de mains 5,6 fois par minute.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 54 m de large et 52 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's occupent une position médiane à 29 m de leur propre ligne de but.",
+    "fact.3": "Potato compte 2 joueurs de champ à moins de 5 m du ballon.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent sur 37 m de large et 33 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's occupent une position médiane à 33 m de leur propre ligne de but."
+   },
+   "de": {
+    "headline": "End-to-End-Zauber",
+    "fact.0": "Der Ballbesitz bedeutet, 5,6 Mal pro Minute den Besitzer zu wechseln.",
+    "fact.1": "Die Außenfeldspieler von Potato spannen sich über 54 m breit und 52 m tief.",
+    "fact.2": "Die Verteidiger Potato haben eine mittlere Position 29 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 2 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.4": "Carrot Außenfeldspieler sind 37 m breit und 33 m tief.",
+    "fact.5": "Carrot Verteidiger haben eine Medianposition 33 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball."
+   },
+   "nl": {
+    "headline": "End-to-end spreuk",
+    "fact.0": "Balbezit is 5,6 keer per minuut van eigenaar wisselen.",
+    "fact.1": "De buitenveldspelers van Potato zijn 54 m breed en 52 m diep.",
+    "fact.2": "De verdedigers van Potato hebben een mediane positie op 29 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 2 veldspelers binnen 5 m van de bal.",
+    "fact.4": "De buitenveldspelers van Carrot zijn 37 m breed en 33 m diep.",
+    "fact.5": "De verdedigers van Carrot hebben een mediane positie op 33 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 0 veldspelers binnen 5 meter van de bal."
+   },
+   "zh-Hans": {
+    "headline": "端到端咒语",
+    "fact.0": "控球权每分钟易手5.6次。",
+    "fact.1": "Potato的场地球员宽度为54米，深52米。",
+    "fact.2": "Potato的防守者中位距离自家球门线29米。",
+    "fact.4": "Carrot的场上球员宽度为37米，深33米。",
+    "fact.5": "Carrot的防守者中位距离自家球门线33米。"
+   }
+  },
+  "S-330": {
+   "source_hash": "1bbeb1f16e2ab0ef",
+   "failed": {
+    "fr": [
+     "fact.3",
+     "fact.6"
+    ],
+    "zh-Hans": [
+     "fact.3",
+     "fact.6"
+    ]
+   },
+   "es": {
+    "headline": "Enzo Trentowski avanza sin balón",
+    "fact.0": "Enzo Trentowski avanza 20 m hacia la portería contraria en 4 segundos sin poseer el balón.",
+    "fact.1": "Los jugadores de campo de Potato tienen una longitud de 57 m de ancho y 50 m de profundidad.",
+    "fact.2": "Los defensores de Potato's tienen una posición mediana a 58 m de su propia línea de gol.",
+    "fact.3": "Potato tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "fact.4": "Los jugadores de campo de Carrot tienen una longitud de 45 m de ancho y 50 m de profundidad.",
+    "fact.5": "Los defensores de Carrot's tienen una posición mediana a 5 m de su propia línea de gol.",
+    "fact.6": "Carrot tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "casual": "Enzo Trentowski avanza sin balón, avanzando hacia la portería contraria.",
+    "analyst": "Enzo Trentowski avanza 20 metros hacia la portería rival en más de 4 segundos sin poseer, con Potato FC extendida de 57 metros de ancho y 50 metros de profundidad."
+   },
+   "fr": {
+    "headline": "Enzo Trentowski avance sans le ballon",
+    "fact.0": "Enzo Trentowski avance de 20 m vers le but adverse en 4 secondes sans posséder le ballon.",
+    "fact.1": "Les joueurs de champ de Potato s’étendent sur 57 m de large et 50 m de profondeur.",
+    "fact.2": "Les défenseurs de Potato's occupent une position médiane à 58 m de leur propre ligne de but.",
+    "fact.4": "Les joueurs de champ de Carrot s’étendent sur 45 m de large sur 50 m de profondeur.",
+    "fact.5": "Les défenseurs de Carrot's occupent une position médiane à 5 m de leur propre ligne de but.",
+    "casual": "Enzo Trentowski avance sans le ballon, avançant vers le but adverse.",
+    "analyst": "Enzo Trentowski avance de 20 mètres vers le but adverse en plus de 4 secondes sans possession, avec Potato FC étendue de 57 mètres de large et 50 mètres de profondeur."
+   },
+   "de": {
+    "headline": "Enzo Trentowski bewegt sich vom Ball nach vorne",
+    "fact.0": "Enzo Trentowski rückt in 4 Sekunden 20 m auf das gegnerische Tor zu, ohne den Ball zu besitzen.",
+    "fact.1": "Die Außenfeldspieler Potato sind 57 m breit und 50 m tief.",
+    "fact.2": "Potato Verteidiger haben eine mittlere Position 58 m von der eigenen Torlinie entfernt.",
+    "fact.3": "Potato hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "fact.4": "Carrot Außenfeldspieler sind 45 m breit und 50 m tief.",
+    "fact.5": "Carrot Verteidiger haben eine mediane Position 5 m von der eigenen Torlinie entfernt.",
+    "fact.6": "Carrot hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "casual": "Enzo Trentowski bewegt sich ohne Ball nach vorne und nähert sich dem gegnerischen Tor.",
+    "analyst": "Enzo Trentowski rückt in 4 Sekunden ohne Ballbesitz 20 Meter auf das gegnerische Tor zu, wobei Potato FC 57 Meter breit und 50 Meter tief sind."
+   },
+   "nl": {
+    "headline": "Enzo Trentowski beweegt naar voren zonder de bal",
+    "fact.0": "Enzo Trentowski beweegt 20 meter richting het doel van de tegenstander in 4 seconden zonder de bal te bezitten.",
+    "fact.1": "De buitenveldspelers van Potato zijn 57 meter breed en 50 meter diep.",
+    "fact.2": "De verdedigers van Potato hebben een mediane positie op 58 meter van hun eigen doellijn.",
+    "fact.3": "Potato heeft 0 veldspelers binnen 5 meter van de bal.",
+    "fact.4": "Carrot buitenveldspelers zijn 45 m breed en 50 m diep.",
+    "fact.5": "Carrot verdedigers hebben een mediane positie op 5 meter van hun eigen doellijn.",
+    "fact.6": "Carrot heeft 0 veldspelers binnen 5 meter van de bal.",
+    "casual": "Enzo Trentowski beweegt naar voren zonder de bal en beweegt richting het doel van de tegenstander.",
+    "analyst": "Enzo Trentowski beweegt 20 meter naar het doel van de tegenstander in 4 seconden zonder balbezit, met Potato FC verspreid over 57 meter breed en 50 meter diep."
+   },
+   "zh-Hans": {
+    "headline": "Enzo Trentowski 无球后向前移动",
+    "fact.0": "Enzo Trentowski 在4秒内向对方球门推进20米，且未持球。",
+    "fact.1": "Potato的场地球员宽度为57米，深50米。",
+    "fact.2": "Potato的防守者中位距离自家球门线58米。",
+    "fact.4": "Carrot的场上球员宽度为45米，深50米。",
+    "fact.5": "Carrot的防守者在距离自己球门线5米处有中位数。",
+    "casual": "Enzo Trentowski 无球后向前推进，向对方球门推进。",
+    "analyst": "Enzo Trentowski 在无控球的情况下，在4秒内推进20米向对方球门推进，场 Potato FC 宽57米，深50米。"
+   }
+  },
+  "M-4": {
+   "source_hash": "fcd9d5c8897a0a7c",
+   "failed": {
+    "fr": [
+     "fact.18"
+    ],
+    "de": [
+     "fact.7"
+    ],
+    "nl": [
+     "fact.7"
+    ],
+    "zh-Hans": [
+     "fact.6",
+     "fact.12",
+     "fact.15",
+     "fact.18"
+    ]
+   },
+   "es": {
+    "headline": "Fin de la exhibición: Potato 0–2 Carrot",
+    "fact.0": "Tiempo completo: Potato 0–2 Carrot.",
+    "fact.1": "Disparos hasta ahora: Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.2": "Posesión: Potato 41,1%, Carrot 58,9%.",
+    "fact.3": "Jugador del partido: Anders Gyokerland (6,9).",
+    "fact.4": "2' Gyokerland abre el marcador.",
+    "fact.5": "5' Gyokerland pone el marcador 2–0 a Carrot.",
+    "fact.6": "Potato había estado invicto en 5 jornadas.",
+    "fact.7": "Carrot ganado 4 partidos de liga seguidos.",
+    "fact.8": "Carrot están invictos en 4 partidos de liga.",
+    "fact.9": "Carrot tienen un impulso de 0,75 de su lado, tan unilateral como puede ser.",
+    "fact.10": "Carrot tuvo la ventaja en los últimos cinco minutos (impulso +0,75 de su equipo).",
+    "fact.11": "Carrot jugó el 82% de los pases del último tercio en los últimos cinco minutos.",
+    "fact.12": "Carrot tuvo 5 tiros (xG 1.19) y 0 córners en los últimos cinco minutos.",
+    "fact.13": "Los jugadores de campo de Potato tienen 56 m de ancho y 56 m de profundidad.",
+    "fact.14": "Los defensores de Potato's tienen una posición mediana a 28 m de su propia línea de gol.",
+    "fact.15": "Potato tiene 1 jugador de campo a menos de 5 m de la bola.",
+    "fact.16": "Los jugadores de campo de Carrot's miden 37 m de ancho y 52 m de profundidad.",
+    "fact.17": "Los defensores de Carrot tienen una posición mediana a 32 m de su propia línea de gol.",
+    "fact.18": "Carrot tiene 0 jugadores de campo a menos de 5 m del balón.",
+    "casual": "Finalización de la exhibición: Potato 0–2 Carrot.",
+    "analyst": "Potato 0–2 Carrot al final del partido. Carrot dominó con un 58,9% de posesión y 5 disparos (xG 1,19), Anders Gyokerland anotar ambos goles."
+   },
+   "fr": {
+    "headline": "Fin de l’exhibition : Potato 0–2 Carrot",
+    "fact.0": "Temps plein : Potato 0–2 Carrot.",
+    "fact.1": "Tirs jusqu’à présent : Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.2": "Possession : Potato 41,1 %, Carrot 58,9 %.",
+    "fact.3": "Joueur du match : Anders Gyokerland (6,9).",
+    "fact.4": "2' Gyokerland ouvre le score.",
+    "fact.5": "5' Gyokerland porte le score à 2–0 à Carrot.",
+    "fact.6": "Potato était invaincu en 5 matchs.",
+    "fact.7": "Carrot a remporté 4 matchs de championnat consécutifs.",
+    "fact.8": "Carrot sont invaincus en 4 matchs de championnat.",
+    "fact.9": "Carrot ont un élan de 0,75 de leur côté, à peu près aussi unilatéral que possible.",
+    "fact.10": "Carrot a eu l’avantage dans les cinq dernières minutes (élan +0,75 de leur côté).",
+    "fact.11": "Carrot joué 82 % des dernières passes dans le dernier tiers des cinq dernières minutes.",
+    "fact.12": "Carrot a réalisé 5 tirs (xG 1,19) et 0 corner dans les cinq dernières minutes.",
+    "fact.13": "Les joueurs de champ de Potato s’étendent sur 56 m de large et 56 m de profondeur.",
+    "fact.14": "Les défenseurs de Potato's occupent une position médiane à 28 m de leur propre ligne de but.",
+    "fact.15": "Potato compte 1 joueur de champ à moins de 5 m du ballon.",
+    "fact.16": "Les joueurs de champ de Carrot s’étendent sur 37 m de large et 52 m de profondeur.",
+    "fact.17": "Les défenseurs de Carrot's occupent une position médiane à 32 m de leur propre ligne de but.",
+    "casual": "Fin de l’exhibition : Potato 0–2 Carrot.",
+    "analyst": "Potato 0–2 Carrot à la fin du match. Carrot dominent avec 58,9 % de possession et 5 tirs (xG 1,19), Anders Gyokerland marquant les deux buts."
+   },
+   "de": {
+    "headline": "Ausstellung endet: Potato 0–2 Carrot",
+    "fact.0": "Endzeit: Potato 0–2 Carrot.",
+    "fact.1": "Bisherige Aufnahmen: Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.2": "Ballbesitz: Potato 41,1 % Carrot 58,9 %.",
+    "fact.3": "Spieler des Spiels: Anders Gyokerland (6,9).",
+    "fact.4": "2' Gyokerland eröffnet die Punkteausgleich.",
+    "fact.5": "5' Gyokerland steht 2:0 zu Carrot.",
+    "fact.6": "Potato war in 5 Jahren ungeschlagen.",
+    "fact.8": "Carrot sind in 4 Ligaspielen ungeschlagen.",
+    "fact.9": "Carrot haben von ihrer Seite 0,75 Momentum, so einseitig, wie es nur geht.",
+    "fact.10": "Carrot hatten in den letzten fünf Minuten die Oberhand (Momentum +0,75 von ihrer Seite).",
+    "fact.11": "Carrot spielte in den letzten fünf Minuten 82 % der Pässe im letzten Drittel.",
+    "fact.12": "Carrot hatte in den letzten fünf Minuten 5 Schüsse (xG 1,19) und 0 Eckstöße.",
+    "fact.13": "Potato Außenfeldspieler sind 56 m breit und 56 m tief.",
+    "fact.14": "Die Verteidiger von Potato haben eine mittlere Position 28 m von der eigenen Torlinie entfernt.",
+    "fact.15": "Potato hat 1 Außenfeldspieler innerhalb von 5 m um den Ball.",
+    "fact.16": "Die Außenfeldspieler von Carrot sind 37 m breit und 52 m tief.",
+    "fact.17": "Die Verteidiger von Carrot haben eine mediane Position 32 m von der eigenen Torlinie entfernt.",
+    "fact.18": "Carrot hat 0 Außenfeldspieler im Umkreis von 5 m zum Ball.",
+    "casual": "Ausstellung endet: Potato 0–2 Carrot.",
+    "analyst": "Potato 0:2 Carrot nach Spielzeit. Carrot dominieren mit 58,9 % Ballbesitz und 5 Schüssen (xG 1,19) Anders Gyokerland erzielen beide Tore."
+   },
+   "nl": {
+    "headline": "Tentoonstelling eindigt: Potato 0–2 Carrot",
+    "fact.0": "Voltijd: Potato 0–2 Carrot.",
+    "fact.1": "Tot nu toe aantal foto's: Potato 0 (xG 0,00), Carrot 5 (xG 1,19).",
+    "fact.2": "Posbezit: Potato 41,1%, Carrot 58,9%.",
+    "fact.3": "Speler van de wedstrijd: Anders Gyokerland (6,9).",
+    "fact.4": "2' Gyokerland opent de score.",
+    "fact.5": "5' Gyokerland maakt het 2–0 voor Carrot.",
+    "fact.6": "Potato was ongeslagen in 5 jaar.",
+    "fact.8": "Carrot zijn ongeslagen in 4 competitiewedstrijden.",
+    "fact.9": "Carrot hebben momentum 0,75 van hun kant, zo eenzijdig als het maar kan.",
+    "fact.10": "Carrot had de overhand in de laatste vijf minuten (momentum +0,75 van hun kant).",
+    "fact.11": "Carrot speelde 82% van de passes in het laatste derde deel in de laatste vijf minuten.",
+    "fact.12": "Carrot had 5 schoten (xG 1,19) en 0 corners in de laatste vijf minuten.",
+    "fact.13": "De buitenspelers van Potato zijn 56 m breed en 56 m diep.",
+    "fact.14": "De verdedigers van Potato hebben een mediane positie op 28 meter van hun eigen doellijn.",
+    "fact.15": "Potato heeft 1 buitenveldspeler binnen 5 m van de bal.",
+    "fact.16": "De buitenveldspelers van Carrot zijn 37 meter breed en 52 meter diep.",
+    "fact.17": "De verdedigers van Carrot hebben een mediane positie op 32 meter van hun eigen doellijn.",
+    "fact.18": "Carrot heeft 0 veldspelers binnen 5 meter van de bal.",
+    "casual": "Tentoonstelling eindigt: Potato 0–2 Carrot.",
+    "analyst": "Potato 0–2 Carrot na eindtijd. Carrot domineren met 58,9% balbezit en 5 schoten (xG 1,19), Anders Gyokerland beide doelpunten makend."
+   },
+   "zh-Hans": {
+    "headline": "表演赛结束： Potato 0–2 Carrot",
+    "fact.0": "全场比分： Potato 0–2 Carrot。",
+    "fact.1": "目前射击数： Potato 0（xG 0.00）， Carrot 5（xG 1.19）。",
+    "fact.2": "控球率： Potato 41.1%， Carrot 58.9%。",
+    "fact.3": "本场最佳球员： Anders Gyokerland （6.9）。",
+    "fact.4": "2' Gyokerland 开局得分。",
+    "fact.5": "5' Gyokerland 比分变为2比0 Carrot。",
+    "fact.7": "Carrot 已经连续赢下4场联赛。",
+    "fact.8": "Carrot 在4场联赛中保持不败。",
+    "fact.9": "Carrot 队的势头只有0.75，几乎是一边倒。",
+    "fact.10": "Carrot 在最后五分钟占据上风（势头+0.75）。",
+    "fact.11": "Carrot 在最后五分钟完成了82%的最后三分之一传球。",
+    "fact.13": "Potato的场地球员宽度为56米，深度为56米。",
+    "fact.14": "Potato的防守者中位距离自家球门线28米。",
+    "fact.16": "Carrot的场地球员宽度为37米，深52米。",
+    "fact.17": "Carrot的防守者中分距离自家球门线32米。",
+    "casual": "表演赛结束： Potato 0–2 Carrot。",
+    "analyst": "PotatoCarrot结束时0比2领先。Carrot以58.9%的控球率和5次射门（xG1.19）占据主导地位，Anders Gyokerland打进两球。"
+   }
+  }
+ }
+}

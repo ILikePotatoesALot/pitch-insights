@@ -15,7 +15,7 @@ export default function CompareView() {
   const q = useMemo(() => new URLSearchParams(location.search), []);
   const own = useMemo(() => (["a", "b"] as const).map((side) => {
     const preset = q.get("match") === "continuous-prototype" && side === "a"
-      ? PRESETS.a.replace("POT-11", "POT-07").replace("lang=de", "lang=en") : PRESETS[side];
+      ? PRESETS.a.replace("POT-11", "POT-07") : PRESETS[side];
     return new URLSearchParams(q.get(side) ?? preset);
   }), [q]);
   const initialSpeed = Number(q.get("speed"));

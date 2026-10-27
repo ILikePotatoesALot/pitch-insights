@@ -76,9 +76,15 @@ not implement a complete referee or all offences in those Laws.
   through Microsoft Agent Framework and Foundry. Its input contains event facts
   and these positional measurements. Names, numbers and selected unsupported
   intention phrases are checked; Azure AI Content Safety screens the output.
+  English plus Spanish, French, German, Dutch and Simplified Chinese are available
+  for moment headlines, evidence and commentary. Interface controls remain English;
+  individual translations that fail name or number checks retain their English.
   Commentary is never generated during playback. To regenerate after changing
   the simulation, run `python backend/scripts/generate_commentary.py continuous-prototype`
-  with the project's agents extra installed and its provider configured.
+  with the project's agents extra installed and its provider configured. Then run
+  `python backend/scripts/translate_moments.py continuous-prototype` with Azure
+  Translator configured. The translator uses the same generated evidence as playback
+  without requiring a source JSONL file, and reuses unchanged translations.
 - Prepared moments also pass through the Overlay Director, so the pitch's
   broadcast overlays use the same checked commentary as the moments feed.
 
@@ -99,8 +105,7 @@ full reach model.
 Ratings are labelled illustrative. Full-match win predictions and season-goal
 increments are omitted from the exhibition and its commentary evidence. Shape and proximity figures
 describe geometry; they do not prove pressing success or player intentions.
-The exhibition commentary currently has no stored translations. The positional
-activity surface builds from the point the viewer starts or seeks to and fades
+The positional activity surface builds from the point the viewer starts or seeks to and fades
 over match time.
 
 Further work should calibrate movement and event rates against match data, expand

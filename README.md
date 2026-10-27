@@ -28,7 +28,7 @@ For architecture and setup, see [docs/DESIGN.md](docs/DESIGN.md) and [docs/DEPLO
 - **Replays statistics and ratings** from computed events. Original full matches include win probability; the six-minute exhibition labels ratings as illustrative and omits full-match predictions. The footage clip shows tracking estimates rather than a score or player ratings.
 - **Finds the moments that matter** and explains each one in two voices, casual and analyst, from the computed facts behind it. "Why?" shows those facts.
 - **Keeps the screen clean**: an Overlay Director schedules lower-thirds, stat cards, player tags and rating alerts so they never pile up.
-- **Personalises per viewer**: favourite club and player, level of detail and one focus metric, with a spotlight, pinned card and relevant alerts. Original full matches and the footage clip have English plus Spanish, French, German, Dutch and Simplified Chinese commentary. The continuous exhibition currently has English commentary only.
+- **Personalises per viewer**: favourite club and player, level of detail and one focus metric, with a spotlight, pinned card and relevant alerts. All replay modes, including the continuous exhibition, have English plus Spanish, French, German, Dutch and Simplified Chinese commentary. Language choices change narration and supporting evidence; interface controls remain in English.
 - **Offers two surface views**: Current play responds to recent positions; Activity history builds from the viewer's starting or seek point and fades over match time. Pause and seeking share the players' drawing clock.
 - **Works on real video too**: players tracked from licensed match footage feed the same app: the agents comment on the detected play (hedging what the detector wasn't sure of), and a viewer can follow any tracked player, whose real position the spotlight rides frame by frame.
 
@@ -44,7 +44,7 @@ flowchart LR
     P --> M
     M --> A[Agent Framework and Foundry GPT-4o:<br/>Explainer, Narrator, Video Narrator, Simulation Narrator]
     A --> C[Code grounding checks and Content Safety]
-    C --> T[Original matches and footage:<br/>5 translated languages]
+    C --> T[All replay modes:<br/>5 translated languages]
     C --> B[(Stored checked commentary)]
     T --> B
     B --> R[Replay server, Overlay Director and personalisation<br/>on Container Apps]
@@ -65,7 +65,7 @@ Evidence and narration are prepared ahead of playback. The server releases only 
 | **Microsoft Foundry** (GPT-4o, `text-embedding-3-small`) | Writes commentary; a separate deterministic Memory component retrieves similar earlier moments from stored embeddings for original matches |
 | **Foundry groundedness evaluator** | A second opinion on stored commentary (52 synthetic-match moments and 5 clip passages pass, lowest score 4 of 5 in each set) |
 | **Azure AI Content Safety** | Screens generated commentary before playback; unsafe or unchecked generated text is not shown |
-| **Azure AI Translator** | Prepares 5 translated languages for original-match and footage commentary, with protected names and clocks and number checks |
+| **Azure AI Translator** | Prepares 5 translated languages for original-match, exhibition and footage commentary, with protected names and clocks and number checks |
 | **Application Insights** (OpenTelemetry) | Traces agent runs without prompts or replies; server traces retain route templates, timings and outcomes without raw URLs, viewer IDs or client IPs |
 | **Azure Machine Learning** (MLflow) | Records the video detector's benchmark runs, pre-trained and fine-tuned |
 | **Azure Container Apps** + **Container Registry** | Runs the replay server (WebSocket streaming) |
@@ -113,7 +113,7 @@ python -m pitch_insights.interpret ../samples/comeback-POT-CAR.jsonl --at 70 --p
 python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
 pip install -e ".[dev]"                 # packages for development and the full test suite
-pytest                                   # 443 backend tests; no keys or network needed
+pytest                                   # 447 backend tests; no keys or network needed
 ```
 
 ### Run the app
@@ -131,7 +131,7 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:5173. The continuous exhibition starts by default. Switch matches or audience mode, change speed, or seek to a second in tracking replays and a minute in original full matches. `/?compare=1&match=comeback-POT-CAR` opens a multilingual comparison; `/?compare=1&match=continuous-prototype&speed=1` compares the exhibition in English.
+Then open http://localhost:5173. The continuous exhibition starts by default. Switch matches or audience mode, change speed, or seek to a second in tracking replays and a minute in original full matches. `/?compare=1&match=comeback-POT-CAR` opens a multilingual comparison; `/?compare=1&match=continuous-prototype&speed=1` compares the exhibition in German and English.
 
 Frontend checks (Node 24, from `frontend/`): `npm test` runs 37 regression tests covering replay, following, terrain, player context, formation lines and appearance; `npm run build` checks TypeScript and builds the app. In original matches, selecting a player in Live ratings updates the favourite, pinned card and spotlight. In the exhibition and footage clip, selecting a marker or player row follows them for that replay without replacing the saved favourite.
 
@@ -145,7 +145,7 @@ The default match is a seeded six-minute first-half exhibition between Potato FC
 
 Analysts can enable **Formation lines**, off by default, for one selected team. Lines connect the ten outfield players in observed depth groups, with smoothing and a 1.5-second hold before adopting changed membership. They hide during restarts or incomplete observations. The shape is a geometric estimate, not a confirmed tactical formation.
 
-Movement and event rates are illustrative rather than calibrated against a full match. The exhibition has no offside, fouls, cards, substitutions, corners, throw-ins or second half, and no full-match win predictions. Its ratings are labelled illustrative and its commentary is English only. Details: [docs/CONTINUOUS-SIMULATION.md](docs/CONTINUOUS-SIMULATION.md).
+Movement and event rates are illustrative rather than calibrated against a full match. The exhibition has no offside, fouls, cards, substitutions, corners, throw-ins or second half, and no full-match win predictions. Its ratings are labelled illustrative. Commentary and supporting evidence are available in six languages, with English retained for any individual translation that fails validation. Details: [docs/CONTINUOUS-SIMULATION.md](docs/CONTINUOUS-SIMULATION.md).
 
 ## Original synthetic match realism
 
@@ -181,7 +181,7 @@ cd backend
 
 Generated commentary is screened by **Azure AI Content Safety**, with unsafe or unchecked generated text replaced by a plain fallback. **Foundry's groundedness evaluator** separately scores the 52 original-match moments and 5 footage passages: all pass, with a lowest score of 4 out of 5 in each set. The exhibition's 13 passages pass its code checks and Content Safety screening; they do not have those offline evaluator scores.
 
-**Azure AI Translator** prepares Spanish, French, German, Dutch and Simplified Chinese commentary for the original matches and footage clip. Names and match clocks are protected, and a translation that fails name or number checks keeps its English text. The exhibition has no stored translations. Agent runs are traced to **Application Insights** without prompts or replies.
+**Azure AI Translator** prepares Spanish, French, German, Dutch and Simplified Chinese commentary for the original matches, continuous exhibition and footage clip. Names and match clocks are protected, and a translation that fails name or number checks keeps its English text. Agent runs are traced to **Application Insights** without prompts or replies.
 
 ```
 cd backend
