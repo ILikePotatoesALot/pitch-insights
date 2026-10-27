@@ -20,7 +20,7 @@ export function trackLabel(id: string): string {
 
 interface Pt { x: number; z: number; team: 0 | 1 | 2; speed: number | null; conf: number }
 export interface DrawnPlayer extends Pt { y: number }
-interface Snap { t: number; players: Map<string, Pt>; ball: { x: number; z: number } | null }
+interface Snap { t: number; period: number; phase: string; players: Map<string, Pt>; ball: { x: number; z: number } | null }
 interface Marker { id: string; group: THREE.Group; label: THREE.Sprite; team: 0 | 1 | 2 }
 interface EventMark { line: THREE.Line; ring: THREE.Mesh; born: number; from: THREE.Vector2 | null; to: THREE.Vector2; active: boolean }
 
@@ -52,6 +52,8 @@ export class ClipLayer {
   private bodyGeo = new THREE.CapsuleGeometry(0.7, 1.3, 4, 10);
   private tmp = new THREE.Vector3();
   private current = new Map<string, DrawnPlayer>();
+  private period = 1;
+  private phase = "unknown";
 
   constructor(private heightAt: (x: number, z: number) => number) {
     this.mats = [0, 1, 2].map(() => new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1 }));
@@ -91,7 +93,7 @@ export class ClipLayer {
       if (p.team_id === meta.home.id || p.team_id === meta.away.id) this.selectable.add(p.id);
     }
     const b = frame.ball ? toScene(null, frame.ball.x, frame.ball.y) : null;
-    this.snaps.push({ t: frame.t, players, ball: b ? { x: b.x, z: b.y } : null });
+    this.snaps.push({ t: frame.t, period: frame.period ?? 1, phase: frame.phase ?? "unknown", players, ball: b ? { x: b.x, z: b.y } : null });
     if (this.snaps.length > MAX_SNAPSHOTS) this.snaps.shift();
     this.group.visible = true;
   }
@@ -152,10 +154,14 @@ export class ClipLayer {
   playersNow(): ReadonlyMap<string, DrawnPlayer> { return this.current; }
   ballNow(): { x: number; z: number } | null { return this.ball.visible ? this.ball.position : null; }
   get drawnTime(): number { return this.clock?.t ?? this.snaps[this.snaps.length - 1]?.t ?? 0; }
+  get drawnPeriod(): number { return this.period; }
+  get drawnPhase(): string { return this.phase; }
 
   clear() {
     this.snaps = [];
     this.clock = null;
+    this.period = 1;
+    this.phase = "unknown";
     this.ballLast = null;
     this.current.clear();
     this.selectable.clear();
@@ -189,6 +195,8 @@ export class ClipLayer {
     let i = n - 1;
     while (i > 0 && this.snaps[i].t > rt) i--;
     const a = this.snaps[i], b = this.snaps[Math.min(n - 1, i + 1)];
+    this.period = a.period;
+    this.phase = a.phase;
     const k = b.t > a.t ? Math.min(1, Math.max(0, (rt - a.t) / (b.t - a.t))) : 0;
     const near = k < 0.5 ? a : b;
     const seen = new Set<string>();
