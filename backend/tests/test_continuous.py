@@ -187,6 +187,25 @@ def test_replay_sends_positional_moments_once_and_no_exhibition_win_prediction()
     assert any(m["type"] == "frame" and "analysis" in m for m in messages)
 
 
+def test_exhibition_goal_reaches_broadcast_overlays_with_stored_commentary():
+    _, events, _ = prototype()
+    goal = next(e for e in events if e["type"] == "shot" and e["outcome"] == "goal")
+    with TestClient(app).websocket_connect(
+        f"/ws/replay/continuous-prototype?at={goal['t'] - 0.4}&speed=5&mode=analyst&focus=win_probability"
+    ) as ws:
+        messages = []
+        while True:
+            message = ws.receive_json()
+            messages.append(message)
+            if message["type"] == "frame" and message["t"] >= goal["t"] + 1:
+                break
+    moment = next(m["moment"] for m in messages if m["type"] == "moment" and m["moment"]["type"] == "goal")
+    overlay = next(m["cue"] for m in messages if m["type"] == "cue" and m["cue"]["template"] == "lower_third")
+    assert overlay["moment_id"] == moment["id"]
+    assert overlay["data"]["analyst"] == moment["commentary"]["analyst"]
+    assert "win_probability" not in str(overlay["data"])
+
+
 def test_paused_seek_sends_exact_frame_then_resumes_from_that_position():
     with TestClient(app).websocket_connect("/ws/replay/continuous-prototype?paused=1&at=75.4&speed=5") as ws:
         assert ws.receive_json()["meta"]["tracking"]["hz"] == 5

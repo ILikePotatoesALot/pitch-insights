@@ -155,7 +155,10 @@ export default function App() {
   useEffect(() => { sceneRef.current?.setClipSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setSurfaceView(clipMode || simulationMode ? surfaceView : "history"); }, [surfaceView, clipMode, simulationMode]);
   useEffect(() => { sceneRef.current?.setPlayerContext({ trail: showTrail, nearby: showNearby }); }, [showTrail, showNearby]);
-  useEffect(() => { sceneRef.current?.setCameraMode(clipMode || simulationMode ? cameraMode : "full"); }, [cameraMode, clipMode, simulationMode]);
+  useEffect(() => {
+    // Manual controls also work on event-only matches. Only automatic following needs tracking.
+    sceneRef.current?.setCameraMode(clipMode || simulationMode || cameraMode === "manual" ? cameraMode : "full");
+  }, [cameraMode, clipMode, simulationMode]);
 
   // A change to language, club, player or focus metric reconnects (the server works from the profile it was
   // given) from the current moment, not the start of the minute, so nothing replays. It goes by match seconds,
@@ -246,9 +249,9 @@ export default function App() {
   }, [state, pinned?.id]);
   // Reconcile the spotlight with who is on the pitch (a sending-off or substitution may come from a state, not an event).
   useEffect(() => {
-    const me = state?.players.find((x) => x.player_id === p.player);
+    const me = state?.players.find((x) => x.player_id === spotlit?.id);
     if (me) sceneRef.current?.setSpotlightOn(me.on_pitch);
-  }, [state, p.player]);
+  }, [state, spotlit?.id]);
 
   const clubName = meta && p.team ? [meta.home, meta.away].find((t) => t.id === p.team)?.short_name : undefined;
   const clubAbsent = !!(meta && p.team && !clubName);

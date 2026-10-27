@@ -288,8 +288,15 @@ async def replay(ws: WebSocket, name: str, speed: float = 20.0):
                 await session.tick()
                 continue
             if "simulation_moment" in ev:
-                await ws.send_json({"type": "moment", "moment": shown(ev["simulation_moment"])})
+                moment = shown(ev["simulation_moment"])
+                await ws.send_json({"type": "moment", "moment": moment})
+                state = state_message(brain)
+                cues = [c for c in personaliser.cues(builder, {"type": "simulation_moment"}, [moment], state,
+                                                    lambda: state_message(brain), rep.now)
+                        if visible_to(c, session.viewer["detail"])]
                 await session.tick()
+                if cues:
+                    await session.send_all(session.director.offer(cues, session.show_now()))
                 continue
             out = brain.update(ev)
             await ws.send_json({"type": "event", "event": ev})

@@ -1,5 +1,40 @@
 # Handoff
 
+## Simulation review completed, 27 Oct 2026
+
+Austin resumed the saved plan. The remaining implementation, commentary validation
+and final code review are complete on `codex/continuous-match-simulation`.
+
+Review fixes:
+
+- Prepared simulation moments now reach the Overlay Director as well as the
+  moments feed, restoring AI goal commentary, player tags and personalised alerts.
+  A replay regression test checks the stored goal commentary in its lower-third.
+- Manual camera movement remains available in the original event-only matches;
+  the tracking-only camera restriction no longer resets a manual drag or zoom.
+- Spotlight visibility is reconciled against the selected player, including a
+  temporary simulation selection, rather than always the saved favourite.
+- Updated the commentary desk's stale role and audience-check documentation.
+
+Validation: all 436 backend tests and 29 frontend tests pass, and the production
+build passes. Its existing bundle-size warning remains. All 13 stored selected
+commentary records still match their evidence hashes, pass current local checks
+and retain their successful Content Safety results. They were reused without
+model calls. The additional minor moment deliberately uses its plain headline.
+
+Browser checks cover desktop, 320- and 390-pixel layouts, measured positional
+insights, exact-second paused seeking, Watch this play starting playback, player
+and ball following, the restored live goal overlay and manual orbit in the
+original replay. Comparison viewers both pause at 1:15, and both labels show
+English when German is requested but unavailable. The preview console has no
+warnings or errors. The preview is available at `http://127.0.0.1:5176/`, using the
+local API on port 8002. No unresolved findings remain from this review.
+
+This branch remains local. Pushing, opening its pull request and merging have not
+been requested. Future model work is documented in
+[CONTINUOUS-SIMULATION.md](CONTINUOUS-SIMULATION.md): calibration, goalkeeper
+reach, more set pieces and match rules, a full match and stored translations.
+
 ## Paused at Austin's request, 27 Oct 2026
 
 Work is on local branch `codex/continuous-match-simulation`. Austin asked to keep

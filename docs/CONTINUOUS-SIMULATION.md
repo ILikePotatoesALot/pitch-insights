@@ -68,6 +68,8 @@ not implement a complete referee or all offences in those Laws.
   Commentary is never generated during playback. To regenerate after changing
   the simulation, run `python backend/scripts/generate_commentary.py continuous-prototype`
   with the project's agents extra installed and its provider configured.
+- Prepared moments also pass through the Overlay Director, so the pitch's
+  broadcast overlays use the same checked commentary as the moments feed.
 
 The seeded simulation generates ahead of playback and is cached in process.
 Clients receive only frames and events due on their replay clock. This mirrors
@@ -102,6 +104,8 @@ Backend coverage checks deterministic generation, 22 persistent identities,
 movement limits, pass reception, tackle contact, event schema and intelligence
 compatibility, saved-ball protection, restart placement, measured positional
 evidence, commentary routing, paused exact-time seeking, listing and end handling.
+The replay coverage also checks that a goal's stored commentary reaches its
+broadcast lower-third without an exhibition win prediction.
 Frontend coverage includes selecting and following simulated players without
 action events, terrain interpolation and pause behaviour, shot peaks and goal
 glow, slope sampling, switching between surface views, movement gaps and identity

@@ -176,7 +176,7 @@ def hedging(casual: str, analyst: str, moment: dict) -> list[str]:
 
 
 def with_hedging(grounded: "Grounding", casual: str, analyst: str, moment: dict) -> "Grounding":
-    """`grounded` with the hedging problems added to what is unsupported (and to the claims, which lowers the score)."""
+    """Add video hedging and simulation audience problems to the unsupported claims."""
     problems = hedging(casual, analyst, moment)
     if moment.get("source") == "simulation":
         without_score = re.sub(r"\d+\s*[–-]\s*\d+", "", casual)

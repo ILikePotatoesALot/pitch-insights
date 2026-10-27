@@ -46,7 +46,7 @@ class Lines(BaseModel):
 
 
 class Writer(Protocol):
-    """Anything that can write Lines for a role ("explainer", "narrator" or "video_narrator"). The Agent
+    """Anything that can write Lines for a commentary role. The Agent
     Framework implementation is AgentWriter; tests use a fake."""
     provider: str
     model: str
@@ -55,7 +55,7 @@ class Writer(Protocol):
 
 
 def agent_for(moment: dict) -> str:
-    """Moments detected from video (`source == "video"`) go to the video narrator, whatever their type."""
+    """Route video and exhibition evidence to their specialist narrators, whatever the moment type."""
     if moment.get("source") == "video":
         return "video_narrator"
     if moment.get("source") == "simulation":
@@ -177,7 +177,7 @@ class CommentaryDesk:
                     reason = "no structured output"
                     break
                 check = grounding.check(f"{lines.casual} {lines.analyst}", moment, self.meta)
-                check = grounding.with_hedging(check, lines.casual, lines.analyst, moment)  # video moments only
+                check = grounding.with_hedging(check, lines.casual, lines.analyst, moment)
                 if check.passed:
                     reason = ""
                     break
