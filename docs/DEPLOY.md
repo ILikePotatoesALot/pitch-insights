@@ -2,7 +2,7 @@
 
 The app and its image are now named Seize the game and `seize-the-game-api`. Existing Azure resources and the GitHub repository still use their original identifiers below. Keep those identifiers when updating this deployment; the workflow publishes the renamed image to the existing registry and points the existing Container App at it.
 
-Written 23 Oct 2026. Step 8 in [HANDOFF.md](HANDOFF.md); how it is built and why is in [DESIGN.md, Deployment](DESIGN.md#deployment-azure). The goal: a public link judges can open, kept up until **10 Nov 2026**.
+Written 23 Oct 2026. How it is built and why is in [DESIGN.md, Deployment](DESIGN.md#deployment-azure). The goal: a public link judges can open, kept up until **10 Nov 2026**.
 
 **Scope (agreed 23 Oct):** replay only. The deployed app replays the stored samples, commentary and translations and makes **no GPT-4o calls**, so it needs no Foundry, Content Safety or Translator key. Live simulation comes later, with limits. Viewer profiles go in Cosmos DB (first thing to drop if time runs short: profiles already work in the browser).
 
@@ -14,6 +14,16 @@ browser ──► Static Web Apps (Free)  ──► the app, built with VITE_API
             └─ telemetry ─► Application Insights (the one you already have)
 GitHub Actions ─(OpenID Connect, no secret)─► ACR + Container App; Static Web Apps' own deploy for the app
 ```
+
+Request traces retain route templates, timings and status codes. The replay server
+does not capture raw request URLs, query strings, headers or client IPs in those
+spans. Automatic HTTP and Azure SDK dependency capture is disabled, since profile
+identifiers can also appear in database request URLs. Uvicorn access and WebSocket
+connection logs are suppressed; unexpected errors retain their exception type
+without exception text or tracebacks. Agent-generation traces are configured
+separately and continue to record agent roles, checks and outcomes without prompts
+or replies. These controls affect new application telemetry after deployment;
+cloud ingress logging and previously retained telemetry require separate review.
 
 **Rules for this whole guide:** never paste a key, connection string or token into a chat, an issue or a commit; enter each one yourself, in the portal or GitHub. Only names and addresses are ever shared. All resources go in the existing resource group **`rg-pitch-insights`**, region **East US 2**. The portal moves its buttons around now and then, so the labels below may differ a little; the settings matter more than where they are.
 
@@ -151,7 +161,7 @@ When live simulation is added later: its keys go in Key Vault as new secrets (St
 | Key Vault | cents (one secret, a few reads) |
 | Application Insights, Log Analytics | free allowance of 5 GB a month each; a replay server logs very little |
 
-The US$20 monthly budget alert on the subscription stays on. To keep the bill down: leave **Max replicas** at 3, don't turn on Dedicated plans, and if Azure Cost Analysis shows something unexpected, drop **Min replicas** to 0 first. Each push adds an image of about 150 MB to the registry (Basic holds 10 GB); old ones can be deleted from the registry's **Repositories** page.
+Set a monthly budget alert appropriate to the deployment. To keep the bill down: leave **Max replicas** at 3, don't turn on Dedicated plans, and if Azure Cost Analysis shows something unexpected, drop **Min replicas** to 0 first. Each push adds an image of about 150 MB to the registry (Basic holds 10 GB); old ones can be deleted from the registry's **Repositories** page.
 
 ## Tearing it down after 10 Nov
 

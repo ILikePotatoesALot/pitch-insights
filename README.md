@@ -18,7 +18,7 @@ The app is named **Seize the game**, with `seize-the-game` used in package and s
 
 **Demo video:** *(link added at submission)*
 
-Picking the project up? Start with [docs/HANDOFF.md](docs/HANDOFF.md).
+For architecture and setup, see [docs/DESIGN.md](docs/DESIGN.md) and [docs/DEPLOY.md](docs/DEPLOY.md). Internal assistant handoffs are kept locally and excluded from Git.
 
 ## What it does
 

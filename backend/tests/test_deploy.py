@@ -60,7 +60,7 @@ def test_an_empty_choice_is_stored_as_none(client):
     {**PROFILE, "team": "pot"},
     {**PROFILE, "player": "POT-"},
     {**PROFILE, "focus": "goals"},
-    {**PROFILE, "name": "Austin"},                 # nothing but the five choices is kept
+    {**PROFILE, "name": "Test Viewer"},                 # nothing but the five choices is kept
     {**PROFILE, "email": "a@example.com"},
     {k: v for k, v in PROFILE.items() if k != "mode"},
 ])
