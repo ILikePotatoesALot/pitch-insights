@@ -2,7 +2,7 @@
 
 *Live football intelligence, explained and personalised.*
 
-Seize the game is an AI system that turns live football match events into explainable insights for broadcasters and fans. It reads match data from a synthetic event generator and from computer-vision tracking of match video. Specialist AI agents built on Microsoft Foundry and Microsoft Agent Framework calculate stats and live player ratings, find the key moments, explain why they matter, and present them as on-screen overlays on a live 3D pitch. Each viewer can personalise the experience by club, favourite player, language and level of detail. It runs on Azure.
+Seize the game turns football match data into explainable insights for broadcasters and fans. A continuous synthetic simulation tracks all twenty-two players and the ball, alongside three original full-match scenarios and a computer-vision replay of licensed footage. Code calculates statistics, ratings and moment evidence. Specialist writing agents built with Microsoft Agent Framework and Microsoft Foundry explain that evidence in casual and analyst voices. Checked commentary is stored before playback and presented as personalised overlays on a live 3D pitch. The app runs on Azure and makes no model calls during playback.
 
 Built for the Microsoft Premier League Hackathon (October 2026).
 
@@ -10,9 +10,10 @@ The app is named **Seize the game**, with `seize-the-game` used in package and s
 
 ## Try it
 
-**Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit starts playing immediately. "Watch demo" applies a favourite player and win-probability preset for this visit; "Personalise" opens the optional profile editor. Playback controls stay above the pitch, with a slider, numeric time entry and replay after full time.
+**Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit starts the six-minute continuous exhibition at normal speed. "Watch demo" returns to it with a favourite-player preset for this visit; "Personalise" opens the optional profile editor. Playback controls include pause, speed, seeking and replay.
 
-- **[Two viewers, one match](https://blue-moss-06018420f.1.azurestaticapps.net/?compare=1)**: a Potato FC fan watching casually in German beside a Carrot FC analyst in English, on the same replay.
+- **[Continuous match and formation lines](https://blue-moss-06018420f.1.azurestaticapps.net/?match=continuous-prototype&team=POT&player=POT-07&mode=analyst&lang=en&speed=1)**: follow a player, inspect movement and enable Formation lines for one team in analyst mode. The lines regroup from observed player positions.
+- **[Two viewers, one match](https://blue-moss-06018420f.1.azurestaticapps.net/?compare=1&match=comeback-POT-CAR)**: a Potato FC fan watching casually in German beside a Carrot FC analyst in English, on the same original full-match replay.
 - **[Real footage](https://blue-moss-06018420f.1.azurestaticapps.net/?match=117093-38min_ft&follow=L-t11)**: 100 seconds of a real match, with players tracked from video by a fine-tuned detector, AI commentary that says how sure the detector was, and a spotlight that follows one real player (tap any other to switch).
 - **[A personalised link](https://blue-moss-06018420f.1.azurestaticapps.net/?match=comeback-POT-CAR&team=POT&player=POT-11&mode=casual&lang=es&focus=xg)**: any profile can be set from the address bar (`team`, `player`, `mode`, `lang`, `focus`).
 
@@ -22,53 +23,62 @@ For architecture and setup, see [docs/DESIGN.md](docs/DESIGN.md) and [docs/DEPLO
 
 ## What it does
 
-- **Replays a match on a 3D pitch** with live stats, momentum, win probability and player ratings that move with every action.
+- **Tracks continuous movement**: twenty-two players and the ball at five updates a second, with interpolated markers, terrain, shot peaks and goal glows. Original full-match scenarios and tracked real footage remain available.
+- **Explores off-ball play**: player following, movement trails, nearby-player rings, camera controls and positional width, depth and proximity measurements. Analyst-only formation lines connect one team's observed outfield depth groups and regroup as players move.
+- **Replays statistics and ratings** from computed events. Original full matches include win probability; the six-minute exhibition labels ratings as illustrative and omits full-match predictions. The footage clip shows tracking estimates rather than a score or player ratings.
 - **Finds the moments that matter** and explains each one in two voices, casual and analyst, from the computed facts behind it. "Why?" shows those facts.
 - **Keeps the screen clean**: an Overlay Director schedules lower-thirds, stat cards, player tags and rating alerts so they never pile up.
-- **Personalises per viewer**: favourite club and player (a spotlight follows them on the pitch, with a pinned card and alerts), language (English, Spanish, French, German, Dutch, Simplified Chinese), level of detail and one focus metric.
+- **Personalises per viewer**: favourite club and player, level of detail and one focus metric, with a spotlight, pinned card and relevant alerts. Original full matches and the footage clip have English plus Spanish, French, German, Dutch and Simplified Chinese commentary. The continuous exhibition currently has English commentary only.
+- **Offers two surface views**: Current play responds to recent positions; Activity history builds from the viewer's starting or seek point and fades over match time. Pause and seeking share the players' drawing clock.
 - **Works on real video too**: players tracked from licensed match footage feed the same app: the agents comment on the detected play (hedging what the detector wasn't sure of), and a viewer can follow any tracked player, whose real position the spotlight rides frame by frame.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    G[Synthetic match generator] --> I
-    V[Real video: RF-DETR + tracker] --> I
-    I[Interpreter: stats, patterns, ratings, win probability] --> M[Moment Scorer: evidence packs]
-    M --> A[Agents on Microsoft Agent Framework + Foundry GPT-4o:<br/>Memory, Explainer, Narrator]
-    A --> C[Checks: groundedness in code, Content Safety,<br/>Foundry groundedness evaluator]
-    C --> T[Translator: 5 languages]
-    T --> S[(Stored commentary)]
-    S --> R[Replay server on Container Apps]
+    G[Original synthetic matches] --> I[Interpreter: stats, patterns, ratings]
+    S[Continuous simulation: players and ball] --> I
+    S --> P[Positional measurements]
+    V[Licensed footage: RF-DETR and tracker] --> P
+    I --> M[Moment evidence packs]
+    P --> M
+    M --> A[Agent Framework and Foundry GPT-4o:<br/>Explainer, Narrator, Video Narrator, Simulation Narrator]
+    A --> C[Code grounding checks and Content Safety]
+    C --> T[Original matches and footage:<br/>5 translated languages]
+    C --> B[(Stored checked commentary)]
+    T --> B
+    B --> R[Replay server, Overlay Director and personalisation<br/>on Container Apps]
     I --> R
-    R --> D[Overlay Director + Personalise]
-    D -->|WebSocket| W[React + Three.js app on Static Web Apps]
+    S -->|Tracking frames| R
+    V -->|Tracking frames| R
+    M --> R
+    R -->|WebSocket| W[React and Three.js on Static Web Apps]
 ```
 
-The agents run ahead of time and their checked, translated commentary is stored, so the live app never waits on a model and makes no model calls. Everything else runs live per viewer.
+Evidence and narration are prepared ahead of playback. The server releases only frames, events and moments due on each viewer's replay clock. Original full matches also use embedding retrieval for similar earlier moments. Foundry's offline groundedness evaluator has been run on the original-match and footage commentary; the continuous narration has code checks and Content Safety results, without those evaluator scores.
 
 ## Microsoft and Azure technologies
 
 | Technology | What it does here |
 |---|---|
-| **Microsoft Agent Framework** | The Explainer, Narrator, Video Narrator and Memory agents, with deterministic orchestration, a retry on failed checks and a fallback headline |
-| **Microsoft Foundry** (GPT-4o, `text-embedding-3-small`) | Writes the commentary; embeddings let the Memory agent recall similar earlier moments |
+| **Microsoft Agent Framework** | Four writing roles: Explainer, Narrator, Video Narrator and Simulation Narrator, with deterministic routing, one retry on failed grounding checks and a fallback headline |
+| **Microsoft Foundry** (GPT-4o, `text-embedding-3-small`) | Writes commentary; a separate deterministic Memory component retrieves similar earlier moments from stored embeddings for original matches |
 | **Foundry groundedness evaluator** | A second opinion on stored commentary (52 synthetic-match moments and 5 clip passages pass, lowest score 4 of 5 in each set) |
-| **Azure AI Content Safety** | Screens every line before it can be shown; fails closed |
-| **Azure AI Translator** | Translates every moment into 5 languages, with names and clocks protected and every number checked |
-| **Application Insights** (OpenTelemetry) | Traces agent runs (without prompts or replies) and the live server's requests |
+| **Azure AI Content Safety** | Screens generated commentary before playback; unsafe or unchecked generated text is not shown |
+| **Azure AI Translator** | Prepares 5 translated languages for original-match and footage commentary, with protected names and clocks and number checks |
+| **Application Insights** (OpenTelemetry) | Traces agent runs without prompts or replies; server traces retain route templates, timings and outcomes without raw URLs, viewer IDs or client IPs |
 | **Azure Machine Learning** (MLflow) | Records the video detector's benchmark runs, pre-trained and fine-tuned |
 | **Azure Container Apps** + **Container Registry** | Runs the replay server (WebSocket streaming) |
 | **Azure Static Web Apps** | Hosts the app |
 | **Azure Cosmos DB** (free tier) | Stores viewer profiles, reached through a managed identity with keys disabled |
-| **Azure Key Vault** + **managed identities** | Holds the server's secret; no keys in code, images or GitHub |
-| **GitHub Actions** with OpenID Connect | Tests, builds and deploys on every merge, with no stored Azure secret |
+| **Azure Key Vault** + **managed identities** | Holds the server's telemetry connection string; the backend reaches Azure resources through managed identity |
+| **GitHub Actions** | Tests, builds and deploys affected components on merges into main. Backend Azure authentication uses OpenID Connect; frontend publishing uses a Static Web Apps deployment token stored in GitHub Secrets |
 
 ## Pipeline
 
-1. **Ingest**: synthetic match events, plus player positions and events derived from real, licensed match video (RF-DETR detection on tiles, ByteTrack-style tracking, a fitted image-to-pitch mapping), in one shared event format.
-2. **Interpret**: stats, patterns (momentum, pressure, chaos, tempo) and live player ratings, calculated in code.
-3. **Explain**: each moment is scored by how much it changed the match, and explained by agents from an evidence pack of computed facts, with similar earlier moments recalled by the Memory agent.
+1. **Ingest**: original synthetic match events, continuous player and ball positions with contact-derived actions, and tracking derived from licensed match video, using shared event and frame formats.
+2. **Interpret**: code calculates synthetic-match stats, patterns and ratings, while positional evidence builders measure simulation and footage movement. Footage does not pass through the full-match ratings or prediction model.
+3. **Explain**: code selects moments and evidence; the appropriate writing agent explains them for casual and analyst audiences. Original matches can include similar earlier moments retrieved by the Memory component.
 4. **Render**: timed, machine-readable overlay cues, chosen by the Overlay Director (deterministic rules that keep the screen clean) and drawn over a Three.js 3D pitch.
 5. **Personalise**: analyst or casual mode, favourite club and player, language and focus metric, sent with the connection so each viewer gets their own cues.
 
@@ -83,7 +93,7 @@ The agents run ahead of time and their checked, translated commentary is stored,
 
 ## Setup
 
-Copy `.env.example` to `.env` and fill in your Azure details.
+Stored replays and the continuous exhibition run locally without Azure credentials. To generate new AI commentary, translations or evaluations, copy `.env.example` to `.env`, configure the required services, and install the backend's `agents` or `evaluation` extras. Never commit `.env`.
 
 ### Backend (Python 3.12)
 
@@ -91,7 +101,7 @@ Copy `.env.example` to `.env` and fill in your Azure details.
 cd backend
 py -3.12 -m venv .venv
 .venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e .
 ```
 
 ### Generate a match
@@ -102,7 +112,8 @@ python -m pitch_insights.watch ../samples/comeback-POT-CAR.jsonl --speed 60 --fr
 python -m pitch_insights.interpret ../samples/comeback-POT-CAR.jsonl --at 70 --player Madekuta   # stats, ratings, signals
 python scripts/seed_search.py --story comeback --home POT --away CAR
 python scripts/validate_realism.py      # 300 matches against real-football ranges
-pytest                                   # 418 backend tests; no keys or network needed
+pip install -e ".[dev]"                 # packages for development and the full test suite
+pytest                                   # 443 backend tests; no keys or network needed
 ```
 
 ### Run the app
@@ -120,15 +131,23 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:5173. Pick a demo match, switch between casual fan and analyst, change speed, or jump to a minute. `/?compare=1` opens the side-by-side view.
+Then open http://localhost:5173. The continuous exhibition starts by default. Switch matches or audience mode, change speed, or seek to a second in tracking replays and a minute in original full matches. `/?compare=1&match=comeback-POT-CAR` opens a multilingual comparison; `/?compare=1&match=continuous-prototype&speed=1` compares the exhibition in English.
 
-Frontend checks (Node 24, from `frontend/`): `npm test` runs 12 regression tests for player following and appearance preferences; `npm run build` checks TypeScript and builds the app. Selecting a player in Live ratings now updates the favourite, pinned card and spotlight together. In the real-footage clip, select a marker or player row to follow, and use "Stop following" to clear the selection.
+Frontend checks (Node 24, from `frontend/`): `npm test` runs 37 regression tests covering replay, following, terrain, player context, formation lines and appearance; `npm run build` checks TypeScript and builds the app. In original matches, selecting a player in Live ratings updates the favourite, pinned card and spotlight. In the exhibition and footage clip, selecting a marker or player row follows them for that replay without replacing the saved favourite.
 
 Light mode is the default, with a Light/Dark switch under Appearance. The choice is kept in this browser and shared across comparison panes. On phones, Settings holds the viewing options, and tabs switch between moments, players and stats. Momentum and the pitch guide can be expanded when needed.
 
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 
-## Synthetic data realism
+## Continuous exhibition
+
+The default match is a seeded six-minute first-half exhibition between Potato FC and Carrot FC. Twenty-two persistent players and the ball are sampled at 5 Hz; passes, interceptions and tackles use the same positions as the replay. Basic kick-offs, goal kicks and goalkeeper possession are modelled. Prepared positional moments and 13 stored, screened Simulation Narrator passages feed the same Overlay Director as the original matches.
+
+Analysts can enable **Formation lines**, off by default, for one selected team. Lines connect the ten outfield players in observed depth groups, with smoothing and a 1.5-second hold before adopting changed membership. They hide during restarts or incomplete observations. The shape is a geometric estimate, not a confirmed tactical formation.
+
+Movement and event rates are illustrative rather than calibrated against a full match. The exhibition has no offside, fouls, cards, substitutions, corners, throw-ins or second half, and no full-match win predictions. Its ratings are labelled illustrative and its commentary is English only. Details: [docs/CONTINUOUS-SIMULATION.md](docs/CONTINUOUS-SIMULATION.md).
+
+## Original synthetic match realism
 
 Averages over 300 generated matches (`scripts/validate_realism.py`; full output in [docs/realism-check.txt](docs/realism-check.txt)):
 
@@ -149,18 +168,20 @@ Each club's style shows in its numbers: the high-press side makes the most press
 
 ## Live player ratings
 
-Every player starts at 6.0 and moves with each action, weighted by position and damped by playing time, and every change is logged so the app can show why a rating is what it is. Over 120 generated matches (`scripts/calibrate_ratings.py`): average 6.8, spread 0.76, best player in a match about 8.5, and 9.5+ in about 10% of matches, in line with public rating systems. Every position averages 6.8–6.9. Details in [docs/DESIGN.md](docs/DESIGN.md#interpret-stage-v1).
+For the original full-match generator, every player starts at 6.0 and moves with each action, weighted by position and damped by playing time, with an action breakdown explaining the rating. Over 120 generated matches (`scripts/calibrate_ratings.py`): average 6.8, spread 0.76, best player in a match about 8.5, and 9.5+ in about 10% of matches. Every position averages 6.8–6.9. These calibration figures do not validate the continuous exhibition's illustrative ratings. Details in [docs/DESIGN.md](docs/DESIGN.md#interpret-stage-v1).
 
 ## Agents and grounded commentary
 
-The Explainer and Narrator agents, built with Microsoft Agent Framework on a Microsoft Foundry GPT-4o deployment, turn each key moment's evidence pack into commentary in two voices: casual and analyst. A code check confirms that every name and number they write is in the evidence. A draft that fails gets one retry with the problems named, and after that the moment keeps its plain headline. Commentary for the demo matches is generated ahead and stored, so the demo never waits on a model:
+Four writing roles use Microsoft Agent Framework with a Foundry GPT-4o deployment: Explainer for major original-match moments, Narrator for match flow, Video Narrator for detected footage, and Simulation Narrator for the exhibition. Deterministic code routes each evidence pack to the appropriate role. Name, number and selected unsupported-claim checks trigger one retry, then a plain fallback headline. These checks do not prove every possible inference is supported. Commentary is generated ahead and stored:
 
 ```
 cd backend
 .venv\Scripts\python scripts/generate_commentary.py
 ```
 
-Every line is then screened by **Azure AI Content Safety** (blocked at the lowest harm level, and not shown if the service can't be reached), and **Foundry's groundedness evaluator** gives a second opinion: all 52 synthetic-match moments and all 5 clip passages pass, the lowest scoring 4 out of 5 in each set. **Azure AI Translator** puts every moment into Spanish, French, German, Dutch and Simplified Chinese, with player and club names and match clocks protected, and a translation that loses a name or number keeps its English (9 of 3,180 did across the synthetic matches). Agent runs are traced to **Application Insights** through Agent Framework's OpenTelemetry instrumentation, without prompts or replies.
+Generated commentary is screened by **Azure AI Content Safety**, with unsafe or unchecked generated text replaced by a plain fallback. **Foundry's groundedness evaluator** separately scores the 52 original-match moments and 5 footage passages: all pass, with a lowest score of 4 out of 5 in each set. The exhibition's 13 passages pass its code checks and Content Safety screening; they do not have those offline evaluator scores.
+
+**Azure AI Translator** prepares Spanish, French, German, Dutch and Simplified Chinese commentary for the original matches and footage clip. Names and match clocks are protected, and a translation that fails name or number checks keeps its English text. The exhibition has no stored translations. Agent runs are traced to **Application Insights** without prompts or replies.
 
 ```
 cd backend
@@ -180,10 +201,10 @@ Details: [docs/DESIGN.md, Overlay Director](docs/DESIGN.md#overlay-director) and
 
 ## Responsible AI
 
-- **Grounded:** the agents only explain facts computed in code, a code check confirms every name and number, and "Why?" shows the evidence. A line that fails falls back to the plain headline.
-- **Screened:** Azure AI Content Safety checks every line before it can be shown, and nothing unchecked is shown if the service can't be reached.
+- **Grounded:** agents receive computed evidence; code checks names, numbers and selected unsupported claims, and "Why?" shows the facts. Failed checks trigger a retry and then a fallback. Human review remains important for claims outside those checks.
+- **Screened:** Azure AI Content Safety checks generated English commentary before it is stored. Unsafe or unchecked generated text uses a plain fallback; translated commentary has separate name and number checks.
 - **Labelled:** commentary is marked as AI-generated, machine translations are marked, and the real-footage view says its positions come from a model, with the model's measured accuracy and what the numbers don't cover.
-- **Private:** no accounts, names or viewing history; a profile is five choices the viewer can clear. Agent traces leave out prompts and replies.
+- **Private:** profiles store five choices under a random browser-generated identifier, with no account, name or viewing history. They can be cleared and expire from Cosmos DB after 90 days without a save. Server traces retain route templates, timings and outcomes without raw URLs, query strings, headers, viewer IDs or client IPs; transport access and connection logs are suppressed. Agent traces omit prompts and replies. Cloud ingress logs and previously retained telemetry are separate from these application controls.
 - **Fictional players, real footage with consent:** synthetic clubs and players are invented, and SoccerTrack v2's players are labelled only by side and number.
 
 ## Video path: real footage into the same messages
