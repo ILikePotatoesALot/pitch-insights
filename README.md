@@ -10,6 +10,8 @@ The app is named **Seize the game**, with `seize-the-game` used in package and s
 
 ## Try it
 
+> **Hosting has ended.** The live demo ran on Azure until 10 Nov 2026, the end of judging, and has since been taken down, so the links below no longer work. The demo video shows it running, and [Setup](#setup) explains how to run it locally.
+
 **Live app: [blue-moss-06018420f.1.azurestaticapps.net](https://blue-moss-06018420f.1.azurestaticapps.net)** (desktop browser recommended; no sign-in). The first visit starts the six-minute continuous exhibition at normal speed. "Watch demo" returns to it with a favourite-player preset for this visit; "Personalise" opens the optional profile editor. Playback controls include pause, speed, seeking and replay.
 
 - **[Continuous match and formation lines](https://blue-moss-06018420f.1.azurestaticapps.net/?match=continuous-prototype&team=POT&player=POT-07&mode=analyst&lang=en&speed=1)**: follow a player, inspect movement and enable Formation lines for one team in analyst mode. The lines regroup from observed player positions.
