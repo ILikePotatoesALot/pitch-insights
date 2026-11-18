@@ -8,7 +8,7 @@ import { ThemeSwitch } from "./components/ThemeSwitch";
 import { ReplaySeek } from "./components/ReplaySeek";
 import { PositionInsights } from "./components/PositionInsights";
 import { apiUrl } from "./api";
-import { DEFAULT_PROFILE, LANGUAGE_NAMES, profileFromUrl, profileStore, profileToParams } from "./profile";
+import { DEFAULT_PROFILE, profileFromUrl, profileStore, profileToParams } from "./profile";
 import { trackLabel } from "./pitch/ClipLayer";
 import { PitchScene, teamColours, type SurfaceView } from "./pitch/PitchScene";
 import type { CameraMode } from "./pitch/CameraFollow";
@@ -31,6 +31,9 @@ const controlled = embedded && syncEpoch !== null && Number.isSafeInteger(syncEp
 const urlFollow = /^[LR]-t\d+$/.test(query.get("follow") ?? "") ? query.get("follow") : null;
 const NO_TRACKING: ClipTracking = { players: [], possession: [0, 0] };
 type DetailPanel = "moments" | "players" | "stats";
+const PHASES: Record<string, string> = {
+  kickoff: "Preparing a kick-off", goal_kick: "Preparing a goal kick", keeper_ball: "Goalkeeper holding the ball", open_play: "Open play",
+};
 
 export default function App() {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
@@ -48,7 +51,45 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [panel, setPanel] = useState<DetailPanel>("moments");
   const settingsButton = useRef<HTMLButtonElement>(null);
+  const settingsPanel = useRef<HTMLDivElement>(null);
   const appTitle = useRef<HTMLHeadingElement>(null);
+  const headerEl = useRef<HTMLElement>(null);
+  const heroEl = useRef<HTMLDivElement>(null);
+  const welcomeEl = useRef<HTMLElement>(null);
+  // Settings closes as a menu does: on Escape, on a press outside it, or when focus moves outside it. Escape
+  // returns focus to the Settings button only if focus was in the menu or on the button.
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const inside = (target: EventTarget | null) => target instanceof Node &&
+      !!(settingsPanel.current?.contains(target) || settingsButton.current?.contains(target));
+    const away = (e: Event) => { if (!inside(e.target)) setSettingsOpen(false); };
+    const escape = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const hadFocus = inside(document.activeElement);
+      setSettingsOpen(false);
+      if (hadFocus) settingsButton.current?.focus();
+    };
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("focusin", away);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      document.removeEventListener("focusin", away);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [settingsOpen]);
+  // The score, pitch and replay controls fill the screen below the header. CSS needs to know where that block
+  // starts, which depends on how the header wraps, so it is measured rather than assumed.
+  useEffect(() => {
+    const hero = heroEl.current;
+    if (!hero) return;
+    const place = () => hero.style.setProperty("--hero-top", `${Math.round(hero.getBoundingClientRect().top + window.scrollY)}px`);
+    place();
+    const observer = new ResizeObserver(place);
+    if (headerEl.current) observer.observe(headerEl.current);
+    window.addEventListener("resize", place);
+    return () => { observer.disconnect(); window.removeEventListener("resize", place); };
+  }, []);
   // Links supply a profile for this tab; otherwise restore the viewer's saved choices or start watching immediately.
   const [profile, setProfile] = useState<Profile | null>(null);
   const [fromLink, setFromLink] = useState(false);
@@ -94,6 +135,16 @@ export default function App() {
     scene.setOnFormationChange(setFormationLabels);
     return () => scene.dispose();
   }, []);
+  // While the welcome sits on the pitch, the broadcast cues keep to the space above it instead of going under it.
+  useEffect(() => {
+    const card = welcomeEl.current, pitch = pitchEl.current;
+    if (!card || !pitch) return;
+    const reserve = () => pitch.style.setProperty("--welcome-space", `${card.offsetHeight + 16}px`);
+    reserve();
+    const observer = new ResizeObserver(reserve);
+    observer.observe(card);
+    return () => { observer.disconnect(); pitch.style.removeProperty("--welcome-space"); };
+  }, [welcome]);
 
   const onEvent = useCallback((ev: MatchEvent, meta: MatchMeta) => {
     if (meta.source === "video") return sceneRef.current?.addClipEvent(ev as ClipEvent, meta);
@@ -267,46 +318,60 @@ export default function App() {
   const clubAbsent = !!(meta && p.team && !clubName);
   const accent = meta && p.team === meta.home.id ? colours[0] : meta && p.team === meta.away.id ? colours[1] : undefined;
   const actualLanguage = languages[p.lang] ? p.lang : "en";
-  const chip = [p.team ? `★ ${clubs.find((c) => c.id === p.team)?.short_name ?? p.team}` : "Profile", p.mode === "casual" ? "Casual" : "Analyst",
-                LANGUAGE_NAMES[actualLanguage] ?? actualLanguage].join(" · ");
+  // Language and mode have their own controls in Settings, so the chip names only the club.
+  const chip = p.team ? `★ ${clubs.find((c) => c.id === p.team)?.short_name ?? p.team}` : "Your profile";
   const compareHref = `?compare=1&match=${name ?? ""}&speed=${speed}`;
   const activePanel = panel === "stats" && !showingClip && p.mode !== "analyst" ? "moments" : panel;
   const panels: DetailPanel[] = showingClip || p.mode === "analyst" ? ["moments", "players", "stats"] : ["moments", "players"];
+  const matchField = (where: string) => (
+    <label className={`header-field match-field ${where}`}><span className="setting-label">Match</span>
+    <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); setFollow(null); setSettingsOpen(false); }} aria-label="Match">
+      {matches.map((m) => <option key={m.name} value={m.name}>{m.kind === "video" ? `${m.home.name} v ${m.away.name} · real footage` : `${m.home.name} v ${m.away.name} (${m.name.split("-")[0]})`}</option>)}
+    </select>
+    </label>
+  );
+  const profileChip = (where: string) => (
+    <button type="button" className={`profile-chip${accent ? " fav" : ""} ${where}`} onClick={() => { setSettingsOpen(false); setPicker("edit"); }}
+            aria-label="Edit your profile" title={clubAbsent ? "Your club isn't playing in this match" : "Edit your profile"}>
+      {chip}{clubAbsent && " (not in this match)"}
+    </button>
+  );
 
   return (
     <div className={`app ${layout}${embedded ? " embed" : ""}${controlled ? " sync" : ""}${accent ? " has-fav" : ""}`} style={accent ? ({ "--fav": accent } as CSSProperties) : undefined}>
-      <header>
+      <header ref={headerEl}>
         <h1 ref={appTitle} tabIndex={-1}>Seize the game <small>live football intelligence</small></h1>
-        <button type="button" className="mobile-settings-toggle" ref={settingsButton} aria-expanded={settingsOpen}
+        {/* The match and profile show in the header on a wide screen and inside Settings on a phone. Each copy is
+            hidden (not just moved) at the other size, so the focus order always follows what is on screen. */}
+        {matchField("header-only")}
+        {profileChip("header-only")}
+        <button type="button" className="settings-toggle" ref={settingsButton} aria-expanded={settingsOpen}
                 aria-controls="view-settings" onClick={() => setSettingsOpen((open) => !open)}>Settings</button>
-        <div className="header-settings" id="view-settings" data-open={settingsOpen} onKeyDown={(e) => {
-          if (e.key === "Escape") { setSettingsOpen(false); settingsButton.current?.focus(); }
-        }}>
-        <label className="header-field match-field"><span className="setting-label">Match</span>
-        <select value={name ?? ""} onChange={(e) => { setName(e.target.value); setSeekTo(0); setFollow(null); setSettingsOpen(false); }} aria-label="Match">
-          {matches.map((m) => <option key={m.name} value={m.name}>{m.kind === "video" ? `${m.home.name} v ${m.away.name} · real footage` : `${m.home.name} v ${m.away.name} (${m.name.split("-")[0]})`}</option>)}
-        </select>
-        </label>
+        <div className="settings-menu" id="view-settings" ref={settingsPanel} data-open={settingsOpen}>
+        <div className="menu-only">
+          {matchField("")}
+          {profileChip("")}
+        </div>
         <label className="header-field"><span className="setting-label">Language</span>
         <select value={actualLanguage} onChange={(e) => commit({ ...p, lang: e.target.value })} aria-label="Language">
           {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
         </select>
         </label>
+        <div className="header-field"><span className="setting-label">Viewer</span>
+        <div className="segmented" role="group" aria-label="Viewer mode">
+          {(["casual", "analyst"] as ViewMode[]).map((v) => (
+            <button key={v} className={p.mode === v ? "on" : ""} aria-pressed={p.mode === v} onClick={() => commit({ ...p, mode: v })}>{v === "casual" ? "Casual fan" : "Analyst"}</button>
+          ))}
+        </div>
+        </div>
+        <div className="header-field"><span className="setting-label">Layout</span>
         <div className="segmented" role="group" aria-label="Layout">
           {(["broadcast", "fan"] as LayoutMode[]).map((v) => (
-            <button key={v} className={layout === v ? "on" : ""} onClick={() => setLayout(v)}
+            <button key={v} className={layout === v ? "on" : ""} aria-pressed={layout === v} onClick={() => setLayout(v)}
                     title={v === "broadcast" ? "The pitch and its overlays only" : "Adds the side panel"}>{v === "broadcast" ? "Broadcast" : "Fan"}</button>
           ))}
         </div>
-        <div className="segmented" role="group" aria-label="Viewer mode">
-          {(["casual", "analyst"] as ViewMode[]).map((v) => (
-            <button key={v} className={p.mode === v ? "on" : ""} onClick={() => commit({ ...p, mode: v })}>{v === "casual" ? "Casual fan" : "Analyst"}</button>
-          ))}
         </div>
-        <button className={`profile-chip${accent ? " fav" : ""}`} onClick={() => { setSettingsOpen(false); setPicker("edit"); }} aria-label="Edit your profile"
-                title={clubAbsent ? "Your club isn't playing in this match" : "Edit your profile"}>
-          {chip}{clubAbsent && " (not in this match)"}
-        </button>
         <ThemeSwitch />
         {!embedded && <a className="compare" href={compareHref} target="_blank" rel="noreferrer" title="Open two viewers of this match side by side">Compare viewers</a>}
         </div>
@@ -314,15 +379,28 @@ export default function App() {
 
       <main>
         <section className="stage">
-          {welcome && !embedded && <section className="welcome" aria-labelledby="welcome-title">
-            <div><h2 id="welcome-title">See the match. Understand the moment.</h2>
-              <p>Try a favourite player, live ratings and explanations backed by match evidence. Personalisation is optional.</p></div>
-            <div className="welcome-actions">
-              <button type="button" className="primary" onClick={watchDemo} disabled={!matches.some((m) => m.kind !== "video")}>Watch demo</button>
-              <button type="button" onClick={() => { setWelcome(false); setPicker("edit"); }}>Personalise</button>
-              <button type="button" onClick={() => setWelcome(false)} aria-label="Dismiss welcome">Dismiss</button>
-            </div>
-          </section>}
+          {/* The pitch comes first, under only the score, so it is in view without scrolling; everything that
+              explains or adjusts it follows below. */}
+          <div className="stage-hero" ref={heroEl}>
+          {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} tracking={trackingView} />}
+          {showingMatch && meta && <Scoreboard meta={meta} state={state} colours={colours} clock={simulationMode ? mmss(clipT ?? 0) : undefined} />}
+          <div className="pitch" ref={pitchEl}>
+            {spotlit && <div className="spot-label" ref={spotLabel} style={{ borderColor: spotlit.colour }}>
+              {followed ? `★ ${trackLabel(followed.id)}` : pinned && `#${pinned.number} ${pinned.name.split(" ").slice(-1)[0]}`}</div>}
+            {meta && <Overlays cues={cues} meta={meta} mode={p.mode} colours={colours} />}
+            {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
+            {status === "error" && <div className="overlay-msg">Can't reach the replay server. {import.meta.env.DEV ? "Is it running on port 8000?" : "It may be waking up: try again in a moment."}</div>}
+            {status === "disconnected" && <div className="overlay-msg">Lost the connection to the replay server. Pick a minute and press Go to reconnect.</div>}
+            {welcome && !embedded && <section className="welcome on-pitch" ref={welcomeEl} aria-labelledby="welcome-title">
+              <div><h2 id="welcome-title">See the match. Understand the moment.</h2>
+                <p>Try a favourite player, live ratings and explanations backed by match evidence. Personalisation is optional.</p></div>
+              <div className="welcome-actions">
+                <button type="button" className="primary" onClick={watchDemo} disabled={!matches.some((m) => m.kind !== "video")}>Watch demo</button>
+                <button type="button" onClick={() => { setWelcome(false); setPicker("edit"); }}>Personalise</button>
+                <button type="button" onClick={() => setWelcome(false)} aria-label="Dismiss welcome">Dismiss</button>
+              </div>
+            </section>}
+          </div>
           <div className="controls" role="group" aria-label="Replay controls">
             <div className="playback-state">
               {status === "paused" ? <button onClick={resume}>Play</button> : <button onClick={pause} disabled={status !== "live"}>Pause</button>}
@@ -339,20 +417,16 @@ export default function App() {
             {status === "ended" && <button type="button" onClick={() => {
               setSeekTo(0); clearHistory(); restart();
             }}>{clipMode ? "Replay the clip" : "Replay match"}</button>}
+            {/* In the exhibition, what is happening and the way back to the favourite stay next to the pitch. */}
+            {simulationMode && position && <span className="phase-label">{PHASES[position.phase] ?? position.phase}</span>}
+            {simulationMode && follow && <button type="button" onClick={() => setFollow(null)}>Return to favourite</button>}
           </div>
-          {simulationMode && <section className="welcome" aria-label="Simulation prototype">
-            <div><h2>Every player. Every movement.</h2><p>Six-minute experimental simulation. All 22 players and the ball update five times a second. Tap a player to follow their movement. Try 1× or 2×.</p>
-            <p>Passes and tackles use player positions. Marking, supporting runs and restarts are simulated.</p>
-            {position && <p className="phase-label">{({ kickoff: "Preparing a kick-off", goal_kick: "Preparing a goal kick", keeper_ball: "Goalkeeper holding the ball", open_play: "Open play" } as Record<string, string>)[position.phase] ?? position.phase}</p>}</div>
-            {follow && <button onClick={() => setFollow(null)}>Return to favourite</button>}
-          </section>}
-          {showingClip && meta && <ClipBanner meta={meta} info={clip} t={clipT} colours={colours} tracking={trackingView} />}
+          </div>
           {showingClip && follow && <ClipPinned stats={trackingView.players.find((x) => x.id === follow)} id={follow} colours={colours}
                                                 events={clipEvents} info={clip} onStop={() => setFollow(null)} />}
-          {showingMatch && meta && <Scoreboard meta={meta} state={state} colours={colours} clock={simulationMode ? mmss(clipT ?? 0) : undefined} />}
-          {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
           {showingMatch && meta && pinned && <PinnedPlayer state={state} meta={meta} colours={colours} playerId={pinned.id} mode={p.mode} focus={p.focus}
                                            history={ratingHistory} onChange={() => setPicker("edit")} />}
+          {showingMatch && meta && <FocusStrip meta={meta} state={state} colours={colours} focus={p.focus} />}
           {(showingClip || (showingMatch && simulationMode)) && <section className="pitch-tools" aria-label="Pitch layers">
             <div className="segmented" role="group" aria-label="Surface view">
               <button type="button" aria-pressed={surfaceView === "current"} className={surfaceView === "current" ? "on" : ""} onClick={() => setSurfaceView("current")}>Current play</button>
@@ -380,14 +454,10 @@ export default function App() {
           {(showingMatch || showingClip) && <p className="pitch-caption">
             {simulationMode ? "Simulated positions · 22 players · 5 updates/s" : showingClip ? "Real footage: tracked positions" : "Synthetic match replay"} · {speed}× speed · Surface: {(showingClip || simulationMode) && surfaceView === "current" ? "recent movement and ball" : "activity history"}
           </p>}
-          <div className="pitch" ref={pitchEl}>
-            {spotlit && <div className="spot-label" ref={spotLabel} style={{ borderColor: spotlit.colour }}>
-              {followed ? `★ ${trackLabel(followed.id)}` : pinned && `#${pinned.number} ${pinned.name.split(" ").slice(-1)[0]}`}</div>}
-            {meta && <Overlays cues={cues} meta={meta} mode={p.mode} colours={colours} />}
-            {status === "connecting" && <div className="overlay-msg">Connecting to the replay server…</div>}
-            {status === "error" && <div className="overlay-msg">Can't reach the replay server. {import.meta.env.DEV ? "Is it running on port 8000?" : "It may be waking up: try again in a moment."}</div>}
-            {status === "disconnected" && <div className="overlay-msg">Lost the connection to the replay server. Pick a minute and press Go to reconnect.</div>}
-          </div>
+          {simulationMode && <section className="welcome" aria-label="Simulation prototype">
+            <div><h2>Every player. Every movement.</h2><p>Six-minute experimental simulation. All 22 players and the ball update five times a second. Tap a player to follow their movement. Try 1× or 2×.</p>
+            <p>Passes and tackles use player positions. Marking, supporting runs and restarts are simulated.</p></div>
+          </section>}
           {showingMatch && <>
             <div className="desktop-momentum"><MomentumChart state={state} colours={colours} /></div>
             <details className="mobile-momentum"><summary>Match momentum</summary><MomentumChart state={state} colours={colours} /></details>
