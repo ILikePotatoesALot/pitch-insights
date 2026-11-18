@@ -1,6 +1,6 @@
 # Demo matches
 
-Three generated matches chosen with `scripts/seed_search.py`. Each `.jsonl` file has `match_meta` on the first line, then one event per line. The `.debug.json` files hold hidden generator values (match form, script) and are not for the agents. The `.commentary.json` files hold the stored commentary, and the `.memory.json` files the Memory agent's precomputed embeddings (`backend/scripts/embed_moments.py`).
+Three generated matches chosen with `scripts/seed_search.py`. The app lists only the comeback; the thriller and red-card matches stay here for the tests and the recorded evaluation, and still replay by name (`NOT_LISTED` in `backend/pitch_insights/server.py`). Each `.jsonl` file has `match_meta` on the first line, then one event per line. The `.debug.json` files hold hidden generator values (match form, script) and are not for the agents. The `.commentary.json` files hold the stored commentary, and the `.memory.json` files the Memory agent's precomputed embeddings (`backend/scripts/embed_moments.py`).
 
 | File | Seed | Result | Story |
 |---|---|---|---|
@@ -16,7 +16,7 @@ python -m pitch_insights.generate --seed 52 --home POT --away CAR --out ../sampl
 
 ## Video path (`video/`)
 
-Output of the video path on real, licensed footage: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), match 117093, first half, 38:00–39:40. Kept in their own folder because every `.jsonl` directly in `samples/` is read as a demo match. Players are labelled by team and track ID ("L-t12"); SoccerTrack's players have no names, only side and shirt number. See [docs/DESIGN.md, Video path](../docs/DESIGN.md#video-path).
+Output of the video path on real, licensed footage: [SoccerTrack v2](https://atomscott.github.io/SoccerTrack-v2/) (Scott et al., CC BY 4.0), match 117093, first half, 38:00–39:40. Kept in their own folder because every `.jsonl` directly in `samples/` is read as a demo match (unless it is in `NOT_LISTED`). Players are labelled by team and track ID ("L-t12"); SoccerTrack's players have no names, only side and shirt number. See [docs/DESIGN.md, Video path](../docs/DESIGN.md#video-path).
 
 | File | Contents |
 |---|---|

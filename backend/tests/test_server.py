@@ -10,7 +10,9 @@ def test_lists_demo_matches():
     matches = client.get("/api/matches").json()
     names = {m["name"] for m in matches}
     assert "comeback-POT-CAR" in names
+    assert not names & {"red-card-CAU-POT", "thriller-CAR-BRO"}  # kept for tests, not offered in the app
     assert client.get("/api/matches/comeback-POT-CAR").json()["type"] == "match_meta"
+    assert client.get("/api/matches/thriller-CAR-BRO").json()["type"] == "match_meta"  # still replays by name
     assert client.get("/api/matches/..%2F..%2Fsecret").status_code == 404
 
 
@@ -260,7 +262,7 @@ def test_switching_to_casual_takes_down_the_analyst_cues_on_screen():
 
 def test_lists_clubs_with_their_squads():
     clubs = client.get("/api/clubs").json()
-    assert [c["id"] for c in clubs] == ["BRO", "CAR", "CAU", "POT"]  # by name
+    assert [c["id"] for c in clubs] == ["CAR", "POT"]  # by name, from the listed matches only
     pot = next(c for c in clubs if c["id"] == "POT")
     assert pot["name"] == "Potato FC" and len(pot["players"]) == 20
     assert set(pot["players"][0]) == {"id", "name", "number", "position"}

@@ -76,6 +76,9 @@ log = logging.getLogger("pitch_insights.server")
 configure_privacy_logging()
 SAMPLES = Path(os.getenv("PITCH_SAMPLES", Path(__file__).resolve().parents[2] / "samples"))
 STATE_EVERY_S = 1.0  # wall-clock seconds between state messages
+# Samples kept for the tests and the recorded evaluation but not offered in the app, so the match list stays short.
+# They still replay by name.
+NOT_LISTED = frozenset({"red-card-CAU-POT", "thriller-CAR-BRO"})
 
 @contextlib.asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -100,10 +103,15 @@ def _match_path(name: str) -> Path:
     return path
 
 
+def _listed_samples() -> list[Path]:
+    """The synthetic matches the app offers, by file name."""
+    return [p for p in sorted(SAMPLES.glob("*.jsonl")) if p.stem not in NOT_LISTED]
+
+
 @app.get("/api/matches")
 def list_matches() -> list[dict]:
     out = []
-    for path in sorted(SAMPLES.glob("*.jsonl")):
+    for path in _listed_samples():
         with path.open(encoding="utf-8") as f:
             meta = json.loads(f.readline())
         out.append({"name": path.stem, "match_id": meta["match"]["id"],
@@ -129,8 +137,8 @@ def _clubs(files: tuple[tuple[str, int], ...]) -> list[dict]:
 
 @app.get("/api/clubs")
 def list_clubs() -> list[dict]:
-    """Each club in the samples with its squad: what the profile picker offers as a favourite club and player."""
-    return _clubs(tuple((str(p), p.stat().st_mtime_ns) for p in sorted(SAMPLES.glob("*.jsonl"))))
+    """Each club in the listed matches with its squad: what the profile picker offers as a favourite club and player."""
+    return _clubs(tuple((str(p), p.stat().st_mtime_ns) for p in _listed_samples()))
 
 
 @app.get("/api/matches/{name}")

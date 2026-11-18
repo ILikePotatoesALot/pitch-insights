@@ -137,7 +137,7 @@ Then open http://localhost:5173. The continuous exhibition starts by default. Sw
 
 Frontend checks (Node 24, from `frontend/`): `npm test` runs 37 regression tests covering replay, following, terrain, player context, formation lines and appearance; `npm run build` checks TypeScript and builds the app. In original matches, selecting a player in Live ratings updates the favourite, pinned card and spotlight. In the exhibition and footage clip, selecting a marker or player row follows them for that replay without replacing the saved favourite.
 
-Light mode is the default, with a Light/Dark switch under Appearance. The choice is kept in this browser and shared across comparison panes. On phones, Settings holds the viewing options, and tabs switch between moments, players and stats. Momentum and the pitch guide can be expanded when needed.
+The pitch comes first, under the score, with the replay controls just below it. The header holds the match, your profile and a Settings menu with language, viewer mode, layout, appearance and Compare viewers; on phones Settings also holds the match and profile, and tabs switch between moments, players and stats. Light mode is the default; the Light/Dark choice is kept in this browser and shared across comparison panes. Momentum and the pitch guide can be expanded when needed.
 
 Ready-made demo matches are in [`samples/`](samples/README.md). The event format is described in [docs/DESIGN.md](docs/DESIGN.md), with JSON Schemas in `docs/schema/`.
 
